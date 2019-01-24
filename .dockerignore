@@ -1,0 +1,7 @@
+
+.vscode
+**.tgz
+.git
+.mc
+node_modules
+

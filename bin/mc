@@ -1,0 +1,7 @@
+#!/usr/bin/env node 
+
+'use strict';
+
+process.title = 'mindconnect cli';
+
+require ('../dist/src/cli/mc')
