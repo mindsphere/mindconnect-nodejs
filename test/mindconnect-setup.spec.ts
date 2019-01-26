@@ -74,7 +74,7 @@ describe("MindConnect Setup", () => {
 
     it("should register maximum 5 agents for diagnostics", mochaAsync(async () => {
 
-        if (!process.env.TENANT) {
+        if (!process.env.CI) {
             // don't delete all diagnostic registrations all the time on the CI/CD this can disturb the normal workings on the tenants.
             const mcsetup = new MindConnectSetup(gateway, basicAuth, tenant);
             mcsetup.should.not.be.null;
@@ -82,8 +82,8 @@ describe("MindConnect Setup", () => {
             await mcsetup.DeleteAllDiagnosticActivations();
 
             try {
-                await mcsetup.RegisterForDiagnostic("00000000000000000000000000000000");
-                await mcsetup.RegisterForDiagnostic("00000000000000000000000000000001");
+                await mcsetup.RegisterForDiagnostic("2903bf15381646d3a8f4aeeff8d9bd29");
+                await mcsetup.RegisterForDiagnostic("68766a93af834984a8f8decfbeec961e");
                 await mcsetup.RegisterForDiagnostic("00000000000000000000000000000002");
                 await mcsetup.RegisterForDiagnostic("00000000000000000000000000000003");
                 await mcsetup.RegisterForDiagnostic("00000000000000000000000000000004");

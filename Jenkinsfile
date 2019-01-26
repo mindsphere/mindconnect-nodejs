@@ -15,9 +15,9 @@ pipeline {
         pwd
         mkdir .mc
         cp -a /.mc/. .mc/
-        ls -la .mc/
         mkdir ~/.mc
         cp .mc/auth.json ~/.mc/
+        mv .mc/private.key .
         cp .mc/2903bf15381646d3a8f4aeeff8d9bd29.json agentconfig.json
         cp .mc/68766a93af834984a8f8decfbeec961e.json agentconfig.rsa.json
         '''
