@@ -8,7 +8,7 @@ The mindconnect-nodejs library enables the user to upload time series data, file
 
 This project has started as a community effort at Siemens AG and is now available for general use.
 
-[![Build Status](https://jenkins.mindconnect.rocks/buildStatus/icon?job=mindconnect-nodejs/cicd)](https://jenkins.mindconnect.rocks/job/mindconnect-nodejs/job/cicd/)
+[![Build Status](https://jenkins.mindconnect.rocks/buildStatus/icon?job=mindconnect-nodejs/cicd)](https://jenkins.mindconnect.rocks/blue/organizations/jenkins/mindconnect-nodejs/activity/)
 
 ## Installing the library
 
