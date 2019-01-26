@@ -30,7 +30,7 @@ pipeline {
     }
     stage('Test') {
       steps {
-        sh 'npm test'        
+        sh 'npm run test-jenkins'        
       }
     }
     stage('Package') {
@@ -38,8 +38,8 @@ pipeline {
         sh '''
         npm pack --unsafe-perm
         echo $BUILD_NUMBER
-        mkdir /publish/mindconnect-nodejs/$BUILD_NUMBER
-        cp *.tgz /publish/mindconnect-nodejs/$BUILD_NUMBER
+        mkdir /publish/$BUILD_NUMBER
+        cp *.tgz /publish/$BUILD_NUMBER
         '''
       }
     }
