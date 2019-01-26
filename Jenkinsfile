@@ -4,9 +4,7 @@ pipeline {
       image 'node'
       args '-v /home/sn0wcat/mc:/.mc -v /home/sn0wcat/jenkins_artefacts/mindconnect_nodejs:/publish'
     }
-  }
-  environment {
-        CI = 'true'
+
   }
   stages {
     stage('Prepare') {
@@ -30,7 +28,7 @@ pipeline {
     }
     stage('Test') {
       steps {
-        sh 'npm run test-jenkins'        
+        sh 'npm run test-jenkins'
       }
     }
     stage('Package') {
@@ -43,15 +41,23 @@ pipeline {
         '''
       }
     }
+    stage('Archive Artifacts') {
+      steps {
+        archiveArtifacts '*.tgz'
+      }
+    }
   }
-
+  environment {
+    CI = 'true'
+  }
   post {
-      always {
-          sh '''
+    always {
+      sh '''
           cp -rf .mc/*.json /.mc/
           '''
-          
-          junit '**/*.xml'
-      }
+      junit '**/*.xml'
+
+    }
+
   }
 }
