@@ -10,11 +10,12 @@ pipeline {
     stage('Build') {
       steps {
         sh '''pwd
-
-cp -a /.mc/. .
-
+mkdir .mc
+cp -a /.mc/. .mc/
 ls -la
-ls -la .mc/'''
+ls -la .mc/
+
+'''
       }
     }
   }
