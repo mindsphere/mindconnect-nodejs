@@ -50,6 +50,8 @@ pipeline {
           sh '''
           cp -rf .mc/*.json /.mc/
           '''
+          
+          junit './report.xml'
       }
   }
 }

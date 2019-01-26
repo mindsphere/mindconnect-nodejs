@@ -84,10 +84,6 @@ describe("MindConnect Setup", () => {
             try {
                 await mcsetup.RegisterForDiagnostic("2903bf15381646d3a8f4aeeff8d9bd29");
                 await mcsetup.RegisterForDiagnostic("68766a93af834984a8f8decfbeec961e");
-                await mcsetup.RegisterForDiagnostic("00000000000000000000000000000002");
-                await mcsetup.RegisterForDiagnostic("00000000000000000000000000000003");
-                await mcsetup.RegisterForDiagnostic("00000000000000000000000000000004");
-                await mcsetup.RegisterForDiagnostic("00000000000000000000000000000005");
             } catch (err) {
                 if ((("" + err).indexOf("agent limitation")) < 0) {
                     throw err;
@@ -102,28 +98,32 @@ describe("MindConnect Setup", () => {
     }));
 
     it("should get logs on error", mochaAsync(async () => {
-        const mcsetup = new MindConnectSetup(gateway, basicAuth, tenant);
-        mcsetup.should.not.be.null;
-        const agent = new MindConnectAgent(sharedSecretConfig);
-        agent.should.exist;
+        if (!process.env.CI) {
+            const mcsetup = new MindConnectSetup(gateway, basicAuth, tenant);
+            mcsetup.should.not.be.null;
+            const agent = new MindConnectAgent(sharedSecretConfig);
+            agent.should.exist;
 
-        try {
-            const response = await mcsetup.RegisterForDiagnostic(agent.ClientId());
-        } catch (err) {
-            if ((("" + err).indexOf("Conflict")) < 0) {
-                throw err;
+            await mcsetup.DeleteAllDiagnosticActivations();
+
+            try {
+                const response = await mcsetup.RegisterForDiagnostic(agent.ClientId());
+            } catch (err) {
+                if ((("" + err).indexOf("Conflict")) < 0) {
+                    throw err;
+                }
             }
+            if (!agent.IsOnBoarded()) {
+                agent.OnBoard();
+            }
+            await agent.PostData([{ dataPointId: "Unexistent", qualityCode: "123123135", value: "12312346.42.23" }], undefined, false);
+            const diag = await mcsetup.GetDiagnosticInformation(agent.ClientId());
+            diag.content.should.exist;
+            let activations = await mcsetup.GetDiagnosticActivations();
+            activations.content.length.should.be.greaterThan(0);
+            await mcsetup.DeleteDiagnostic(agent.ClientId());
+            activations = await mcsetup.GetDiagnosticActivations();
+            activations.content.length.should.be.equal(0);
         }
-        if (!agent.IsOnBoarded()) {
-            agent.OnBoard();
-        }
-        await agent.PostData([{ dataPointId: "Unexistent", qualityCode: "123123135", value: "12312346.42.23" }], undefined, false);
-        const diag = await mcsetup.GetDiagnosticInformation(agent.ClientId());
-        diag.content.should.exist;
-        let activations = await mcsetup.GetDiagnosticActivations();
-        activations.content.length.should.be.greaterThan(0);
-        await mcsetup.DeleteDiagnostic(agent.ClientId());
-        activations = await mcsetup.GetDiagnosticActivations();
-        activations.content.length.should.be.equal(0);
     }));
 });
