@@ -2,17 +2,19 @@ pipeline {
   agent {
     docker {
       image 'node'
-      args '''-v /home/sn0wcat/mc:/.mc
-pwd
-cp -a /.mc/ . '''
+      args '-v /home/sn0wcat/mc:/.mc'
     }
 
   }
   stages {
     stage('Build') {
       steps {
-        sh '''npm install
-ls -la .mc'''
+        sh '''pwd
+
+cp -a /.mc/. .
+
+ls -la
+ls -la .mc/'''
       }
     }
   }
