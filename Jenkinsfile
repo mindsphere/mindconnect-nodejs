@@ -2,7 +2,9 @@ pipeline {
   agent {
     docker {
       image 'node'
-      args '-v /home/sn0wcat/mc:/.mc'
+      args '''-v /home/sn0wcat/mc:/.mc
+pwd
+cp -a /.mc/ . '''
     }
 
   }
