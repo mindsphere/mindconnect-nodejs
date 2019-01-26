@@ -51,7 +51,7 @@ pipeline {
           cp -rf .mc/*.json /.mc/
           '''
           
-          junit './report.xml'
+          junit '**/*.xml'
       }
   }
 }
