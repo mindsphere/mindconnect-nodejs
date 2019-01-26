@@ -19,4 +19,12 @@ ls -la .mc/
       }
     }
   }
+
+  post {
+      always {
+          sh '''
+          ls -la
+          '''
+      }
+  }
 }
