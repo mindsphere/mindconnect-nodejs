@@ -38,9 +38,6 @@ The library comes with a command line interface which can also be installed glob
 ```bash
 # install the library globaly if you want to use its command line interface.
  npm install -g @mindconnect/mindconnect-nodejs
-
-# or from the local file
- npm install -g mindconnect-...tgz
 ```
 
 <img src="images/full.gif">
