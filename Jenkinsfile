@@ -35,9 +35,6 @@ pipeline {
       steps {
         sh '''
         npm pack --unsafe-perm
-        echo $BUILD_NUMBER
-        mkdir /publish/$BUILD_NUMBER
-        cp *.tgz /publish/$BUILD_NUMBER
         '''
       }
     }
