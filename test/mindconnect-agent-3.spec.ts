@@ -496,7 +496,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             await agent.OnBoard();
         }
 
-        const result = await agent.Upload("LICENSE.md", "text/plain", "blubb", true, undefined, 1024);
+        const result = await agent.Upload("CHANGELOG.md", "text/plain", "blubb", true, undefined, 1024);
     }));
 
 
@@ -507,7 +507,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             await agent.OnBoard();
         }
 
-        const result = await agent.Upload("LICENSE.md", "text/plain", "blubb", true);
+        const result = await agent.Upload("CODE_OF_CONDUCT.md", "text/plain", "blubb");
     }));
 
     it("should be able to retry an operation before throwing an error", mochaAsync(async () => {

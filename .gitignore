@@ -72,3 +72,4 @@ private.key
 public.pem
 .mochatest
 .mochatest/**.json
+report.xml

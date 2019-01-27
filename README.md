@@ -8,6 +8,10 @@ The mindconnect-nodejs library enables the user to upload time series data, file
 
 This project has started as a community effort at Siemens AG and is now available for general use.
 
+[![Build Status](https://jenkins.mindconnect.rocks/buildStatus/icon?job=mindconnect-nodejs/cicd)](https://jenkins.mindconnect.rocks/blue/organizations/jenkins/mindconnect-nodejs/activity/) [![The MIT License](https://img.shields.io/badge/license-MIT-009999.svg?style=flat)](./license)
+[![npm](https://img.shields.io/npm/v/@mindconnect/mindconnect-nodejs/latest.svg?style=flat)](https://www.npmjs.com/package/@mindconnect/mindconnect-nodejs) ![](https://img.shields.io/npm/dw/@mindconnect/mindconnect-nodejs.svg?colorB=009999)
+
+
 ## Installing the library
 
 There are several ways to install the library. The most common one is via npm registry:
@@ -36,9 +40,6 @@ The library comes with a command line interface which can also be installed glob
 ```bash
 # install the library globaly if you want to use its command line interface.
  npm install -g @mindconnect/mindconnect-nodejs
-
-# or from the local file
- npm install -g mindconnect-...tgz
 ```
 
 <img src="images/full.gif">
