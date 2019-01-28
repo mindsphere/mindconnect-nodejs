@@ -457,40 +457,6 @@ export class MindConnectAgent extends AgentAuth {
         return promise;
     }
 
-    // Commented out: the exchange endpoint is very bad...
-    // private async UploadFile(fileName: string, fileType: string, encoding?: MessageEncoding, chunkSize: number = 7 * 1024 * 1024): Promise<boolean> {
-
-    //     http.globalAgent.maxSockets = 15;
-
-    //     await this.RenewToken();
-    //     if (!this._accessToken)
-    //         throw new Error("The agent doesn't have a valid access token.");
-
-    //     const stats = fs.statSync(fileName);
-    //     const totalChunks = Math.ceil(stats.size / chunkSize);
-    //     const file = fs.createReadStream(fileName, { "highWaterMark": chunkSize });
-
-    //     const headers = { ...this._multipartHeaders, "Authorization": `Bearer ${this._accessToken.access_token}` };
-    //     const url = `${this._configuration.content.baseUrl}/api/mindconnect/v3/exchange`;
-    //     log(`GetDataSourceConfiguration Headers ${JSON.stringify(headers)} Url ${url}`);
-
-    //     const mindConnectEncoder =
-    //         encoding ?
-    //             new MindConnectTransform(path.basename(fileName), stats.ctime, fileType, chunkSize, encoding, totalChunks) :
-    //             new MindConnectRawTransform(path.basename(fileName), stats.ctime, fileType, chunkSize, totalChunks);
-
-
-    //     mindConnectEncoder.on("data", async (data: string) => {
-    //         await this.PostMessage(url, data, headers);
-    //     });
-
-    //     await promisePipe(
-    //         file,
-    //         mindConnectEncoder
-    //     );
-    //     return true;
-    // }
-
     private async PostMessage(url: string, dataMessage: string | ArrayBuffer, headers: {}): Promise<boolean> {
 
         try {
