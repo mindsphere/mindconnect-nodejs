@@ -324,7 +324,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
 
         const now = Math.floor(Date.now() / 1000);
 
-        if (this._configuration.response.client_secret_expires_at - 3600 <= now) {
+        if (this._configuration.response.client_secret_expires_at - 25 * 3600 <= now) {
             log("client secret expired - renewing");
             await this.RotateKey();
             this._accessToken = undefined; // delete the token it will need to be regenerated with the new key

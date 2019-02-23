@@ -360,7 +360,7 @@ export class MindConnectAgent extends AgentAuth {
      * @param {string} [entityId] entityid can be used to define the asset for upload, otherwise the agent is used.
      * @param {number} [chunkSize=8 * 1024 * 1024]  - at the moment 8MB as per restriction of mindgate
      * @param {number} [maxSockets=3] - maxSockets for http Upload
-     * @returns {Promise<Object>}
+     * @returns {Promise<string>} md5 hash of the uploaded file
      *
      * @memberOf MindConnectAgent
      */
