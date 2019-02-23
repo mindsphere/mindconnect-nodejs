@@ -429,7 +429,7 @@ export class MindConnectAgent extends AgentAuth {
             ).once("finish", async () => {
                 try {
                     await Promise.all(promises);
-                    console.log(promises);
+                    log(promises);
                     resolve(hash.read().toString("hex"));
                 }
                 catch (err) {
