@@ -494,8 +494,8 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         if (!agent.IsOnBoarded()) {
             await agent.OnBoard();
         }
-        const result = await agent.Upload("CHANGELOG.md", "text/plain", "blubb", true, undefined, 1024);
-        result.should.be.equal("296eab6b2660719c6ffe75ff7355eee4");
+        const result = await agent.Upload("CODE_OF_CONDUCT.md", "text/plain", "blubb", true, undefined, 1024);
+        result.should.be.equal("2b9b7c5ad3e71a431c7e5b4bf762bcdf");
     }));
 
 
