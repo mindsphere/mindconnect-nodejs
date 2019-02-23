@@ -491,24 +491,38 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
 
     it("should be able to upload a file chunked", mochaAsync(async () => {
         const agent = new MindConnectAgent(sharedSecretConfig);
-
         if (!agent.IsOnBoarded()) {
             await agent.OnBoard();
         }
-
-        const result = await agent.Upload("CHANGELOG.md", "text/plain", "blubb", true, undefined, 1024);
+        const result = await agent.Upload("CODE_OF_CONDUCT.md", "text/plain", "blubb", true, undefined, 1024);
+        result.should.be.equal("2b9b7c5ad3e71a431c7e5b4bf762bcdf");
     }));
 
 
-    it("should be able to upload a file in one piece as well", mochaAsync(async () => {
+    it("should be able to upload a text file in one piece as well", mochaAsync(async () => {
         const agent = new MindConnectAgent(sharedSecretConfig);
 
         if (!agent.IsOnBoarded()) {
             await agent.OnBoard();
         }
 
-        const result = await agent.Upload("CODE_OF_CONDUCT.md", "text/plain", "blubb");
+        const result = await agent.Upload("CODE_OF_CONDUCT.md", "", "desc");
+        result.should.be.equal("2b9b7c5ad3e71a431c7e5b4bf762bcdf");
     }));
+
+
+    it("should be able to upload a binary in one piece as well", mochaAsync(async () => {
+        const agent = new MindConnectAgent(sharedSecretConfig);
+
+        if (!agent.IsOnBoarded()) {
+            await agent.OnBoard();
+        }
+
+        const result = await agent.Upload("./images/full.gif", "", "desc");
+        result.should.be.equal("3b005ae235287f0d1e67c11f89857ad0");
+    }));
+
+
 
     it("should be able to retry an operation before throwing an error", mochaAsync(async () => {
         const agent = new MindConnectAgent(sharedSecretConfig);

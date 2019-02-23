@@ -15,7 +15,7 @@ const mime = require("mime-types");
 const log = console.log;
 
 program
-    .version("MindConnect NodeJS CLI - Version: 3.2.0")
+    .version("MindConnect NodeJS CLI - Version: 3.3.0")
     .on("--help", () => {
         log(`\n  Documentation:\n`);
         log(`    the ${chalk.magentaBright("magenta colored commands *")} require service credentials.`);

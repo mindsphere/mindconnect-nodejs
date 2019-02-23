@@ -72,7 +72,7 @@ describe("MindConnect Setup", () => {
     }));
 
 
-    it("should register maximum 5 agents for diagnostics", mochaAsync(async () => {
+    it("should register 2 agents for diagnostics", mochaAsync(async () => {
 
         if (!process.env.CI) {
             // don't delete all diagnostic registrations all the time on the CI/CD this can disturb the normal workings on the tenants.
@@ -91,7 +91,7 @@ describe("MindConnect Setup", () => {
             }
             const activations = await mcsetup.GetDiagnosticActivations();
             log(activations.content);
-            activations.content.length.should.be.equal(5);
+            activations.content.length.should.be.equal(2);
             await mcsetup.DeleteAllDiagnosticActivations();
 
         }
