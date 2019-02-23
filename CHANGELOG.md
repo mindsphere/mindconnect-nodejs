@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.3.0 - (Midnight Blue Vienna) - January 2019
+## 3.3.0 - (Midnight Blue Vienna) - February 2019
 
 - upgraded referenced packages to the latest version
 - improved resilience under heavy load
