@@ -40,7 +40,6 @@ describe("File Encoder Agent", () => {
     it("should be able to encode a small file properly using text encoder", function (done) {
 
         try {
-
             const stats = fs.statSync("package.json");
             const chunkSize = 10 * 1024;
             const totalChunks = Math.ceil(stats.size / chunkSize);

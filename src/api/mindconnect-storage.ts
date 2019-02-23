@@ -54,10 +54,6 @@ export class DefaultStorage implements IConfigurationStorage {
         const fileName = `${this._basePath}/${config.content.clientId}.json`;
         return await this.lock.acquire(fileName, () => {
             const data = JSON.stringify(config);
-            if (Date.now() % 17 === 0) {
-                console.log("Error!");
-                throw new Error("No");
-            }
             fs.writeFileSync(fileName, data);
             return config;
         });

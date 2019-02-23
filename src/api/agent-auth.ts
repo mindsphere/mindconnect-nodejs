@@ -6,6 +6,7 @@ import * as uuid from "uuid";
 import { AccessToken, IConfigurationStorage, IMindConnectConfiguration, OnboardingStatus, retry, SelfSignedClientAssertion, TokenKey } from "..";
 import { MindConnectBase, TokenRotation } from "./mindconnect-base";
 import { DefaultStorage, IsConfigurationStorage } from "./mindconnect-storage";
+import AsyncLock = require("async-lock");
 import _ = require("lodash");
 const log = debug("mindconnect-agentauth");
 const rsaPemToJwk = require("rsa-pem-to-jwk");
@@ -30,6 +31,15 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
      * @memberof AgentAuth
      */
     private _oauthPublicKey?: TokenKey;
+
+    /**
+     * lock object for client secret renewal. (this is the most sensitive part in the tocken rotation, which needs to be done in critical section)
+     *
+     * @private
+     * @type {AsyncLock}
+     * @memberOf AgentAuth
+     */
+    private secretLock: AsyncLock;
 
     /**
      * Asynchronous method which saves the agent state in the .mc (or reconfigured) folder.
@@ -118,12 +128,10 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
             };
         }
 
-
         log(`Rotating Key - Headers: ${JSON.stringify(headers)} Url: ${url} Profile: ${this.GetProfile()}`);
 
         try {
             const response = await fetch(url, { method: "PUT", body: JSON.stringify(body), headers: headers, agent: this._proxyHttpAgent });
-
             const json = await response.json();
 
             if (!response.ok) {
@@ -324,9 +332,19 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
 
         const now = Math.floor(Date.now() / 1000);
 
+        const secondsLeft = now - (this._configuration.response.client_secret_expires_at - 25 * 3600);
         if (this._configuration.response.client_secret_expires_at - 25 * 3600 <= now) {
-            log("client secret expired - renewing");
-            await this.RotateKey();
+            log(`client secret will expire in ${secondsLeft} seconds - renewing`);
+            try {
+
+                await this.secretLock.acquire("secretLock", async () => {
+                    await retry(5, () => this.RotateKey());
+                });
+
+            } catch (err) {
+                console.warn(`There is a problem rotating the client secrets. The client secret will expire in ${secondsLeft}`);
+            }
+
             this._accessToken = undefined; // delete the token it will need to be regenerated with the new key
         }
 
@@ -416,5 +434,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
             throw new Error("Configuration profile not supported. The library only supports the shared_secret and RSA_3072 config profiles");
         }
         log(`Agent configuration with ${this._profile}`);
+
+        this.secretLock = new AsyncLock({});
     }
 }
