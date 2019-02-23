@@ -14,7 +14,6 @@ import { bulkDataTemplate, dataTemplate } from "./mindconnect-template";
 import { dataValidator, eventValidator } from "./mindconnect-validators";
 const mime = require("mime-types");
 const log = debug("mindconnect-agent");
-
 /**
  * MindConnect Agent implements the V3 of the Mindsphere API.
  *
@@ -264,8 +263,8 @@ export class MindConnectAgent extends AgentAuth {
             }
         }
 
-        const result = await this.PostMessage(url, JSON.stringify(event), headers);
-        return result;
+        const result = await this.SendMessage("POST", url, JSON.stringify(event), headers);
+        return <boolean>result;
     }
 
 
@@ -311,8 +310,8 @@ export class MindConnectAgent extends AgentAuth {
         const dataMessage = dataTemplate(timeStamp, dataPoints, this._configuration.dataSourceConfiguration.configurationId);
         log(dataMessage);
 
-        const result = await this.PostMessage(url, dataMessage, headers);
-        return result;
+        const result = await this.SendMessage("POST", url, dataMessage, headers);
+        return <boolean>result;
     }
 
     public async BulkPostData(timeStampedDataPoints: TimeStampedDataPoint[], validateModel: boolean = true): Promise<boolean> {
@@ -347,8 +346,8 @@ export class MindConnectAgent extends AgentAuth {
         const bulkDataMessage = bulkDataTemplate(timeStampedDataPoints, this._configuration.dataSourceConfiguration.configurationId);
         log(bulkDataMessage);
 
-        const result = await this.PostMessage(url, bulkDataMessage, headers);
-        return result;
+        const result = await this.SendMessage("POST", url, bulkDataMessage, headers);
+        return <boolean>result;
     }
 
     /**
@@ -365,104 +364,124 @@ export class MindConnectAgent extends AgentAuth {
      *
      * @memberOf MindConnectAgent
      */
-    public Upload(fileName: string, fileType: string, description: string, chunk: boolean = true, entityId?: string, chunkSize: number = 8 * 1024 * 1024, maxSockets: number = 3): Promise<Object> {
+    public async Upload(fileName: string, fileType: string, description: string, chunk: boolean = true, entityId?: string, chunkSize: number = 8 * 1024 * 1024, maxSockets: number = 3): Promise<string> {
         http.globalAgent.maxSockets = maxSockets;
-        const promise = new Promise<Object>((promiseResolve, promiseReject) => {
-            (async () => {
 
-                try {
-                    await this.RenewToken();
-                    if (!this._accessToken || !this._accessToken.access_token)
-                        throw new Error("The agent doesn't have a valid access token.");
-                    const token = this._accessToken.access_token;
+        await this.RenewToken();
+        if (!this._accessToken || !this._accessToken.access_token)
+            throw new Error("The agent doesn't have a valid access token.");
+        const token = this._accessToken.access_token;
 
-                    if (!this._configuration.content.clientId)
-                        throw new Error("No client id in the configuration of the agent.");
+        if (!this._configuration.content.clientId)
+            throw new Error("No client id in the configuration of the agent.");
 
-                    const hash = crypto.createHash("md5");
-                    const stats = fs.statSync(fileName);
-                    const totalChunks = Math.ceil(stats.size / chunkSize);
-                    if (!chunk && totalChunks > 1) {
-                        promiseReject("File is too big.");
-                    } else if (chunk && totalChunks > 1) {
-                        log("WARN: Chunking is experimental!");
+        const promises: any[] = [];
+        const stats = fs.statSync(fileName);
+        const timeStamp = stats.ctime;
+
+        const totalChunks = Math.ceil(stats.size / chunkSize);
+        if (!chunk && totalChunks > 1) {
+            throw new Error("File is too big.");
+        } else if (chunk && totalChunks > 1) {
+            log("WARN: Chunking is experimental!");
+        }
+        const shortFileName = path.basename(fileName);
+        let chunks = 0;
+
+        if (!entityId) {
+            entityId = this._configuration.content.clientId;
+        }
+
+        if (!fileType) {
+            fileType = mime.lookup(fileName) || "application/octet-stream";
+        }
+
+        let current: Uint8Array = new Uint8Array(0);
+
+        const fileReadStream = fs.createReadStream(fileName, { "highWaterMark": chunkSize });
+        const hash = crypto.createHash("md5");
+        return new Promise((resolve, reject) => {
+            fileReadStream.on("data", (data: Buffer) => {
+
+                if (current.byteLength + data.byteLength < chunkSize) {
+                    const newLength = current.byteLength + data.byteLength;
+                    const newBuffer = new Uint8Array(newLength);
+                    newBuffer.set(current, 0);
+                    newBuffer.set(data, current.byteLength);
+                    current = newBuffer;
+                } else {
+                    if (current.byteLength > 0) {
+                        const currentBuffer = Buffer.from(current);
+                        promises.push(this.UploadChunk(token, description, ++chunks, totalChunks, fileType, timeStamp, shortFileName, "" + entityId, currentBuffer));
                     }
-                    const shortFileName = path.basename(fileName);
-                    let chunks = 0;
-
-                    if (!entityId) {
-                        entityId = this._configuration.content.clientId;
-                    }
-
-                    if (!fileType) {
-                        fileType = mime.lookup(fileName) || "application/octet-stream";
-                    }
-
-                    const promises: Promise<void | Object>[] = [];
-                    const file = fs.createReadStream(fileName, { "highWaterMark": chunkSize });
-
-                    file.on("data", async (buffer: Buffer) => {
-                        const headers = {
-                            ...this._apiHeaders,
-                            "Authorization": `Bearer ${token}`,
-                            "description": description,
-                            "type": totalChunks === 1 ? fileType : `${fileType}.chunked`,
-                            "timestamp": stats.ctime.toISOString(),
-                            "content-type": "application/octet-stream"
-                        };
-
-                        const currentFileName = totalChunks === 1 ? shortFileName : `${shortFileName}.${++chunks}.of.${totalChunks}`;
-                        const url = `${this._configuration.content.baseUrl}/api/iotfile/v3/files/${entityId}/${currentFileName}`;
-
-                        if (this._configuration.urls && (<any>this._configuration.urls)[url]) {
-                            const eTag = (<any>this._configuration.urls)[url];
-                            const etagNumber = parseInt(eTag);
-                            (<any>headers)["If-Match"] = etagNumber;
-                        }
-
-                        hash.update(buffer);
-                        promises.push(fetch(url, { method: "PUT", body: buffer, headers: headers, agent: this._proxyHttpAgent }).then(async response => {
-                            if (response.status <= 200 || response.status >= 300) {
-                                throw new Error(`${response.status} ${response.statusText}`);
-                            } else {
-                                if (!this._configuration.urls) {
-                                    this._configuration.urls = {};
-                                }
-                                (<any>this._configuration.urls)[url] = response.headers.get("eTag");
-                                await this.SaveConfig();
-                            }
-                        }));
-                    });
-
-                    file.on("end", async () => {
-
-                        try {
-                            // wait till all uploads in a job are done.
-                            await Promise.all(promises);
-                            promiseResolve(hash.digest("hex"));
-                        }
-                        catch (err) {
-                            promiseReject(new Error("upload failed" + err));
-                        }
-                    });
-
-                    file.read();
-                } catch (error) {
-                    promiseReject(new Error("Upload failed" + error));
+                    current = new Uint8Array(data.byteLength);
+                    current.set(data, 0);
                 }
+            }).on("error", err => {
+                reject(err);
+            }).on("end", () => {
+                if (current.byteLength > 0) {
+                    const currentBuffer = Buffer.from(current);
+                    promises.push(this.UploadChunk(token, description, ++chunks, totalChunks, fileType, timeStamp, shortFileName, "" + entityId, currentBuffer));
+                }
+            }).pipe(
+                hash
+            ).once("finish", async () => {
+                try {
+                    await Promise.all(promises);
+                    console.log(promises);
+                    resolve(hash.read().toString("hex"));
+                }
+                catch (err) {
+                    reject(new Error("upload failed" + err));
+                }
+            });
 
-            })();
         });
-
-        return promise;
     }
 
-    private async PostMessage(url: string, dataMessage: string | ArrayBuffer, headers: {}): Promise<boolean> {
 
+    private async UploadChunk(token: string, description: string, chunks: number, totalChunks: number, fileType: string, timeStamp: Date, shortFileName: string, entityId: string, buffer: Uint8Array): Promise<boolean> {
+
+        if (buffer.length <= 0)
+            return false;
+
+        const headers = {
+            ...this._apiHeaders,
+            "Authorization": `Bearer ${token}`,
+            "description": description,
+            "type": totalChunks === 1 ? fileType : `${fileType}.chunked`,
+            "timestamp": timeStamp,
+            "content-type": "application/octet-stream"
+        };
+
+        const currentFileName = totalChunks === 1 ? shortFileName : `${shortFileName}.${chunks}.of.${totalChunks}`;
+        const url = `${this._configuration.content.baseUrl}/api/iotfile/v3/files/${entityId}/${currentFileName}`;
+
+        if (this._configuration.urls && (<any>this._configuration.urls)[url]) {
+            const eTag = (<any>this._configuration.urls)[url];
+            const etagNumber = parseInt(eTag);
+            (<any>headers)["If-Match"] = etagNumber;
+        }
+
+        const result = await this.SendMessage("PUT", url, buffer, headers);
+
+        if (!this._configuration.urls) {
+            this._configuration.urls = {};
+        }
+        (<any>this._configuration.urls)[url] = result;
+        await this.SaveConfig();
+
+        return true;
+
+    }
+
+
+    private async SendMessage(method: "POST" | "PUT", url: string, dataMessage: string | ArrayBuffer, headers: {}): Promise<string | boolean> {
         try {
-            const response = await fetch(url, { method: "POST", body: dataMessage, headers: headers, agent: this._proxyHttpAgent });
+            const response = await fetch(url, { method: method, body: dataMessage, headers: headers, agent: this._proxyHttpAgent });
             if (!response.ok) {
-                log({ method: "POST", body: dataMessage, headers: headers, agent: this._proxyHttpAgent });
+                log({ method: method, body: dataMessage, headers: headers, agent: this._proxyHttpAgent });
                 log(response);
 
                 throw new Error(response.statusText);
@@ -470,7 +489,9 @@ export class MindConnectAgent extends AgentAuth {
 
             const text = await response.text();
             if (response.status >= 200 && response.status <= 299) {
-                return true;
+                const etag = response.headers.get("eTag");
+                return etag !== null ? etag : true;
+
             } else {
                 throw new Error(`Error occured response status ${response.status} ${text}`);
             }
