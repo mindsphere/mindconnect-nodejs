@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { IMindConnectConfiguration } from "..";
 import debug = require("debug");
+import AsyncLock = require("async-lock");
 import _ = require("lodash");
 const log = debug("mindconnect-storage");
 
@@ -28,6 +29,7 @@ export function IsConfigurationStorage(arg: any): arg is IConfigurationStorage {
  * @class DefaultStorage
  */
 export class DefaultStorage implements IConfigurationStorage {
+    lock: AsyncLock;
 
     public GetConfig(configuration: IMindConnectConfiguration): IMindConnectConfiguration {
 
@@ -48,17 +50,17 @@ export class DefaultStorage implements IConfigurationStorage {
     }
 
     public async SaveConfig(config: IMindConnectConfiguration): Promise<IMindConnectConfiguration> {
-        const promise = new Promise<IMindConnectConfiguration>((resolve, reject) => {
-            const fileName = `${this._basePath}/${config.content.clientId}.json`;
+
+        const fileName = `${this._basePath}/${config.content.clientId}.json`;
+        return await this.lock.acquire(fileName, () => {
             const data = JSON.stringify(config);
-            fs.writeFile(fileName, data, err => {
-                if (err)
-                    reject(err);
-                else
-                    resolve(config);
-            });
+            if (Date.now() % 17 === 0) {
+                console.log("Error!");
+                throw new Error("No");
+            }
+            fs.writeFileSync(fileName, data);
+            return config;
         });
-        return promise;
     }
 
     constructor(private _basePath: string) {
@@ -66,5 +68,8 @@ export class DefaultStorage implements IConfigurationStorage {
         if (!fs.existsSync(this._basePath)) {
             fs.mkdirSync(this._basePath);
         }
+
+        this.lock = new AsyncLock({});
+
     }
 }

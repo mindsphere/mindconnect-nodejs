@@ -7,7 +7,7 @@ import * as http from "http";
 import fetch from "node-fetch";
 import * as path from "path";
 import "url-search-params-polyfill";
-import { DataSourceConfiguration, Mapping } from "..";
+import { DataSourceConfiguration, Mapping, retry } from "..";
 import { AgentAuth } from "./agent-auth";
 import { BaseEvent, DataPointValue, TimeStampedDataPoint } from "./mindconnect-models";
 import { bulkDataTemplate, dataTemplate } from "./mindconnect-template";
@@ -116,7 +116,7 @@ export class MindConnectAgent extends AgentAuth {
 
             if (response.status >= 200 && response.status <= 299) {
                 this._configuration.dataSourceConfiguration = json;
-                await this.SaveConfig();
+                await retry(5, () => this.SaveConfig());
                 return json;
             } else {
                 throw new Error(`invalid response ${JSON.stringify(response)}`);
@@ -149,7 +149,7 @@ export class MindConnectAgent extends AgentAuth {
 
             if (response.status >= 200 && response.status <= 299) {
                 this._configuration.dataSourceConfiguration = json;
-                await this.SaveConfig();
+                await retry(5, () => this.SaveConfig());
                 return json;
             } else {
                 throw new Error(`invalid response ${JSON.stringify(response)}`);
@@ -182,7 +182,7 @@ export class MindConnectAgent extends AgentAuth {
 
             if (response.status >= 200 && response.status <= 299) {
                 this._configuration.mappings = json;
-                await this.SaveConfig();
+                await retry(5, () => this.SaveConfig());
                 return json.content;
             } else {
                 throw new Error(`invalid response ${JSON.stringify(response)}`);
@@ -470,7 +470,7 @@ export class MindConnectAgent extends AgentAuth {
             this._configuration.urls = {};
         }
         (<any>this._configuration.urls)[url] = result;
-        await this.SaveConfig();
+        await retry(5, () => this.SaveConfig());
 
         return true;
 

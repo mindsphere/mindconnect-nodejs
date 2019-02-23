@@ -1,7 +1,7 @@
 // Copyright (C), Siemens AG 2017
 import * as chai from "chai";
 import "url-search-params-polyfill";
-import { DefaultStorage, IMindConnectConfiguration } from "../src";
+import { DefaultStorage, IMindConnectConfiguration, retry } from "../src";
 import { mochaAsync } from "./test-utils";
 const rimraf = require("rimraf");
 
@@ -74,27 +74,29 @@ describe("Default Storage", () => {
     }));
 
 
-    // it.only("should be able to save and retrieve configuration", mochaAsync(async () => {
-    //     const storage = new DefaultStorage("./.mochatest/");
+    it("should be able to syncronize the locks", mochaAsync(async () => {
+        const storage = new DefaultStorage("./.mochatest/");
+        rsaConfig.urls = ["TEST"];
 
-    //     const config = await storage.SaveConfig(rsaConfig);
-    //     config.urls = ["TEST"];
-    //     config.should.not.be.null;
+        const promises = [];
 
-    //     _.isEqual(rsaConfig, config).should.be.true;
-    //     config.urls.should.not.be.undefined;
-    //     (<any>config).urls[0].should.equal("TEST");
-
-    //     const newConfig = await storage.GetConfiguration(rsaConfig);
-    //     console.log(newConfig)
-    //     _.isEqual(config, newConfig).should.be.true;
-    //     (<any>newConfig).urls.should.not.be.undefined;
-    //     (<any>newConfig).urls[0].should.equal("TEST");
-
-    //     rimraf.sync("./.mochatest/");
-    // }));
+        (<any>rsaConfig).indexes = [];
 
 
+        for (let index = 0; index < 25; index++) {
+            (<any>rsaConfig).indexes.push(index);
+            promises.push(await retry(5, () => storage.SaveConfig(rsaConfig)));
+        }
 
+        await Promise.all(promises);
+
+        const newConfig = storage.GetConfig(rsaConfig);
+        for (let index = 0; index < (<any>newConfig).indexes.length; index++) {
+            const element = (<any>rsaConfig).indexes[index];
+            index.should.be.equal(element);
+        }
+
+        rimraf.sync("./.mochatest/");
+    }));
 
 });

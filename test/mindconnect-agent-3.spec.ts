@@ -506,8 +506,8 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             await agent.OnBoard();
         }
 
-        const result = await agent.Upload("package-lock.json", "", "desc");
-        result.should.be.equal("3b4d5e5d5e7ae888c4894c64ca4ed337");
+        const result = await agent.Upload("CODE_OF_CONDUCT.md", "", "desc");
+        result.should.be.equal("2b9b7c5ad3e71a431c7e5b4bf762bcdf");
     }));
 
 

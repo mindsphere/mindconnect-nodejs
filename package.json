@@ -37,6 +37,7 @@
   "dependencies": {
     "ajv": "^6.9.2",
     "ajv-keywords": "^3.4.0",
+    "async-lock": "^1.1.4",
     "buffer-concat": "^1.0.0",
     "chalk": "^2.4.2",
     "commander": "^2.19.0",
@@ -56,6 +57,7 @@
   },
   "devDependencies": {
     "@types/ajv": "^1.0.0",
+    "@types/async-lock": "^1.1.1",
     "@types/chai": "^4.1.7",
     "@types/csvtojson": "^1.1.5",
     "@types/debug": "^4.1.2",

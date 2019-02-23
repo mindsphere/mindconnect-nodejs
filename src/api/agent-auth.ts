@@ -3,7 +3,7 @@ import * as jwt from "jsonwebtoken";
 import fetch from "node-fetch";
 import "url-search-params-polyfill";
 import * as uuid from "uuid";
-import { AccessToken, IConfigurationStorage, IMindConnectConfiguration, OnboardingStatus, SelfSignedClientAssertion, TokenKey } from "..";
+import { AccessToken, IConfigurationStorage, IMindConnectConfiguration, OnboardingStatus, retry, SelfSignedClientAssertion, TokenKey } from "..";
 import { MindConnectBase, TokenRotation } from "./mindconnect-base";
 import { DefaultStorage, IsConfigurationStorage } from "./mindconnect-storage";
 import _ = require("lodash");
@@ -79,7 +79,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
 
             if (response.status === 201) {
                 this._configuration.response = json;
-                await this.SaveConfig();
+                await retry(5, () => this.SaveConfig());
                 return OnboardingStatus.StatusEnum.ONBOARDED;
             } else {
                 throw new Error(`invalid response ${JSON.stringify(response)}`);
@@ -132,7 +132,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
 
             if (response.status >= 200 && response.status <= 299) {
                 this._configuration.response = json;
-                await this.SaveConfig();
+                await (retry(5, () => this.SaveConfig()));
                 return true;
             } else {
                 throw new Error(`invalid response ${JSON.stringify(response)}`);
