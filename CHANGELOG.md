@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.3.0 - (Midnight Blue Vienna) - January 2019
+
+- upgraded referenced packages to the latest version
+- improved resillience under heavy load
+
+## Bugfixes 3.3.0
+
+- improved resillency
+- added critical sections around file storage and secret renewal
+- added retries for file storage and secret renewal
+- fixed stream processing in file upload
+- cleaned up the code
+
 ## 3.2.0 - (Dark Red Vienna) - January 2019
 
 - MIT License - Open Source Release
