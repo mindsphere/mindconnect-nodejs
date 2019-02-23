@@ -1,6 +1,7 @@
 // Copyright (C), Siemens AG 2017
 import * as chai from "chai";
 import * as debug from "debug";
+import * as fs from "fs";
 import "url-search-params-polyfill";
 import { DataPointValue, IMindConnectConfiguration, MindConnectAgent, retry } from "../src";
 import { mochaAsync } from "./test-utils";
@@ -8,22 +9,22 @@ const log = debug("mindconnect-agent-test");
 const HttpsProxyAgent = require("https-proxy-agent");
 chai.should();
 
-describe("MindConnectApi perf test", () => {
+describe("MindConnectApi RSA_3072 Agent performance test", () => {
 
-    const sharedSecretConfig: IMindConnectConfiguration = require("../agentconfig.json");
+    const rsaConfig: IMindConnectConfiguration = require("../agentconfig.rsa.json");
 
-    it("should instantiate shared secret agent.", () => {
-        const agent = new MindConnectAgent(sharedSecretConfig);
+    it("should instantiate RSA_3072 agent.", () => {
+        const agent = new MindConnectAgent(rsaConfig);
         agent.should.not.be.null;
         (<any>agent)._configuration.should.not.be.null;
-        (<any>agent)._configuration.content.clientCredentialProfile[0].should.be.equal("SHARED_SECRET");
+        (<any>agent)._configuration.content.clientCredentialProfile[0].should.be.equal("RSA_3072");
         (<any>agent)._storage.should.not.be.null;
     });
 
+    it("should function under heavy load", mochaAsync(async () => {
 
-    it.only("should function under heavy load", mochaAsync(async () => {
-
-        const agent = new MindConnectAgent(sharedSecretConfig);
+        const agent = new MindConnectAgent(rsaConfig);
+        agent.SetupAgentCertificate(fs.readFileSync("private.key"));
         if (!agent.IsOnBoarded()) {
             await agent.OnBoard();
         }
@@ -65,13 +66,11 @@ describe("MindConnectApi perf test", () => {
             if (isValid) {
                 const result = await retry(5, () => agent.PostData(values));
             } else {
-                // we are using simpler one for CI/CD
-                // console.log("Running CI/CD");
-                const values: DataPointValue[] = [
-                    { "dataPointId": "DP001", "qualityCode": "0", "value": "123.67" },
-                ];
-                const result = await retry(5, () => agent.PostData(values));
+                throw new Error("invalid configuration!");
             }
+
+            await retry(3, () => agent.Upload("images/mappings.png", "", "desc"));
+            await retry(3, () => agent.Upload("images/mc4.png", "", "desc", true, undefined, 1024));
         }
 
     }));
