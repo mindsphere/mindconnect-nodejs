@@ -15,26 +15,23 @@ const log = debug("mindconnect");
  * @returns {ajv.ValidateFunction}
  */
 export function dataValidator(model: DataSourceConfiguration): ajv.ValidateFunction {
-
     const dataPointIdArray: string[] = [];
     let valueArray: string[] = [];
     const schemaValidator = new ajv({ $data: true, allErrors: true });
 
     ajvKeywords(schemaValidator, ["uniqueItemProperties", "select"]);
     schemaValidator.addKeyword("str_number", {
-        validate: function (schema: {}, data: any) {
+        validate: function(schema: {}, data: any) {
             let ret = false;
-            Number.isNaN(Number(data)) ? ret = false : ret = true;
+            Number.isNaN(Number(data)) ? (ret = false) : (ret = true);
             return ret;
         },
         errors: true
     });
 
     schemaValidator.addKeyword("str_integer", {
-        validate: function (schema: {}, data: any) {
-            const ret = false;
-            if (Number.isNaN(Number(data)))
-                return false;
+        validate: function(schema: {}, data: any) {
+            if (Number.isNaN(Number(data))) return false;
 
             return Number.isInteger(Number(data));
         },
@@ -42,40 +39,50 @@ export function dataValidator(model: DataSourceConfiguration): ajv.ValidateFunct
     });
 
     schemaValidator.addKeyword("str_boolean", {
-        validate: function (schema: {}, data: any) {
+        validate: function(schema: {}, data: any) {
             data = data.toLowerCase();
-            return ((data === "true") || (data === "false"));
+            return data === "true" || data === "false";
         },
         errors: true
     });
     schemaValidator.addKeyword("str_string", {
-        validate: function (schema: {}, data: any) {
+        validate: function(schema: {}, data: any) {
             return true;
         },
         errors: true
     });
 
-    model.dataSources.forEach(function (elem) {
-        elem.dataPoints.forEach(function (elem2) {
+    model.dataSources.forEach(function(elem) {
+        elem.dataPoints.forEach(function(elem2) {
             dataPointIdArray.push(elem2.id);
             valueArray.push(elem2.type.toString());
         });
     });
-    valueArray = valueArray.map(function (elem) {
+    valueArray = valueArray.map(function(elem) {
         let tmp = "";
         switch (elem) {
-            case "BOOLEAN": tmp = "str_boolean"; break;
-            case "INT": tmp = "str_integer"; break;
-            case "LONG": tmp = "str_integer"; break;
-            case "DOUBLE": tmp = "str_number"; break;
-            case "STRING": tmp = "str_string"; break;
+            case "BOOLEAN":
+                tmp = "str_boolean";
+                break;
+            case "INT":
+                tmp = "str_integer";
+                break;
+            case "LONG":
+                tmp = "str_integer";
+                break;
+            case "DOUBLE":
+                tmp = "str_number";
+                break;
+            case "STRING":
+                tmp = "str_string";
+                break;
         }
         return tmp;
     });
     const schema = JSON.parse(schemaTopTemplateString(JSON.stringify(dataPointIdArray), dataPointIdArray.length));
     log(`schema: ${JSON.stringify(schema)}`);
 
-    dataPointIdArray.forEach(function (elem, index) {
+    dataPointIdArray.forEach(function(elem, index) {
         schema.items.selectCases[elem] = JSON.parse(schemaSubTemplateString(valueArray[index]));
     });
 

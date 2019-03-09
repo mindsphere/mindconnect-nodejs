@@ -18,22 +18,21 @@ export const convertToTdpArray = (data: any[]): TimeStampedDataPoint[] => {
             delete x["timestamp"];
         });
         const tdp: TimeStampedDataPoint = {
-            "timestamp": element,
-            "values": groupedData[element]
+            timestamp: element,
+            values: groupedData[element]
         };
         tdpArray.push(tdp);
     }
     return tdpArray;
 };
 
-export type authJson = { "auth": string; "iv": string, "gateway": string, "tenant": string };
+export type authJson = { auth: string; iv: string; gateway: string; tenant: string };
 
 export const isUrl = (url: string): boolean => {
     try {
         new URL(url);
         return true;
-    }
-    catch (e) {
+    } catch (e) {
         return false;
     }
 };
@@ -43,11 +42,8 @@ export const getPiamUrl = (gateway: string, tenant: string): string => {
     return piamUrl.endsWith("/") ? piamUrl : piamUrl + "/";
 };
 
-
 const normalizePasskey = (passkey: string): string => {
-    return passkey.length < 32
-        ? passkey + new Array(33 - passkey.length).join("$")
-        : passkey = (passkey).substr(0, 32);
+    return passkey.length < 32 ? passkey + new Array(33 - passkey.length).join("$") : passkey.substr(0, 32);
 };
 
 export const encrypt = (user: string, password: string, passkey: string, gateway: string, tenant: string): authJson => {
@@ -58,17 +54,21 @@ export const encrypt = (user: string, password: string, passkey: string, gateway
     let crypted = cipher.update(`Basic ${base64encoded}`, "utf8", "hex");
     crypted += cipher.final("hex");
     const encryptedAuth = {
-        "auth": crypted.toString(),
-        "iv": iv.toString("base64"),
-        "gateway": gateway,
-        "tenant": tenant
+        auth: crypted.toString(),
+        iv: iv.toString("base64"),
+        gateway: gateway,
+        tenant: tenant
     };
     console.log(encryptedAuth);
     return encryptedAuth;
 };
 
 export const decrypt = (encryptedAuth: authJson, passkey: string): string => {
-    const decipher = crypto.createDecipheriv("aes-256-ctr", normalizePasskey(passkey), Buffer.from(encryptedAuth.iv, "base64"));
+    const decipher = crypto.createDecipheriv(
+        "aes-256-ctr",
+        normalizePasskey(passkey),
+        Buffer.from(encryptedAuth.iv, "base64")
+    );
     let dec = decipher.update(encryptedAuth.auth, "hex", "utf8");
     dec += decipher.final("utf8");
     return dec;
@@ -103,7 +103,6 @@ export const errorLog = (err: any, verbose: any) => {
             console.error(chalk.redBright(err.stack));
         }
     } else {
-
         console.error(chalk.redBright(err.toString()));
     }
     process.exit(1);
@@ -128,16 +127,19 @@ export const getConfigProfile = (config: IMindConnectConfiguration): string => {
     try {
         const result = `${config.content.clientCredentialProfile}`;
         if (["SHARED_SECRET", "RSA_3072"].indexOf(result) < 0) {
-            throw new Error("Configuration profile not supported. The library only supports the shared_secret and RSA_3072 config profiles");
+            throw new Error(
+                "Configuration profile not supported. The library only supports the shared_secret and RSA_3072 config profiles"
+            );
         }
         return result;
     } catch (err) {
-        throw new Error("Configuration profile not supported. The library only supports the shared_secret and RSA_3072 config profiles");
+        throw new Error(
+            "Configuration profile not supported. The library only supports the shared_secret and RSA_3072 config profiles"
+        );
     }
 };
 
 export const checkCertificate = (config: IMindConnectConfiguration, options: any): boolean => {
-
     const profile = getConfigProfile(config);
 
     if (profile === "RSA_3072") {
@@ -155,15 +157,15 @@ export const checkCertificate = (config: IMindConnectConfiguration, options: any
 const sleep = (ms: any) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
-* retry the function n times (while progressively waiting for the success) until success
-* the waiting schema is iteration * timeoutInMiliseconds (default is 300ms)
-*
-* @param {number} n
-* @param {Function} func
-* @param {number} [timoutinMilliseconds=300]
-* @param {Function} [logFunction]
-* @returns
-*/
+ * retry the function n times (while progressively waiting for the success) until success
+ * the waiting schema is iteration * timeoutInMiliseconds (default is 300ms)
+ *
+ * @param {number} n
+ * @param {Function} func
+ * @param {number} [timoutinMilliseconds=300]
+ * @param {Function} [logFunction]
+ * @returns
+ */
 export const retry = async (n: number, func: Function, timoutinMilliseconds: number = 300, logFunction?: Function) => {
     let error;
     for (let i = 0; i < n; i++) {
@@ -182,8 +184,7 @@ export const retry = async (n: number, func: Function, timoutinMilliseconds: num
     throw error;
 };
 
-
-export const retrylog = function (operation: string) {
+export const retrylog = function(operation: string) {
     let x = 0;
     return () => {
         if (x > 0) {
@@ -192,4 +193,3 @@ export const retrylog = function (operation: string) {
         x++;
     };
 };
-
