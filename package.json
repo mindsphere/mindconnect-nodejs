@@ -68,7 +68,7 @@
         "chai": "^4.2.0",
         "concurrently": "^4.1.0",
         "cross-env": "^5.2.0",
-        "mocha": "^6.0.1",
+        "mocha": "^6.0.2",
         "mocha-jenkins-reporter": "^0.4.1",
         "rimraf": "^2.6.2",
         "stream-buffers": "^3.0.2",
