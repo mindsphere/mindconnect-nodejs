@@ -11,7 +11,7 @@ This project has started as a community effort at Siemens AG and is now availabl
 [![Build Status](https://jenkins.mindconnect.rocks/buildStatus/icon?job=mindconnect-nodejs/master)](https://jenkins.mindconnect.rocks/blue/organizations/jenkins/mindconnect-nodejs/activity/) [![The MIT License](https://img.shields.io/badge/license-MIT-009999.svg?style=flat)](./LICENSE.md)
 [![npm](https://img.shields.io/npm/v/@mindconnect/mindconnect-nodejs/latest.svg?style=flat)](https://www.npmjs.com/package/@mindconnect/mindconnect-nodejs) ![](https://img.shields.io/npm/dw/@mindconnect/mindconnect-nodejs.svg?colorB=009999)
 [![Known Vulnerabilities](https://snyk.io/test/github/mindsphere/mindconnect-nodejs/badge.svg?targetFile=package.json)](https://snyk.io/test/github/mindsphere/mindconnect-nodejs?targetFile=package.json)
-
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/mindsphere/mindconnect-nodejs.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/mindsphere/mindconnect-nodejs/context:javascript)
 
 ## Installing the library
 
@@ -72,6 +72,8 @@ Mindsphere V3 IoT model requires that you create an asset type and aspect types 
 
 ![assetype](images/types.png)
 
+More information about [MindSphere Data Model](http://go.siemens.net/39453207).
+
 ### Step 1: Create an asset
 
 Create an asset (In example it is called **AcmeMotor**) of type Engine in AssetManager for your data.
@@ -94,6 +96,8 @@ Create an agent in Asset Manager of type core.MindConnectLib create initial JSON
     "expiration": "2018-04-06T00:47:39.000Z"
 }
 ```
+
+More Information about [core.MindConnectLib](http://go.siemens.net/41963280) configuration.
 
 ### Step 3 : Create an agent
 
