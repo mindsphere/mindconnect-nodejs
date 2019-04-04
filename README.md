@@ -43,8 +43,6 @@ The library comes with a command line interface which can also be installed glob
  npm install -g @mindconnect/mindconnect-nodejs
 ```
 
-## Using CLI
-
 The CLI can be used to create starter projects, upload timeseries, events and files, read agent diagnostics etc.
 
 ```bash
@@ -62,26 +60,6 @@ Here are some examples how to use the CLI:
 
 ```bash
 # 1. install the library globaly if you want to use its command line interface.
- npm install -g @mindconnect/mindconnect-nodejs
-
-# 3.1 for typescript nodejs project run
-mc starter-ts
-
-# 3.2 for javascript nodejs project run
-mc starter-js
-
-# This will create a folder starterts (or starterjs) which you can use as a starting point for your agent.
-# Don't forget to run npm install there.
-
-# for full help run
-mc starter-ts --help # or
-mc starter-js --help
-```
-
-## How to create a nodejs MindSphere agent
-
-The following steps describe the easiest way to test the library. You can of course create the required dependencies also programmatically via API calls.
-
 ### Step 0: Create an asset type and aspect types
 
 Mindsphere V3 IoT model requires that you create an asset type and aspect types to describe your assets. For the example we will create an asset type of type Engine with two aspect types: Environment and Vibration. (Note that my tenant is called castidev, you will have to use your own tenant name)
