@@ -1,4 +1,4 @@
-export const pacakgeTemplateTs = {
+export const packageTemplateTs = {
     name: "mc-agent-ts",
     version: "1.0.0",
     description: "MindConnect NodeJS Agent",

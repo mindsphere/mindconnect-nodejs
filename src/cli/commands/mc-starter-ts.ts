@@ -2,8 +2,8 @@ import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
-import { pacakgeTemplateTs } from "../../../templates/ts/package_template";
-import { tstemplate } from "../../../templates/ts/ts-template";
+import { packageTemplateTs } from "../../../templates/ts/package_template";
+import { tsconfigjson, tstemplate } from "../../../templates/ts/ts-template";
 import { errorLog, verboseLog } from "../../api/utils";
 
 export default (program: CommanderStatic) => {
@@ -35,11 +35,13 @@ export default (program: CommanderStatic) => {
                         mypackage = require("../../../../package.json");
                     }
 
-                    pacakgeTemplateTs.dependencies["@mindconnect/mindconnect-nodejs"] = "^" + mypackage.version;
-                    pacakgeTemplateTs.devDependencies["@types/node"] = mypackage.devDependencies["@types/node"];
-                    pacakgeTemplateTs.devDependencies["typescript"] = mypackage.devDependencies["typescript"];
+                    packageTemplateTs.dependencies["@mindconnect/mindconnect-nodejs"] = "^" + mypackage.version;
+                    packageTemplateTs.devDependencies["@types/node"] = mypackage.devDependencies["@types/node"];
+                    packageTemplateTs.devDependencies["typescript"] = mypackage.devDependencies["typescript"];
                     verboseLog(`Writing package.json in ${options.dir}`, options.verbose);
-                    fs.writeFileSync(options.dir + "/package.json", JSON.stringify(pacakgeTemplateTs, null, 4));
+                    fs.writeFileSync(options.dir + "/package.json", JSON.stringify(packageTemplateTs, null, 4));
+                    verboseLog(`Writing tsconfig.json in ${options.dir}`, options.verbose);
+                    fs.writeFileSync(options.dir + "/tsconfig.json", JSON.stringify(tsconfigjson, null, 4));
                     log(`Starter project in ${chalk.greenBright(options.dir)} has been created.`);
                     log(
                         `Please run npm install in ${chalk.greenBright(options.dir)} directory to install dependecies.`

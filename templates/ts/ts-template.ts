@@ -89,3 +89,19 @@ export const tstemplate: string = `import { DataPointValue, MindConnectAgent, Mi
         }
     }
 })();`;
+
+
+export const tsconfigjson = {
+    "compilerOptions": {
+        "target": "es2015",
+        "module": "commonjs",
+        "lib": [
+            "es2015",
+            "dom"
+        ],
+        "allowJs": false,
+        "declaration": true,
+        "sourceMap": true,
+        "strict": true
+    }
+};

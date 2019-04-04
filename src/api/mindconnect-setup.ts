@@ -1,8 +1,7 @@
+import * as debug from "debug";
 import fetch from "node-fetch";
 import { DiagnosticInformation, PagedDiagnosticActivation, PagedDiagnosticInformation } from "..";
 import { CredentialAuth } from "./credential-auth";
-import debug = require("debug");
-
 const log = debug("mindconnect-setup");
 // Copyright (C), Siemens AG 2017
 
@@ -16,9 +15,6 @@ const log = debug("mindconnect-setup");
  * @class MindConnectSetup
  */
 export class MindConnectSetup extends CredentialAuth {
-
-
-
     /**
      * Register the agent for diagnostics.
      *
@@ -33,18 +29,22 @@ export class MindConnectSetup extends CredentialAuth {
         }
 
         await this.RenewToken();
-        if (!this._accessToken)
-            throw new Error("The agent doesn't have a valid access token.");
+        if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
 
-        const headers = { ...this._apiHeaders, "Authorization": `Bearer ${this._accessToken.access_token}` };
+        const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
         const url = `${this._gateway}/api/mindconnect/v3/diagnosticActivations`;
 
         log(`RegisterForDiagnostic Headers ${JSON.stringify(headers)} Url ${url}`);
 
-        const body = { "agentId": agentId };
+        const body = { agentId: agentId };
 
         try {
-            const response = await fetch(url, { method: "POST", body: JSON.stringify(body), headers: headers, agent: this._proxyHttpAgent });
+            const response = await fetch(url, {
+                method: "POST",
+                body: JSON.stringify(body),
+                headers: headers,
+                agent: this._proxyHttpAgent
+            });
             if (!response.ok) {
                 throw new Error(`${response.statusText} ${await response.text()}`);
             }
@@ -60,7 +60,6 @@ export class MindConnectSetup extends CredentialAuth {
             throw new Error(`Network error occured ${err.message}`);
         }
     }
-
 
     /**
      * Unregister the agent from the diagnostics.
@@ -90,16 +89,13 @@ export class MindConnectSetup extends CredentialAuth {
         if (!ignoreError) {
             throw Error("there is no such agent id registered for diagnostic");
         }
-
     }
-
 
     private async DeleteActivation(activationId: string) {
         await this.RenewToken();
-        if (!this._accessToken)
-            throw new Error("The agent doesn't have a valid access token.");
+        if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
 
-        const headers = { ...this._apiHeaders, "Authorization": `Bearer ${this._accessToken.access_token}` };
+        const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
         const url = `${this._gateway}/api/mindconnect/v3/diagnosticActivations/${activationId}`;
 
         log(`DeleteDiagnostic Headers ${JSON.stringify(headers)} Url ${url}`);
@@ -129,12 +125,10 @@ export class MindConnectSetup extends CredentialAuth {
     public async DeleteAllDiagnosticActivations() {
         const activations = await this.GetDiagnosticActivations();
         for (const activation of activations.content) {
-            if (activation.id)
-                await this.DeleteActivation(activation.id);
+            if (activation.id) await this.DeleteActivation(activation.id);
             log(`Deleting activation with ${activation.id} for agent ${activation.agentId}`);
         }
     }
-
 
     /**
      * Gets all registered agents for diagnostic.
@@ -144,12 +138,10 @@ export class MindConnectSetup extends CredentialAuth {
      * @memberOf MindConnectSetup
      */
     public async GetDiagnosticActivations(): Promise<PagedDiagnosticActivation> {
-
         await this.RenewToken();
-        if (!this._accessToken)
-            throw new Error("The agent doesn't have a valid access token.");
+        if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
 
-        const headers = { ...this._apiHeaders, "Authorization": `Bearer ${this._accessToken.access_token}` };
+        const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
         const url = `${this._gateway}/api/mindconnect/v3/diagnosticActivations`;
 
         log(`GetDiagnosticActivations Headers ${JSON.stringify(headers)} Url ${url}`);
@@ -172,7 +164,6 @@ export class MindConnectSetup extends CredentialAuth {
         }
     }
 
-
     /**
      * Gets the diagnostic information for the registered agent(s)
      *
@@ -183,8 +174,12 @@ export class MindConnectSetup extends CredentialAuth {
      *
      * @memberOf MindConnectSetup
      */
-    public async GetDiagnosticInformation(agentId?: string, callback?: (x: DiagnosticInformation[], ...args: any[]) => any, callbackOptions?: any, skipToLast: boolean = true) {
-
+    public async GetDiagnosticInformation(
+        agentId?: string,
+        callback?: (x: DiagnosticInformation[], ...args: any[]) => any,
+        callbackOptions?: any,
+        skipToLast: boolean = true
+    ) {
         let pagedInformation: PagedDiagnosticInformation;
         let page = 0;
         do {
@@ -205,12 +200,10 @@ export class MindConnectSetup extends CredentialAuth {
     }
 
     private async GetPagedInforamtion(page: number, agentId?: string): Promise<PagedDiagnosticInformation> {
-
         await this.RenewToken();
-        if (!this._accessToken)
-            throw new Error("The agent doesn't have a valid access token.");
+        if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
 
-        const headers = { ...this._apiHeaders, "Authorization": `Bearer ${this._accessToken.access_token}` };
+        const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
         let url = `${this._gateway}/api/mindconnect/v3/diagnosticInformation?size=50&page=${page}`;
         if (agentId) {
             url = `${url}&filter={"agentId" : "${agentId}"}`;

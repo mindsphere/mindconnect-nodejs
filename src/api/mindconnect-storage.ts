@@ -1,9 +1,9 @@
+import * as AsyncLock from "async-lock";
+import * as debug from "debug";
 import * as fs from "fs";
+import * as _ from "lodash";
 import * as path from "path";
 import { IMindConnectConfiguration } from "..";
-import debug = require("debug");
-import AsyncLock = require("async-lock");
-import _ = require("lodash");
 const log = debug("mindconnect-storage");
 
 /**
@@ -29,19 +29,18 @@ export function IsConfigurationStorage(arg: any): arg is IConfigurationStorage {
  * @class DefaultStorage
  */
 export class DefaultStorage implements IConfigurationStorage {
-    lock: AsyncLock;
+    private lock: AsyncLock;
 
     public GetConfig(configuration: IMindConnectConfiguration): IMindConnectConfiguration {
-
         try {
-            const json = <IMindConnectConfiguration>require(path.resolve(`${this._basePath}/${configuration.content.clientId}.json`));
+            const json = <IMindConnectConfiguration>(
+                require(path.resolve(`${this._basePath}/${configuration.content.clientId}.json`))
+            );
             if (_.isEqual(json.content, configuration.content)) {
                 return json;
-
             } else {
                 log("The configuration has changed we will onboard again.");
             }
-
         } catch (err) {
             log(`There is no configuration stored yet for agent with id ${configuration.content.clientId}`);
         }
@@ -50,7 +49,6 @@ export class DefaultStorage implements IConfigurationStorage {
     }
 
     public async SaveConfig(config: IMindConnectConfiguration): Promise<IMindConnectConfiguration> {
-
         const fileName = `${this._basePath}/${config.content.clientId}.json`;
         return await this.lock.acquire(fileName, () => {
             const data = JSON.stringify(config);
@@ -60,12 +58,10 @@ export class DefaultStorage implements IConfigurationStorage {
     }
 
     constructor(private _basePath: string) {
-
         if (!fs.existsSync(this._basePath)) {
             fs.mkdirSync(this._basePath);
         }
 
         this.lock = new AsyncLock({});
-
     }
 }
