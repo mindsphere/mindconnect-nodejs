@@ -77,7 +77,7 @@ describe("MindConnect Setup", () => {
             testObject.AcquireToken.should.exist;
             await testObject.AcquireToken();
             testObject.ValidateToken.should.exist;
-            console.log(testObject._accessToken);
+            // console.log(testObject._accessToken);
             await testObject.ValidateToken();
             testObject._accessToken.should.exist;
 

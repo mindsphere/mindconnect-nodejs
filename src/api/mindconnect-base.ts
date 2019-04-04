@@ -9,7 +9,6 @@ const log = debug("mindconnect");
  * @interface TokenRotation
  */
 export interface TokenRotation {
-
     /**
      * Checks if the token has expired and renews it if necessary.
      *
@@ -20,7 +19,6 @@ export interface TokenRotation {
     RenewToken(): Promise<boolean>;
 }
 
-
 /**
  * Base class for mindconnect agent (and setup) which provides headers and proxy handling.
  *
@@ -29,15 +27,20 @@ export interface TokenRotation {
  * @class MindConnectBase
  */
 export abstract class MindConnectBase {
-
     /**
-    * This is a https proxy agent which is used in the fetch commands if the HTTP_PROXY variable is configured.
-    *
-    * @protected
-    * @type {*}
-    * @memberof MindConnectBase
-    */
+     * This is a https proxy agent which is used in the fetch commands if the HTTP_PROXY variable is configured.
+     *
+     * @protected
+     * @type {*}
+     * @memberof MindConnectBase
+     */
     protected _proxyHttpAgent: any;
+
+    private _headers = {
+        Accept: "*/*",
+        "X-Powered-By": "meowz",
+        "User-Agent": "mindconnect-nodejs (3.4.0)"
+    };
 
     /**
      * Http headers used for /exchange endpoint handling.
@@ -46,9 +49,7 @@ export abstract class MindConnectBase {
      * @memberof MindConnectBase
      */
     protected _multipartHeaders = {
-        "Accept": "*/*",
-        "X-Powered-By": "meowz",
-        "User-Agent": "mindconnect-nodejs",
+        ...this._headers,
         "Content-Type": "multipart/mixed; boundary=mindspheremessage"
     };
 
@@ -59,9 +60,7 @@ export abstract class MindConnectBase {
      * @memberof MindConnectBase
      */
     protected _apiHeaders = {
-        "Accept": "*/*",
-        "X-Powered-By": "meowz",
-        "User-Agent": "mindconnect-nodejs",
+        ...this._headers,
         "Content-Type": "application/json"
     };
 
@@ -72,9 +71,7 @@ export abstract class MindConnectBase {
      * @memberof MindConnectBase
      */
     protected _urlEncodedHeaders = {
-        "Accept": "*/*",
-        "X-Powered-By": "meowz",
-        "User-Agent": "mindconnect-nodejs",
+        ...this._headers,
         "Content-Type": "application/x-www-form-urlencoded"
     };
 
