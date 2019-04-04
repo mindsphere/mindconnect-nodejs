@@ -88,7 +88,7 @@ Mindsphere V3 IoT model requires that you create an asset type and aspect types 
 
 ![assetype](images/types.png)
 
-More information about [MindSphere Data Model](http://go.siemens.net/39453207).
+More information about [MindSphere Data Model](http://bit.ly/2IgVB9T).
 
 ### Step 1: Create an asset
 
@@ -113,7 +113,7 @@ Create an agent in Asset Manager of type core.MindConnectLib create initial JSON
 }
 ```
 
-More Information about [core.MindConnectLib](http://go.siemens.net/41963280) configuration.
+More Information about [core.MindConnectLib](http://bit.ly/2HZ2ehE) configuration.
 
 ### Step 3 : Create an agent
 
