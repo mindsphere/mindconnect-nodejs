@@ -133,6 +133,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
 
             await agent.RenewToken();
 
+            // * This is an expired token which can't be used, signed with self-created certificate
             (<any>agent)._accessToken.access_token =
                 "eyJraWQiOiJrZXktaWQtMSIsImFsZyI6IlJTMjU2IiwidHlwIjoiSldUIn0.eyJqdGkiOiJmN2E0ODg4Yi0zYTFiLTRkZjEtOGFkOS1lYWUyOGZhMTY3OTYiLCJzY29wZSI6WyJtZHNwOmNvcmU6RGVmYXVsdEFnZW50Il0sImlzcyI6Imh0dHBzOi8vc291dGhnYXRlLmV1MS5taW5kc3BoZXJlLmlvL2FwaS9hZ2VudG1hbmFnZW1lbnQvIiwic3ViIjoiYTNhYzVhZTg4OTU0NDcxN2IwMmZhODI4MmEzMGQxYjQiLCJ6aWQiOiJhZ2VudGlhbSIsImF1ZCI6WyJzb3V0aGdhdGUiXSwiaWF0IjoxNTU0MTUyMjQ5LCJleHAiOjE1NTQxNTU4NDksInNjaGVtYXMiOlsidXJuOnNpZW1lbnM6bWluZHNwaGVyZTppYW06djEiXSwidGVuIjoiY2FzdGlkZXYiLCJ0ZW5fY3R4IjoibWFpbi10ZW5hbnQiLCJjYXQiOiJhZ2VudC10b2tlbjp2MSIsImdyYW50X3R5cGUiOiJjbGllbnRfY3JlZGVudGlhbHMifQ.O5glWlktjC2IxRZkjchAnhysmumBonsqcSZhvOAtJj8iRkYtbbzRQWsXv1x59GVwOB5HexC8tPLduYS9CeieuQQyPFXYR8eODUg3GxHwLVowp7gkRYotWa4zZVCQz2KkOjkPzG_eFc5YOJZLcl0JeD6j8cvZB9IKrb6ixX9kcx-9Q_vGenFKxtIletFqsQi1EBu4qXa9btCMYKQ-cl7PYphKAz3z8Z0LrxI8oMz5fGGKXOTIFErP0DnE8quKEsYv2oG8zSuccOmZppHoPOIIhStqJh9ry8rXo-5589FBFLypzxX4ZUflf_5r16kUD0B3GcWQ70YbCGxsMdBEHFSSvWG2f9RZcVCmpTWxRV0iEOylJb8qrlYtkhvG310YZftdVG4XRKRCz6r5zZYfi5vyB_lodziYpF2OcqyCEM3VPw4ORqh9Q2_vs-yS8d1zCubfsyHMAueI3ooEoKSE8bg6nrUtVndBtbsN0v8iaj5pC6K9QuXn4MZyqkOrxEuWBKFCXWNWu08uuwxMw7n_wz2vZeKva8VJfCNqXcL9nV5NwfCDuNZ6s9gSOVDogcj7iqL7F_VI2kpmDFsR8SLFD30g078-JLViyzSAm2dPsZG7u4cyGrghR0w6NKHfitAvA1lYlcQb48b2wtRdKnKgWk_rhK1JaRx4EJH95yCn3VpP2kM";
 
@@ -146,6 +147,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             }
             errorOccured.should.be.true;
 
+            // * This is self-created certificate
             (<any>(
                 agent
             ))._oauthPublicKey.value = `-----BEGIN PUBLIC KEY-----MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAsj2ULABiqDw3IMatCR8zpwTb3qIwkurNN8O+o9qrcjgsXUkXMYDuGMN5RlUeOkG6bOdQeQmvllnm7qJ00QFRamSaM9NTg3I9yGxUeQsddsb4PtMypeeq1jenoeswLFwK4p9dgZPbPfb/Oi+ymlBdb0HbTTzCufswcfZ/erFeQa9vEtaM1HRDEA4ZZyfDELkM17CjCpzKwfeHeZ6JSOYJ+a4yLy8viwU88PGQN6gcw6f3fUhnbMxqkN9Uyw/PmkD+cwNxSuOaFHZ9Q8gFmqnlu8NJNKIijMC2y1xQlSiK89Nos8rYgLPwMgREi8Kil5Ve5GSz3mdjsBR1P5DHNjoYNLBq4TpRweDdUYkQz82LSFgfhdvd/+tenk1vgYqCbViEKrKjO2+G0haT6x1a/9EZkv+yV9MI+f4XOoCZl1CWQE1fzntUUgT7a59NpGb4z9iVg30dAsAPNLE/qzx4X59SQt86H5xcKAyjqXeEbSVllqST+pGb/dEt1UqBjXPHn2UhacUCABzHlU1KaYTTrdGNzXsnof+GF4FyjPhcR77mi10q+sBb37ACcDxW07IwV5ddTCMOtG5zQo+cWqFHwNQlgqUMevbI6n6+g7OC774VLaMy2TdKfUUZRQowHetz1bBhWUY+iEjfxf1vR6IKJ7gJuUUeu4WxSiEQ0bbh0qRF8v0CAwEAAQ==-----END PUBLIC KEY-----`;
