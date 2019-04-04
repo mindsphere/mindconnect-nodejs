@@ -3,6 +3,7 @@
 ## 3.4.0 - (Malachite Vienna) - April 2019
 
 - new CLI commands mc starter-ts and mc starter-js for starter projects
+- added version to user-agent
 
 ## Bugfixes 3.4.0
 
