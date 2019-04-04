@@ -6,6 +6,8 @@ import getDiagnosticCommand from "./commands/mc-get-diagnostic";
 import onboardCommand from "./commands/mc-onboard";
 import registerDiagnosticCommand from "./commands/mc-register-diagnostic";
 import serviceCredentialsCommand from "./commands/mc-service-credentials";
+import starterJsCommand from "./commands/mc-starter-js";
+import starterTsCommand from "./commands/mc-starter-ts";
 import unregisterDiagnoticCommand from "./commands/mc-unregister-diagnostic";
 import uploadFileCommand from "./commands/mc-upload-file";
 import uploadTimeSeriesCommand from "./commands/mc-upload-timeseries";
@@ -25,6 +27,10 @@ serviceCredentialsCommand(program);
 registerDiagnosticCommand(program);
 getDiagnosticCommand(program);
 unregisterDiagnoticCommand(program);
+
+// * cli for starter projects
+starterTsCommand(program);
+starterJsCommand(program);
 
 program.parse(process.argv);
 

@@ -42,6 +42,11 @@ src/**/*.js
 src/**/*.map
 src/**/*.d.ts
 
+templates/**/*.js
+templates/**/*.map
+templates/**/*.d.ts
+
+
 test/**/*.js
 test/**/*.map
 test/**/*.d.ts
