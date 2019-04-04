@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.4.0 - (Malachite Vienna) - April 2019
+
+- new CLI commands mc starter-ts and mc starter-js for starter projects
+
+## Bugfixes 3.4.0
+
+- refactored the CLI commands to separate files
+- made lock private in mindconnect storage
+- references upgrade
+
 ## 3.3.0 - (Midnight Blue Vienna) - February 2019
 
 - upgraded referenced packages to the latest version

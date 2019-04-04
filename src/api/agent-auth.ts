@@ -1,25 +1,31 @@
+import * as AsyncLock from "async-lock";
 import * as debug from "debug";
 import * as jwt from "jsonwebtoken";
 import fetch from "node-fetch";
 import "url-search-params-polyfill";
 import * as uuid from "uuid";
-import { AccessToken, IConfigurationStorage, IMindConnectConfiguration, OnboardingStatus, retry, SelfSignedClientAssertion, TokenKey } from "..";
+import {
+    AccessToken,
+    IConfigurationStorage,
+    IMindConnectConfiguration,
+    OnboardingStatus,
+    retry,
+    SelfSignedClientAssertion,
+    TokenKey
+} from "..";
 import { MindConnectBase, TokenRotation } from "./mindconnect-base";
 import { DefaultStorage, IsConfigurationStorage } from "./mindconnect-storage";
-import AsyncLock = require("async-lock");
-import _ = require("lodash");
 const log = debug("mindconnect-agentauth");
 const rsaPemToJwk = require("rsa-pem-to-jwk");
 
-
 export abstract class AgentAuth extends MindConnectBase implements TokenRotation {
     /**
-    * The assertion response contains the /exchange token plus additional information. If this is not set, the client will try to
-    * acquire a new token.
-    * @private
-    * @type {AccessToken}
-    * @memberof AgentAuth
-    */
+     * The assertion response contains the /exchange token plus additional information. If this is not set, the client will try to
+     * acquire a new token.
+     * @private
+     * @type {AccessToken}
+     * @memberof AgentAuth
+     */
     protected _accessToken?: AccessToken;
 
     /**
@@ -49,13 +55,11 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
      * @memberof AgentAuth
      */
     protected async SaveConfig(): Promise<object> {
-
         if (!this._storage) {
             throw new Error("Invalid storage configured");
         }
         return this._storage.SaveConfig(this._configuration);
     }
-
 
     /**
      * Onboard the agent and return the onboarding state.
@@ -64,23 +68,29 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
      * @memberof MindConnectAgent
      */
     public async OnBoard(): Promise<OnboardingStatus.StatusEnum> {
-        const headers = { ...this._apiHeaders, "Authorization": `Bearer ${this._configuration.content.iat}` };
+        const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._configuration.content.iat}` };
         const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/register`;
 
         log(`Onboarding - Headers: ${JSON.stringify(headers)} Url: ${url} Profile: ${this.GetProfile()}`);
         try {
-
             let body: object = {};
             if (this.GetProfile() === "RSA_3072") {
                 if (!this._publicJwk)
-                    throw new Error("The RSA_3072 profile requires a certificate (did you call SetupAgentCerts before onboarding?)");
+                    throw new Error(
+                        "The RSA_3072 profile requires a certificate (did you call SetupAgentCerts before onboarding?)"
+                    );
 
                 body = {
-                    "jwks": { "keys": [this._publicJwk] }
+                    jwks: { keys: [this._publicJwk] }
                 };
             }
 
-            const response = await fetch(url, { method: "POST", body: JSON.stringify(body), headers: headers, agent: this._proxyHttpAgent });
+            const response = await fetch(url, {
+                method: "POST",
+                body: JSON.stringify(body),
+                headers: headers,
+                agent: this._proxyHttpAgent
+            });
             const json = await response.json();
 
             if (!response.ok) {
@@ -102,7 +112,6 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
         }
     }
 
-
     /**
      * This method rotates the client secret (reregisters the agent). It is called by RenewToken when the secret is expiring.
      *
@@ -111,27 +120,36 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
      * @memberof AgentAuth
      */
     private async RotateKey(): Promise<boolean> {
-        if (!this._configuration.response)
-            throw new Error("This agent was not onboarded yet.");
+        if (!this._configuration.response) throw new Error("This agent was not onboarded yet.");
 
-        const headers = { ...this._apiHeaders, "Authorization": `Bearer ${this._configuration.response.registration_access_token}` };
+        const headers = {
+            ...this._apiHeaders,
+            Authorization: `Bearer ${this._configuration.response.registration_access_token}`
+        };
         const url = this._configuration.response.registration_client_uri;
 
         let body: object = { client_id: this._configuration.content.clientId }; // mindsphere 3.0. expects a body in the the put request
 
         if (this.GetProfile() === "RSA_3072") {
             if (!this._publicJwk)
-                throw new Error("The RSA_3072 profile requires a certificate (did you call SetupAgentCerts before key rotation?)");
+                throw new Error(
+                    "The RSA_3072 profile requires a certificate (did you call SetupAgentCerts before key rotation?)"
+                );
             body = {
                 ...body,
-                "jwks": { "keys": [this._publicJwk] }
+                jwks: { keys: [this._publicJwk] }
             };
         }
 
         log(`Rotating Key - Headers: ${JSON.stringify(headers)} Url: ${url} Profile: ${this.GetProfile()}`);
 
         try {
-            const response = await fetch(url, { method: "PUT", body: JSON.stringify(body), headers: headers, agent: this._proxyHttpAgent });
+            const response = await fetch(url, {
+                method: "PUT",
+                body: JSON.stringify(body),
+                headers: headers,
+                agent: this._proxyHttpAgent
+            });
             const json = await response.json();
 
             if (!response.ok) {
@@ -140,7 +158,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
 
             if (response.status >= 200 && response.status <= 299) {
                 this._configuration.response = json;
-                await (retry(5, () => this.SaveConfig()));
+                await retry(5, () => this.SaveConfig());
                 return true;
             } else {
                 throw new Error(`invalid response ${JSON.stringify(response)}`);
@@ -193,9 +211,10 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
 
             token = jwt.sign(jwtToken, this._configuration.response.client_secret);
         } else {
-
             if (!this._privateCert) {
-                throw new Error("The RSA_3072 profile requires a certificate (did you call SetupAgentCerts before acquiring a token?)");
+                throw new Error(
+                    "The RSA_3072 profile requires a certificate (did you call SetupAgentCerts before acquiring a token?)"
+                );
             }
 
             token = jwt.sign(jwtToken, this._privateCert, { algorithm: "RS384" });
@@ -204,11 +223,10 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
         log(token);
 
         const formData: any = {
-            "grant_type": "client_credentials",
-            "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-            "client_assertion": token
+            grant_type: "client_credentials",
+            client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+            client_assertion: token
         };
-
 
         const result = new URLSearchParams();
 
@@ -227,7 +245,6 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
      * @memberof AgentAuth
      */
     private async AquireToken(): Promise<boolean> {
-
         const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/oauth/token`;
         const headers = this._urlEncodedHeaders;
         const body = this.CreateClientAssertion().toString();
@@ -235,7 +252,12 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
         log(`Acquire Token Headers ${JSON.stringify(headers)} Url: ${url} Body: ${body.toString()}`);
 
         try {
-            const response = await fetch(url, { method: "POST", body: body, headers: headers, agent: this._proxyHttpAgent });
+            const response = await fetch(url, {
+                method: "POST",
+                body: body,
+                headers: headers,
+                agent: this._proxyHttpAgent
+            });
             const json = await response.json();
 
             if (!response.ok) {
@@ -252,7 +274,11 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
             // process body
         } catch (err) {
             log(err);
-            throw new Error(`Network error occured ${err.message} (hint: possible cause for this error is invalid date/time on the device)`);
+            throw new Error(
+                `Network error occured ${
+                    err.message
+                } (hint: possible cause for this error is invalid date/time on the device)`
+            );
         }
     }
 
@@ -265,9 +291,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
      * @memberof AgentAuth
      */
     private async ValidateToken(): Promise<boolean> {
-
-        if (!this._accessToken)
-            throw new Error("The token needs to be acquired first before validation.");
+        if (!this._accessToken) throw new Error("The token needs to be acquired first before validation.");
 
         if (!this._oauthPublicKey) {
             const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/oauth/token_key`;
@@ -295,13 +319,13 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
         }
 
         log(this._oauthPublicKey.value);
-        const publicKeyWithLineBreaks = this._oauthPublicKey.value.replace("-----BEGIN PUBLIC KEY-----", "-----BEGIN PUBLIC KEY-----\n").replace("-----END PUBLIC KEY-----", "\n-----END PUBLIC KEY-----");
-        if (!this._accessToken.access_token)
-            throw new Error("Invalid access token");
+        const publicKeyWithLineBreaks = this._oauthPublicKey.value
+            .replace("-----BEGIN PUBLIC KEY-----", "-----BEGIN PUBLIC KEY-----\n")
+            .replace("-----END PUBLIC KEY-----", "\n-----END PUBLIC KEY-----");
+        if (!this._accessToken.access_token) throw new Error("Invalid access token");
 
         const result = jwt.verify(this._accessToken.access_token, publicKeyWithLineBreaks);
         return result ? true : false;
-
     }
 
     /**
@@ -312,7 +336,6 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
      * @memberof AgentAuth
      */
     public async RenewToken(): Promise<boolean> {
-
         if (!this._configuration.response) {
             throw new Error("the device was not onborded or the response was deleted");
         }
@@ -336,13 +359,13 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
         if (this._configuration.response.client_secret_expires_at - 25 * 3600 <= now) {
             log(`client secret will expire in ${secondsLeft} seconds - renewing`);
             try {
-
                 await this.secretLock.acquire("secretLock", async () => {
                     await retry(5, () => this.RotateKey());
                 });
-
             } catch (err) {
-                console.warn(`There is a problem rotating the client secrets. The client secret will expire in ${secondsLeft}`);
+                console.warn(
+                    `There is a problem rotating the client secrets. The client secret will expire in ${secondsLeft}`
+                );
             }
 
             this._accessToken = undefined; // delete the token it will need to be regenerated with the new key
@@ -351,8 +374,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
         if (!this._accessToken) {
             await this.AquireToken();
             await this.ValidateToken();
-            if (!this._accessToken)
-                throw new Error("Error aquiering the new token!");
+            if (!this._accessToken) throw new Error("Error aquiering the new token!");
             log("New token acquired");
         }
 
@@ -385,7 +407,6 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
      * @memberOf AgentAuth
      */
     public SetupAgentCertificate(privateCert: string | Buffer) {
-
         if (this.GetProfile() !== "RSA_3072") {
             throw new Error("The certificates are required only for RSA_3072 configuration!");
         }
@@ -416,8 +437,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
         super();
         log(`constructor called with parameters: configuration: ${JSON.stringify(configuration)} path: ${basePath}`);
 
-        if (!configuration || !configuration.content)
-            throw new Error("Invalid configuration!");
+        if (!configuration || !configuration.content) throw new Error("Invalid configuration!");
 
         if (typeof basePath === "string") {
             this._storage = new DefaultStorage(basePath);
@@ -431,7 +451,9 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
 
         this._profile = `${this._configuration.content.clientCredentialProfile}`;
         if (["SHARED_SECRET", "RSA_3072"].indexOf(this._profile) < 0) {
-            throw new Error("Configuration profile not supported. The library only supports the shared_secret and RSA_3072 config profiles");
+            throw new Error(
+                "Configuration profile not supported. The library only supports the shared_secret and RSA_3072 config profiles"
+            );
         }
         log(`Agent configuration with ${this._profile}`);
 
