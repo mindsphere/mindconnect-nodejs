@@ -61,13 +61,13 @@ Here are some examples how to use the CLI:
 ## Using CLI to generate starter projects
 
 ```bash
-# 1. install the library globaly if you want to use its command line interface.
+# install the library globaly if you want to use its command line interface.
  npm install -g @mindconnect/mindconnect-nodejs
 
-# 3.1 for typescript nodejs project run
+# for typescript nodejs project run
 mc starter-ts
 
-# 3.2 for javascript nodejs project run
+# for javascript nodejs project run
 mc starter-js
 
 # This will create a folder starterts (or starterjs) which you can use as a starting point for your agent.
