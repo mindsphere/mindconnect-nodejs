@@ -43,23 +43,39 @@ The library comes with a command line interface which can also be installed glob
  npm install -g @mindconnect/mindconnect-nodejs
 ```
 
-<img src="images/full.gif">
 
-## Using generator for the project
+
+## Using CLI
+
+The CLI can be used to create starter projects, upload timeseries, events and files, read agent diagnostics etc. 
 
 ```bash
-# 1. clone this repository
-git clone git@code.siemens.com:mindsphere-mainline/incubator/mindconnect-nodejs.git
+# run mc --help to see the full help inforamtion
+mc --help
+```
 
-# 2. install depencencies
-npm install
+Here are some examples how to use the CLI:
+
+<img src="images/full.gif">
+
+## Using CLI to generate starter projects
+
+```bash
+# 1. install the library globaly if you want to use its command line interface.
+ npm install -g @mindconnect/mindconnect-nodejs
+
 # 3.1 for typescript nodejs project run
-npm run starterts
+mc starter-ts
 
 # 3.2 for javascript nodejs project run
-npm run starterjs
+mc starter-js
 
-# This will create a folder starterts (or starterjs) which you can use as a starting point for your agent. Don't forget to run npm install there :)
+# This will create a folder starterts (or starterjs) which you can use as a starting point for your agent.
+# Don't forget to run npm install there.
+
+# for full help run
+mc starter-ts --help # or
+mc starter-js --help
 ```
 
 ## How to create a nodejs MindSphere agent
