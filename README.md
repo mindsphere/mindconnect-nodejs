@@ -9,7 +9,7 @@ The mindconnect-nodejs library enables the user to upload time series data, file
 This project has started as a community effort at Siemens AG and is now available for general use.
 
 [![Build Status](https://jenkins.mindconnect.rocks/buildStatus/icon?job=mindconnect-nodejs/master)](https://jenkins.mindconnect.rocks/blue/organizations/jenkins/mindconnect-nodejs/activity/) [![The MIT License](https://img.shields.io/badge/license-MIT-009999.svg?style=flat)](./LICENSE.md)
-[![npm](https://img.shields.io/npm/v/@mindconnect/mindconnect-nodejs/latest.svg?style=flat)](https://www.npmjs.com/package/@mindconnect/mindconnect-nodejs) ![](https://img.shields.io/npm/dw/@mindconnect/mindconnect-nodejs.svg?colorB=009999)
+[![npm](https://img.shields.io/npm/v/@mindconnect/mindconnect-nodejs/latest.svg?style=flat)](https://www.npmjs.com/package/@mindconnect/mindconnect-nodejs) ![downloads](https://img.shields.io/npm/dw/@mindconnect/mindconnect-nodejs.svg?colorB=009999)
 [![Known Vulnerabilities](https://snyk.io/test/github/mindsphere/mindconnect-nodejs/badge.svg?targetFile=package.json)](https://snyk.io/test/github/mindsphere/mindconnect-nodejs?targetFile=package.json)
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/mindsphere/mindconnect-nodejs.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/mindsphere/mindconnect-nodejs/context:javascript)
 
@@ -43,23 +43,39 @@ The library comes with a command line interface which can also be installed glob
  npm install -g @mindconnect/mindconnect-nodejs
 ```
 
-<img src="images/full.gif">
+## Using CLI
 
-## Using generator for the project
+The CLI can be used to create starter projects, upload timeseries, events and files, read agent diagnostics etc.
 
 ```bash
-# 1. clone this repository
-git clone git@code.siemens.com:mindsphere-mainline/incubator/mindconnect-nodejs.git
+# run mc --help to see the full help inforamtion
+mc --help
+```
 
-# 2. install depencencies
-npm install
+Here are some examples how to use the CLI:
+
+![image](images/full.gif)
+
+<!-- <img src="images/full.gif"> -->
+
+## Using CLI to generate starter projects
+
+```bash
+# 1. install the library globaly if you want to use its command line interface.
+ npm install -g @mindconnect/mindconnect-nodejs
+
 # 3.1 for typescript nodejs project run
-npm run starterts
+mc starter-ts
 
 # 3.2 for javascript nodejs project run
-npm run starterjs
+mc starter-js
 
-# This will create a folder starterts (or starterjs) which you can use as a starting point for your agent. Don't forget to run npm install there :)
+# This will create a folder starterts (or starterjs) which you can use as a starting point for your agent.
+# Don't forget to run npm install there.
+
+# for full help run
+mc starter-ts --help # or
+mc starter-js --help
 ```
 
 ## How to create a nodejs MindSphere agent
@@ -314,9 +330,9 @@ The diagnostic endpoint gives informations about the possible problems which an 
 
 ### Using setup and diagnostic from CLI
 
-**Use this only in secure enviroments! (e.g on your working station, not on the agents)**
+This should only be used **in secure enviroments!** (e.g on your working station, not on the agents).
 
-<img src="images/setup.gif">
+![setup](images/setup.gif)
 
 ### Using setup and diagnostic from code
 

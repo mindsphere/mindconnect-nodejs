@@ -22,8 +22,6 @@
         "dev": "npm run ts:build && cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 concurrently --raw \"npm run ts:watch\" \"npm run test:watch\" ",
         "start-agent-dev": "npm run ts:build && cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 cross-env DEBUG=http,mindconnect-agent,mindconnect-fileencoder node ./src/demoagent/test-agent.js ",
         "doc": "typedoc -out docs --excludePrivate --readme ./README.md --target es6 --name mindconnect-nodejs --exclude \"**/*+(test-agent|index|.spec|.e2e).ts\" --externalPattern \"**/node_modules/**\" --ignoreCompilerErrors && cp -R images docs/images/ && cp CHANGELOG.md docs/CHANGELOG.md",
-        "starterjs": "npm pack --unsafe-perm && rimraf starterts && mkdir starterjs && mv ./*.tgz starterjs/ && cp templates/js/index.txt starterjs/index.js && node templates/generate.js ./js/package_template.json >> starterjs/package.json",
-        "starterts": "npm pack --unsafe-perm && mkdir starterts && mv ./*.tgz starterts/ && cp templates/ts/index.txt starterts/index.ts && node templates/generate.js ./ts/package_template.json >> starterts/package.json && cp templates/ts/ts.json starterts/tsconfig.json",
         "createkey": "openssl genrsa -out private.key 3072"
     },
     "keywords": [
