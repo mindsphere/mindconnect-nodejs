@@ -68,7 +68,7 @@ describe("MindConnect Setup", () => {
         })
     );
 
-    it.only(
+    it(
         "should validate token also on certificate change",
         mochaAsync(async () => {
             const mcsetup = new MindConnectSetup(gateway, basicAuth, tenant);
