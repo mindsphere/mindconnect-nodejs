@@ -346,6 +346,10 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
             } catch (err) {
                 log("jwt exchange token expired - renewing");
                 this._accessToken = undefined;
+                if (err.name === "JsonWebTokenError" && err.message === "invalid signature") {
+                    log("invalid certificate - renewing");
+                    this._oauthPublicKey = undefined;
+                }
             }
         }
 
