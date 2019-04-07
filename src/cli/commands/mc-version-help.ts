@@ -3,7 +3,7 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 
 export default (program: CommanderStatic) => {
-    program.version("MindConnect NodeJS CLI - Version: 3.4.0");
+    program.version("MindConnect NodeJS CLI - Version: 3.5.0");
 
     program.on("--help", () => {
         log(`\n  Documentation:\n`);
