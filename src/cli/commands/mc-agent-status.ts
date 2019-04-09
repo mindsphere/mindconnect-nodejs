@@ -138,7 +138,7 @@ const coloredStatusLog = (agent: MindConnectAgent) => {
 };
 
 const coloredBoardingStatusLog = (boardingstatus: OnboardingStatus) => {
-    let color = chalk.magentaBright;
+    let color;
     if (boardingstatus.status === OnboardingStatus.StatusEnum.ONBOARDING) {
         color = chalk.yellowBright;
     } else if (boardingstatus.status === OnboardingStatus.StatusEnum.NOTONBOARDED) {
