@@ -133,6 +133,36 @@ describe("MindConnect Setup", () => {
     );
 
     it(
+        "should get agent status",
+        mochaAsync(async () => {
+            const mcsetup = new MindConnectSetup(gateway, basicAuth, tenant);
+            const agent = new MindConnectAgent(sharedSecretConfig);
+
+            const agentStatus = await mcsetup.GetAgentStatus(agent.ClientId());
+            agentStatus.should.not.be.undefined;
+            agentStatus.since.should.not.be.undefined;
+            agentStatus.status.toString().should.be.oneOf(["ONLINE", "OFFLINE"]);
+        })
+    );
+
+    it(
+        "should get agent boarding status",
+        mochaAsync(async () => {
+            const mcsetup = new MindConnectSetup(gateway, basicAuth, tenant);
+            const agent = new MindConnectAgent(sharedSecretConfig);
+
+            const boardingStatus = await mcsetup.GetBoardingStatus(agent.ClientId());
+
+            boardingStatus.should.not.be.undefined;
+            if (!boardingStatus.status) {
+                throw new Error("invalid status");
+            }
+            boardingStatus.status.should.not.be.undefined;
+            boardingStatus.status.should.be.equal("ONBOARDED");
+        })
+    );
+
+    it(
         "should register 2 agents for diagnostics",
         mochaAsync(async () => {
             if (!process.env.CI) {

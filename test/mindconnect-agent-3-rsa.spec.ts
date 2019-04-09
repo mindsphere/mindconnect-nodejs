@@ -228,7 +228,6 @@ describe("MindConnectApi Version 3 Agent (RSA_3072)", () => {
             }
 
             const currentToken = await agent.GetAgentToken();
-            console.log(currentToken);
             currentToken.should.not.be.undefined;
         })
     );

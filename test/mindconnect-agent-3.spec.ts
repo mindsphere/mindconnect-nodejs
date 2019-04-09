@@ -208,7 +208,6 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             }
 
             const currentToken = await agent.GetAgentToken();
-            console.log(currentToken);
             currentToken.should.not.be.undefined;
         })
     );
