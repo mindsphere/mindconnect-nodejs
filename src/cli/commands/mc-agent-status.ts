@@ -4,7 +4,7 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { MindConnectAgent, MindConnectSetup } from "../..";
-import { OnlineStatus } from "../../api/mindconnect-models";
+import { OnboardingStatus, OnlineStatus } from "../../api/mindconnect-models";
 import {
     checkCertificate,
     decrypt,
@@ -54,17 +54,19 @@ export default (program: CommanderStatic) => {
                     }
 
                     log(
-                        `Local information (.mc folder):\nAgent Id: ${chalk.magentaBright(agent.ClientId())} is ${
+                        `\nAgent status, local information (from .mc folder):\nAgent Id: ${chalk.magentaBright(
+                            agent.ClientId()
+                        )} is ${
                             agent.IsOnBoarded() ? chalk.magentaBright("onboarded") : chalk.redBright("not onboarded")
-                        }, data source ${
+                        }, data source is ${
                             agent.HasDataSourceConfiguration()
-                                ? chalk.magentaBright("is configured")
-                                : chalk.redBright(" is not configured")
+                                ? chalk.magentaBright("configured")
+                                : chalk.redBright("not configured")
                         }, mappings are ${
                             agent.HasDataMappings()
                                 ? chalk.magentaBright("configured")
                                 : chalk.redBright("not configured")
-                        }`
+                        }.`
                     );
 
                     if (!options.passkey) {
@@ -87,12 +89,34 @@ export default (program: CommanderStatic) => {
 
                     if (onlinestatus) {
                         log(
-                            `${chalk.magentaBright("Online")} Status: ${
+                            `Online Status: ${
                                 onlinestatus.status === OnlineStatus.StatusEnum.OFFLINE
                                     ? chalk.redBright("OFFLINE")
                                     : chalk.greenBright("ONLINE")
                             } since: ${chalk.magentaBright(onlinestatus.since)}`
                         );
+                    }
+
+                    let boardingstatus: OnboardingStatus | undefined;
+
+                    await retry(
+                        options.retry,
+                        async () => (boardingstatus = await setup.GetBoardingStatus(agent.ClientId())),
+                        300,
+                        retrylog("GetBoardingStatus")
+                    );
+
+                    if (boardingstatus && boardingstatus.status) {
+                        let color = chalk.magentaBright;
+                        if (boardingstatus.status === OnboardingStatus.StatusEnum.ONBOARDING) {
+                            color = chalk.yellowBright;
+                        } else if (boardingstatus.status === OnboardingStatus.StatusEnum.NOTONBOARDED) {
+                            color = chalk.redBright;
+                        } else {
+                            color = chalk.greenBright;
+                        }
+
+                        log(`Agent is ${color("" + boardingstatus.status)}.`);
                     }
 
                     if (agent.HasDataSourceConfiguration()) {
@@ -113,10 +137,13 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc agent-status   \t\t\t\tuses default ${chalk.magentaBright("agentconfig.json")}`);
-            log(`    mc agent-status --config agent.json \tuses specified configuration file`);
-            log(`    mc agent-status --cert private.key \t\tuses specified key for RSA_3072 profile`);
-            log(`    mc agent-status --passkey mypasskey \tdisplays also the online agent information`);
+            log(`    mc agent-status   \t\t\t\t\tuses default ${chalk.magentaBright("agentconfig.json")}`);
+            log(`    mc agent-status --config agent.json \t\tuses specified configuration file`);
+            log(`    mc agent-status --cert private.key \t\t\tuses specified key for RSA_3072 profile`);
+            log(`    mc agent-status --passkey mypasskey \t\tdisplays also the online agent information`);
+            log(
+                `    mc agent-status --passkey mypasskey --verbose \tdisplays additionally the mappings and configuration`
+            );
             serviceCredentialLog();
         });
 };

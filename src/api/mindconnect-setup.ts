@@ -2,6 +2,7 @@ import * as debug from "debug";
 import fetch from "node-fetch";
 import { DiagnosticInformation, OnlineStatus, PagedDiagnosticActivation, PagedDiagnosticInformation } from "..";
 import { CredentialAuth } from "./credential-auth";
+import { OnboardingStatus } from "./mindconnect-models";
 const log = debug("mindconnect-setup");
 // Copyright (C), Siemens AG 2017
 
@@ -250,6 +251,34 @@ export class MindConnectSetup extends CredentialAuth {
                 const json = await response.json();
                 log(`GetAgentStatus Response ${JSON.stringify(json)}`);
                 return json as OnlineStatus;
+            } else {
+                throw new Error(`invalid response ${JSON.stringify(response)}`);
+            }
+        } catch (err) {
+            log(err);
+            throw new Error(`Network error occured ${err.message}`);
+        }
+    }
+
+    public async GetBoardingStatus(agentId: string): Promise<OnboardingStatus> {
+        await this.RenewToken();
+        if (!this._accessToken) {
+            throw new Error("The agent doesn't have a valid access token.");
+        }
+
+        const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
+        const url = `${this._gateway}/api/agentmanagement/v3/agents/${agentId}/boarding/status`;
+        log(`GetAgentStatus Headers ${JSON.stringify(headers)} Url ${url}`);
+
+        try {
+            const response = await fetch(url, { method: "GET", headers: headers, agent: this._proxyHttpAgent });
+            if (!response.ok) {
+                throw new Error(`${response.statusText} ${await response.text()}`);
+            }
+            if (response.status >= 200 && response.status <= 299) {
+                const json = await response.json();
+                log(`GetBoardingStatus Response ${JSON.stringify(json)}`);
+                return json as OnboardingStatus;
             } else {
                 throw new Error(`invalid response ${JSON.stringify(response)}`);
             }
