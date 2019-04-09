@@ -53,21 +53,7 @@ export default (program: CommanderStatic) => {
                         agent.SetupAgentCertificate(fs.readFileSync(options.cert));
                     }
 
-                    log(
-                        `\nAgent status, local information (from .mc folder):\nAgent Id: ${chalk.magentaBright(
-                            agent.ClientId()
-                        )} is ${
-                            agent.IsOnBoarded() ? chalk.magentaBright("onboarded") : chalk.redBright("not onboarded")
-                        }, data source is ${
-                            agent.HasDataSourceConfiguration()
-                                ? chalk.magentaBright("configured")
-                                : chalk.redBright("not configured")
-                        }, mappings are ${
-                            agent.HasDataMappings()
-                                ? chalk.magentaBright("configured")
-                                : chalk.redBright("not configured")
-                        }.`
-                    );
+                    coloredStatusLog(agent);
 
                     if (!options.passkey) {
                         errorLog(
@@ -107,16 +93,7 @@ export default (program: CommanderStatic) => {
                     );
 
                     if (boardingstatus && boardingstatus.status) {
-                        let color = chalk.magentaBright;
-                        if (boardingstatus.status === OnboardingStatus.StatusEnum.ONBOARDING) {
-                            color = chalk.yellowBright;
-                        } else if (boardingstatus.status === OnboardingStatus.StatusEnum.NOTONBOARDED) {
-                            color = chalk.redBright;
-                        } else {
-                            color = chalk.greenBright;
-                        }
-
-                        log(`Agent is ${color("" + boardingstatus.status)}.`);
+                        coloredBoardingStatusLog(boardingstatus);
                     }
 
                     if (agent.HasDataSourceConfiguration()) {
@@ -146,4 +123,28 @@ export default (program: CommanderStatic) => {
             );
             serviceCredentialLog();
         });
+};
+
+const coloredStatusLog = (agent: MindConnectAgent) => {
+    log(
+        `\nAgent status, local information (from .mc folder):\nAgent Id: ${chalk.magentaBright(agent.ClientId())} is ${
+            agent.IsOnBoarded() ? chalk.magentaBright("onboarded") : chalk.redBright("not onboarded")
+        }, data source is ${
+            agent.HasDataSourceConfiguration() ? chalk.magentaBright("configured") : chalk.redBright("not configured")
+        }, mappings are ${
+            agent.HasDataMappings() ? chalk.magentaBright("configured") : chalk.redBright("not configured")
+        }.`
+    );
+};
+
+const coloredBoardingStatusLog = (boardingstatus: OnboardingStatus) => {
+    let color = chalk.magentaBright;
+    if (boardingstatus.status === OnboardingStatus.StatusEnum.ONBOARDING) {
+        color = chalk.yellowBright;
+    } else if (boardingstatus.status === OnboardingStatus.StatusEnum.NOTONBOARDED) {
+        color = chalk.redBright;
+    } else {
+        color = chalk.greenBright;
+    }
+    log(`Agent is ${color("" + boardingstatus.status)}.`);
 };
