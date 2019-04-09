@@ -1,7 +1,8 @@
-import { CommanderStatic } from "commander";
 import chalk from "chalk";
-import { errorLog, isUrl, getPiamUrl, encrypt, storeAuth, decrypt } from "../../api/utils";
+import { CommanderStatic } from "commander";
 import { log } from "console";
+import { decrypt, encrypt, errorLog, getPiamUrl, isUrl, storeAuth } from "../../api/utils";
+import { serviceCredentialLog } from "./command-utils";
 
 export default (program: CommanderStatic) => {
     program
@@ -48,13 +49,6 @@ export default (program: CommanderStatic) => {
             log(
                 `    mc service-credentials --user tenantx001 --password xxxx-xxx-x-x --gateway eu1 --tenant tenantx --passkey mypasskey`
             );
-            log(`\n  Important:\n`);
-            log(`    this should be used only in secure environments for setup tasks\n`);
-            log(`    how to get service credentials:`);
-            log(
-                chalk.magentaBright(
-                    `    https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials`
-                )
-            );
+            serviceCredentialLog();
         });
 };

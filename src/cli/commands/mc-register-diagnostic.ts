@@ -5,6 +5,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { MindConnectSetup } from "../..";
 import { decrypt, errorLog, homeDirLog, loadAuth, proxyLog, verboseLog } from "../../api/utils";
+import { serviceCredentialLog } from "./command-utils";
 
 export default (program: CommanderStatic) => {
     program
@@ -20,8 +21,8 @@ export default (program: CommanderStatic) => {
                     if (!options.passkey) {
                         errorLog("you have to provide a passkey (run mc rd --help for full description)", true);
                     }
-                    homeDirLog(options.verbose);
-                    proxyLog(options.verbose);
+                    homeDirLog(options.verbose, chalk.magentaBright);
+                    proxyLog(options.verbose, chalk.magentaBright);
 
                     const auth = loadAuth();
                     const setup = new MindConnectSetup(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
@@ -56,17 +57,6 @@ export default (program: CommanderStatic) => {
             log(`\n  Examples:\n`);
             log(`    mc rd -k mypasskey`);
             log(`    mc register-diagnostic --config someagent.json -passkey mypasskey`);
-            log(`\n  Important:\n`);
-            log(
-                `    you need to supply the ${chalk.magentaBright(
-                    "service credentials"
-                )} for this operation and provide the passkey \n`
-            );
-            log(`    how to get service credentials:`);
-            log(
-                chalk.magentaBright(
-                    `    https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials`
-                )
-            );
+            serviceCredentialLog();
         });
 };

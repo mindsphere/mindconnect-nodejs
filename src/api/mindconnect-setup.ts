@@ -1,6 +1,6 @@
 import * as debug from "debug";
 import fetch from "node-fetch";
-import { DiagnosticInformation, PagedDiagnosticActivation, PagedDiagnosticInformation } from "..";
+import { DiagnosticInformation, OnlineStatus, PagedDiagnosticActivation, PagedDiagnosticInformation } from "..";
 import { CredentialAuth } from "./credential-auth";
 const log = debug("mindconnect-setup");
 // Copyright (C), Siemens AG 2017
@@ -201,7 +201,9 @@ export class MindConnectSetup extends CredentialAuth {
 
     private async GetPagedInforamtion(page: number, agentId?: string): Promise<PagedDiagnosticInformation> {
         await this.RenewToken();
-        if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
+        if (!this._accessToken) {
+            throw new Error("The agent doesn't have a valid access token.");
+        }
 
         const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
         let url = `${this._gateway}/api/mindconnect/v3/diagnosticInformation?size=50&page=${page}`;
@@ -220,6 +222,34 @@ export class MindConnectSetup extends CredentialAuth {
                 const json = await response.json();
                 log(`GetDiagnosticInformation Response ${JSON.stringify(json)}`);
                 return json;
+            } else {
+                throw new Error(`invalid response ${JSON.stringify(response)}`);
+            }
+        } catch (err) {
+            log(err);
+            throw new Error(`Network error occured ${err.message}`);
+        }
+    }
+
+    public async GetAgentStatus(agentId: string): Promise<OnlineStatus> {
+        await this.RenewToken();
+        if (!this._accessToken) {
+            throw new Error("The agent doesn't have a valid access token.");
+        }
+
+        const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
+        const url = `${this._gateway}/api/agentmanagement/v3/agents/${agentId}/status`;
+        log(`GetAgentStatus Headers ${JSON.stringify(headers)} Url ${url}`);
+
+        try {
+            const response = await fetch(url, { method: "GET", headers: headers, agent: this._proxyHttpAgent });
+            if (!response.ok) {
+                throw new Error(`${response.statusText} ${await response.text()}`);
+            }
+            if (response.status >= 200 && response.status <= 299) {
+                const json = await response.json();
+                log(`GetAgentStatus Response ${JSON.stringify(json)}`);
+                return json as OnlineStatus;
             } else {
                 throw new Error(`invalid response ${JSON.stringify(response)}`);
             }

@@ -114,13 +114,19 @@ export const verboseLog = (message: any, verbose: any) => {
     }
 };
 
-export const proxyLog = (verbose: any) => {
+export const proxyLog = (verbose: any, color?: Function) => {
     const proxy = process.env.HTTP_PROXY || process.env.http_proxy;
-    verboseLog(proxy ? `Using ${chalk.cyanBright(proxy)} as proxy server` : "No proxy configured.", verbose);
+    if (!color) {
+        color = chalk.cyanBright;
+    }
+    verboseLog(proxy ? `Using ${color(proxy)} as proxy server` : "No proxy configured.", verbose);
 };
 
-export const homeDirLog = (verbose: any) => {
-    verboseLog(`Using configuration stored in ${chalk.cyanBright(getHomeDotMcDir())}`, verbose);
+export const homeDirLog = (verbose: any, color?: Function) => {
+    if (!color) {
+        color = chalk.cyanBright;
+    }
+    verboseLog(`Using configuration stored in ${color(getHomeDotMcDir())}`, verbose);
 };
 
 export const getConfigProfile = (config: IMindConnectConfiguration): string => {
