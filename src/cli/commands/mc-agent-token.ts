@@ -4,20 +4,16 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { MindConnectAgent, MindConnectSetup } from "../..";
-import { OnboardingStatus, OnlineStatus } from "../../api/mindconnect-models";
 import {
     checkCertificate,
-    decrypt,
     errorLog,
     getHomeDotMcDir,
     homeDirLog,
-    loadAuth,
     proxyLog,
     retry,
     retrylog,
     verboseLog
 } from "../../api/utils";
-import { serviceCredentialLog } from "./command-utils";
 
 export default (program: CommanderStatic) => {
     program
@@ -54,17 +50,12 @@ export default (program: CommanderStatic) => {
                     if (profile) {
                         agent.SetupAgentCertificate(fs.readFileSync(options.cert));
                     }
-
-                    
                     await retry(
                         options.retry,
                         async () => log(await agent.GetAgentToken()),
                         300,
                         retrylog("GetAgentToken")
                     );
-
-                    
-                    
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
