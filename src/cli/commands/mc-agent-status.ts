@@ -43,9 +43,11 @@ export default (program: CommanderStatic) => {
                         `Agent Status for the agent configuration in: ${chalk.magentaBright(configFile)}.`,
                         options.verbose
                     );
+
                     if (!fs.existsSync(configFile)) {
                         throw new Error(`Can't find file ${configFile}`);
                     }
+
                     const configuration = require(configFile);
                     const profile = checkCertificate(configuration, options);
                     const agent = new MindConnectAgent(configuration, undefined, getHomeDotMcDir());
@@ -72,26 +74,15 @@ export default (program: CommanderStatic) => {
                         300,
                         retrylog("GetAgentStatus")
                     );
-
-                    if (onlinestatus) {
-                        log(
-                            `Online Status: ${
-                                onlinestatus.status === OnlineStatus.StatusEnum.OFFLINE
-                                    ? chalk.redBright("OFFLINE")
-                                    : chalk.greenBright("ONLINE")
-                            } since: ${chalk.magentaBright(onlinestatus.since)}`
-                        );
-                    }
+                    onlineLog(onlinestatus);
 
                     let boardingstatus: OnboardingStatus | undefined;
-
                     await retry(
                         options.retry,
                         async () => (boardingstatus = await setup.GetBoardingStatus(agent.ClientId())),
                         300,
                         retrylog("GetBoardingStatus")
                     );
-
                     if (boardingstatus && boardingstatus.status) {
                         coloredBoardingStatusLog(boardingstatus);
                     }
@@ -105,8 +96,6 @@ export default (program: CommanderStatic) => {
                         verboseLog(chalk.magentaBright("Data Mappings\n"), options.verbose);
                         verboseLog(JSON.stringify(await agent.GetDataMappings(), null, 2), options.verbose);
                     }
-
-                    console.log();
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
@@ -147,4 +136,16 @@ const coloredBoardingStatusLog = (boardingstatus: OnboardingStatus) => {
         color = chalk.greenBright;
     }
     log(`Agent is ${color("" + boardingstatus.status)}.`);
+};
+
+const onlineLog = (onlinestatus: OnlineStatus | undefined) => {
+    if (onlinestatus) {
+        log(
+            `Online Status: ${
+                onlinestatus.status === OnlineStatus.StatusEnum.OFFLINE
+                    ? chalk.redBright("OFFLINE")
+                    : chalk.greenBright("ONLINE")
+            } since: ${chalk.magentaBright(onlinestatus.since)}`
+        );
+    }
 };
