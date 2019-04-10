@@ -3,7 +3,7 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
-import { MindConnectAgent, MindConnectSetup } from "../..";
+import { MindConnectAgent } from "../..";
 import {
     checkCertificate,
     errorLog,
