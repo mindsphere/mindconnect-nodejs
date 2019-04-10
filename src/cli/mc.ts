@@ -13,6 +13,8 @@ import unregisterDiagnoticCommand from "./commands/mc-unregister-diagnostic";
 import uploadFileCommand from "./commands/mc-upload-file";
 import uploadTimeSeriesCommand from "./commands/mc-upload-timeseries";
 import versionAndHelp from "./commands/mc-version-help";
+import agentTokenCommand from "./commands/mc-agent-token";
+
 
 // * generic commands
 versionAndHelp(program);
@@ -22,6 +24,7 @@ onboardCommand(program);
 uploadFileCommand(program);
 uploadTimeSeriesCommand(program);
 createEventCommand(program);
+agentTokenCommand(program);
 agentStatusCommand(program);
 
 // * setup commands
