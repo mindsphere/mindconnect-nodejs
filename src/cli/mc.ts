@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Copyright (C), Siemens AG 2017
 import * as program from "commander";
+import agentStatusCommand from "./commands/mc-agent-status";
 import createEventCommand from "./commands/mc-create-event";
 import getDiagnosticCommand from "./commands/mc-get-diagnostic";
 import onboardCommand from "./commands/mc-onboard";
@@ -21,6 +22,7 @@ onboardCommand(program);
 uploadFileCommand(program);
 uploadTimeSeriesCommand(program);
 createEventCommand(program);
+agentStatusCommand(program);
 
 // * setup commands
 serviceCredentialsCommand(program);

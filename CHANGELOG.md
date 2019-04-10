@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.5.0 - (Venetian Red Vienna) - April 2019
+
+- CLI Command: agent-status displays agent status
+
+
 ## 3.4.0 - (Malachite Vienna) - April 2019
 
 - new CLI commands mc starter-ts and mc starter-js for starter projects

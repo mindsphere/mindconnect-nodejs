@@ -219,6 +219,20 @@ describe("MindConnectApi Version 3 Agent (RSA_3072)", () => {
     );
 
     it(
+        "should be able to get the currently valid agent token",
+        mochaAsync(async () => {
+            const agent = new MindConnectAgent(rsaConfig);
+            agent.SetupAgentCertificate(fs.readFileSync("private.key"));
+            if (!agent.IsOnBoarded()) {
+                await agent.OnBoard();
+            }
+
+            const currentToken = await agent.GetAgentToken();
+            currentToken.should.not.be.undefined;
+        })
+    );
+
+    it(
         "should be able to put the datasource configuration.",
         mochaAsync(async () => {
             const agent = new MindConnectAgent(rsaConfig);

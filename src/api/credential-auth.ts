@@ -102,6 +102,20 @@ export abstract class CredentialAuth extends MindConnectBase implements TokenRot
     }
 
     /**
+     * Returns the current agent token.
+     * This token can be used in e.g. in Postman to call mindspher APIs.
+     *
+     * @returns {(Promise<string>)}
+     *
+     * @memberOf AgentAuth
+     */
+    public async GetServiceToken(): Promise<string> {
+        await this.RenewToken();
+        if (!this._accessToken || !this._accessToken.access_token) throw new Error("Error getting the new token!");
+        return this._accessToken.access_token;
+    }
+
+    /**
      * Creates an instance of CredentialAuth.
      * @param {string} _gateway
      * @param {string} _basicAuth

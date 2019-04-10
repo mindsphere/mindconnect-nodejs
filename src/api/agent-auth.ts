@@ -385,6 +385,20 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
         return true;
     }
 
+    /**
+     * Returns the current agent token.
+     * This token can be used in e.g. in Postman to call mindspher APIs.
+     *
+     * @returns {(Promise<string>)}
+     *
+     * @memberOf AgentAuth
+     */
+    public async GetAgentToken(): Promise<string> {
+        await this.RenewToken();
+        if (!this._accessToken || !this._accessToken.access_token) throw new Error("Error getting the new token!");
+        return this._accessToken.access_token;
+    }
+
     private _profile: string;
 
     /**

@@ -15,9 +15,6 @@ import {
 } from "../../api/utils";
 
 export default (program: CommanderStatic) => {
-    /**
-     * Agent onboarding
-     */
     program
         .command("onboard")
         .alias("ob")
