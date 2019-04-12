@@ -3,7 +3,8 @@
 ## 3.5.0 - (Venetian Red Vienna) - April 2019
 
 - CLI Command: agent-status displays agent status
-
+- CLI Command: agent-token provides a valid agent token for use in tools (e.g. postman)
+- CLI Command: service-token provides a valid service-credentials token for use in tools (e.g. postman)
 
 ## 3.4.0 - (Malachite Vienna) - April 2019
 
