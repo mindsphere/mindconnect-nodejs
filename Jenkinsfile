@@ -1,11 +1,10 @@
 pipeline {
+  options { disableConcurrentBuilds() }
   agent {
     docker {
       image 'node'
       args '-v /home/sn0wcat/mc:/.mc -v /home/sn0wcat/jenkins_artefacts/mindconnect_nodejs:/publish'
     }
-
-    options { disableConcurrentBuilds() }
   }
   stages {
     stage('Prepare') {
