@@ -9,8 +9,9 @@ export default (program: CommanderStatic) => {
         log(`\n  Documentation:\n`);
         log(`    the ${chalk.magentaBright("magenta colored commands *")} require service credentials.`);
         log(`    the ${chalk.cyanBright("cyan colored commands ")}require mindconnectlib (agent) credentials`);
-        log(`    the ${chalk.greenBright("green colored commands ")} are used to setup starter projects`);
-        log(`    the service credentials should only be used in secure environments for setup tasks\n`);
+        log(`    the ${chalk.greenBright("green colored commands #")} are used to setup starter projects`);
+        log(`    the service credentials should only be used in secure environments for setup tasks`);
+        log(`    Full documentation: ${chalk.cyanBright("https://mindconnect-nodejs.github.com")}\n`);
     });
 
     program.on("command:*", function() {

@@ -6,6 +6,10 @@
 - CLI Command: agent-token provides a valid agent token for use in tools (e.g. postman)
 - CLI Command: service-token provides a valid service-credentials token for use in tools (e.g. postman)
 
+## Bugfixes and improvements 3.5.0
+
+- CLI Command: upload-timeseries - improved help and error messages during parsing #20
+
 ## 3.4.0 - (Malachite Vienna) - April 2019
 
 - new CLI commands mc starter-ts and mc starter-js for starter projects

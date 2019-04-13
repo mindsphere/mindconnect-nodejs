@@ -1,6 +1,0 @@
-pages:
-  script:
-  - echo "pushing docs"
-  artifacts:
-    paths:
-    - public
