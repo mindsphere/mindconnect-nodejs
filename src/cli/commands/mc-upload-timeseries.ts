@@ -105,42 +105,19 @@ export default (program: CommanderStatic) => {
                         options.verbose
                     );
 
-                    let i = 0;
+                    let messageCount = 0;
                     await csv()
                         .fromFile(uploadFile)
                         .subscribe(async json => {
                             data.push(json);
                             if (data.length >= maxSize) {
-                                verboseLog(
-                                    `posting timeseries message Nr. ${chalk.cyanBright(
-                                        ++i + ""
-                                    )} with ${chalk.cyanBright(data.length + "")} records `,
-                                    true
-                                );
-                                await retry(
-                                    options.retry,
-                                    () =>
-                                        agent.BulkPostData(convertToTdpArray(data), options.validation ? true : false),
-                                    300,
-                                    retrylog("TimeSeriesBulkUpload")
-                                );
+                                messageCount = await postChunk(messageCount, data, options, agent);
                                 data = [];
                             }
                         });
 
                     if (data.length >= 1) {
-                        verboseLog(
-                            `posting timeseries message Nr. ${chalk.cyanBright(++i + "")} with ${chalk.cyanBright(
-                                data.length + ""
-                            )} records `,
-                            true
-                        );
-                        await retry(
-                            options.retry,
-                            () => agent.BulkPostData(convertToTdpArray(data), options.validation ? true : false),
-                            300,
-                            retrylog("TimeSeriesBulkUpload")
-                        );
+                        messageCount = await postChunk(messageCount, data, options, agent);
                         data = [];
                     }
                 } catch (err) {
@@ -152,3 +129,20 @@ export default (program: CommanderStatic) => {
             displayCsvHelp(chalk.cyanBright);
         });
 };
+
+async function postChunk(messageCount: number, data: any[], options: any, agent: MindConnectAgent) {
+    verboseLog(
+        `posting timeseries message Nr. ${chalk.cyanBright(++messageCount + "")} with ${chalk.cyanBright(
+            data.length + ""
+        )} records `,
+        true
+    );
+    const tdpArray = convertToTdpArray(data);
+    await retry(
+        options.retry,
+        () => agent.BulkPostData(tdpArray, options.validation ? true : false),
+        300,
+        retrylog("TimeSeriesBulkUpload")
+    );
+    return messageCount;
+}
