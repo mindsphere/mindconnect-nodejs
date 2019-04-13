@@ -35,7 +35,7 @@ describe("MindConnect Util Functions:", () => {
             errorMessage = err.message;
         }
         errorOccured.should.be.true;
-        errorMessage.should.contain("str_integer");
+        errorMessage.should.contain("match the configuration!");
         retries.length.should.be.equal(3);
     });
 });
