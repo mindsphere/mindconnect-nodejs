@@ -18,18 +18,22 @@ This project has started as a community effort at Siemens AG and is now availabl
 There are several ways to install the library. The most common one is via npm registry:
 
 ```bash
-# install the library from registry (npmjs.org)
+# install the latest stable library from the npm registry
 npm install @mindconnect/mindconnect-nodejs
+
+# install the latest alpha version from the npm registry
+npm install @mindconnect/mindconnect-nodejs@alpha
 ```
 
 As an alternative, you can also clone the repository, pack and install the files from local file:
 
-``` bash
+```bash
 # clone the repository and run in the library directory
 npm install
 npm pack
 
 #this creates a mindconnect-....tgz file
+
 # in your project directory run
 npm install mindconnect-...tgz --save
 ```
