@@ -13,7 +13,7 @@ export default (program: CommanderStatic) => {
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
-        .description(chalk.magentaBright(`displays the service token for use in other tools (e.g. postman) `))
+        .description(chalk.magentaBright(`displays the service token for use in other tools (e.g. postman) *`))
         .action(options => {
             (async () => {
                 try {

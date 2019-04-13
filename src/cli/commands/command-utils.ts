@@ -15,3 +15,47 @@ export const serviceCredentialLog = () => {
         )
     );
 };
+
+const subtractSecond = (date: Date, seconds: number): string => {
+    const newDate = new Date(date);
+    newDate.setSeconds(date.getSeconds() - seconds);
+    return newDate.toISOString();
+};
+
+export const displayCsvHelp = (color: (chalk: string) => string) => {
+    const now = new Date();
+    log("\n  Examples:\n");
+    log(`    mc ts -f timeseries.csv \t\t\t\t\t upload timeseries from the csv file to mindsphere `);
+    log(`    mc upload-timeseries --file timeseries.csv  --size 100  \t use http post size of 100 records `);
+
+    log(`\n  ${color("Data Format:")} (use your own data point ids from mindsphere)\n`);
+    log(`  timestamp, ${color("dataPointId")}, ${chalk.greenBright("qualityCode")}, ${chalk.yellowBright("value")}`);
+    log(
+        `  ${subtractSecond(now, 2)}, ${color("DP-Temperature")} ,${chalk.greenBright("0")}, ${chalk.yellowBright(
+            "20.34"
+        )}`
+    );
+    log(`  ${subtractSecond(now, 1)}, ${color("DP-Humidity")}, ${chalk.greenBright("0")}, ${chalk.yellowBright("70")}`);
+    log(
+        `  ${subtractSecond(now, 0)}, ${color("DP-Pressure")}, ${chalk.greenBright("0")}, ${chalk.yellowBright(
+            "1012.3"
+        )}`
+    );
+
+    log(
+        `\n  Make sure that the timestamp is in ISO format. The headers and the casing (timestamp, dataPointId) are important.`,
+        `\n  The values must correspond with data types configured in mindsphere (in example: ${color(
+            "DP-Humidity"
+        )} must be an ${color("integer")})`
+    );
+
+    log(`\n  ${color("Important:")}\n`);
+    log(
+        `    You have to configure the data source and data mappings in mindsphere asset manager before you can upload the data`
+    );
+    log(
+        `    See also: ${color(
+            "https://documentation.mindsphere.io/resources/html/asset-manager/en-US/116404525451.html"
+        )}`
+    );
+};

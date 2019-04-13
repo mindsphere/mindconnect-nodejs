@@ -31,7 +31,7 @@ export default (program: CommanderStatic) => {
         )
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
-        .description(chalk.magentaBright(`displays the agent status and agent onboarding status`))
+        .description(chalk.magentaBright(`displays the agent status and agent onboarding status *`))
         .action(options => {
             (async () => {
                 try {

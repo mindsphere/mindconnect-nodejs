@@ -12,7 +12,7 @@ export default (program: CommanderStatic) => {
         .alias("st")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "starterts")
         .option("-v, --verbose", "verbose output")
-        .description(chalk.greenBright("creates a starter project in typescript"))
+        .description(chalk.greenBright("creates a starter project in typescript #"))
         .action(options => {
             (async () => {
                 try {
