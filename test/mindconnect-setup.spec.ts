@@ -13,6 +13,7 @@ describe("MindConnect Setup", () => {
     const tenant = process.env.TENANT || loadAuth().tenant;
     const basicAuth = process.env.BASICAUTH || decrypt(loadAuth(), "passkey.4.unit.test");
     const sharedSecretConfig: IMindConnectConfiguration = require("../agentconfig.json");
+    const offboardConfig: IMindConnectConfiguration = require("../agentconfig.offboard.json");
 
     it("should instantiate", () => {
         const mcsetup = new MindConnectSetup(gateway, basicAuth, tenant);
@@ -224,4 +225,9 @@ describe("MindConnect Setup", () => {
             }
         })
     );
+
+    it.only("should be able to offboard the agent", async () => {
+        const mcsetup = new MindConnectSetup(gateway, basicAuth, tenant);
+        mcsetup.should.exist;
+    });
 });
