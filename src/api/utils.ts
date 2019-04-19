@@ -199,3 +199,9 @@ export const retrylog = function(operation: string) {
         x++;
     };
 };
+
+export const checkAssetId = (agentId: string) => {
+    if (!/[a-f0-9]{32}/gi.test(agentId)) {
+        throw new Error("You have to pass valid 32 char long agent id");
+    }
+};
