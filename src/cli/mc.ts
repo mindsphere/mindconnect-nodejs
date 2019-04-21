@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Copyright (C), Siemens AG 2017
 import * as program from "commander";
+import createTemplateCommand from "./commands/iot-create-template";
 import agentStatusCommand from "./commands/mc-agent-status";
 import agentTokenCommand from "./commands/mc-agent-token";
 import createEventCommand from "./commands/mc-create-event";
@@ -37,6 +38,9 @@ unregisterDiagnoticCommand(program);
 // * cli for starter projects
 starterTsCommand(program);
 starterJsCommand(program);
+
+// * template directory for upload
+createTemplateCommand(program);
 
 program.parse(process.argv);
 

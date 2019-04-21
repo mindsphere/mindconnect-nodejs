@@ -66,6 +66,7 @@ agentconfig*.json
 subtenant.json
 starterjs
 starterts
+bulkupload
 
 #demodata
 

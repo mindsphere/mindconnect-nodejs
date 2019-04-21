@@ -10,7 +10,7 @@ export default (program: CommanderStatic) => {
     program
         .command("starter-js")
         .alias("sj")
-        .option("-d, --dir <directoryname>", "config file with agent configuration", "starterjs")
+        .option("-d, --dir <directoryname>", "directory name", "starterjs")
         .option("-v, --verbose", "verbose output")
         .description(chalk.greenBright("creates a starter project in javascript #"))
         .action(options => {
