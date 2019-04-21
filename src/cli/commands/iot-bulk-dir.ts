@@ -10,17 +10,12 @@ export default (program: CommanderStatic) => {
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
         .option("-i, --assetid <assetid>", "asset id from the mindsphere ")
         .option("-v, --verbose", "verbose output")
-        .description(chalk.greenBright("creates a sample directory name for bulk upload #"))
+        .description(chalk.magentaBright("creates a template directory for bulk upload *"))
         .action(options => {
             (async () => {
                 try {
-                    verboseLog(`Creating directory ${chalk.greenBright(options.dir)}`, options.verbose);
-                    if (fs.existsSync(options.dir)) {
-                        throw new Error(`the directory ${chalk.greenBright(options.dir)} already exists`);
-                    }
+                    checkRequiredParamaters(options);
                     fs.mkdirSync(options.dir);
-
-                    checkAssetId(options.assetid);
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
@@ -28,11 +23,23 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc starter-ts \t\t\t this creates a directory called ${chalk.greenBright("starterts")}`);
             log(
-                `    mc st --dir mindconnect-agent \t this creates a directory called ${chalk.greenBright(
-                    "mindconnect-agent"
+                `    mc iot-bulk-dir  --assetid 12356...abc \t this creates a directory called ${chalk.magentaBright(
+                    "bulkimport"
+                )}`
+            );
+            log(
+                `    mc ibd --dir asset1 -i 123456...abc  \t this creates a directory called ${chalk.magentaBright(
+                    "asset1"
                 )}`
             );
         });
 };
+function checkRequiredParamaters(options: any) {
+    verboseLog(`Creating directory template for assetid ${chalk.magentaBright(options.assetid)}`, options.verbose);
+    checkAssetId(options.assetid);
+    verboseLog(`Creating directory ${chalk.magentaBright(options.dir)}`, options.verbose);
+    if (fs.existsSync(options.dir)) {
+        throw new Error(`the directory ${chalk.magentaBright(options.dir)} already exists`);
+    }
+}
