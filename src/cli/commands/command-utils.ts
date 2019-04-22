@@ -16,7 +16,7 @@ export const serviceCredentialLog = () => {
     );
 };
 
-const subtractSecond = (date: Date, seconds: number): string => {
+export const subtractSecond = (date: Date, seconds: number): string => {
     const newDate = new Date(date);
     newDate.setSeconds(date.getSeconds() - seconds);
     return newDate.toISOString();

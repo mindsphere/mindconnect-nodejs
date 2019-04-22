@@ -5,16 +5,18 @@ import * as fs from "fs";
 import {
     AspectListResource,
     AspectResource,
+    AspectVariable,
     Asset,
     AssetManagement,
     AssetResourceWithHierarchyPath,
     AssetTypeResource,
     AssetTypeResourceAspects,
     RootAssetResource,
-    TwinType
+    TwinType,
+    VariableDefinition
 } from "../../api/sdk";
 import { checkAssetId, decrypt, errorLog, loadAuth, retry, retrylog, throwError, verboseLog } from "../../api/utils";
-import { directoryReadyLog } from "./command-utils";
+import { directoryReadyLog, subtractSecond } from "./command-utils";
 export default (program: CommanderStatic) => {
     program
         .command("iot-prepare-bulk-dir")
@@ -22,6 +24,8 @@ export default (program: CommanderStatic) => {
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
         .option("-i, --assetid <assetid>", "asset id from the mindsphere ")
         .option("-t, --typeid <typeid>", "typeid e.g. castidev.Engine ")
+        .option("-m, --max <max>", "entries per file ", 3)
+        .option("-f, --files <files>", "entries per file ", 2)
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
@@ -69,11 +73,23 @@ export default (program: CommanderStatic) => {
                             retrylog("GetAssetType")
                         )) as AssetTypeResource;
 
-                        aspects = assetType.aspects || [];
+                        if (assetType.aspects) {
+                            aspects = assetType.aspects.filter(x => {
+                                return x.aspectType && x.aspectType.category === "dynamic";
+                            });
+                        }
+                        aspects = aspects || [];
                     }
+
+                    // console.log(aspects);
 
                     aspects.forEach(aspect => {
                         createAspectDirs(path, aspect, options);
+
+                        // ! The variables are stored in different spots depenendet if they come from type or the asset.
+                        const variables: AspectVariable[] = aspect.variables || aspect.aspectType.variables || [];
+
+                        generateCsv(aspect.name, variables, options, path);
                     });
 
                     const root = (await retry(
@@ -83,7 +99,7 @@ export default (program: CommanderStatic) => {
                         retrylog("GetRoot")
                     )) as RootAssetResource;
 
-                    options.typeId
+                    options.typeid
                         ? writeNewAssetJson(options, root, path)
                         : fs.writeFileSync(`${path}/${options.assetid}.json`, JSON.stringify(asset, null, 2));
 
@@ -167,4 +183,66 @@ function checkRequiredParamaters(options: any) {
             "you have to provide a passkey to get the service token (run mc stk --help for full description)",
             true
         );
+}
+
+function generateCsv(name: string, variable: AspectVariable[], options: any, path: string) {
+    verboseLog(`Generating ${options.max} entries for ${name}`, options.verbose);
+
+    const startDate = new Date();
+
+    for (let file = options.files; file > 0; file--) {
+        const date = new Date(startDate);
+        date.setDate(date.getDate() - (file - 1));
+
+        const fileName = `${path}/csv/${name}/${file}.csv`;
+        verboseLog(`generating: ${chalk.magentaBright(fileName)}`, options.verbose);
+        const stream = fs.createWriteStream(fileName);
+
+        let headers = `_time, `;
+        variable.forEach(variable => {
+            headers += variable.name + ", ";
+            if (variable.qualityCode) headers += variable.name + "_qc, ";
+        });
+        stream.write(headers.trimRight().slice(0, -1) + "\n");
+
+        variable.forEach(variable => {
+            headers += variable.name + ", ";
+            if (variable.qualityCode) headers += variable.name + "_qc, ";
+        });
+
+        for (let index = options.max; index > 0; index--) {
+            let line = subtractSecond(date, index) + ", ";
+
+            variable.forEach(variable => {
+                line += generateRandom(variable.dataType) + ", ";
+                if (variable.qualityCode) line += "0, ";
+            });
+
+            stream.write(line.trimRight().slice(0, -1) + "\n");
+        }
+        stream.end();
+    }
+}
+
+function generateRandom(type: VariableDefinition.DataTypeEnum): number | string | boolean {
+    let result;
+
+    switch (type) {
+        case VariableDefinition.DataTypeEnum.DOUBLE:
+            result = (Math.random() * 10).toFixed(2);
+            break;
+        case VariableDefinition.DataTypeEnum.INT:
+        case VariableDefinition.DataTypeEnum.LONG:
+            result = Math.floor(Math.random() * 10);
+            break;
+        case VariableDefinition.DataTypeEnum.BOOLEAN:
+            result = true;
+            break;
+        case VariableDefinition.DataTypeEnum.STRING:
+        case VariableDefinition.DataTypeEnum.BIGSTRING:
+            result = `${type}_${Math.random()}`;
+        default:
+            throw new Error(`invalid type ${type}`);
+    }
+    return result;
 }
