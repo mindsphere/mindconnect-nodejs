@@ -205,3 +205,8 @@ export const checkAssetId = (agentId: string) => {
         throw new Error("You have to pass valid 32 char long asset id");
     }
 };
+
+export const throwError = (error: string) => {
+    throw new Error(error);
+};
+

@@ -1,8 +1,14 @@
 import { checkAssetId } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
-import { AspectListResource, Asset, AssetResourceWithHierarchyPath, AssetTypeResource } from "./asset-models";
-const debug = require("debug");
+import {
+    AspectListResource,
+    Asset,
+    AssetResourceWithHierarchyPath,
+    AssetTypeResource,
+    RootAssetResource
+} from "./asset-models";
 
+// TODO: finish asset management
 export class AssetManagement extends SdkClient {
     private _baseUrl: string = "/api/assetmanagement/v3";
 
@@ -13,7 +19,7 @@ export class AssetManagement extends SdkClient {
     ): Promise<AssetTypeResource> {
         const result = await this.HttpAction({
             verb: "GET",
-            baseUrl: `${this._baseUrl}/assettype/${typeId}?exploded=${exploded}`,
+            baseUrl: `${this._baseUrl}/assettypes/${typeId}?exploded=${exploded}`,
             ifMatch: ifNoneMatch
         });
         return result as AssetTypeResource;
@@ -59,5 +65,14 @@ export class AssetManagement extends SdkClient {
             message: "PostAsset"
         });
         return result as AssetResourceWithHierarchyPath;
+    }
+
+    public async GetRootAsset(): Promise<RootAssetResource> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            baseUrl: `${this._baseUrl}/assets/root`,
+            message: "PostAsset"
+        });
+        return result as RootAssetResource;
     }
 }

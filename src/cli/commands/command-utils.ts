@@ -59,3 +59,23 @@ export const displayCsvHelp = (color: (chalk: string) => string) => {
         )}`
     );
 };
+
+export const directoryReadyLog = ({
+    path,
+    verifyCommand,
+    runCommand,
+    jobCommand
+}: {
+    path: string;
+    verifyCommand: string;
+    runCommand: string;
+    jobCommand: string;
+}) => {
+    log(`\nthe directory ${chalk.magentaBright(path)} is ready`);
+    log(`you can now edit the template files in the directory`);
+    log(`\nwhen you are done run:`);
+    log(`\tmc ${chalk.magentaBright(verifyCommand)} command to verify directory and then`);
+    log(`\tmc ${chalk.magentaBright(runCommand)} command to upload files and start the job`);
+    log(`\nchecking progress:`);
+    log(`\tmc ${chalk.magentaBright(jobCommand)} to check the progress of the job`);
+};
