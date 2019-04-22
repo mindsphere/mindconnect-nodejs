@@ -2,7 +2,8 @@ import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
-import { AspectListResource, AssetManagement } from "../../api/sdk";
+import { BulkImportInput, Data } from "../../api/iot-ts-bulk-models";
+import { AspectListResource, AssetManagement, TwinType } from "../../api/sdk";
 import { checkAssetId, decrypt, errorLog, loadAuth, retry, retrylog, verboseLog } from "../../api/utils";
 export default (program: CommanderStatic) => {
     program
@@ -18,7 +19,10 @@ export default (program: CommanderStatic) => {
             (async () => {
                 try {
                     checkRequiredParamaters(options);
-                    fs.mkdirSync(options.dir);
+                    const path = options.dir;
+                    fs.mkdirSync(path);
+                    fs.mkdirSync(`${path}/csv/`);
+                    fs.mkdirSync(`${path}/json/`);
 
                     const auth = loadAuth();
                     const assetMgmt = new AssetManagement(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
@@ -30,11 +34,30 @@ export default (program: CommanderStatic) => {
                     )) as AspectListResource;
                     // console.log(JSON.stringify(asset));
 
+                    const asset = await assetMgmt.GetAsset(options.assetid);
+                    asset.twinType = TwinType.Simulation;
+
+                    await assetMgmt.PutAsset(options.assetid, {
+                        twinType: "simulation",
+                        name: asset.name,
+                        etag: asset.etag
+                    });
+
                     if (!aspectList._embedded) throw new Error("no aspects");
                     const aspects = aspectList._embedded.aspects || [];
+                    const job: BulkImportInput = {};
+                    const jobData = new Array<Data>();
+
                     aspects.forEach(element => {
-                        console.log(element);
+                        fs.mkdirSync(`${path}/csv/${element.name}`);
+                        fs.mkdirSync(`${path}/json/${element.name}`);
+
+                        jobData.push({ entity: options.assetid, propertySetName: element.name, timeseriesFiles: [] });
                     });
+
+                    job.data = jobData;
+
+                    fs.writeFileSync(`${path}/${options.assetid}.json`, JSON.stringify(job));
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
