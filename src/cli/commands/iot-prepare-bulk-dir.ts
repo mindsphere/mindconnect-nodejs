@@ -180,7 +180,7 @@ function checkRequiredParamaters(options: any) {
 
     !options.passkey &&
         errorLog(
-            "you have to provide a passkey to get the service token (run mc stk --help for full description)",
+            "you have to provide a passkey to get the service token (run mc pbk --help for full description)",
             true
         );
 }
