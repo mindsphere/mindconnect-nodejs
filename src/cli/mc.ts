@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Copyright (C), Siemens AG 2017
 import * as program from "commander";
+import iotBulkRunCommand from "./commands/iot-bulk-run";
 import iotBulkDirCommand from "./commands/iot-prepare-bulk-dir";
 import agentStatusCommand from "./commands/mc-agent-status";
 import agentTokenCommand from "./commands/mc-agent-token";
@@ -37,6 +38,7 @@ unregisterDiagnoticCommand(program);
 
 // * setup for iot bulk upload
 iotBulkDirCommand(program);
+iotBulkRunCommand(program);
 
 // * cli for starter projects
 starterTsCommand(program);

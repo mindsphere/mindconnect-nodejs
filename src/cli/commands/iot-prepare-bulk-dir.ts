@@ -25,7 +25,7 @@ export default (program: CommanderStatic) => {
         .option("-i, --assetid <assetid>", "asset id from the mindsphere ")
         .option("-t, --typeid <typeid>", "typeid e.g. castidev.Engine ")
         .option("-m, --max <max>", "entries per file ", 3)
-        .option("-f, --files <files>", "entries per file ", 2)
+        .option("-f, --files <files>", "generated files ", 2)
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
@@ -101,7 +101,7 @@ export default (program: CommanderStatic) => {
 
                     options.typeid
                         ? writeNewAssetJson(options, root, path)
-                        : fs.writeFileSync(`${path}/${options.assetid}.json`, JSON.stringify(asset, null, 2));
+                        : fs.writeFileSync(`${path}/asset.json`, JSON.stringify(asset, null, 2));
 
                     directoryReadyLog({
                         path: `${path}`,
@@ -144,9 +144,9 @@ function writeNewAssetJson(options: any, root: RootAssetResource, path: any) {
             longitude: 11.00783
         }
     };
-    const newAssetJson = `${path}/NewAsset.json`;
+    const newAssetJson = `${path}/asset.json`;
     verboseLog(`Writing ${chalk.magentaBright(newAssetJson)}`, options.verbose);
-    fs.writeFileSync(`${path}/NewAsset.json`, JSON.stringify(asset, null, 2));
+    fs.writeFileSync(`${path}/asset.json`, JSON.stringify(asset, null, 2));
 }
 
 function createAspectDirs(path: any, element: AssetTypeResourceAspects, options: any) {
@@ -211,10 +211,11 @@ function generateCsv(name: string, variable: AspectVariable[], options: any, pat
         });
 
         for (let index = options.max; index > 0; index--) {
-            let line = subtractSecond(date, index) + ", ";
+            const currentDate = subtractSecond(date, index);
+            let line = currentDate.toISOString() + ", ";
 
             variable.forEach(variable => {
-                line += generateRandom(variable.dataType) + ", ";
+                line += generateRandom(currentDate, variable.dataType) + ", ";
                 if (variable.qualityCode) line += "0, ";
             });
 
@@ -224,16 +225,16 @@ function generateCsv(name: string, variable: AspectVariable[], options: any, pat
     }
 }
 
-function generateRandom(type: VariableDefinition.DataTypeEnum): number | string | boolean {
+function generateRandom(timestamp: Date, type: VariableDefinition.DataTypeEnum): number | string | boolean {
     let result;
 
     switch (type) {
         case VariableDefinition.DataTypeEnum.DOUBLE:
-            result = (Math.random() * 10).toFixed(2);
+            result = (Math.sin(timestamp.getTime()) * 10).toFixed(2);
             break;
         case VariableDefinition.DataTypeEnum.INT:
         case VariableDefinition.DataTypeEnum.LONG:
-            result = Math.floor(Math.random() * 10);
+            result = Math.floor(Math.sin(timestamp.getTime()) * 20);
             break;
         case VariableDefinition.DataTypeEnum.BOOLEAN:
             result = true;
