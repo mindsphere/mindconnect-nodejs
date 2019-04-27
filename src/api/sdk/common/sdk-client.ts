@@ -10,13 +10,15 @@ export abstract class SdkClient extends CredentialAuth {
         baseUrl,
         body,
         message,
-        additionalHeaders
+        additionalHeaders,
+        noResponse
     }: {
         verb: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
         baseUrl: string;
         body?: Object;
         message?: string;
         additionalHeaders?: Object;
+        noResponse?: boolean;
     }): Promise<Object> {
         await this.RenewToken();
         if (!this._accessToken) {
@@ -34,7 +36,7 @@ export abstract class SdkClient extends CredentialAuth {
         log(`${message} Headers ${JSON.stringify(headers)} Url ${url}`);
         try {
             const request: any = { method: verb, headers: headers, agent: this._proxyHttpAgent };
-            if (verb !== "GET") {
+            if (verb !== "GET" && verb !== "DELETE") {
                 request.body = JSON.stringify(body);
             }
             const response = await fetch(url, request);
@@ -44,6 +46,10 @@ export abstract class SdkClient extends CredentialAuth {
 
             if (response.status < 200 || response.status > 299) {
                 throw new Error(`invalid response ${JSON.stringify(response)}`);
+            }
+
+            if (noResponse) {
+                return {};
             }
             const json = await response.json();
             log(`${message} Response ${JSON.stringify(json)}`);

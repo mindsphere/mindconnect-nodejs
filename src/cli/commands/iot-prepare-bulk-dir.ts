@@ -2,19 +2,7 @@ import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
-import {
-    AspectListResource,
-    AspectResource,
-    AspectVariable,
-    Asset,
-    AssetManagement,
-    AssetResourceWithHierarchyPath,
-    AssetTypeResource,
-    AssetTypeResourceAspects,
-    RootAssetResource,
-    TwinType,
-    VariableDefinition
-} from "../../api/sdk";
+import { AssetManagementClient, AssetManagementModels } from "../../api/sdk";
 import { checkAssetId, decrypt, errorLog, loadAuth, retry, retrylog, throwError, verboseLog } from "../../api/utils";
 import { directoryReadyLog, subtractSecond } from "./command-utils";
 export default (program: CommanderStatic) => {
@@ -36,7 +24,7 @@ export default (program: CommanderStatic) => {
                     checkRequiredParamaters(options);
                     const path = makeCsvAndJsonDir(options);
                     const auth = loadAuth();
-                    const assetMgmt = new AssetManagement(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
+                    const assetMgmt = new AssetManagementClient(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
 
                     let aspects: any[] = [];
                     let asset;
@@ -46,22 +34,22 @@ export default (program: CommanderStatic) => {
                             () => assetMgmt.GetAsset(options.assetid),
                             300,
                             retrylog("GetAsset")
-                        )) as AssetResourceWithHierarchyPath;
+                        )) as AssetManagementModels.AssetResourceWithHierarchyPath;
 
                         const embAspects = (await retry(
                             options.retry,
                             () => assetMgmt.GetAspects(options.assetid),
                             300,
                             retrylog("GetAspects")
-                        )) as AspectListResource;
+                        )) as AssetManagementModels.AspectListResource;
 
                         if (embAspects._embedded && embAspects._embedded.aspects) {
                             aspects = embAspects._embedded.aspects.filter(x => {
-                                return x.category === AspectResource.CategoryEnum.Dynamic;
+                                return x.category === AssetManagementModels.AspectResource.CategoryEnum.Dynamic;
                             });
                         }
 
-                        asset.twinType !== TwinType.Simulation &&
+                        asset.twinType !== AssetManagementModels.TwinType.Simulation &&
                             throwError("The bulk upload only works for simulation assets!");
                     }
 
@@ -71,7 +59,7 @@ export default (program: CommanderStatic) => {
                             () => assetMgmt.GetAssetType(options.typeid),
                             300,
                             retrylog("GetAssetType")
-                        )) as AssetTypeResource;
+                        )) as AssetManagementModels.AssetTypeResource;
 
                         if (assetType.aspects) {
                             aspects = assetType.aspects.filter(x => {
@@ -87,7 +75,8 @@ export default (program: CommanderStatic) => {
                         createAspectDirs(path, aspect, options);
 
                         // ! The variables are stored in different spots depenendet if they come from type or the asset.
-                        const variables: AspectVariable[] = aspect.variables || aspect.aspectType.variables || [];
+                        const variables: AssetManagementModels.AspectVariable[] =
+                            aspect.variables || aspect.aspectType.variables || [];
 
                         generateCsv(aspect.name, variables, options, path);
                     });
@@ -97,7 +86,7 @@ export default (program: CommanderStatic) => {
                         () => assetMgmt.GetRootAsset(),
                         300,
                         retrylog("GetRoot")
-                    )) as RootAssetResource;
+                    )) as AssetManagementModels.RootAssetResource;
 
                     options.typeid
                         ? writeNewAssetJson(options, root, path)
@@ -129,10 +118,10 @@ export default (program: CommanderStatic) => {
         });
 };
 
-function writeNewAssetJson(options: any, root: RootAssetResource, path: any) {
-    const asset: Asset = {
+function writeNewAssetJson(options: any, root: AssetManagementModels.RootAssetResource, path: any) {
+    const asset: AssetManagementModels.Asset = {
         name: "NewAsset",
-        twinType: TwinType.Simulation,
+        twinType: AssetManagementModels.TwinType.Simulation,
         typeId: options.typeid,
         parentId: root.assetId,
         location: {
@@ -149,7 +138,7 @@ function writeNewAssetJson(options: any, root: RootAssetResource, path: any) {
     fs.writeFileSync(`${path}/asset.json`, JSON.stringify(asset, null, 2));
 }
 
-function createAspectDirs(path: any, element: AssetTypeResourceAspects, options: any) {
+function createAspectDirs(path: any, element: AssetManagementModels.AssetTypeResourceAspects, options: any) {
     const csvDir = `${path}/csv/${element.name}`;
     verboseLog(`creating directory: ${chalk.magentaBright(csvDir)}`, options.verbose);
     fs.mkdirSync(csvDir);
@@ -185,7 +174,7 @@ function checkRequiredParamaters(options: any) {
         );
 }
 
-function generateCsv(name: string, variable: AspectVariable[], options: any, path: string) {
+function generateCsv(name: string, variable: AssetManagementModels.AspectVariable[], options: any, path: string) {
     verboseLog(`Generating ${options.size} entries for ${name}`, options.verbose);
 
     const startDate = new Date();
@@ -226,22 +215,25 @@ function generateCsv(name: string, variable: AspectVariable[], options: any, pat
     }
 }
 
-function generateRandom(timestamp: Date, type: VariableDefinition.DataTypeEnum): number | string | boolean {
+function generateRandom(
+    timestamp: Date,
+    type: AssetManagementModels.VariableDefinition.DataTypeEnum
+): number | string | boolean {
     let result;
 
     switch (type) {
-        case VariableDefinition.DataTypeEnum.DOUBLE:
+        case AssetManagementModels.VariableDefinition.DataTypeEnum.DOUBLE:
             result = (Math.sin(timestamp.getTime()) * 10).toFixed(2) + 20;
             break;
-        case VariableDefinition.DataTypeEnum.INT:
-        case VariableDefinition.DataTypeEnum.LONG:
+        case AssetManagementModels.VariableDefinition.DataTypeEnum.INT:
+        case AssetManagementModels.VariableDefinition.DataTypeEnum.LONG:
             result = Math.floor(Math.sin(timestamp.getTime()) * 20) + 40;
             break;
-        case VariableDefinition.DataTypeEnum.BOOLEAN:
+        case AssetManagementModels.VariableDefinition.DataTypeEnum.BOOLEAN:
             result = true;
             break;
-        case VariableDefinition.DataTypeEnum.STRING:
-        case VariableDefinition.DataTypeEnum.BIGSTRING:
+        case AssetManagementModels.VariableDefinition.DataTypeEnum.STRING:
+        case AssetManagementModels.VariableDefinition.DataTypeEnum.BIGSTRING:
             result = `${type}_${Math.random()}`;
         default:
             throw new Error(`invalid type ${type}`);

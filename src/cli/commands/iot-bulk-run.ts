@@ -4,7 +4,9 @@ import { log } from "console";
 import * as csv from "csvtojson";
 import * as fs from "fs";
 import * as path from "path";
-import { AssetManagement } from "../../api/sdk";
+import { sleep } from "../../../test/test-utils";
+import { AssetManagementClient } from "../../api/sdk";
+import { TimeSeriesClient } from "../../api/sdk/iot/iot-timeseries";
 import { decrypt, errorLog, loadAuth, throwError, verboseLog } from "../../api/utils";
 
 export default (program: CommanderStatic) => {
@@ -13,7 +15,7 @@ export default (program: CommanderStatic) => {
         .alias("ibr")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
-        .option("-s, --size <size>", "entries per file ", 3)
+        .option("-s, --size <size>", "entries per file ", 1000)
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
         .description(chalk.magentaBright("runs the bulk upload job from <directoryname> directory *"))
@@ -23,16 +25,20 @@ export default (program: CommanderStatic) => {
                     checkRequiredParamaters(options);
                     const asset = await createOrReadAsset(options);
                     const aspects = getAspectsFromDirNames(options);
+                    const auth = loadAuth();
+                    const timeSeries = new TimeSeriesClient(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
 
                     for (const aspect of aspects) {
                         const files = getFiles(options, aspect);
 
                         for (const file of files) {
+                            !options.verbose && process.stdout.write(".");
+
                             let data: any = [];
                             let recordCount = 0;
                             let mintime: Date | undefined;
                             let maxtime: Date | undefined;
-                            const maxSize = options.max;
+                            const maxSize = options.size;
                             maxSize > 0 || throwError("the size must be greater than 0");
                             await verboseLog(
                                 `reding file: ${options.dir}/csv/${aspect}/${chalk.magentaBright(file)}`,
@@ -53,6 +59,9 @@ export default (program: CommanderStatic) => {
                                             aspect,
                                             data
                                         });
+
+                                        await timeSeries.PutTimeSeries(asset.assetId, aspect, data);
+                                        await sleep(2000);
                                         data = [];
                                         mintime = undefined;
                                         maxtime = undefined;
@@ -68,6 +77,8 @@ export default (program: CommanderStatic) => {
                                     aspect,
                                     data
                                 });
+                                await timeSeries.PutTimeSeries(asset.assetId, aspect, data);
+                                await sleep(2000);
                             }
 
                             verboseLog(
@@ -76,6 +87,7 @@ export default (program: CommanderStatic) => {
                             );
                         }
                     }
+                    console.log("Done.");
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
@@ -118,8 +130,10 @@ function writeDataAsJson({
     mintime || maxtime || throwError("the data is ivalid the timestamps are corrupted");
     const newFileName = `from_${mintime && mintime.toISOString()}_to_${maxtime && maxtime.toISOString()}_${
         data.length
-    }_records.json`;
-    verboseLog(`writing ${options.dir}/json/${aspect}/${chalk.magentaBright(newFileName)}`, options.verbose);
+    }_records`.replace(/[^a-z0-9]/gi, "_");
+    verboseLog(`writing ${options.dir}/json/${aspect}/${chalk.magentaBright(newFileName + ".json")}`, options.verbose);
+    fs.writeFileSync(`${options.dir}/json/${aspect}/${newFileName}.json`, JSON.stringify(data));
+    verboseLog(`done`, options.verbose);
 }
 
 function getFiles(options: any, aspect: string) {
@@ -141,7 +155,7 @@ function getAspectsFromDirNames(options: any): string[] {
 async function createOrReadAsset(options: any) {
     let asset = require(path.resolve(`${options.dir}/asset.json`));
     const auth = loadAuth();
-    const assetMgmt = new AssetManagement(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
+    const assetMgmt = new AssetManagementClient(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
     if (!asset.assetId) {
         verboseLog(`creating new asset ${chalk.magentaBright(asset.name)}`, options.verbose);
         asset = await assetMgmt.PostAsset(asset);
