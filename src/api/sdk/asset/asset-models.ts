@@ -1,18 +1,4 @@
-// tslint:disable
-
 export namespace AssetManagementModels {
-    /**
-     *
-     * @export
-     * @class RequiredError
-     * @extends {Error}
-     */
-    export class RequiredError extends Error {
-        constructor(public field: string, msg?: string) {
-            super(msg);
-        }
-    }
-
     /**
      *
      * @export

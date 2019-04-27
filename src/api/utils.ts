@@ -210,3 +210,11 @@ export const throwError = (error: string) => {
     throw new Error(error);
 };
 
+export const toQueryString = (qs: any) => {
+    return Object.keys(qs || {})
+        .map(key => {
+            const value = qs[key] instanceof Date ? qs[key].toISOString() : qs[key];
+            return encodeURIComponent(key) + "=" + encodeURIComponent(value);
+        })
+        .join("&");
+};
