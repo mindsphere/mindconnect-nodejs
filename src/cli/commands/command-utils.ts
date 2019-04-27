@@ -18,7 +18,7 @@ export const serviceCredentialLog = () => {
 
 export const subtractSecond = (date: Date, seconds: number): Date => {
     const newDate = new Date(date);
-    newDate.setSeconds(date.getSeconds() - seconds);
+    newDate.setUTCMilliseconds(date.getUTCMilliseconds() - Math.floor(seconds * 1000));
     return newDate;
 };
 

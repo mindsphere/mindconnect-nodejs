@@ -24,7 +24,7 @@ export default (program: CommanderStatic) => {
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
         .option("-i, --assetid <assetid>", "asset id from the mindsphere ")
         .option("-t, --typeid <typeid>", "typeid e.g. castidev.Engine ")
-        .option("-m, --max <max>", "entries per file ", 3)
+        .option("-s, --size <size>", "entries per file ", 3)
         .option("-f, --files <files>", "generated files ", 2)
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-k, --passkey <passkey>", "passkey")
@@ -186,13 +186,14 @@ function checkRequiredParamaters(options: any) {
 }
 
 function generateCsv(name: string, variable: AspectVariable[], options: any, path: string) {
-    verboseLog(`Generating ${options.max} entries for ${name}`, options.verbose);
+    verboseLog(`Generating ${options.size} entries for ${name}`, options.verbose);
 
     const startDate = new Date();
 
     for (let file = options.files; file > 0; file--) {
         const date = new Date(startDate);
-        date.setDate(date.getDate() - (file - 1));
+        date.setUTCDate(date.getUTCDate() - (file - 1));
+        date.setUTCHours(0, 0, 0, 0);
 
         const fileName = `${path}/csv/${name}/${file}.csv`;
         verboseLog(`generating: ${chalk.magentaBright(fileName)}`, options.verbose);
@@ -210,8 +211,8 @@ function generateCsv(name: string, variable: AspectVariable[], options: any, pat
             if (variable.qualityCode) headers += variable.name + "_qc, ";
         });
 
-        for (let index = options.max; index > 0; index--) {
-            const currentDate = subtractSecond(date, index);
+        for (let index = options.size; index > 0; index--) {
+            const currentDate = subtractSecond(date, (86400 / options.size) * index);
             let line = currentDate.toISOString() + ", ";
 
             variable.forEach(variable => {
@@ -230,11 +231,11 @@ function generateRandom(timestamp: Date, type: VariableDefinition.DataTypeEnum):
 
     switch (type) {
         case VariableDefinition.DataTypeEnum.DOUBLE:
-            result = (Math.sin(timestamp.getTime()) * 10).toFixed(2);
+            result = (Math.sin(timestamp.getTime()) * 10).toFixed(2) + 20;
             break;
         case VariableDefinition.DataTypeEnum.INT:
         case VariableDefinition.DataTypeEnum.LONG:
-            result = Math.floor(Math.sin(timestamp.getTime()) * 20);
+            result = Math.floor(Math.sin(timestamp.getTime()) * 20) + 40;
             break;
         case VariableDefinition.DataTypeEnum.BOOLEAN:
             result = true;

@@ -6,7 +6,6 @@ import * as fs from "fs";
 import * as path from "path";
 import { AssetManagement } from "../../api/sdk";
 import { decrypt, errorLog, loadAuth, throwError, verboseLog } from "../../api/utils";
-import csvtojson = require("csvtojson");
 
 export default (program: CommanderStatic) => {
     program
@@ -14,7 +13,7 @@ export default (program: CommanderStatic) => {
         .alias("ibr")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
-        .option("-m, --max <max>", "entries per file ", 3)
+        .option("-s, --size <size>", "entries per file ", 3)
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
         .description(chalk.magentaBright("runs the bulk upload job from <directoryname> directory *"))
