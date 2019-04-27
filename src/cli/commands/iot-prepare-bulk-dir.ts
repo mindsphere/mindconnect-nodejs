@@ -4,7 +4,13 @@ import { log } from "console";
 import * as fs from "fs";
 import { AssetManagementClient, AssetManagementModels } from "../../api/sdk";
 import { checkAssetId, decrypt, errorLog, loadAuth, retry, retrylog, throwError, verboseLog } from "../../api/utils";
-import { directoryReadyLog, subtractSecond } from "./command-utils";
+import {
+    createAspectDirs,
+    directoryReadyLog,
+    generateCsv,
+    makeCsvAndJsonDir,
+    writeNewAssetJson
+} from "./command-utils";
 export default (program: CommanderStatic) => {
     program
         .command("iot-prepare-bulk-dir")
@@ -24,7 +30,11 @@ export default (program: CommanderStatic) => {
                     checkRequiredParamaters(options);
                     const path = makeCsvAndJsonDir(options);
                     const auth = loadAuth();
-                    const assetMgmt = new AssetManagementClient(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
+                    const assetMgmt = new AssetManagementClient(
+                        auth.gateway,
+                        decrypt(auth, options.passkey),
+                        auth.tenant
+                    );
 
                     let aspects: any[] = [];
                     let asset;
@@ -115,45 +125,12 @@ export default (program: CommanderStatic) => {
                     "asset1"
                 )} for existing asset`
             );
+
+            log(
+                `The typeid must be derived from core.basicdevice and twintype must be simulation for the bulk upload `
+            );
         });
 };
-
-function writeNewAssetJson(options: any, root: AssetManagementModels.RootAssetResource, path: any) {
-    const asset: AssetManagementModels.Asset = {
-        name: "NewAsset",
-        twinType: AssetManagementModels.TwinType.Simulation,
-        typeId: options.typeid,
-        parentId: root.assetId,
-        location: {
-            country: "Germany",
-            postalCode: "91052",
-            region: "Bayern",
-            streetAddress: "Schuhstr 60",
-            latitude: 49.59099,
-            longitude: 11.00783
-        }
-    };
-    const newAssetJson = `${path}/asset.json`;
-    verboseLog(`Writing ${chalk.magentaBright(newAssetJson)}`, options.verbose);
-    fs.writeFileSync(`${path}/asset.json`, JSON.stringify(asset, null, 2));
-}
-
-function createAspectDirs(path: any, element: AssetManagementModels.AssetTypeResourceAspects, options: any) {
-    const csvDir = `${path}/csv/${element.name}`;
-    verboseLog(`creating directory: ${chalk.magentaBright(csvDir)}`, options.verbose);
-    fs.mkdirSync(csvDir);
-    const jsonDir = `${path}/json/${element.name}`;
-    verboseLog(`creating directory: ${chalk.magentaBright(jsonDir)}`, options.verbose);
-    fs.mkdirSync(jsonDir);
-}
-
-function makeCsvAndJsonDir(options: any) {
-    const path = options.dir;
-    fs.mkdirSync(path);
-    fs.mkdirSync(`${path}/csv/`);
-    fs.mkdirSync(`${path}/json/`);
-    return path;
-}
 
 function checkRequiredParamaters(options: any) {
     !options.typeid && !options.assetid && throwError("You have to specify either a typeid or assetid");
@@ -172,71 +149,4 @@ function checkRequiredParamaters(options: any) {
             "you have to provide a passkey to get the service token (run mc pbk --help for full description)",
             true
         );
-}
-
-function generateCsv(name: string, variable: AssetManagementModels.AspectVariable[], options: any, path: string) {
-    verboseLog(`Generating ${options.size} entries for ${name}`, options.verbose);
-
-    const startDate = new Date();
-
-    for (let file = options.files; file > 0; file--) {
-        const date = new Date(startDate);
-        date.setUTCDate(date.getUTCDate() - (file - 1));
-        date.setUTCHours(0, 0, 0, 0);
-
-        const fileName = `${path}/csv/${name}/${file}.csv`;
-        verboseLog(`generating: ${chalk.magentaBright(fileName)}`, options.verbose);
-        const stream = fs.createWriteStream(fileName);
-
-        let headers = `_time, `;
-        variable.forEach(variable => {
-            headers += variable.name + ", ";
-            if (variable.qualityCode) headers += variable.name + "_qc, ";
-        });
-        stream.write(headers.trimRight().slice(0, -1) + "\n");
-
-        variable.forEach(variable => {
-            headers += variable.name + ", ";
-            if (variable.qualityCode) headers += variable.name + "_qc, ";
-        });
-
-        for (let index = options.size; index > 0; index--) {
-            const currentDate = subtractSecond(date, (86400 / options.size) * index);
-            let line = currentDate.toISOString() + ", ";
-
-            variable.forEach(variable => {
-                line += generateRandom(currentDate, variable.dataType) + ", ";
-                if (variable.qualityCode) line += "0, ";
-            });
-
-            stream.write(line.trimRight().slice(0, -1) + "\n");
-        }
-        stream.end();
-    }
-}
-
-function generateRandom(
-    timestamp: Date,
-    type: AssetManagementModels.VariableDefinition.DataTypeEnum
-): number | string | boolean {
-    let result;
-
-    switch (type) {
-        case AssetManagementModels.VariableDefinition.DataTypeEnum.DOUBLE:
-            result = (Math.sin(timestamp.getTime()) * 10).toFixed(2) + 20;
-            break;
-        case AssetManagementModels.VariableDefinition.DataTypeEnum.INT:
-        case AssetManagementModels.VariableDefinition.DataTypeEnum.LONG:
-            result = Math.floor(Math.sin(timestamp.getTime()) * 20) + 40;
-            break;
-        case AssetManagementModels.VariableDefinition.DataTypeEnum.BOOLEAN:
-            result = true;
-            break;
-        case AssetManagementModels.VariableDefinition.DataTypeEnum.STRING:
-        case AssetManagementModels.VariableDefinition.DataTypeEnum.BIGSTRING:
-            result = `${type}_${Math.random()}`;
-        default:
-            throw new Error(`invalid type ${type}`);
-    }
-    return result;
 }

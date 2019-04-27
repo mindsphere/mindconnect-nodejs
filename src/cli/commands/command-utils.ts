@@ -1,5 +1,8 @@
 import chalk from "chalk";
 import { log } from "console";
+import * as fs from "fs";
+import { AssetManagementModels } from "../../api/sdk";
+import { verboseLog } from "../../api/utils";
 
 export const serviceCredentialLog = () => {
     log(`\n  Important: \n`);
@@ -83,3 +86,112 @@ export const directoryReadyLog = ({
     log(`\nchecking progress:`);
     log(`\tmc ${chalk.magentaBright(jobCommand)} to check the progress of the job`);
 };
+
+export function generateRandom(
+    timestamp: Date,
+    type: AssetManagementModels.VariableDefinition.DataTypeEnum
+): number | string | boolean {
+    let result;
+
+    switch (type) {
+        case AssetManagementModels.VariableDefinition.DataTypeEnum.DOUBLE:
+            result = (Math.sin(timestamp.getTime()) * 10).toFixed(2) + 20;
+            break;
+        case AssetManagementModels.VariableDefinition.DataTypeEnum.INT:
+        case AssetManagementModels.VariableDefinition.DataTypeEnum.LONG:
+            result = Math.floor(Math.sin(timestamp.getTime()) * 20) + 40;
+            break;
+        case AssetManagementModels.VariableDefinition.DataTypeEnum.BOOLEAN:
+            result = true;
+            break;
+        case AssetManagementModels.VariableDefinition.DataTypeEnum.STRING:
+        case AssetManagementModels.VariableDefinition.DataTypeEnum.BIGSTRING:
+            result = `${type}_${Math.random()}`;
+        default:
+            throw new Error(`invalid type ${type}`);
+    }
+    return result;
+}
+
+export function generateCsv(
+    name: string,
+    variable: AssetManagementModels.AspectVariable[],
+    options: any,
+    path: string
+) {
+    verboseLog(`Generating ${options.size} entries for ${name}`, options.verbose);
+
+    const startDate = new Date();
+
+    for (let file = options.files; file > 0; file--) {
+        const date = new Date(startDate);
+        date.setUTCDate(date.getUTCDate() - (file - 1));
+        date.setUTCHours(0, 0, 0, 0);
+
+        const fileName = `${path}/csv/${name}/${file}.csv`;
+        verboseLog(`generating: ${chalk.magentaBright(fileName)}`, options.verbose);
+        const stream = fs.createWriteStream(fileName);
+
+        let headers = `_time, `;
+        variable.forEach(variable => {
+            headers += variable.name + ", ";
+            if (variable.qualityCode) headers += variable.name + "_qc, ";
+        });
+        stream.write(headers.trimRight().slice(0, -1) + "\n");
+
+        variable.forEach(variable => {
+            headers += variable.name + ", ";
+            if (variable.qualityCode) headers += variable.name + "_qc, ";
+        });
+
+        for (let index = options.size; index > 0; index--) {
+            const currentDate = subtractSecond(date, (86400 / options.size) * index);
+            let line = currentDate.toISOString() + ", ";
+
+            variable.forEach(variable => {
+                line += generateRandom(currentDate, variable.dataType) + ", ";
+                if (variable.qualityCode) line += "0, ";
+            });
+
+            stream.write(line.trimRight().slice(0, -1) + "\n");
+        }
+        stream.end();
+    }
+}
+
+export function writeNewAssetJson(options: any, root: AssetManagementModels.RootAssetResource, path: any) {
+    const asset: AssetManagementModels.Asset = {
+        name: "NewAsset",
+        twinType: AssetManagementModels.TwinType.Simulation,
+        typeId: options.typeid,
+        parentId: root.assetId,
+        location: {
+            country: "Germany",
+            postalCode: "91052",
+            region: "Bayern",
+            streetAddress: "Schuhstr 60",
+            latitude: 49.59099,
+            longitude: 11.00783
+        }
+    };
+    const newAssetJson = `${path}/asset.json`;
+    verboseLog(`Writing ${chalk.magentaBright(newAssetJson)}`, options.verbose);
+    fs.writeFileSync(`${path}/asset.json`, JSON.stringify(asset, null, 2));
+}
+
+export function createAspectDirs(path: any, element: AssetManagementModels.AssetTypeResourceAspects, options: any) {
+    const csvDir = `${path}/csv/${element.name}`;
+    verboseLog(`creating directory: ${chalk.magentaBright(csvDir)}`, options.verbose);
+    fs.mkdirSync(csvDir);
+    const jsonDir = `${path}/json/${element.name}`;
+    verboseLog(`creating directory: ${chalk.magentaBright(jsonDir)}`, options.verbose);
+    fs.mkdirSync(jsonDir);
+}
+
+export function makeCsvAndJsonDir(options: any) {
+    const path = options.dir;
+    fs.mkdirSync(path);
+    fs.mkdirSync(`${path}/csv/`);
+    fs.mkdirSync(`${path}/json/`);
+    return path;
+}
