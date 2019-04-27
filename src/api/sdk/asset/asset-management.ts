@@ -20,7 +20,7 @@ export class AssetManagement extends SdkClient {
         const result = await this.HttpAction({
             verb: "GET",
             baseUrl: `${this._baseUrl}/assettypes/${typeId}?exploded=${exploded}`,
-            ifMatch: ifNoneMatch
+            additionalHeaders: { "If-Match": ifNoneMatch }
         });
         return result as AssetTypeResource;
     }
@@ -52,7 +52,7 @@ export class AssetManagement extends SdkClient {
             baseUrl: `${this._baseUrl}/assets/${assetId}`,
             body: asset,
             message: "PutAsset",
-            ifMatch: (<any>asset)["etag"]
+            additionalHeaders: { "If-Match": (<any>asset)["etag"] }
         });
         return true;
     }

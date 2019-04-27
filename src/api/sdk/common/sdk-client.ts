@@ -10,29 +10,25 @@ export abstract class SdkClient extends CredentialAuth {
         baseUrl,
         body,
         message,
-        ifMatch,
-        ifNoneMatch
+        additionalHeaders
     }: {
         verb: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
         baseUrl: string;
         body?: Object;
         message?: string;
-        ifMatch?: number;
-        ifNoneMatch?: number;
+        additionalHeaders?: Object;
     }): Promise<Object> {
         await this.RenewToken();
         if (!this._accessToken) {
             throw new Error("no valid token");
         }
-        const headers: any = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
+        additionalHeaders = additionalHeaders || {};
 
-        if (ifMatch !== undefined) {
-            headers["If-Match"] = ifMatch;
-        }
-
-        if (ifNoneMatch !== undefined) {
-            headers["If-None-Match"] = ifNoneMatch;
-        }
+        const headers: any = {
+            ...this._apiHeaders,
+            Authorization: `Bearer ${this._accessToken.access_token}`,
+            ...additionalHeaders
+        };
 
         const url = `${this._gateway}${baseUrl}`;
         log(`${message} Headers ${JSON.stringify(headers)} Url ${url}`);
