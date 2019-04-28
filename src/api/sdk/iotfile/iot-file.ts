@@ -22,17 +22,19 @@ export class IotFileClient extends SdkClient {
         entityid: string,
         filepath: string,
         file: string | Buffer,
-        optional?: { part?: number; "If-Match"?: number; timestamp?: Date; description?: string; type: string }
+        optional?: { part?: number; "If-Match"?: number; timestamp?: Date; description?: string; type?: string }
     ): Promise<Headers> {
         checkAssetId(entityid);
 
         const myBuffer = typeof file === "string" ? fs.readFileSync(file) : (file as Buffer);
+        optional = optional || {};
 
         return (await this.HttpAction({
             verb: "PUT",
             baseUrl: `${this._baseUrl}/files/${entityid}/${filepath}`,
             body: myBuffer,
-            additionalHeaders: optional,
+            additionalHeaders: { ...optional },
+            octetStream: true,
             noResponse: true,
             returnHeaders: true
         })) as Headers;

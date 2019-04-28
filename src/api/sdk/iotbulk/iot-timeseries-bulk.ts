@@ -42,11 +42,19 @@ export class TimeSeriesBulkClient extends SdkClient {
      * @memberOf TimeSeriesBulkClient
      */
     public async GetJobStatus(jobId: string): Promise<TimeSeriesBulkModels.JobStatus> {
-        return (await this.HttpAction({
+        const result = (await this.HttpAction({
             verb: "GET",
             baseUrl: `${this._baseUrl}/importJobs/${jobId}`,
             message: "GetJobStatus"
-        })) as TimeSeriesBulkModels.JobStatus;
+        })) as any;
+
+        // ! This is unfortunately necessary as the version of the API (3.3.0) on eu1 in April 2019
+        // ! was returning properties jobId, jobStartTime, jobLastModified but OpenAPI specification was id, startTime, lastModified
+        result.id = result.id || result.jobId;
+        result.startTime = result.startTime || result.jobStartTime;
+        result.lastModifed = result.lastModifed || result.jobLastModified;
+
+        return result as TimeSeriesBulkModels.JobStatus;
     }
 
     /**
@@ -78,7 +86,8 @@ export class TimeSeriesBulkClient extends SdkClient {
         if (qs !== "") qs = `&${qs}`;
         return (await this.HttpAction({
             verb: "GET",
-            baseUrl: `${this._baseUrl}/timeseries/${entity}/${propertysetname}?${fromto}${qs}`
+            baseUrl: `${this._baseUrl}/timeseries/${entity}/${propertysetname}?${fromto}${qs}`,
+            message: "GetTimeSeries"
         })) as TimeSeriesBulkModels.Timeseries[];
     }
 }

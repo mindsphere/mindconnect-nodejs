@@ -10,6 +10,7 @@ export abstract class SdkClient extends CredentialAuth {
         baseUrl,
         body,
         message,
+        octetStream,
         additionalHeaders,
         noResponse,
         returnHeaders
@@ -18,6 +19,7 @@ export abstract class SdkClient extends CredentialAuth {
         baseUrl: string;
         body?: Object;
         message?: string;
+        octetStream?: boolean;
         additionalHeaders?: Object;
         noResponse?: boolean;
         returnHeaders?: boolean;
@@ -27,9 +29,10 @@ export abstract class SdkClient extends CredentialAuth {
             throw new Error("no valid token");
         }
         additionalHeaders = additionalHeaders || {};
+        const apiheaders = octetStream ? this._octetStreamHeaders : this._apiHeaders;
 
         const headers: any = {
-            ...this._apiHeaders,
+            ...apiheaders,
             Authorization: `Bearer ${this._accessToken.access_token}`,
             ...additionalHeaders
         };
@@ -39,7 +42,7 @@ export abstract class SdkClient extends CredentialAuth {
         try {
             const request: any = { method: verb, headers: headers, agent: this._proxyHttpAgent };
             if (verb !== "GET" && verb !== "DELETE") {
-                request.body = JSON.stringify(body);
+                request.body = octetStream ? body : JSON.stringify(body);
             }
             const response = await fetch(url, request);
             if (!response.ok) {

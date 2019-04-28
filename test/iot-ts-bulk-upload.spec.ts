@@ -1,4 +1,4 @@
-import { IotTsBulkUpload } from "../src";
+import { TimeSeriesBulkClient } from "../src/api/sdk";
 import { decrypt, loadAuth } from "../src/api/utils";
 
 describe("IotTsBulkUpload", () => {
@@ -6,12 +6,12 @@ describe("IotTsBulkUpload", () => {
     const tenant = process.env.TENANT || loadAuth().tenant;
     const basicAuth = process.env.BASICAUTH || decrypt(loadAuth(), "passkey.4.unit.test");
     it.only("should instantiate", async () => {
-        const tsBulkUpload = new IotTsBulkUpload(gateway, basicAuth, tenant);
+        const tsBulkUpload = new TimeSeriesBulkClient(gateway, basicAuth, tenant);
         tsBulkUpload.should.exist;
     });
 
     it.only("should renew token", async () => {
-        const tsBulkUpload = new IotTsBulkUpload(gateway, basicAuth, tenant);
+        const tsBulkUpload = new TimeSeriesBulkClient(gateway, basicAuth, tenant);
         tsBulkUpload.should.exist;
         const result = await tsBulkUpload.RenewToken();
         result.should.be.true;

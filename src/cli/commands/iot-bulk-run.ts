@@ -4,7 +4,9 @@ import { log } from "console";
 import * as csv from "csvtojson";
 import * as fs from "fs";
 import * as path from "path";
-import { AssetManagementClient } from "../../api/sdk";
+import { sleep } from "../../../test/test-utils";
+import { Data } from "../../api/iot-ts-bulk-models";
+import { AssetManagementClient, TimeSeriesBulkClient } from "../../api/sdk";
 import { IotFileClient } from "../../api/sdk/iotfile/iot-file";
 import { decrypt, errorLog, loadAuth, throwError, verboseLog } from "../../api/utils";
 
@@ -31,8 +33,15 @@ export default (program: CommanderStatic) => {
                         auth.tenant
                     );
 
+                    const jobsInput = {
+                        data: new Array<Data>()
+                    };
+
                     for (const aspect of aspects) {
                         const files = getFiles(options, aspect);
+
+                        const aspectJob: Data = { entity: asset.assetId, propertySetName: aspect, timeseriesFiles: [] };
+                        jobsInput.data.push(aspectJob);
 
                         for (const file of files) {
                             !options.verbose && process.stdout.write(".");
@@ -55,7 +64,7 @@ export default (program: CommanderStatic) => {
                                     ({ mintime, maxtime } = determineMinAndMax(mintime, timestamp, maxtime));
 
                                     if (data.length >= maxSize) {
-                                        const path = writeDataAsJson({
+                                        const [path, newname] = writeDataAsJson({
                                             mintime,
                                             maxtime,
                                             options,
@@ -63,8 +72,23 @@ export default (program: CommanderStatic) => {
                                             data
                                         });
 
-                                        await fileUploadClient.PutFile(asset.assetId, path, path);
+                                        const result = await fileUploadClient.PutFile(
+                                            asset.assetId,
+                                            `bulk/${newname}.json`,
+                                            path,
+                                            {
+                                                type: "application/json",
+                                                timestamp: new Date(),
+                                                description: newname
+                                            }
+                                        );
 
+                                        verboseLog(result, options.verbose);
+                                        aspectJob.timeseriesFiles.push({
+                                            filePath: `bulk/${newname}.json`,
+                                            from: mintime,
+                                            to: maxtime
+                                        });
                                         data = [];
                                         mintime = undefined;
                                         maxtime = undefined;
@@ -73,12 +97,30 @@ export default (program: CommanderStatic) => {
                                 });
 
                             if (data.length > 0) {
-                                const path = writeDataAsJson({
+                                const [path, newname] = writeDataAsJson({
                                     mintime,
                                     maxtime,
                                     options,
                                     aspect,
                                     data
+                                });
+
+                                const result = await fileUploadClient.PutFile(
+                                    asset.assetId,
+                                    `bulk/${newname}.json`,
+                                    path,
+                                    {
+                                        type: "application/json",
+                                        timestamp: new Date(),
+                                        description: newname
+                                    }
+                                );
+
+                                verboseLog(result, options.verbose);
+                                aspectJob.timeseriesFiles.push({
+                                    filePath: `bulk/${newname}.json`,
+                                    from: mintime,
+                                    to: maxtime
                                 });
                             }
 
@@ -88,6 +130,26 @@ export default (program: CommanderStatic) => {
                             );
                         }
                     }
+
+                    console.log(jobsInput);
+
+                    const bulkupload = new TimeSeriesBulkClient(
+                        auth.gateway,
+                        decrypt(auth, options.passkey),
+                        auth.tenant
+                    );
+
+                    const result = await bulkupload.PostImportJob({ data: [jobsInput.data[0]] });
+                    console.log(JSON.stringify(result));
+
+                    for (let index = 0; index < 100; index++) {
+                        await sleep(2000);
+                        const current = await bulkupload.GetJobStatus(`${result.jobId}`);
+                        console.log(JSON.stringify(current));
+                    }
+
+                    // const allfiles = await fileUploadClient.GetFiles(asset.assetId);
+                    // console.log(JSON.stringify(allfiles, null, 2));
                     console.log("Done.");
                 } catch (err) {
                     errorLog(err, options.verbose);
@@ -129,13 +191,13 @@ function writeDataAsJson({
     data: any[];
 }) {
     mintime || maxtime || throwError("the data is ivalid the timestamps are corrupted");
-    const newFileName = `from_${mintime && mintime.toISOString()}_to_${maxtime && maxtime.toISOString()}_${
+    const newFileName = `${aspect}_from_${mintime && mintime.toISOString()}_to_${maxtime && maxtime.toISOString()}_${
         data.length
     }_records`.replace(/[^a-z0-9]/gi, "_");
     verboseLog(`writing ${options.dir}/json/${aspect}/${chalk.magentaBright(newFileName + ".json")}`, options.verbose);
     const newPath = `${options.dir}/json/${aspect}/${newFileName}.json`;
     fs.writeFileSync(newPath, JSON.stringify(data));
-    return newPath;
+    return [newPath, newFileName];
 }
 
 function getFiles(options: any, aspect: string) {

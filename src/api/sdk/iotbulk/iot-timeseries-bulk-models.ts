@@ -116,7 +116,11 @@ export namespace TimeSeriesBulkModels {
      */
     export interface JobStatus {
         /**
-         * Job id for checking status of bulk ingest job. The request will return below job status. - SUBMITTED - Once job is submitted for bulk ingestion. - IN_PROGRESS - Once job is in progress. - ERROR - Job failed due to invalid input or because of internal error. - SUCCESS - Job is successful and parquet file is uploaded in time series cold store.
+         * Job id for checking status of bulk ingest job. The request will return below job status.
+         * - SUBMITTED - Once job is submitted for bulk ingestion.
+         * - IN_PROGRESS - Once job is in progress.
+         * - ERROR - Job failed due to invalid input or because of internal error.
+         * - SUCCESS - Job is successful and parquet file is uploaded in time series cold store.
          * @type {string}
          * @memberof JobStatus
          */
@@ -145,6 +149,27 @@ export namespace TimeSeriesBulkModels {
          * @memberof JobStatus
          */
         lastModified?: Date;
+
+        /**
+         * Job id for checking status of bulk ingest job. The request will return below job status. - SUBMITTED - Once job is submitted for bulk ingestion. - IN_PROGRESS - Once job is in progress. - ERROR - Job failed due to invalid input or because of internal error. - SUCCESS - Job is successful and parquet file is uploaded in time series cold store.
+         * @type {string}
+         * @memberof JobStatus
+         */
+        jobId?: string;
+
+        /**
+         * Job start time in ISO date format.
+         * @type {Date}
+         * @memberof JobStatus
+         */
+
+        jobStartTime?: Date;
+        /**
+         * Job last modified time in ISO date format.
+         * @type {Date}
+         * @memberof JobStatus
+         */
+        jobLastModified?: Date;
     }
 
     /**
