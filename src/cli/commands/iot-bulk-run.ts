@@ -4,9 +4,8 @@ import { log } from "console";
 import * as csv from "csvtojson";
 import * as fs from "fs";
 import * as path from "path";
-import { sleep } from "../../../test/test-utils";
 import { AssetManagementClient } from "../../api/sdk";
-import { TimeSeriesClient } from "../../api/sdk/iot/iot-timeseries";
+import { IotFileClient } from "../../api/sdk/iotfile/iot-file";
 import { decrypt, errorLog, loadAuth, throwError, verboseLog } from "../../api/utils";
 
 export default (program: CommanderStatic) => {
@@ -26,7 +25,11 @@ export default (program: CommanderStatic) => {
                     const asset = await createOrReadAsset(options);
                     const aspects = getAspectsFromDirNames(options);
                     const auth = loadAuth();
-                    const timeSeries = new TimeSeriesClient(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
+                    const fileUploadClient = new IotFileClient(
+                        auth.gateway,
+                        decrypt(auth, options.passkey),
+                        auth.tenant
+                    );
 
                     for (const aspect of aspects) {
                         const files = getFiles(options, aspect);
@@ -52,7 +55,7 @@ export default (program: CommanderStatic) => {
                                     ({ mintime, maxtime } = determineMinAndMax(mintime, timestamp, maxtime));
 
                                     if (data.length >= maxSize) {
-                                        writeDataAsJson({
+                                        const path = writeDataAsJson({
                                             mintime,
                                             maxtime,
                                             options,
@@ -60,8 +63,8 @@ export default (program: CommanderStatic) => {
                                             data
                                         });
 
-                                        await timeSeries.PutTimeSeries(asset.assetId, aspect, data);
-                                        await sleep(2000);
+                                        await fileUploadClient.PutFile(asset.assetId, path, path);
+
                                         data = [];
                                         mintime = undefined;
                                         maxtime = undefined;
@@ -70,15 +73,13 @@ export default (program: CommanderStatic) => {
                                 });
 
                             if (data.length > 0) {
-                                writeDataAsJson({
+                                const path = writeDataAsJson({
                                     mintime,
                                     maxtime,
                                     options,
                                     aspect,
                                     data
                                 });
-                                await timeSeries.PutTimeSeries(asset.assetId, aspect, data);
-                                await sleep(2000);
                             }
 
                             verboseLog(
@@ -132,8 +133,9 @@ function writeDataAsJson({
         data.length
     }_records`.replace(/[^a-z0-9]/gi, "_");
     verboseLog(`writing ${options.dir}/json/${aspect}/${chalk.magentaBright(newFileName + ".json")}`, options.verbose);
-    fs.writeFileSync(`${options.dir}/json/${aspect}/${newFileName}.json`, JSON.stringify(data));
-    verboseLog(`done`, options.verbose);
+    const newPath = `${options.dir}/json/${aspect}/${newFileName}.json`;
+    fs.writeFileSync(newPath, JSON.stringify(data));
+    return newPath;
 }
 
 function getFiles(options: any, aspect: string) {
