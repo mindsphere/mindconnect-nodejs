@@ -5,8 +5,7 @@ import * as csv from "csvtojson";
 import * as fs from "fs";
 import * as path from "path";
 import { sleep } from "../../../test/test-utils";
-import { Data } from "../../api/iot-ts-bulk-models";
-import { AssetManagementClient, TimeSeriesBulkClient } from "../../api/sdk";
+import { AssetManagementClient, TimeSeriesBulkClient, TimeSeriesBulkModels } from "../../api/sdk";
 import { IotFileClient } from "../../api/sdk/iotfile/iot-file";
 import { decrypt, errorLog, loadAuth, throwError, verboseLog } from "../../api/utils";
 
@@ -34,13 +33,17 @@ export default (program: CommanderStatic) => {
                     );
 
                     const jobsInput = {
-                        data: new Array<Data>()
+                        data: new Array<TimeSeriesBulkModels.Data>()
                     };
 
                     for (const aspect of aspects) {
                         const files = getFiles(options, aspect);
 
-                        const aspectJob: Data = { entity: asset.assetId, propertySetName: aspect, timeseriesFiles: [] };
+                        const aspectJob: TimeSeriesBulkModels.Data = {
+                            entity: asset.assetId,
+                            propertySetName: aspect,
+                            timeseriesFiles: []
+                        };
                         jobsInput.data.push(aspectJob);
 
                         for (const file of files) {
