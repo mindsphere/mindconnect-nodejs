@@ -2,7 +2,7 @@ import chalk from "chalk";
 import { log } from "console";
 import * as fs from "fs";
 import { AssetManagementModels } from "../../api/sdk";
-import { verboseLog } from "../../api/utils";
+import { throwError, verboseLog } from "../../api/utils";
 
 export const serviceCredentialLog = () => {
     log(`\n  Important: \n`);
@@ -137,9 +137,7 @@ export function generateCsv({
     for (let file = options.files; file > 0; file--) {
         const date = new Date(startDate);
         date.setUTCDate(date.getUTCDate() - parseInt(options.offset));
-        console.log(options.offset);
 
-        console.log(date);
         if (mode === AssetManagementModels.TwinType.Performance) {
             // * generate one file per day
             date.setUTCDate(date.getUTCDate() - (file - 1));
@@ -183,17 +181,26 @@ export function generateCsv({
     }
 }
 
-export function writeNewAssetJson(options: any, root: AssetManagementModels.RootAssetResource, path: any) {
+export function writeNewAssetJson(
+    options: any,
+    root: AssetManagementModels.RootAssetResource,
+    path: any,
+    twintype: string
+) {
     const asset: AssetManagementModels.Asset = {
-        name: "NewAsset",
-        twinType: AssetManagementModels.TwinType.Simulation,
+        name: `${twintype}Asset`,
+        twinType:
+            twintype === "performance"
+                ? AssetManagementModels.TwinType.Performance
+                : AssetManagementModels.TwinType.Simulation,
         typeId: options.typeid,
         parentId: root.assetId,
         location: {
             country: "Germany",
             postalCode: "91052",
             region: "Bayern",
-            streetAddress: "Schuhstr 60",
+            streetAddress: "Schuhstr. 60",
+            locality: "Erlangen",
             latitude: 49.59099,
             longitude: 11.00783
         }
@@ -218,4 +225,15 @@ export function makeCsvAndJsonDir(options: any) {
     fs.mkdirSync(`${path}/csv/`);
     fs.mkdirSync(`${path}/json/`);
     return path;
+}
+
+export function checkTwinTypeOfAsset(
+    asset: AssetManagementModels.AssetResourceWithHierarchyPath | undefined,
+    options: any
+) {
+    asset &&
+        asset.twinType !== options.twintype &&
+        throwError(
+            `You can't use the twintype mode ${chalk.magentaBright(options.twintype)} for ${asset.twinType} asset`
+        );
 }

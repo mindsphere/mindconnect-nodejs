@@ -5,6 +5,7 @@ import * as fs from "fs";
 import { AssetManagementClient, AssetManagementModels } from "../../api/sdk";
 import { authJson, checkAssetId, decrypt, errorLog, loadAuth, throwError, verboseLog } from "../../api/utils";
 import {
+    checkTwinTypeOfAsset,
     createAspectDirs,
     directoryReadyLog,
     generateCsv,
@@ -18,10 +19,11 @@ export default (program: CommanderStatic) => {
         .command("prepare-bulk")
         .alias("pb")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
+        .option("-w, --twintype <mode>", "twintype of asset", "performance")
         .option("-i, --assetid <assetid>", "asset id from the mindsphere ")
         .option("-t, --typeid <typeid>", "typeid e.g. castidev.Engine ")
-        .option("-s, --size <size>", "entries per file ", 1000)
-        .option("-f, --files <files>", "generated files ", 3)
+        .option("-s, --size <size>", "entries per file ", 100)
+        .option("-f, --files <files>", "generated files ", 2)
         .option("-o, --offset <days>", "offset in days from current date ", 0)
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-k, --passkey <passkey>", "passkey")
@@ -34,6 +36,8 @@ export default (program: CommanderStatic) => {
                     const path = makeCsvAndJsonDir(options);
                     const auth = loadAuth();
                     const { root, asset, aspects } = await getAssetAndAspects(auth, options);
+
+                    checkTwinTypeOfAsset(asset, options);
 
                     const spinner = ora("generating data...");
                     !options.verbose && spinner.start();
@@ -50,12 +54,12 @@ export default (program: CommanderStatic) => {
                             variables: variables,
                             options: options,
                             path: path,
-                            mode: AssetManagementModels.TwinType.Simulation
+                            mode: options.twintype
                         });
                     });
 
                     options.typeid
-                        ? writeNewAssetJson(options, root, path)
+                        ? writeNewAssetJson(options, root, path, options.twintype)
                         : fs.writeFileSync(`${path}/asset.json`, JSON.stringify(asset, null, 2));
 
                     !options.verbose && spinner.succeed("done.");
@@ -129,6 +133,9 @@ async function getAssetAndAspects(auth: authJson, options: any) {
 }
 
 function checkRequiredParamaters(options: any) {
+    options.twintype !== "performance" &&
+        options.twintype !== "simulation" &&
+        throwError("you have to specify the twin type");
     !options.typeid && !options.assetid && throwError("You have to specify either a typeid or assetid");
     !!options.typeid === !!options.assetid && throwError("You can't specify typeid and assetid at the same time");
     verboseLog(
