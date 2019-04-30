@@ -3,11 +3,41 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as csv from "csvtojson";
 import * as fs from "fs";
+import * as _ from "lodash";
 import * as path from "path";
 import { sleep } from "../../../test/test-utils";
-import { AssetManagementClient, TimeSeriesBulkClient, TimeSeriesBulkModels } from "../../api/sdk";
-import { decrypt, errorLog, loadAuth, throwError, verboseLog } from "../../api/utils";
+import {
+    AssetManagementClient,
+    AssetManagementModels,
+    TimeSeriesBulkClient,
+    TimeSeriesBulkModels
+} from "../../api/sdk";
+import { IotFileClient } from "../../api/sdk/iotfile/iot-file";
+import { decrypt, errorLog, loadAuth, retry, retrylog, throwError, verboseLog } from "../../api/utils";
 import ora = require("ora");
+
+interface ExtendedFileInfo extends TimeSeriesBulkModels.FileInfo {}
+
+type fileInfo = {
+    entity: string;
+    propertyset: string;
+    path: string;
+    filepath: string;
+    mintime: Date;
+    maxtime: Date;
+    etag?: string;
+};
+
+type jobState = {
+    options: {
+        size: any;
+        twintype: AssetManagementModels.TwinType | undefined;
+        asset: AssetManagementModels.AssetResourceWithHierarchyPath;
+    };
+
+    uploadFiles: fileInfo[];
+    bulkImports: TimeSeriesBulkModels.BulkImportInput[];
+};
 
 export default (program: CommanderStatic) => {
     program
@@ -24,145 +54,66 @@ export default (program: CommanderStatic) => {
             (async () => {
                 try {
                     checkRequiredParamaters(options);
-                    const asset = await createOrReadAsset(options);
+                    const asset = (await createOrReadAsset(
+                        options
+                    )) as AssetManagementModels.AssetResourceWithHierarchyPath;
                     const aspects = getAspectsFromDirNames(options);
-
-                    const jobsInput = {
-                        data: new Array<TimeSeriesBulkModels.Data>()
-                    };
-
-                    const uploadJobs = [];
-
                     const spinner = ora("creating files");
-
-                    for (const aspect of aspects) {
-                        const files = getFiles(options, aspect);
-
-                        const aspectJob: TimeSeriesBulkModels.Data = {
-                            entity: asset.assetId,
-                            propertySetName: aspect,
-                            timeseriesFiles: []
-                        };
-                        jobsInput.data.push(aspectJob);
-
-                        !options.verbose && spinner.start("");
-                        for (const file of files) {
-                            let data: any = [];
-                            let recordCount = 0;
-                            let mintime: Date | undefined;
-                            let maxtime: Date | undefined;
-                            const maxSize = options.size;
-                            maxSize > 0 || throwError("the size must be greater than 0");
-                            await verboseLog(
-                                `reading file: ${options.dir}/csv/${aspect}/${chalk.magentaBright(file)}`,
-                                options.verbose,
-                                spinner
-                            );
-                            await csv()
-                                .fromFile(`${options.dir}/csv/${aspect}/${file}`)
-                                .subscribe(async json => {
-                                    data.push(json);
-                                    const timestamp = new Date(json._time);
-                                    ({ mintime, maxtime } = determineMinAndMax(mintime, timestamp, maxtime));
-
-                                    if (data.length >= maxSize) {
-                                        const [path, newname] = writeDataAsJson({
-                                            mintime,
-                                            maxtime,
-                                            options,
-                                            aspect,
-                                            data
-                                        });
-
-                                        uploadJobs.push({
-                                            entity: asset.assetId,
-                                            filepath: `bulk/${newname}.json`,
-                                            path: path,
-                                            mintime: mintime,
-                                            maxtime: maxtime
-                                        });
-
-                                        // const result = await fileUploadClient.PutFile(
-                                        //     asset.assetId,
-                                        //     `bulk/${newname}.json`,
-                                        //     path,
-                                        //     {
-                                        //         type: "application/json",
-                                        //         timestamp: new Date(),
-                                        //         description: newname
-                                        //     }
-                                        // );
-
-                                        // verboseLog(result, options.verbose);
-                                        aspectJob.timeseriesFiles.push({
-                                            filePath: `bulk/${newname}.json`,
-                                            from: mintime,
-                                            to: maxtime
-                                        });
-                                        data = [];
-                                        mintime = undefined;
-                                        maxtime = undefined;
-                                    }
-                                    recordCount++;
-                                });
-
-                            if (data.length > 0) {
-                                const [path, newname] = writeDataAsJson({
-                                    mintime,
-                                    maxtime,
-                                    options,
-                                    aspect,
-                                    data
-                                });
-
-                                uploadJobs.push({
-                                    entity: asset.assetId,
-                                    filepath: `bulk/${newname}.json`,
-                                    path: path,
-                                    mintime: mintime,
-                                    maxtime: maxtime
-                                });
-
-                                // const result = await fileUploadClient.PutFile(
-                                //     asset.assetId,
-                                //     `bulk/${newname}.json`,
-                                //     path,
-                                //     {
-                                //         type: "application/json",
-                                //         timestamp: new Date(),
-                                //         description: newname
-                                //     }
-                                // );
-
-                                // verboseLog(result, options.verbose);
-                                aspectJob.timeseriesFiles.push({
-                                    filePath: `bulk/${newname}.json`,
-                                    from: mintime,
-                                    to: maxtime
-                                });
-                            }
-
-                            verboseLog(
-                                `total record count in ${file}: ${chalk.magentaBright(recordCount.toString())}`,
-                                options.verbose,
-                                spinner
-                            );
-                        }
-                    }
-
-                    !options.verbose && spinner.succeed("done converting files to json");
-
-                    fs.writeFileSync(
-                        `${options.dir}/jobstate.json`,
-                        JSON.stringify(
-                            { options: { size: options.size, files: options.files }, uploadJobs: uploadJobs },
-                            null,
-                            2
-                        )
+                    verboseLog(
+                        `Starting bulk-import of timeseries data for twintype : ${asset.twinType}`,
+                        options.verbose,
+                        spinner
                     );
 
+                    const files: fileInfo[] = await getUploadJobs({ aspects, options, spinner, asset });
+
+                    const jobstate: jobState = {
+                        options: { size: options.size, twintype: asset.twinType, asset: asset },
+                        uploadFiles: files,
+                        bulkImports: []
+                    };
+                    fs.writeFileSync(`${options.dir}/jobstate.json`, JSON.stringify(jobstate, null, 2));
+
+                    asset.twinType === AssetManagementModels.TwinType.Simulation &&
+                        verifySimulationFiles(jobstate.uploadFiles) &&
+                        verboseLog("All files verified", options.verbose, spinner);
+
+                    await sleep(1000);
+                    !options.verbose && spinner.succeed("done converting files to json");
+                    console.log(
+                        `\nrun mc bulk-run with ${chalk.magentaBright(
+                            "--start"
+                        )} option to start sending data to mindsphere\n`
+                    );
                     if (options.start) {
-                        console.log(jobsInput);
+                        await uploadFiles(options, jobstate);
+
+                        fs.writeFileSync(`${options.dir}/jobstate.json`, JSON.stringify(jobstate, null, 2));
+
+                        const results = _(jobstate.uploadFiles)
+                            .groupBy(x => {
+                                const date = new Date(x.mintime);
+                                date.setMinutes(0, 0, 0);
+                                return JSON.stringify({ propertySet: x.propertyset, fullHourDate: date });
+                            })
+                            .map()
+                            .value();
+
+                        for (const fileInfos of results) {
+                            const first = (_(fileInfos).first() as fileInfo) || throwError("no data in results");
+                            const data: TimeSeriesBulkModels.Data = {
+                                entity: first.entity,
+                                propertySetName: first.propertyset,
+                                timeseriesFiles: fileInfos.map(x => {
+                                    return { filepath: x.filepath, from: x.mintime, to: x.maxtime };
+                                })
+                            };
+                            console.log(data);
+                            jobstate.bulkImports.push({ data: [data] });
+                            console.log("\n");
+                        }
+
+                        console.log(jobstate.bulkImports);
 
                         const auth = loadAuth();
                         const bulkupload = new TimeSeriesBulkClient(
@@ -171,14 +122,22 @@ export default (program: CommanderStatic) => {
                             auth.tenant
                         );
 
-                        const result = await bulkupload.PostImportJob({ data: [jobsInput.data[0]] });
-                        console.log(JSON.stringify(result));
-
-                        for (let index = 0; index < 100; index++) {
-                            await sleep(2000);
-                            const current = await bulkupload.GetJobStatus(`${result.jobId}`);
-                            console.log(JSON.stringify(current));
+                        for (const bulkImport of jobstate.bulkImports) {
+                            const jobid = await bulkupload.PostImportJob(bulkImport);
+                            (bulkImport as any).jobid = jobid;
+                            console.log(jobid);
                         }
+
+                        fs.writeFileSync(`${options.dir}/jobstate.json`, JSON.stringify(jobstate, null, 2));
+
+                        // const result = await bulkupload.PostImportJob({ data: [jobsInput.data[0]] });
+                        // console.log(JSON.stringify(result));
+
+                        // for (let index = 0; index < 100; index++) {
+                        //     await sleep(2000);
+                        //     const current = await bulkupload.GetJobStatus(`${result.jobId}`);
+                        //     console.log(JSON.stringify(current));
+                        // }
 
                         // const allfiles = await fileUploadClient.GetFiles(asset.assetId);
                         // console.log(JSON.stringify(allfiles, null, 2));
@@ -199,6 +158,126 @@ export default (program: CommanderStatic) => {
             );
         });
 };
+
+async function uploadFiles(options: any, jobstate: jobState) {
+    const auth = loadAuth();
+    const fileUploadClient = new IotFileClient(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
+    for (const entry of jobstate.uploadFiles) {
+        const result = await retry(
+            options.retry,
+            () =>
+                fileUploadClient.PutFile(`${jobstate.options.asset.assetId}`, entry.filepath, entry.path, {
+                    type: "application/json",
+                    timestamp: fs.statSync(entry.path).mtime,
+                    description: "bulk upload"
+                }),
+            500,
+            retrylog("PutFile")
+        );
+        entry.etag = result.get("etag") || "0";
+    }
+}
+
+async function getUploadJobs({
+    aspects,
+    options,
+    spinner,
+    asset
+}: {
+    aspects: string[];
+    options: any;
+    spinner: ora.Ora;
+    asset: any;
+}) {
+    const uploadJobs: fileInfo[] = [];
+    for (const aspect of aspects) {
+        const files = getFiles(options, aspect);
+        !options.verbose && spinner.start("");
+        for (const file of files) {
+            let data: any = [];
+            let recordCount = 0;
+            let mintime: Date | undefined;
+            let maxtime: Date | undefined;
+            const maxSize = options.size;
+            maxSize > 0 || throwError("the size must be greater than 0");
+            await verboseLog(
+                `reading file: ${options.dir}/csv/${aspect}/${chalk.magentaBright(file)}`,
+                options.verbose,
+                spinner
+            );
+            await csv()
+                .fromFile(`${options.dir}/csv/${aspect}/${file}`)
+                .subscribe(async json => {
+                    data.push(json);
+                    const timestamp = new Date(json._time);
+                    ({ mintime, maxtime } = determineMinAndMax(mintime, timestamp, maxtime));
+                    if (data.length >= maxSize) {
+                        const [path, newname] = writeDataAsJson({
+                            mintime,
+                            maxtime,
+                            options,
+                            aspect,
+                            data
+                        });
+                        uploadJobs.push({
+                            entity: asset.assetId,
+                            propertyset: aspect,
+                            filepath: `bulk/${newname}.json`,
+                            path: path,
+                            mintime: mintime,
+                            maxtime: maxtime
+                        });
+                        data = [];
+                        mintime = maxtime = undefined;
+                    }
+                    recordCount++;
+                });
+            if (data.length > 0) {
+                const [path, newname] = writeDataAsJson({
+                    mintime,
+                    maxtime,
+                    options,
+                    aspect,
+                    data
+                });
+                uploadJobs.push({
+                    entity: asset.assetId,
+                    propertyset: aspect,
+                    filepath: `bulk/${newname}.json`,
+                    path: path,
+                    mintime: mintime as Date,
+                    maxtime: maxtime as Date
+                });
+            }
+            verboseLog(
+                `total record count in ${file}: ${chalk.magentaBright(recordCount.toString())}`,
+                options.verbose,
+                spinner
+            );
+        }
+    }
+    return uploadJobs;
+}
+
+function verifySimulationFiles(uploadJobs: fileInfo[]) {
+    const incompatibleFiles = uploadJobs.filter(fileInfo => {
+        const minFullHour = new Date(fileInfo.mintime);
+        minFullHour.setMinutes(0, 0, 0);
+        const maxFullHour = new Date(fileInfo.maxtime);
+        maxFullHour.setMinutes(0, 0, 0);
+        return minFullHour.valueOf() !== maxFullHour.valueOf();
+    });
+
+    incompatibleFiles.length > 0 &&
+        (() => {
+            incompatibleFiles.forEach(f => console.log(f.path));
+            throwError(
+                `there are ${incompatibleFiles.length} files which contain data which are not from the same hour!`
+            );
+        })();
+
+    return true;
+}
 
 function determineMinAndMax(mintime: Date | undefined, timestamp: Date, maxtime: Date | undefined) {
     if (!mintime || timestamp < mintime) {
@@ -233,10 +312,10 @@ function writeDataAsJson({
     return [newPath, newFileName];
 }
 
-function getFiles(options: any, aspect: string) {
-    verboseLog(`reading directory ${options.dir}/csv/${chalk.magentaBright(aspect)}`, options.verbose);
-    const files = fs.readdirSync(`${options.dir}/csv/${aspect}`).filter(x => {
-        return fs.statSync(`${options.dir}/csv/${aspect}/${x}`).isFile();
+function getFiles(options: any, aspect: string, csvorjson: "csv" | "json" = "csv") {
+    verboseLog(`reading directory ${options.dir}/${csvorjson}/${chalk.magentaBright(aspect)}`, options.verbose);
+    const files = fs.readdirSync(`${options.dir}/${csvorjson}/${aspect}`).filter(x => {
+        return fs.statSync(`${options.dir}/${csvorjson}/${aspect}/${x}`).isFile();
     });
     return files;
 }
