@@ -3,7 +3,7 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import { AssetManagementClient, AssetManagementModels } from "../../api/sdk";
-import { checkAssetId, decrypt, errorLog, loadAuth, retry, retrylog, throwError, verboseLog } from "../../api/utils";
+import { authJson, checkAssetId, decrypt, errorLog, loadAuth, throwError, verboseLog } from "../../api/utils";
 import {
     createAspectDirs,
     directoryReadyLog,
@@ -11,96 +11,54 @@ import {
     makeCsvAndJsonDir,
     writeNewAssetJson
 } from "./command-utils";
+import ora = require("ora");
+
 export default (program: CommanderStatic) => {
     program
-        .command("iot-prepare-bulk-dir")
-        .alias("pbd")
+        .command("prepare-bulk")
+        .alias("pb")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
         .option("-i, --assetid <assetid>", "asset id from the mindsphere ")
         .option("-t, --typeid <typeid>", "typeid e.g. castidev.Engine ")
-        .option("-s, --size <size>", "entries per file ", 3)
-        .option("-f, --files <files>", "generated files ", 2)
+        .option("-s, --size <size>", "entries per file ", 1000)
+        .option("-f, --files <files>", "generated files ", 3)
+        .option("-o, --offset <days>", "offset in days from current date ", 0)
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
-        .description(chalk.magentaBright("creates a template directory for bulk upload *"))
+        .description(chalk.magentaBright("creates a template directory for timeseries (bulk) upload *"))
         .action(options => {
             (async () => {
                 try {
                     checkRequiredParamaters(options);
                     const path = makeCsvAndJsonDir(options);
                     const auth = loadAuth();
-                    const assetMgmt = new AssetManagementClient(
-                        auth.gateway,
-                        decrypt(auth, options.passkey),
-                        auth.tenant
-                    );
+                    const { root, asset, aspects } = await getAssetAndAspects(auth, options);
 
-                    let aspects: any[] = [];
-                    let asset;
-                    if (options.assetid) {
-                        asset = (await retry(
-                            options.retry,
-                            () => assetMgmt.GetAsset(options.assetid),
-                            300,
-                            retrylog("GetAsset")
-                        )) as AssetManagementModels.AssetResourceWithHierarchyPath;
-
-                        const embAspects = (await retry(
-                            options.retry,
-                            () => assetMgmt.GetAspects(options.assetid),
-                            300,
-                            retrylog("GetAspects")
-                        )) as AssetManagementModels.AspectListResource;
-
-                        if (embAspects._embedded && embAspects._embedded.aspects) {
-                            aspects = embAspects._embedded.aspects.filter(x => {
-                                return x.category === AssetManagementModels.AspectResource.CategoryEnum.Dynamic;
-                            });
-                        }
-
-                        asset.twinType !== AssetManagementModels.TwinType.Simulation &&
-                            throwError("The bulk upload only works for simulation assets!");
-                    }
-
-                    if (options.typeid) {
-                        const assetType = (await retry(
-                            options.retry,
-                            () => assetMgmt.GetAssetType(options.typeid),
-                            300,
-                            retrylog("GetAssetType")
-                        )) as AssetManagementModels.AssetTypeResource;
-
-                        if (assetType.aspects) {
-                            aspects = assetType.aspects.filter(x => {
-                                return x.aspectType && x.aspectType.category === "dynamic";
-                            });
-                        }
-                        aspects = aspects || [];
-                    }
-
-                    // console.log(aspects);
+                    const spinner = ora("generating data...");
+                    !options.verbose && spinner.start();
 
                     aspects.forEach(aspect => {
                         createAspectDirs(path, aspect, options);
 
-                        // ! The variables are stored in different spots depenendet if they come from type or the asset.
-                        const variables: AssetManagementModels.AspectVariable[] =
-                            aspect.variables || aspect.aspectType.variables || [];
+                        // * The variables are stored in different spots depenendet if they come from the type or from the asset.
+                        const variables = aspect.variables || aspect.aspectType.variables || [];
 
-                        generateCsv(aspect.name, variables, options, path);
+                        // * The csv generation generates data for every day for performance assets and every hour for simulation assets
+                        generateCsv({
+                            name: aspect.name,
+                            variables: variables,
+                            options: options,
+                            path: path,
+                            mode: AssetManagementModels.TwinType.Simulation
+                        });
                     });
-
-                    const root = (await retry(
-                        options.retry,
-                        () => assetMgmt.GetRootAsset(),
-                        300,
-                        retrylog("GetRoot")
-                    )) as AssetManagementModels.RootAssetResource;
 
                     options.typeid
                         ? writeNewAssetJson(options, root, path)
                         : fs.writeFileSync(`${path}/asset.json`, JSON.stringify(asset, null, 2));
+
+                    !options.verbose && spinner.succeed("done.");
 
                     directoryReadyLog({
                         path: `${path}`,
@@ -116,21 +74,59 @@ export default (program: CommanderStatic) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc iot-prepare-bulk-dir  --typeid castidev.Engine \t this creates a directory called ${chalk.magentaBright(
+                `    mc prepare-bulk  --typeid castidev.Engine \t this creates a directory called ${chalk.magentaBright(
                     "bulkimport"
                 )} for new asset of type castidev.Engine`
             );
             log(
-                `    mc pbd --dir asset1 -i 123456...abc \t\t this creates a directory called ${chalk.magentaBright(
+                `    mc pb --dir asset1 -i 123456...abc \t\t this creates a directory called ${chalk.magentaBright(
                     "asset1"
                 )} for existing asset`
             );
 
+            log(`    mc pb -of 3 -t castidev.Engine \t\t start data creation template 3 days before now`);
             log(
-                `The typeid must be derived from core.basicdevice and twintype must be simulation for the bulk upload `
+                `\n\tuse --mode ${chalk.magentaBright(
+                    "performance"
+                )} for standard data generation or --mode ${chalk.magentaBright(
+                    "simulation"
+                )} for high frequency data generation `
+            );
+            log(
+                `\tThe typeid must be derived from ${chalk.magentaBright(
+                    "core.basicdevice"
+                )} and asset ${chalk.magentaBright("twintype")} must be ${chalk.magentaBright(
+                    "simulation"
+                )} for high frequency data upload\n`
             );
         });
 };
+
+async function getAssetAndAspects(auth: authJson, options: any) {
+    const assetMgmt = new AssetManagementClient(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
+    let aspects: any[] = [];
+    let asset;
+    if (options.assetid) {
+        asset = await assetMgmt.GetAsset(options.assetid);
+        const embAspects = await assetMgmt.GetAspects(options.assetid);
+        if (embAspects._embedded && embAspects._embedded.aspects) {
+            aspects = embAspects._embedded.aspects.filter(x => {
+                return x.category === AssetManagementModels.AspectResource.CategoryEnum.Dynamic;
+            });
+        }
+    }
+    if (options.typeid) {
+        const assetType = await assetMgmt.GetAssetType(options.typeid);
+        if (assetType.aspects) {
+            aspects = assetType.aspects.filter(x => {
+                return x.aspectType && x.aspectType.category === "dynamic";
+            });
+        }
+        aspects = aspects || [];
+    }
+    const root = await assetMgmt.GetRootAsset();
+    return { root, asset, aspects };
+}
 
 function checkRequiredParamaters(options: any) {
     !options.typeid && !options.assetid && throwError("You have to specify either a typeid or assetid");

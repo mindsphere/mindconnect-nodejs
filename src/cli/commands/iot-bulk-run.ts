@@ -6,35 +6,34 @@ import * as fs from "fs";
 import * as path from "path";
 import { sleep } from "../../../test/test-utils";
 import { AssetManagementClient, TimeSeriesBulkClient, TimeSeriesBulkModels } from "../../api/sdk";
-import { IotFileClient } from "../../api/sdk/iotfile/iot-file";
 import { decrypt, errorLog, loadAuth, throwError, verboseLog } from "../../api/utils";
+import ora = require("ora");
 
 export default (program: CommanderStatic) => {
     program
-        .command("iot-bulk-run")
-        .alias("ibr")
+        .command("bulk-run")
+        .alias("br")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
-        .option("-s, --size <size>", "entries per file ", 1000)
+        .option("-s, --size <size>", "entries per file ", Number.MAX_SAFE_INTEGER)
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
-        .description(chalk.magentaBright("runs the bulk upload job from <directoryname> directory *"))
+        .option("-st, --start", "start sending data to mindsphere")
+        .description(chalk.magentaBright("runs the (bulk) upload job from <directoryname> directory *"))
         .action(options => {
             (async () => {
                 try {
                     checkRequiredParamaters(options);
                     const asset = await createOrReadAsset(options);
                     const aspects = getAspectsFromDirNames(options);
-                    const auth = loadAuth();
-                    const fileUploadClient = new IotFileClient(
-                        auth.gateway,
-                        decrypt(auth, options.passkey),
-                        auth.tenant
-                    );
 
                     const jobsInput = {
                         data: new Array<TimeSeriesBulkModels.Data>()
                     };
+
+                    const uploadJobs = [];
+
+                    const spinner = ora("creating files");
 
                     for (const aspect of aspects) {
                         const files = getFiles(options, aspect);
@@ -46,9 +45,8 @@ export default (program: CommanderStatic) => {
                         };
                         jobsInput.data.push(aspectJob);
 
+                        !options.verbose && spinner.start("");
                         for (const file of files) {
-                            !options.verbose && process.stdout.write(".");
-
                             let data: any = [];
                             let recordCount = 0;
                             let mintime: Date | undefined;
@@ -56,8 +54,9 @@ export default (program: CommanderStatic) => {
                             const maxSize = options.size;
                             maxSize > 0 || throwError("the size must be greater than 0");
                             await verboseLog(
-                                `reding file: ${options.dir}/csv/${aspect}/${chalk.magentaBright(file)}`,
-                                options.verbose
+                                `reading file: ${options.dir}/csv/${aspect}/${chalk.magentaBright(file)}`,
+                                options.verbose,
+                                spinner
                             );
                             await csv()
                                 .fromFile(`${options.dir}/csv/${aspect}/${file}`)
@@ -75,18 +74,26 @@ export default (program: CommanderStatic) => {
                                             data
                                         });
 
-                                        const result = await fileUploadClient.PutFile(
-                                            asset.assetId,
-                                            `bulk/${newname}.json`,
-                                            path,
-                                            {
-                                                type: "application/json",
-                                                timestamp: new Date(),
-                                                description: newname
-                                            }
-                                        );
+                                        uploadJobs.push({
+                                            entity: asset.assetId,
+                                            filepath: `bulk/${newname}.json`,
+                                            path: path,
+                                            mintime: mintime,
+                                            maxtime: maxtime
+                                        });
 
-                                        verboseLog(result, options.verbose);
+                                        // const result = await fileUploadClient.PutFile(
+                                        //     asset.assetId,
+                                        //     `bulk/${newname}.json`,
+                                        //     path,
+                                        //     {
+                                        //         type: "application/json",
+                                        //         timestamp: new Date(),
+                                        //         description: newname
+                                        //     }
+                                        // );
+
+                                        // verboseLog(result, options.verbose);
                                         aspectJob.timeseriesFiles.push({
                                             filePath: `bulk/${newname}.json`,
                                             from: mintime,
@@ -108,18 +115,26 @@ export default (program: CommanderStatic) => {
                                     data
                                 });
 
-                                const result = await fileUploadClient.PutFile(
-                                    asset.assetId,
-                                    `bulk/${newname}.json`,
-                                    path,
-                                    {
-                                        type: "application/json",
-                                        timestamp: new Date(),
-                                        description: newname
-                                    }
-                                );
+                                uploadJobs.push({
+                                    entity: asset.assetId,
+                                    filepath: `bulk/${newname}.json`,
+                                    path: path,
+                                    mintime: mintime,
+                                    maxtime: maxtime
+                                });
 
-                                verboseLog(result, options.verbose);
+                                // const result = await fileUploadClient.PutFile(
+                                //     asset.assetId,
+                                //     `bulk/${newname}.json`,
+                                //     path,
+                                //     {
+                                //         type: "application/json",
+                                //         timestamp: new Date(),
+                                //         description: newname
+                                //     }
+                                // );
+
+                                // verboseLog(result, options.verbose);
                                 aspectJob.timeseriesFiles.push({
                                     filePath: `bulk/${newname}.json`,
                                     from: mintime,
@@ -129,31 +144,46 @@ export default (program: CommanderStatic) => {
 
                             verboseLog(
                                 `total record count in ${file}: ${chalk.magentaBright(recordCount.toString())}`,
-                                options.verbose
+                                options.verbose,
+                                spinner
                             );
                         }
                     }
 
-                    console.log(jobsInput);
+                    !options.verbose && spinner.succeed("done converting files to json");
 
-                    const bulkupload = new TimeSeriesBulkClient(
-                        auth.gateway,
-                        decrypt(auth, options.passkey),
-                        auth.tenant
+                    fs.writeFileSync(
+                        `${options.dir}/jobstate.json`,
+                        JSON.stringify(
+                            { options: { size: options.size, files: options.files }, uploadJobs: uploadJobs },
+                            null,
+                            2
+                        )
                     );
 
-                    const result = await bulkupload.PostImportJob({ data: [jobsInput.data[0]] });
-                    console.log(JSON.stringify(result));
+                    if (options.start) {
+                        console.log(jobsInput);
 
-                    for (let index = 0; index < 100; index++) {
-                        await sleep(2000);
-                        const current = await bulkupload.GetJobStatus(`${result.jobId}`);
-                        console.log(JSON.stringify(current));
+                        const auth = loadAuth();
+                        const bulkupload = new TimeSeriesBulkClient(
+                            auth.gateway,
+                            decrypt(auth, options.passkey),
+                            auth.tenant
+                        );
+
+                        const result = await bulkupload.PostImportJob({ data: [jobsInput.data[0]] });
+                        console.log(JSON.stringify(result));
+
+                        for (let index = 0; index < 100; index++) {
+                            await sleep(2000);
+                            const current = await bulkupload.GetJobStatus(`${result.jobId}`);
+                            console.log(JSON.stringify(current));
+                        }
+
+                        // const allfiles = await fileUploadClient.GetFiles(asset.assetId);
+                        // console.log(JSON.stringify(allfiles, null, 2));
+                        console.log("Done.");
                     }
-
-                    // const allfiles = await fileUploadClient.GetFiles(asset.assetId);
-                    // console.log(JSON.stringify(allfiles, null, 2));
-                    console.log("Done.");
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
@@ -161,9 +191,9 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc iot-bulk-run runs the upload job from the  ${chalk.magentaBright("bulkimport")} directory`);
+            log(`    mc bulk-run runs the upload job from the  ${chalk.magentaBright("bulkimport")} directory`);
             log(
-                `    mc ibr --dir asset1 --verbose runs the upload job from the ${chalk.magentaBright(
+                `    mc br --dir asset1 --verbose runs the upload job from the ${chalk.magentaBright(
                     "asset1"
                 )} with verbose output`
             );
@@ -248,6 +278,10 @@ async function createOrReadAsset(options: any) {
 }
 
 function checkRequiredParamaters(options: any) {
+    if (`${options.dir}`.endsWith("/") || `${options.dir}`.endsWith("/")) {
+        options.dir = `${options.dir}`.slice(0, -1);
+    }
+
     verboseLog(`reading directory: ${chalk.magentaBright(options.dir)}`, options.verbose);
     !fs.existsSync(options.dir) && throwError(`the directory ${chalk.magentaBright(options.dir)} doesn't exist!`);
 

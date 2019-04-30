@@ -108,9 +108,10 @@ export const errorLog = (err: any, verbose: any) => {
     process.exit(1);
 };
 
-export const verboseLog = (message: any, verbose: any) => {
-    if (verbose) {
-        console.log(`... ${message}`);
+export const verboseLog = (message: any, verbose: any, spinner?: any) => {
+    verbose && console.log(`... ${message}`);
+    if (!verbose && spinner) {
+        spinner.text = `... ${message}`;
     }
 };
 

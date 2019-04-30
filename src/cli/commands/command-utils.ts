@@ -87,69 +87,93 @@ export const directoryReadyLog = ({
     log(`\tmc ${chalk.magentaBright(jobCommand)} to check the progress of the job`);
 };
 
-export function generateRandom(
-    timestamp: Date,
-    type: AssetManagementModels.VariableDefinition.DataTypeEnum
-): number | string | boolean {
-    let result;
+export const generateRandom = (() => {
+    const variables: string[] = [];
+    return (timestamp: Date, type: AssetManagementModels.VariableDefinition.DataTypeEnum, variableName: string) => {
+        !variables.includes(variableName) && variables.push(variableName);
+        let result;
 
-    switch (type) {
-        case AssetManagementModels.VariableDefinition.DataTypeEnum.DOUBLE:
-            result = (Math.sin(timestamp.getTime()) * 10).toFixed(2) + 20;
-            break;
-        case AssetManagementModels.VariableDefinition.DataTypeEnum.INT:
-        case AssetManagementModels.VariableDefinition.DataTypeEnum.LONG:
-            result = Math.floor(Math.sin(timestamp.getTime()) * 20) + 40;
-            break;
-        case AssetManagementModels.VariableDefinition.DataTypeEnum.BOOLEAN:
-            result = true;
-            break;
-        case AssetManagementModels.VariableDefinition.DataTypeEnum.STRING:
-        case AssetManagementModels.VariableDefinition.DataTypeEnum.BIGSTRING:
-            result = `${type}_${Math.random()}`;
-        default:
-            throw new Error(`invalid type ${type}`);
-    }
-    return result;
-}
+        // multiply the sine curves with factor to have every variable visible
+        const factor = variables.indexOf(variableName) + 1;
+        switch (type) {
+            case AssetManagementModels.VariableDefinition.DataTypeEnum.DOUBLE:
+                result = (Math.sin(timestamp.getTime()) * factor * 10).toFixed(2) + 20;
+                break;
+            case AssetManagementModels.VariableDefinition.DataTypeEnum.INT:
+            case AssetManagementModels.VariableDefinition.DataTypeEnum.LONG:
+                result = Math.floor(Math.sin(timestamp.getTime()) * factor * 20) + 40;
+                break;
+            case AssetManagementModels.VariableDefinition.DataTypeEnum.BOOLEAN:
+                result = true;
+                break;
+            case AssetManagementModels.VariableDefinition.DataTypeEnum.STRING:
+            case AssetManagementModels.VariableDefinition.DataTypeEnum.BIGSTRING:
+                result = `${type}_${Math.random()}`;
+            default:
+                throw new Error(`invalid type ${type}`);
+        }
+        return result;
+    };
+})();
 
-export function generateCsv(
-    name: string,
-    variable: AssetManagementModels.AspectVariable[],
-    options: any,
-    path: string
-) {
+export function generateCsv({
+    name,
+    variables,
+    options,
+    path,
+    mode
+}: {
+    name: string;
+    variables: AssetManagementModels.AspectVariable[];
+    options: any;
+    path: string;
+    mode: AssetManagementModels.TwinType;
+}) {
     verboseLog(`Generating ${options.size} entries for ${name}`, options.verbose);
+    verboseLog(`Asset TwinType: ${mode}`, options.verbose);
 
     const startDate = new Date();
 
     for (let file = options.files; file > 0; file--) {
         const date = new Date(startDate);
-        date.setUTCDate(date.getUTCDate() - (file - 1));
-        date.setUTCHours(0, 0, 0, 0);
+        date.setUTCDate(date.getUTCDate() - parseInt(options.offset));
+        console.log(options.offset);
+
+        console.log(date);
+        if (mode === AssetManagementModels.TwinType.Performance) {
+            // * generate one file per day
+            date.setUTCDate(date.getUTCDate() - (file - 1));
+            date.setUTCHours(0, 0, 0, 0);
+        } else {
+            // * generate one file per hour
+            date.setUTCHours(file - 1, 0, 0, 0);
+        }
 
         const fileName = `${path}/csv/${name}/${file}.csv`;
         verboseLog(`generating: ${chalk.magentaBright(fileName)}`, options.verbose);
         const stream = fs.createWriteStream(fileName);
 
         let headers = `_time, `;
-        variable.forEach(variable => {
+        variables.forEach(variable => {
             headers += variable.name + ", ";
             if (variable.qualityCode) headers += variable.name + "_qc, ";
         });
         stream.write(headers.trimRight().slice(0, -1) + "\n");
 
-        variable.forEach(variable => {
+        variables.forEach(variable => {
             headers += variable.name + ", ";
             if (variable.qualityCode) headers += variable.name + "_qc, ";
         });
 
         for (let index = options.size; index > 0; index--) {
-            const currentDate = subtractSecond(date, (86400 / options.size) * index);
+            const currentDate =
+                mode === AssetManagementModels.TwinType.Performance
+                    ? subtractSecond(date, (86400 / options.size) * index)
+                    : subtractSecond(date, (3600 / options.size) * index);
             let line = currentDate.toISOString() + ", ";
 
-            variable.forEach(variable => {
-                line += generateRandom(currentDate, variable.dataType) + ", ";
+            variables.forEach(variable => {
+                line += generateRandom(currentDate, variable.dataType, `${variable.name}`) + ", ";
                 if (variable.qualityCode) line += "0, ";
             });
 
