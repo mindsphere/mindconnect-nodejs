@@ -16,40 +16,17 @@ import { IotFileClient } from "../../api/sdk/iotfile/iot-file";
 import { decrypt, errorLog, loadAuth, retry, retrylog, throwError, verboseLog } from "../../api/utils";
 import ora = require("ora");
 
-interface ExtendedFileInfo extends TimeSeriesBulkModels.FileInfo {}
-
-type fileInfo = {
-    entity: string;
-    propertyset: string;
-    path: string;
-    filepath: string;
-    mintime: Date;
-    maxtime: Date;
-    etag?: string;
-};
-
-type jobState = {
-    options: {
-        size: any;
-        twintype: AssetManagementModels.TwinType | undefined;
-        asset: AssetManagementModels.AssetResourceWithHierarchyPath;
-    };
-
-    uploadFiles: fileInfo[];
-    bulkImports: TimeSeriesBulkModels.BulkImportInput[];
-};
-
 export default (program: CommanderStatic) => {
     program
-        .command("bulk-run")
-        .alias("br")
+        .command("run-bulk")
+        .alias("rb")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-s, --size <size>", "entries per file ", Number.MAX_SAFE_INTEGER)
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
         .option("-st, --start", "start sending data to mindsphere")
-        .description(chalk.magentaBright("runs the (bulk) upload job from <directoryname> directory *"))
+        .description(chalk.magentaBright("runs the timeseries (bulk) upload job from <directoryname> directory *"))
         .action(options => {
             (async () => {
                 try {
@@ -59,6 +36,7 @@ export default (program: CommanderStatic) => {
                     )) as AssetManagementModels.AssetResourceWithHierarchyPath;
                     const aspects = getAspectsFromDirNames(options);
                     const spinner = ora("creating files");
+                    !options.verbose && spinner.start("");
                     verboseLog(
                         `Starting bulk-import of timeseries data for twintype : ${asset.twinType}`,
                         options.verbose,
@@ -72,7 +50,7 @@ export default (program: CommanderStatic) => {
                         uploadFiles: files,
                         bulkImports: []
                     };
-                    fs.writeFileSync(`${options.dir}/jobstate.json`, JSON.stringify(jobstate, null, 2));
+                    saveJobState(options, jobstate);
 
                     asset.twinType === AssetManagementModels.TwinType.Simulation &&
                         verifySimulationFiles(jobstate.uploadFiles) &&
@@ -80,15 +58,17 @@ export default (program: CommanderStatic) => {
 
                     await sleep(1000);
                     !options.verbose && spinner.succeed("done converting files to json");
-                    console.log(
-                        `\nrun mc bulk-run with ${chalk.magentaBright(
-                            "--start"
-                        )} option to start sending data to mindsphere\n`
-                    );
+                    !options.start &&
+                        console.log(
+                            `\nrun mc bulk-run with ${chalk.magentaBright(
+                                "--start"
+                            )} option to start sending data to mindsphere\n`
+                        );
                     if (options.start) {
-                        await uploadFiles(options, jobstate);
-
-                        fs.writeFileSync(`${options.dir}/jobstate.json`, JSON.stringify(jobstate, null, 2));
+                        const spinner = ora("running");
+                        !options.verbose && spinner.start("");
+                        await uploadFiles(options, jobstate, spinner);
+                        saveJobState(options, jobstate);
 
                         const results = _(jobstate.uploadFiles)
                             .groupBy(x => {
@@ -123,25 +103,18 @@ export default (program: CommanderStatic) => {
                         );
 
                         for (const bulkImport of jobstate.bulkImports) {
-                            const jobid = await bulkupload.PostImportJob(bulkImport);
-                            (bulkImport as any).jobid = jobid;
-                            console.log(jobid);
+                            const job = await bulkupload.PostImportJob(bulkImport);
+                            (bulkImport as any).jobid = job.id;
+                            console.log(
+                                `Job with ${chalk.magentaBright("" + job.jobId)} is in status : ${job.status} [${
+                                    job.message
+                                }]`
+                            );
                         }
 
-                        fs.writeFileSync(`${options.dir}/jobstate.json`, JSON.stringify(jobstate, null, 2));
-
-                        // const result = await bulkupload.PostImportJob({ data: [jobsInput.data[0]] });
-                        // console.log(JSON.stringify(result));
-
-                        // for (let index = 0; index < 100; index++) {
-                        //     await sleep(2000);
-                        //     const current = await bulkupload.GetJobStatus(`${result.jobId}`);
-                        //     console.log(JSON.stringify(current));
-                        // }
-
-                        // const allfiles = await fileUploadClient.GetFiles(asset.assetId);
-                        // console.log(JSON.stringify(allfiles, null, 2));
-                        console.log("Done.");
+                        saveJobState(options, jobstate);
+                        !options.verbose && spinner.succeed("Done");
+                        log(`\tmc ${chalk.magentaBright("mc check-n")} command to check the progress of the job`);
                     }
                 } catch (err) {
                     errorLog(err, options.verbose);
@@ -150,16 +123,20 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc bulk-run runs the upload job from the  ${chalk.magentaBright("bulkimport")} directory`);
+            log(`    mc run-bulk runs the upload job from the  ${chalk.magentaBright("bulkimport")} directory`);
             log(
-                `    mc br --dir asset1 --verbose runs the upload job from the ${chalk.magentaBright(
+                `    mc run-bulk --dir asset1 --verbose runs the upload job from the ${chalk.magentaBright(
                     "asset1"
                 )} with verbose output`
             );
         });
 };
 
-async function uploadFiles(options: any, jobstate: jobState) {
+function saveJobState(options: any, jobstate: jobState) {
+    fs.writeFileSync(`${options.dir}/jobstate.json`, JSON.stringify(jobstate, null, 2));
+}
+
+async function uploadFiles(options: any, jobstate: jobState, spinner?: any) {
     const auth = loadAuth();
     const fileUploadClient = new IotFileClient(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
     for (const entry of jobstate.uploadFiles) {
@@ -175,6 +152,7 @@ async function uploadFiles(options: any, jobstate: jobState) {
             retrylog("PutFile")
         );
         entry.etag = result.get("etag") || "0";
+        verboseLog(`uploaded file ${entry.filepath}`, options.verbose, spinner);
     }
 }
 
@@ -192,7 +170,6 @@ async function getUploadJobs({
     const uploadJobs: fileInfo[] = [];
     for (const aspect of aspects) {
         const files = getFiles(options, aspect);
-        !options.verbose && spinner.start("");
         for (const file of files) {
             let data: any = [];
             let recordCount = 0;
@@ -368,21 +345,21 @@ function checkRequiredParamaters(options: any) {
         throwError(
             `the directory ${chalk.magentaBright(
                 options.dir
-            )} must contain the asset.json file. run mc iot-prepare-bulk-dir command first!`
+            )} must contain the asset.json file. run mc prepare-bulk command first!`
         );
 
     !fs.existsSync(`${options.dir}/json/`) &&
         throwError(
             `the directory ${chalk.magentaBright(
                 options.dir
-            )} must contain the json/ folder. run mc iot-prepare-bulk-dir command first!`
+            )} must contain the json/ folder. run mc prepare-bulk command first!`
         );
 
     !fs.existsSync(`${options.dir}/csv/`) &&
         throwError(
             `the directory ${chalk.magentaBright(
                 options.dir
-            )} must contain the csv/ folder. run mc iot-prepare-bulk-dir command first!`
+            )} must contain the csv/ folder. run mc prepare-bulk command first!`
         );
 
     !options.passkey &&
@@ -391,3 +368,24 @@ function checkRequiredParamaters(options: any) {
             true
         );
 }
+
+export type fileInfo = {
+    entity: string;
+    propertyset: string;
+    path: string;
+    filepath: string;
+    mintime: Date;
+    maxtime: Date;
+    etag?: string;
+};
+
+export type jobState = {
+    options: {
+        size: any;
+        twintype: AssetManagementModels.TwinType | undefined;
+        asset: AssetManagementModels.AssetResourceWithHierarchyPath;
+    };
+
+    uploadFiles: fileInfo[];
+    bulkImports: TimeSeriesBulkModels.BulkImportInput[];
+};

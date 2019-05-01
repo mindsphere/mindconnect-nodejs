@@ -4,14 +4,7 @@ import { log } from "console";
 import * as fs from "fs";
 import { AssetManagementClient, AssetManagementModels } from "../../api/sdk";
 import { authJson, checkAssetId, decrypt, errorLog, loadAuth, throwError, verboseLog } from "../../api/utils";
-import {
-    checkTwinTypeOfAsset,
-    createAspectDirs,
-    directoryReadyLog,
-    generateCsv,
-    makeCsvAndJsonDir,
-    writeNewAssetJson
-} from "./command-utils";
+import { directoryReadyLog, subtractSecond } from "./command-utils";
 import ora = require("ora");
 
 export default (program: CommanderStatic) => {
@@ -19,7 +12,7 @@ export default (program: CommanderStatic) => {
         .command("prepare-bulk")
         .alias("pb")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
-        .option("-w, --twintype <mode>", "twintype of asset", "performance")
+        .option("-w, --twintype <mode>", "twintype of asset [performance|simulation]", "performance")
         .option("-i, --assetid <assetid>", "asset id from the mindsphere ")
         .option("-t, --typeid <typeid>", "typeid e.g. castidev.Engine ")
         .option("-s, --size <size>", "entries per file ", 100)
@@ -42,21 +35,24 @@ export default (program: CommanderStatic) => {
                     const spinner = ora("generating data...");
                     !options.verbose && spinner.start();
 
-                    aspects.forEach(aspect => {
+                    for (const aspect of aspects) {
                         createAspectDirs(path, aspect, options);
 
                         // * The variables are stored in different spots depenendet if they come from the type or from the asset.
                         const variables = aspect.variables || aspect.aspectType.variables || [];
 
                         // * The csv generation generates data for every day for performance assets and every hour for simulation assets
-                        generateCsv({
-                            name: aspect.name,
-                            variables: variables,
-                            options: options,
-                            path: path,
-                            mode: options.twintype
-                        });
-                    });
+                        await generateCsv(
+                            {
+                                name: aspect.name,
+                                variables: variables,
+                                options: options,
+                                path: path,
+                                mode: options.twintype
+                            },
+                            spinner
+                        );
+                    }
 
                     options.typeid
                         ? writeNewAssetJson(options, root, path, options.twintype)
@@ -66,9 +62,8 @@ export default (program: CommanderStatic) => {
 
                     directoryReadyLog({
                         path: `${path}`,
-                        jobCommand: "iot-bulk-check",
-                        verifyCommand: "iot-bulk-verify",
-                        runCommand: "iot-bulk-run"
+                        jobCommand: "bulk-check",
+                        runCommand: "bulk-run"
                     });
                 } catch (err) {
                     errorLog(err, options.verbose);
@@ -149,7 +144,158 @@ function checkRequiredParamaters(options: any) {
 
     !options.passkey &&
         errorLog(
-            "you have to provide a passkey to get the service token (run mc pbk --help for full description)",
+            "you have to provide a passkey to get the service token (run mc pb --help for full description)",
             true
+        );
+}
+
+const generateRandom = (() => {
+    const variables: string[] = [];
+    return (timestamp: Date, type: AssetManagementModels.VariableDefinition.DataTypeEnum, variableName: string) => {
+        !variables.includes(variableName) && variables.push(variableName);
+        let result;
+
+        // multiply the sine curves with factor to have every variable visible
+        const factor = variables.indexOf(variableName) + 1;
+        switch (type) {
+            case AssetManagementModels.VariableDefinition.DataTypeEnum.DOUBLE:
+                result = (Math.sin(timestamp.getTime()) * factor * 10).toFixed(2) + 20;
+                break;
+            case AssetManagementModels.VariableDefinition.DataTypeEnum.INT:
+            case AssetManagementModels.VariableDefinition.DataTypeEnum.LONG:
+                result = Math.floor(Math.sin(timestamp.getTime()) * factor * 20) + 40;
+                break;
+            case AssetManagementModels.VariableDefinition.DataTypeEnum.BOOLEAN:
+                result = true;
+                break;
+            case AssetManagementModels.VariableDefinition.DataTypeEnum.STRING:
+            case AssetManagementModels.VariableDefinition.DataTypeEnum.BIGSTRING:
+                result = `${type}_${Math.random()}`;
+            default:
+                throw new Error(`invalid type ${type}`);
+        }
+        return result;
+    };
+})();
+
+async function generateCsv(
+    {
+        name,
+        variables,
+        options,
+        path,
+        mode
+    }: {
+        name: string;
+        variables: AssetManagementModels.AspectVariable[];
+        options: any;
+        path: string;
+        mode: AssetManagementModels.TwinType;
+    },
+    spinner?: any
+) {
+    verboseLog(`Generating ${options.size} entries for ${name}`, options.verbose, spinner);
+    verboseLog(`Asset TwinType: ${mode}`, options.verbose, spinner);
+
+    const startDate = new Date();
+    startDate.setUTCDate(startDate.getUTCDate() - parseInt(options.offset));
+
+    for (let file = options.files; file > 0; file--) {
+        const date = new Date(startDate);
+
+        if (mode === AssetManagementModels.TwinType.Performance) {
+            // * generate one file per day
+            date.setUTCDate(date.getUTCDate() - (file - 1));
+            date.setUTCHours(0, 0, 0, 0);
+        } else {
+            // * generate one file per hour
+            date.setUTCHours(file - 1, 0, 0, 0);
+        }
+
+        const fileName = `${path}/csv/${name}/${file}.csv`;
+        verboseLog(`generating: ${chalk.magentaBright(fileName)}`, options.verbose, spinner);
+        const stream = fs.createWriteStream(fileName, { highWaterMark: 12 * 16384 } as any);
+
+        let headers = `_time, `;
+        variables.forEach(variable => {
+            headers += variable.name + ", ";
+            if (variable.qualityCode) headers += variable.name + "_qc, ";
+        });
+
+        stream.write(headers.trimRight().slice(0, -1) + "\n");
+
+        variables.forEach(variable => {
+            headers += variable.name + ", ";
+            if (variable.qualityCode) headers += variable.name + "_qc, ";
+        });
+
+        for (let index = options.size; index > 0; index--) {
+            const currentDate =
+                mode === AssetManagementModels.TwinType.Performance
+                    ? subtractSecond(date, (86400 / options.size) * index)
+                    : subtractSecond(date, (3600 / options.size) * index);
+            let line = currentDate.toISOString() + ", ";
+
+            variables.forEach(variable => {
+                line += generateRandom(currentDate, variable.dataType, `${variable.name}`) + ", ";
+                if (variable.qualityCode) line += "0, ";
+            });
+
+            const result = stream.write(line.trimRight().slice(0, -1) + "\n");
+            if (!result) {
+                await new Promise(resolve => stream.once("drain", resolve));
+            }
+        }
+
+        stream.end();
+    }
+}
+
+function writeNewAssetJson(options: any, root: AssetManagementModels.RootAssetResource, path: any, twintype: string) {
+    const asset: AssetManagementModels.Asset = {
+        name: `${twintype}Asset`,
+        twinType:
+            twintype === "performance"
+                ? AssetManagementModels.TwinType.Performance
+                : AssetManagementModels.TwinType.Simulation,
+        typeId: options.typeid,
+        parentId: root.assetId,
+        location: {
+            country: "Germany",
+            postalCode: "91052",
+            region: "Bayern",
+            streetAddress: "Schuhstr. 60",
+            locality: "Erlangen",
+            latitude: 49.59099,
+            longitude: 11.00783
+        }
+    };
+    const newAssetJson = `${path}/asset.json`;
+    verboseLog(`Writing ${chalk.magentaBright(newAssetJson)}`, options.verbose);
+    fs.writeFileSync(`${path}/asset.json`, JSON.stringify(asset, null, 2));
+}
+
+function createAspectDirs(path: any, element: AssetManagementModels.AssetTypeResourceAspects, options: any) {
+    const csvDir = `${path}/csv/${element.name}`;
+    verboseLog(`creating directory: ${chalk.magentaBright(csvDir)}`, options.verbose);
+    fs.mkdirSync(csvDir);
+    const jsonDir = `${path}/json/${element.name}`;
+    verboseLog(`creating directory: ${chalk.magentaBright(jsonDir)}`, options.verbose);
+    fs.mkdirSync(jsonDir);
+}
+
+function makeCsvAndJsonDir(options: any) {
+    const path = options.dir;
+    fs.mkdirSync(path);
+    fs.mkdirSync(`${path}/csv/`);
+    fs.mkdirSync(`${path}/json/`);
+    return path;
+}
+
+function checkTwinTypeOfAsset(asset: AssetManagementModels.AssetResourceWithHierarchyPath | undefined, options: any) {
+    asset &&
+        asset.twinType !== options.twintype &&
+        throwError(
+            `You can't use the twintype mode ${chalk.magentaBright(options.twintype)} for ${asset.twinType} asset`
         );
 }

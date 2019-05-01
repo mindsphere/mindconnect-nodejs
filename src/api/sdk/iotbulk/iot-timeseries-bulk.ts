@@ -25,12 +25,15 @@ export class TimeSeriesBulkClient extends SdkClient {
      * @memberOf TimeSeriesBulkClient
      */
     public async PostImportJob(job: TimeSeriesBulkModels.BulkImportInput): Promise<TimeSeriesBulkModels.JobStatus> {
-        return (await this.HttpAction({
+        const result = (await this.HttpAction({
             verb: "POST",
             baseUrl: `${this._baseUrl}/importJobs`,
             body: job,
             message: "PostImportJob"
         })) as TimeSeriesBulkModels.JobStatus;
+
+        this.fixResultsFor3_3_0(result);
+        return result;
     }
 
     /**
@@ -48,13 +51,17 @@ export class TimeSeriesBulkClient extends SdkClient {
             message: "GetJobStatus"
         })) as any;
 
+        this.fixResultsFor3_3_0(result);
+        return result as TimeSeriesBulkModels.JobStatus;
+    }
+
+    private fixResultsFor3_3_0(result: any) {
         // ! This is unfortunately necessary as the version of the API (3.3.0) on eu1 in April 2019
         // ! was returning properties jobId, jobStartTime, jobLastModified but OpenAPI specification was id, startTime, lastModified
+
         result.id = result.id || result.jobId;
         result.startTime = result.startTime || result.jobStartTime;
         result.lastModifed = result.lastModifed || result.jobLastModified;
-
-        return result as TimeSeriesBulkModels.JobStatus;
     }
 
     /**
