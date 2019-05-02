@@ -6,14 +6,10 @@ import * as fs from "fs";
 import * as _ from "lodash";
 import * as path from "path";
 import { sleep } from "../../../test/test-utils";
-import {
-    AssetManagementClient,
-    AssetManagementModels,
-    TimeSeriesBulkClient,
-    TimeSeriesBulkModels
-} from "../../api/sdk";
+import { AssetManagementClient, AssetManagementModels, TimeSeriesBulkClient, TimeSeriesBulkModels } from "../../api/sdk";
 import { IotFileClient } from "../../api/sdk/iotfile/iot-file";
 import { decrypt, errorLog, loadAuth, retry, throwError, verboseLog } from "../../api/utils";
+import { modeInformation } from "./command-utils";
 import ora = require("ora");
 
 export default (program: CommanderStatic) => {
@@ -34,6 +30,9 @@ export default (program: CommanderStatic) => {
                     const asset = (await createOrReadAsset(
                         options
                     )) as AssetManagementModels.AssetResourceWithHierarchyPath;
+
+                    modeInformation(asset);
+
                     const aspects = getAspectsFromDirNames(options);
                     const spinner = ora("creating files");
                     !options.verbose && spinner.start("");
@@ -45,11 +44,16 @@ export default (program: CommanderStatic) => {
 
                     const files: fileInfo[] = await createJsonFilesForUpload({ aspects, options, spinner, asset });
 
-                    const jobstate: jobState = {
+                    let jobstate: jobState = {
                         options: { size: options.size, twintype: asset.twinType, asset: asset },
                         uploadFiles: files,
                         bulkImports: []
                     };
+
+                    if (fs.existsSync(path.resolve(`${options.dir}/jobstate.json`))) {
+                        jobstate = require(path.resolve(`${options.dir}/jobstate.json`)) as jobState;
+                    }
+
                     saveJobState(options, jobstate);
 
                     asset.twinType === AssetManagementModels.TwinType.Simulation &&
@@ -64,54 +68,32 @@ export default (program: CommanderStatic) => {
                                 "--start"
                             )} option to start sending data to mindsphere\n`
                         );
+
+                    // *
+                    // * this is called only with the start - option
+                    // *
+
                     if (options.start) {
                         const spinner = ora("running");
                         !options.verbose && spinner.start("");
                         await uploadFiles(options, jobstate, spinner);
                         saveJobState(options, jobstate);
 
-                        const results = _(jobstate.uploadFiles)
-                            .groupBy(x => {
-                                const date = new Date(x.mintime);
-                                date.setMinutes(0, 0, 0);
-                                return JSON.stringify({ propertySet: x.propertyset, fullHourDate: date });
-                            })
-                            .map()
-                            .value();
-
-                        for (const fileInfos of results) {
-                            const first = (_(fileInfos).first() as fileInfo) || throwError("no data in results");
-                            const data: TimeSeriesBulkModels.Data = {
-                                entity: first.entity,
-                                propertySetName: first.propertyset,
-                                timeseriesFiles: fileInfos.map(x => {
-                                    return { filepath: x.filepath, from: x.mintime, to: x.maxtime };
-                                })
-                            };
-                            jobstate.bulkImports.push({ data: [data] });
-                            console.log("\n");
-                        }
-
-                        const auth = loadAuth();
-                        const bulkupload = new TimeSeriesBulkClient(
-                            auth.gateway,
-                            decrypt(auth, options.passkey),
-                            auth.tenant
-                        );
-
-                        for (const bulkImport of jobstate.bulkImports) {
-                            const job = await bulkupload.PostImportJob(bulkImport);
-                            (bulkImport as any).jobid = job.id;
-                            console.log(
-                                `Job with ${chalk.magentaBright("" + job.jobId)} is in status : ${job.status} [${
-                                    job.message
-                                }]`
+                        if (!jobstate.bulkImports || jobstate.bulkImports.length === 0) {
+                            await createUploadJobs(jobstate, options, spinner);
+                            saveJobState(options, jobstate);
+                        } else {
+                            verboseLog(
+                                `the jobs for ${options.dir} have already been created.`,
+                                options.verbose,
+                                spinner
                             );
+                            await sleep(2000);
                         }
-
-                        saveJobState(options, jobstate);
                         !options.verbose && spinner.succeed("Done");
-                        log(`\tmc ${chalk.magentaBright("check-bulk")} command to check the progress of the job`);
+                        console.log(
+                            `\t run mc ${chalk.magentaBright("check-bulk")} command to check the progress of the job`
+                        );
                     }
                 } catch (err) {
                     errorLog(err, options.verbose);
@@ -129,6 +111,39 @@ export default (program: CommanderStatic) => {
         });
 };
 
+async function createUploadJobs(jobstate: jobState, options: any, spinner: ora.Ora) {
+    const results = _(jobstate.uploadFiles)
+        .groupBy(x => {
+            const date = new Date(x.mintime);
+            date.setMinutes(0, 0, 0);
+            return JSON.stringify({ propertySet: x.propertyset, fullHourDate: date });
+        })
+        .map()
+        .value();
+    for (const fileInfos of results) {
+        const first = (_(fileInfos).first() as fileInfo) || throwError("no data in results");
+        const data: TimeSeriesBulkModels.Data = {
+            entity: first.entity,
+            propertySetName: first.propertyset,
+            timeseriesFiles: fileInfos.map(x => {
+                return { filepath: x.filepath, from: x.mintime, to: x.maxtime };
+            })
+        };
+        jobstate.bulkImports.push({ data: [data] });
+    }
+    const auth = loadAuth();
+    const bulkupload = new TimeSeriesBulkClient(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
+    for (const bulkImport of jobstate.bulkImports) {
+        const job = await bulkupload.PostImportJob(bulkImport);
+        (bulkImport as any).jobid = job.id;
+        verboseLog(
+            `Job with ${chalk.magentaBright("" + job.jobId)} is in status : ${job.status} [${job.message}]`,
+            options.verbose,
+            spinner
+        );
+    }
+}
+
 function saveJobState(options: any, jobstate: jobState) {
     fs.writeFileSync(`${options.dir}/jobstate.json`, JSON.stringify(jobstate, null, 2));
 }
@@ -137,6 +152,14 @@ async function uploadFiles(options: any, jobstate: jobState, spinner?: any) {
     const auth = loadAuth();
     const fileUploadClient = new IotFileClient(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
     for (const entry of jobstate.uploadFiles) {
+        if (entry.etag) {
+            verboseLog(
+                `The file  ${chalk.magentaBright(entry.filepath)} was already uploaded`,
+                options.verbose,
+                spinner
+            );
+            continue;
+        }
         const result = await retry(
             options.retry,
             () =>

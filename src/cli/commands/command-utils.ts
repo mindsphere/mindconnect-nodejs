@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import { log } from "console";
+import { AssetManagementModels } from "../../api/sdk";
 
 export const serviceCredentialLog = () => {
     log(`\n  Important: \n`);
@@ -96,3 +97,20 @@ export const directoryReadyLog = ({
     log(`\nchecking progress:`);
     log(`\tmc ${chalk.magentaBright(jobCommand)} to check the progress of the job`);
 };
+
+export function modeInformation(asset: AssetManagementModels.AssetResourceWithHierarchyPath) {
+    console.log(
+        `\nRunning timeseries ${
+            asset.twinType === AssetManagementModels.TwinType.Performance ? "bulk API" : "API"
+        } ingest for ${chalk.magentaBright(asset.name)} of type ${chalk.magentaBright(
+            "" + asset.typeId
+        )} with twintype ${chalk.magentaBright("" + asset.twinType)}`
+    );
+    if (asset.twinType === AssetManagementModels.TwinType.Performance) {
+        console.log(`\n${chalk.magentaBright("Important:")}`);
+        console.log(`\nYou are using the ${chalk.magentaBright("standard timeseries")} ingest for the asset.`);
+        console.log(
+            `The calls to the API will be ${chalk.greenBright("throttled")} to match your throttling limits.\n`
+        );
+    }
+}

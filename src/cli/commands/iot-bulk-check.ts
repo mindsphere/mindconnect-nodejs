@@ -3,8 +3,9 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
+import { sleep } from "../../../test/test-utils";
 import { TimeSeriesBulkClient } from "../../api/sdk";
-import { decrypt, errorLog, loadAuth, throwError, verboseLog } from "../../api/utils";
+import { decrypt, errorLog, loadAuth, retry, throwError, verboseLog } from "../../api/utils";
 import { colorizeStatus } from "./command-utils";
 import { jobState } from "./iot-bulk-run";
 import _ = require("lodash");
@@ -16,7 +17,6 @@ export default (program: CommanderStatic) => {
         .alias("cb")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
-        .option("-p, --poll", "poll status every 2 seconds until all are successfull or failed")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
         .description(chalk.magentaBright("checks the progress of the upload jobs from <directoryname> directory *"))
@@ -24,7 +24,6 @@ export default (program: CommanderStatic) => {
             (async () => {
                 try {
                     checkRequiredParamaters(options);
-
                     const jobState = require(path.resolve(`${options.dir}/jobstate.json`)) as jobState;
 
                     const auth = loadAuth();
@@ -39,7 +38,8 @@ export default (program: CommanderStatic) => {
                     const newStatus = [];
                     for (const job of jobState.bulkImports) {
                         const jobid = (job as any).jobid;
-                        const js = await jobClient.GetJobStatus(jobid);
+                        const js = await retry(options.retry, () => jobClient.GetJobStatus(jobid), 2000);
+                        await sleep(500);
                         newStatus.push(js);
                         verboseLog(
                             `Job with id ${chalk.magentaBright(jobid)} is in status : ${colorizeStatus(
