@@ -4,7 +4,7 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { sleep } from "../../../test/test-utils";
-import { TimeSeriesBulkClient } from "../../api/sdk";
+import { AssetManagementModels, TimeSeriesBulkClient } from "../../api/sdk";
 import { decrypt, errorLog, loadAuth, retry, throwError, verboseLog } from "../../api/utils";
 import { colorizeStatus } from "./command-utils";
 import { jobState } from "./iot-bulk-run";
@@ -25,6 +25,17 @@ export default (program: CommanderStatic) => {
                 try {
                     checkRequiredParamaters(options);
                     const jobState = require(path.resolve(`${options.dir}/jobstate.json`)) as jobState;
+
+                    const asset = jobState.options.asset;
+                    if (asset.twinType === AssetManagementModels.TwinType.Performance) {
+                        const totalMessages = jobState.uploadFiles.length;
+                        const postedMessages = jobState.timeSeriesFiles.length;
+
+                        console.log(`Statistics for perormance asset ${chalk.magentaBright(asset.name)}`);
+                        console.log(`total timeseries messages: ${totalMessages}`);
+                        console.log(`posted timeseries messages: ${postedMessages}`);
+                        process.exit(0);
+                    }
 
                     const auth = loadAuth();
                     const jobClient = new TimeSeriesBulkClient(

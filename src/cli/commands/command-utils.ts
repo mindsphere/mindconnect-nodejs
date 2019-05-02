@@ -121,5 +121,8 @@ export function modeInformation(asset: AssetManagementModels.AssetResourceWithHi
                 options.size
             )} per message.\n`
         );
+        console.log(`Using this feature has direct impact on mindsphere resource consumption.`);
+        console.log(`You might get a notice that you will need to upgrade your account's data ingest rate.`);
+        console.log(`The feature will be deprecated once bulk upload also works for performance assets.\n`);
     }
 }

@@ -24,7 +24,8 @@ export default (program: CommanderStatic) => {
         .alias("rb")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
-        .option("-p, --skip", "skip generation of json files if they were already generated")
+        .option("-s, --size <size>", "entries per file ", Number.MAX_SAFE_INTEGER)
+        .option("-p, --skip", " skip json generation (if already generated)")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
         .option("-st, --start", "start sending data to mindsphere")
@@ -59,9 +60,11 @@ export default (program: CommanderStatic) => {
                         jobstate = require(path.resolve(`${options.dir}/jobstate.json`)) as jobState;
                     }
 
-                    const files: fileInfo[] = await createJsonFilesForUpload({ aspects, options, spinner, asset });
-                    jobstate.uploadFiles = files;
-                    saveJobState(options, jobstate);
+                    if (!options.skip) {
+                        const files: fileInfo[] = await createJsonFilesForUpload({ aspects, options, spinner, asset });
+                        jobstate.uploadFiles = files;
+                        saveJobState(options, jobstate);
+                    }
 
                     asset.twinType === AssetManagementModels.TwinType.Simulation &&
                         verifySimulationFiles(jobstate.uploadFiles) &&
@@ -120,13 +123,13 @@ async function runTimeSeriesUpload(options: any, jobstate: jobState, spinner: or
 
         if (jobstate.timeSeriesFiles.indexOf(file.path) >= 0) {
             verboseLog(
-                `${chalk.magentaBright(timeSeries.length)} records from ${chalk.magentaBright(
-                    file.mintime.toISOString()
-                )} to ${chalk.magentaBright(file.maxtime.toISOString())} were already posted`,
+                `${chalk.magentaBright(timeSeries.length)} records from ${formatDate(file.mintime)} to ${formatDate(
+                    file.maxtime
+                )} were already posted`,
                 options.verbose,
                 spinner
             );
-            await sleep(300);
+            await sleep(10);
             continue;
         }
 
