@@ -6,7 +6,7 @@
 - CLI Command: agent-token provides a valid agent token for use in tools (e.g. postman)
 - CLI Command: service-token provides a valid service-credentials token for use in tools (e.g. postman)
 - CLI Command: prepare-bulk - creates a template directory for timeseries (bulk) upload
-- CLI Command: run-bulk - runs the timeseries (bulk) upload jobs 
+- CLI Command: run-bulk - runs the timeseries (bulk) upload jobs
 - CLI Command: check-bulk - checks the progress of the upload jobs
 
 ## Bugfixes and improvements 3.5.0
