@@ -98,7 +98,8 @@ export const directoryReadyLog = ({
     log(`\tmc ${chalk.magentaBright(jobCommand)} to check the progress of the job`);
 };
 
-export function modeInformation(asset: AssetManagementModels.AssetResourceWithHierarchyPath) {
+export function modeInformation(asset: AssetManagementModels.AssetResourceWithHierarchyPath, options: any) {
+    const MAX_SIZE_FOR_TS = 200;
     console.log(
         `\nRunning timeseries ${
             asset.twinType === AssetManagementModels.TwinType.Performance ? "bulk API" : "API"
@@ -107,10 +108,18 @@ export function modeInformation(asset: AssetManagementModels.AssetResourceWithHi
         )} with twintype ${chalk.magentaBright("" + asset.twinType)}`
     );
     if (asset.twinType === AssetManagementModels.TwinType.Performance) {
+        if (parseInt(options.size, 10) > MAX_SIZE_FOR_TS) {
+            options.size = MAX_SIZE_FOR_TS;
+        }
         console.log(`\n${chalk.magentaBright("Important:")}`);
         console.log(`\nYou are using the ${chalk.magentaBright("standard timeseries")} ingest for the asset.`);
         console.log(
-            `The calls to the API will be ${chalk.greenBright("throttled")} to match your throttling limits.\n`
+            `The calls to the API will be ${chalk.magentaBright("throttled")} to match your throttling limits.`
+        );
+        console.log(
+            `The number of the records per message will be reduced to ${chalk.magentaBright(
+                options.size
+            )} per message.\n`
         );
     }
 }

@@ -6,7 +6,13 @@ import * as fs from "fs";
 import * as _ from "lodash";
 import * as path from "path";
 import { sleep } from "../../../test/test-utils";
-import { AssetManagementClient, AssetManagementModels, TimeSeriesBulkClient, TimeSeriesBulkModels } from "../../api/sdk";
+import {
+    AssetManagementClient,
+    AssetManagementModels,
+    TimeSeriesBulkClient,
+    TimeSeriesBulkModels,
+    TimeSeriesClient
+} from "../../api/sdk";
 import { IotFileClient } from "../../api/sdk/iotfile/iot-file";
 import { decrypt, errorLog, loadAuth, retry, throwError, verboseLog } from "../../api/utils";
 import { modeInformation } from "./command-utils";
@@ -18,7 +24,7 @@ export default (program: CommanderStatic) => {
         .alias("rb")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
-        .option("-s, --size <size>", "entries per file ", Number.MAX_SAFE_INTEGER)
+        .option("-p, --skip", "skip generation of json files if they were already generated")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
         .option("-st, --start", "start sending data to mindsphere")
@@ -31,7 +37,7 @@ export default (program: CommanderStatic) => {
                         options
                     )) as AssetManagementModels.AssetResourceWithHierarchyPath;
 
-                    modeInformation(asset);
+                    modeInformation(asset, options);
 
                     const aspects = getAspectsFromDirNames(options);
                     const spinner = ora("creating files");
@@ -42,18 +48,19 @@ export default (program: CommanderStatic) => {
                         spinner
                     );
 
-                    const files: fileInfo[] = await createJsonFilesForUpload({ aspects, options, spinner, asset });
-
                     let jobstate: jobState = {
                         options: { size: options.size, twintype: asset.twinType, asset: asset },
-                        uploadFiles: files,
-                        bulkImports: []
+                        uploadFiles: [],
+                        bulkImports: [],
+                        timeSeriesFiles: []
                     };
 
                     if (fs.existsSync(path.resolve(`${options.dir}/jobstate.json`))) {
                         jobstate = require(path.resolve(`${options.dir}/jobstate.json`)) as jobState;
                     }
 
+                    const files: fileInfo[] = await createJsonFilesForUpload({ aspects, options, spinner, asset });
+                    jobstate.uploadFiles = files;
                     saveJobState(options, jobstate);
 
                     asset.twinType === AssetManagementModels.TwinType.Simulation &&
@@ -76,24 +83,18 @@ export default (program: CommanderStatic) => {
                     if (options.start) {
                         const spinner = ora("running");
                         !options.verbose && spinner.start("");
-                        await uploadFiles(options, jobstate, spinner);
-                        saveJobState(options, jobstate);
+                        asset.twinType === AssetManagementModels.TwinType.Simulation
+                            ? await runSimulationUpload(options, jobstate, spinner)
+                            : await runTimeSeriesUpload(options, jobstate, spinner);
 
-                        if (!jobstate.bulkImports || jobstate.bulkImports.length === 0) {
-                            await createUploadJobs(jobstate, options, spinner);
-                            saveJobState(options, jobstate);
-                        } else {
-                            verboseLog(
-                                `the jobs for ${options.dir} have already been created.`,
-                                options.verbose,
-                                spinner
-                            );
-                            await sleep(2000);
-                        }
                         !options.verbose && spinner.succeed("Done");
-                        console.log(
-                            `\t run mc ${chalk.magentaBright("check-bulk")} command to check the progress of the job`
-                        );
+
+                        asset.twinType === AssetManagementModels.TwinType.Simulation &&
+                            console.log(
+                                `\t run mc ${chalk.magentaBright(
+                                    "check-bulk"
+                                )} command to check the progress of the job`
+                            );
                     }
                 } catch (err) {
                     errorLog(err, options.verbose);
@@ -110,6 +111,56 @@ export default (program: CommanderStatic) => {
             );
         });
 };
+
+async function runTimeSeriesUpload(options: any, jobstate: jobState, spinner: ora.Ora) {
+    const auth = loadAuth();
+    const tsClient = new TimeSeriesClient(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
+    for (const file of jobstate.uploadFiles) {
+        const timeSeries = require(path.resolve(file.path));
+
+        if (jobstate.timeSeriesFiles.indexOf(file.path) >= 0) {
+            verboseLog(
+                `${chalk.magentaBright(timeSeries.length)} records from ${chalk.magentaBright(
+                    file.mintime.toISOString()
+                )} to ${chalk.magentaBright(file.maxtime.toISOString())} were already posted`,
+                options.verbose,
+                spinner
+            );
+            await sleep(300);
+            continue;
+        }
+
+        await retry(options.retry, () => tsClient.PutTimeSeries(file.entity, file.propertyset, timeSeries), 2000);
+        verboseLog(
+            `posted ${chalk.magentaBright(timeSeries.length)} records from ${formatDate(file.mintime)} to ${formatDate(
+                file.maxtime
+            )}`,
+            options.verbose,
+            spinner
+        );
+        jobstate.timeSeriesFiles.push(file.path);
+        saveJobState(options, jobstate);
+        await sleep(500);
+    }
+}
+
+function formatDate(date: string | Date) {
+    if (date instanceof Date) {
+        return `${chalk.magentaBright(date.toISOString())}`;
+    } else return `${chalk.magentaBright(date)}`;
+}
+
+async function runSimulationUpload(options: any, jobstate: jobState, spinner: ora.Ora) {
+    await uploadFiles(options, jobstate, spinner);
+    saveJobState(options, jobstate);
+    if (!jobstate.bulkImports || jobstate.bulkImports.length === 0) {
+        await createUploadJobs(jobstate, options, spinner);
+        saveJobState(options, jobstate);
+    } else {
+        verboseLog(`the jobs for ${options.dir} have already been created.`, options.verbose, spinner);
+        await sleep(2000);
+    }
+}
 
 async function createUploadJobs(jobstate: jobState, options: any, spinner: ora.Ora) {
     const results = _(jobstate.uploadFiles)
@@ -408,4 +459,5 @@ export type jobState = {
 
     uploadFiles: fileInfo[];
     bulkImports: TimeSeriesBulkModels.BulkImportInput[];
+    timeSeriesFiles: string[];
 };
