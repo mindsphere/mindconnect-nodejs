@@ -38,16 +38,6 @@ Commit messages shall follow the conventions defined by [conventional-changelog]
 In most cases the changed component is a good choice as scope
 e.g. if the change is done in the MindConnectAgent  the scope should be *Agent*.
 
-### License Headers
-
-The only license header we need for a software written by Siemens is:
-
-```javascript
-// Copyright Siemens AG, YEAR
-```
-
-The YEAR shall reflect the creation date.
-
 ### Code Style
 
 Please follow the typescript code style which is established in tslint.json. (Works out of the box in many editors, e.g. Visual Studio Code)
