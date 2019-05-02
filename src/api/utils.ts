@@ -98,7 +98,7 @@ export const loadAuth = (): authJson => {
 
 export const errorLog = (err: any, verbose: any) => {
     if (err.message) {
-        console.error(chalk.redBright(err.message.toString()));
+        console.error(`\n${chalk.redBright(err.message.toString())}`);
         if (verbose && err.stack) {
             console.error(chalk.redBright(err.stack));
         }

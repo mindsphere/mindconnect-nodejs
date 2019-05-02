@@ -13,7 +13,7 @@ import {
     TimeSeriesBulkModels
 } from "../../api/sdk";
 import { IotFileClient } from "../../api/sdk/iotfile/iot-file";
-import { decrypt, errorLog, loadAuth, retry, retrylog, throwError, verboseLog } from "../../api/utils";
+import { decrypt, errorLog, loadAuth, retry, throwError, verboseLog } from "../../api/utils";
 import ora = require("ora");
 
 export default (program: CommanderStatic) => {
@@ -43,7 +43,7 @@ export default (program: CommanderStatic) => {
                         spinner
                     );
 
-                    const files: fileInfo[] = await getUploadJobs({ aspects, options, spinner, asset });
+                    const files: fileInfo[] = await createJsonFilesForUpload({ aspects, options, spinner, asset });
 
                     const jobstate: jobState = {
                         options: { size: options.size, twintype: asset.twinType, asset: asset },
@@ -88,12 +88,9 @@ export default (program: CommanderStatic) => {
                                     return { filepath: x.filepath, from: x.mintime, to: x.maxtime };
                                 })
                             };
-                            console.log(data);
                             jobstate.bulkImports.push({ data: [data] });
                             console.log("\n");
                         }
-
-                        console.log(jobstate.bulkImports);
 
                         const auth = loadAuth();
                         const bulkupload = new TimeSeriesBulkClient(
@@ -114,7 +111,7 @@ export default (program: CommanderStatic) => {
 
                         saveJobState(options, jobstate);
                         !options.verbose && spinner.succeed("Done");
-                        log(`\tmc ${chalk.magentaBright("mc check-n")} command to check the progress of the job`);
+                        log(`\tmc ${chalk.magentaBright("check-bulk")} command to check the progress of the job`);
                     }
                 } catch (err) {
                     errorLog(err, options.verbose);
@@ -149,14 +146,14 @@ async function uploadFiles(options: any, jobstate: jobState, spinner?: any) {
                     description: "bulk upload"
                 }),
             500,
-            retrylog("PutFile")
+            () => verboseLog(`Uploading the file again...`, options.verbose, spinner)
         );
         entry.etag = result.get("etag") || "0";
-        verboseLog(`uploaded file ${entry.filepath}`, options.verbose, spinner);
+        verboseLog(`uploaded ${entry.filepath}`, options.verbose, spinner);
     }
 }
 
-async function getUploadJobs({
+async function createJsonFilesForUpload({
     aspects,
     options,
     spinner,

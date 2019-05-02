@@ -12,7 +12,7 @@ export default (program: CommanderStatic) => {
         .command("prepare-bulk")
         .alias("pb")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
-        .option("-w, --twintype <mode>", "twintype of asset [performance|simulation]", "performance")
+        .option("-w, --twintype <mode>", "twintype of asset [performance|simulation]")
         .option("-i, --assetid <assetid>", "asset id from the mindsphere ")
         .option("-t, --typeid <typeid>", "typeid e.g. castidev.Engine ")
         .option("-s, --size <size>", "entries per file ", 100)
@@ -62,8 +62,8 @@ export default (program: CommanderStatic) => {
 
                     directoryReadyLog({
                         path: `${path}`,
-                        jobCommand: "bulk-check",
-                        runCommand: "bulk-run"
+                        jobCommand: "check-bulk",
+                        runCommand: "run-bulk"
                     });
                 } catch (err) {
                     errorLog(err, options.verbose);
@@ -130,7 +130,7 @@ async function getAssetAndAspects(auth: authJson, options: any) {
 function checkRequiredParamaters(options: any) {
     options.twintype !== "performance" &&
         options.twintype !== "simulation" &&
-        throwError("you have to specify the twin type");
+        throwError("you have to specify the twin type performance or simulation");
     !options.typeid && !options.assetid && throwError("You have to specify either a typeid or assetid");
     !!options.typeid === !!options.assetid && throwError("You can't specify typeid and assetid at the same time");
     verboseLog(
