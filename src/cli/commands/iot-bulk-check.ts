@@ -84,7 +84,7 @@ export default (program: CommanderStatic) => {
 };
 
 function checkRequiredParamaters(options: any) {
-    if (`${options.dir}`.endsWith("/") || `${options.dir}`.endsWith("/")) {
+    if (`${options.dir}`.endsWith("/") || `${options.dir}`.endsWith("\\")) {
         options.dir = `${options.dir}`.slice(0, -1);
     }
 

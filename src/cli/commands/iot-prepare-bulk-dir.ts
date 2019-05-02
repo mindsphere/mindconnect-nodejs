@@ -171,6 +171,7 @@ const generateRandom = (() => {
             case AssetManagementModels.VariableDefinition.DataTypeEnum.STRING:
             case AssetManagementModels.VariableDefinition.DataTypeEnum.BIGSTRING:
                 result = `${type}_${Math.random()}`;
+                break;
             default:
                 throw new Error(`invalid type ${type}`);
         }
