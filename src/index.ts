@@ -6,5 +6,3 @@ export * from "./api/mindconnect-setup";
 export * from "./api/mindconnect-storage";
 export * from "./api/mindconnect-template";
 export { retry } from "./api/utils";
-
-

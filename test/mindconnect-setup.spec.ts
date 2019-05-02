@@ -224,4 +224,9 @@ describe("MindConnect Setup", () => {
             }
         })
     );
+
+    it("should be able to offboard the agent", async () => {
+        const mcsetup = new MindConnectSetup(gateway, basicAuth, tenant);
+        mcsetup.should.exist;
+    });
 });

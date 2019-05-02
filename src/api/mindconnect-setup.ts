@@ -3,6 +3,7 @@ import fetch from "node-fetch";
 import { DiagnosticInformation, OnlineStatus, PagedDiagnosticActivation, PagedDiagnosticInformation } from "..";
 import { CredentialAuth } from "./credential-auth";
 import { OnboardingStatus } from "./mindconnect-models";
+import { checkAssetId } from "./utils";
 const log = debug("mindconnect-setup");
 // Copyright (C), Siemens AG 2017
 
@@ -25,9 +26,7 @@ export class MindConnectSetup extends CredentialAuth {
      * @memberOf MindConnectSetup
      */
     public async RegisterForDiagnostic(agentId: string) {
-        if (!/[a-f0-9]{32}/gi.test(agentId)) {
-            throw new Error("You have to pass valid 32 char long agent id");
-        }
+        checkAssetId(agentId);
 
         await this.RenewToken();
         if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
@@ -288,3 +287,4 @@ export class MindConnectSetup extends CredentialAuth {
         }
     }
 }
+

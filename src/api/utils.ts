@@ -98,7 +98,7 @@ export const loadAuth = (): authJson => {
 
 export const errorLog = (err: any, verbose: any) => {
     if (err.message) {
-        console.error(chalk.redBright(err.message.toString()));
+        console.error(`\n${chalk.redBright(err.message.toString())}`);
         if (verbose && err.stack) {
             console.error(chalk.redBright(err.stack));
         }
@@ -108,9 +108,10 @@ export const errorLog = (err: any, verbose: any) => {
     process.exit(1);
 };
 
-export const verboseLog = (message: any, verbose: any) => {
-    if (verbose) {
-        console.log(`... ${message}`);
+export const verboseLog = (message: any, verbose: any, spinner?: any) => {
+    verbose && console.log(`... ${message}`);
+    if (!verbose && spinner) {
+        spinner.text = `... ${message}`;
     }
 };
 
@@ -198,4 +199,23 @@ export const retrylog = function(operation: string) {
         }
         x++;
     };
+};
+
+export const checkAssetId = (agentId: string) => {
+    if (!/[a-f0-9]{32}/gi.test(agentId)) {
+        throw new Error("You have to pass valid 32 char long asset id");
+    }
+};
+
+export const throwError = (error: string) => {
+    throw new Error(error);
+};
+
+export const toQueryString = (qs: any) => {
+    return Object.keys(qs || {})
+        .map(key => {
+            const value = qs[key] instanceof Date ? qs[key].toISOString() : qs[key];
+            return encodeURIComponent(key) + "=" + encodeURIComponent(value);
+        })
+        .join("&");
 };

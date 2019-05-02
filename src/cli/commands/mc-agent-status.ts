@@ -117,11 +117,11 @@ export default (program: CommanderStatic) => {
 const coloredStatusLog = (agent: MindConnectAgent) => {
     log(
         `\nAgent status, local information (from .mc folder):\nAgent Id: ${chalk.magentaBright(agent.ClientId())} is ${
-            agent.IsOnBoarded() ? chalk.magentaBright("onboarded") : chalk.redBright("not onboarded")
+            agent.IsOnBoarded() ? chalk.greenBright("onboarded") : chalk.redBright("not onboarded")
         }, data source is ${
-            agent.HasDataSourceConfiguration() ? chalk.magentaBright("configured") : chalk.redBright("not configured")
+            agent.HasDataSourceConfiguration() ? chalk.greenBright("configured") : chalk.redBright("not configured")
         }, mappings are ${
-            agent.HasDataMappings() ? chalk.magentaBright("configured") : chalk.redBright("not configured")
+            agent.HasDataMappings() ? chalk.greenBright("configured") : chalk.redBright("not configured")
         }.`
     );
 };

@@ -64,6 +64,11 @@ export abstract class MindConnectBase {
         "Content-Type": "application/json"
     };
 
+    protected _octetStreamHeaders = {
+        ...this._headers,
+        "Content-Type": "application/octet-stream"
+    };
+
     /**
      * Http headers used to register the client assertion and acquire the /exchange token.
      *
