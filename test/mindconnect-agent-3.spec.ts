@@ -1,7 +1,6 @@
 // Copyright (C), Siemens AG 2017
 import * as chai from "chai";
 import * as debug from "debug";
-import * as fs from "fs";
 import { it } from "mocha";
 import * as os from "os";
 import "url-search-params-polyfill";
@@ -662,36 +661,37 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         })
     );
 
-    it(
+    it.only(
         "should be able to upload files",
         mochaAsync(async () => {
             const agent = new MindConnectAgent(sharedSecretConfig);
             if (!agent.IsOnBoarded()) {
                 await agent.OnBoard();
             }
+            const result1 = await agent.UploadFile(agent.ClientId(), `test14/package-lock.json`, "package-lock.json");
 
-            const date = new Date().getTime();
-            const result1 = await agent.UploadFile(agent.ClientId(), `x/test/package-lock.json`, "package-lock.json");
+            const buffer = new Buffer(24 * 1024 * 1024);
 
-            const result2 = await agent.UploadFile(
-                agent.ClientId(),
-                `x/test/buffer-package-lock.json`,
-                fs.readFileSync("package-lock.json"),
-                { chunkSize: 5 * 1024 * 1024, type: "application/json" }
-            );
+            const result2 = await agent.UploadFile(agent.ClientId(), `test/no-etags.bin`, buffer, {
+                chunkSize: 8 * 1024 * 1024,
+                type: "application/octet-stream",
+                chunk: true
+            });
 
-            const result3 = await agent.Upload(
-                "package-lock.json",
-                "application/json",
-                "",
-                false,
-                undefined,
-                undefined,
-                undefined,
-                `x/test/upload-package-lock.json`
-            );
-            result1.should.be.equal(result2);
-            result1.should.be.equal(result3);
+            console.log("4567");
+
+            // const result3 = await agent.Upload(
+            //     "package-lock.json",
+            //     "application/json",
+            //     "",
+            //     false,
+            //     undefined,
+            //     undefined,
+            //     undefined,
+            //     `x/test/upload-package-lock.json`
+            // );
+            // result1.should.be.equal(result2);
+            // result1.should.be.equal(result3);
         })
     );
 });

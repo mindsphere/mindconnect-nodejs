@@ -380,6 +380,10 @@ export class MindConnectAgent extends AgentAuth {
     ): Promise<string> {
         optional = optional || {};
         const chunkSize = optional.chunkSize || 8 * 1024 * 1024;
+        optional.chunk &&
+            chunkSize < 5 * 1024 * 1024 &&
+            throwError("The chunk size must be at least 5 MB for multipart upload.");
+            
         const fileLength = file instanceof Buffer ? file.length : fs.statSync(file).size;
         const totalChunks = this.getTotalChunks(fileLength, chunkSize, optional);
 
@@ -400,16 +404,19 @@ export class MindConnectAgent extends AgentAuth {
         let current = new Uint8Array(0);
         let chunks = 0;
 
+        // console.log(totalChunks);
+        optional.chunk && totalChunks > 1 && (await this.MultipartOperation("start", entityId, filepath));
+
         return new Promise((resolve, reject) => {
             mystream
                 .on("error", err => reject(err))
-                .on("data", (data: Buffer) => {
+                .on("data", async (data: Buffer) => {
                     if (current.byteLength + data.byteLength < chunkSize) {
                         current = this.addDataToBuffer(current, data);
                     } else {
                         if (current.byteLength > 0) {
                             const currentBuffer = Buffer.from(current);
-                            promises.push(
+                            promises.push(() =>
                                 this.UploadChunk({
                                     ...fileInfo,
                                     chunks: ++chunks,
@@ -424,7 +431,7 @@ export class MindConnectAgent extends AgentAuth {
                 .on("end", () => {
                     if (current.byteLength > 0) {
                         const currentBuffer = Buffer.from(current);
-                        promises.push(
+                        promises.push(() =>
                             this.UploadChunk({
                                 ...fileInfo,
                                 chunks: ++chunks,
@@ -436,7 +443,9 @@ export class MindConnectAgent extends AgentAuth {
                 .pipe(hash)
                 .once("finish", async () => {
                     try {
-                        await Promise.all(promises);
+                        for (const promise of promises) {
+                            await promise();
+                        }
                         log(promises);
                         resolve(hash.read().toString("hex"));
                     } catch (err) {
@@ -587,16 +596,54 @@ export class MindConnectAgent extends AgentAuth {
         const token = await this.GetAgentToken();
 
         const headers = {
-            ...this._apiHeaders,
+            ...this._octetStreamHeaders,
             Authorization: `Bearer ${token}`,
             description: description,
             type: totalChunks === 1 ? fileType : `${fileType}.chunked`,
-            timestamp: timeStamp.toISOString(),
-            "content-type": "application/octet-stream"
+            timestamp: timeStamp.toISOString()
         };
 
-        const currentFileName = totalChunks === 1 ? uploadPath : `${uploadPath}.${chunks}.of.${totalChunks}`;
-        const url = `${this._configuration.content.baseUrl}/api/iotfile/v3/files/${entityId}/${currentFileName}`;
+        let part = totalChunks === 1 ? "" : `?part=${chunks}`;
+        if (part === `?part=${totalChunks}`) {
+            part = `?upload=complete`;
+        }
+
+        const url = `${this._configuration.content.baseUrl}/api/iotfile/v3/files/${entityId}/${uploadPath}${part}`;
+        this.readEtag(url, headers);
+
+        const result = await this.SendMessage("PUT", url, buffer, headers);
+        await this.addUrl(url, result);
+
+        return true;
+    }
+
+    private readEtag(url: string, headers: Object) {
+        if (this._configuration.urls && (<any>this._configuration.urls)[url]) {
+            const eTag = (<any>this._configuration.urls)[url];
+            const etagNumber = parseInt(eTag);
+            (<any>headers)["If-Match"] = etagNumber;
+        }
+    }
+
+    private async addUrl(url: string, result: string | boolean) {
+        if (!this._configuration.urls) {
+            this._configuration.urls = {};
+        }
+        (<any>this._configuration.urls)[url] = result;
+        await retry(5, () => this.SaveConfig());
+    }
+
+    private async MultipartOperation(mode: "start" | "complete" | "abort", entityId: string, filePath: string) {
+        const url = `${
+            this._configuration.content.baseUrl
+        }/api/iotfile/v3/files/${entityId}/${filePath}?upload=${mode}`;
+
+        const token = await this.GetAgentToken();
+
+        const headers = {
+            ...this._octetStreamHeaders,
+            Authorization: `Bearer ${token}`
+        };
 
         if (this._configuration.urls && (<any>this._configuration.urls)[url]) {
             const eTag = (<any>this._configuration.urls)[url];
@@ -604,15 +651,11 @@ export class MindConnectAgent extends AgentAuth {
             (<any>headers)["If-Match"] = etagNumber;
         }
 
-        const result = await this.SendMessage("PUT", url, buffer, headers);
+        this.readEtag(url, headers);
 
-        if (!this._configuration.urls) {
-            this._configuration.urls = {};
-        }
-        (<any>this._configuration.urls)[url] = result;
-        await retry(5, () => this.SaveConfig());
-
-        return true;
+        const result = await this.SendMessage("PUT", url, new Buffer(""), headers);
+        await this.addUrl(url, result);
+        return result;
     }
 
     private async SendMessage(
@@ -638,7 +681,7 @@ export class MindConnectAgent extends AgentAuth {
             const text = await response.text();
             if (response.status >= 200 && response.status <= 299) {
                 const etag = response.headers.get("eTag");
-                return etag !== null ? etag : true;
+                return etag ? etag : "0";
             } else {
                 throw new Error(`Error occured response status ${response.status} ${text}`);
             }
