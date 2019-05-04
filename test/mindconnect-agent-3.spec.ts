@@ -1,6 +1,7 @@
 // Copyright (C), Siemens AG 2017
 import * as chai from "chai";
 import * as debug from "debug";
+import * as fs from "fs";
 import { it } from "mocha";
 import * as os from "os";
 import "url-search-params-polyfill";
@@ -585,18 +586,6 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
     );
 
     it(
-        "should be able to upload a file chunked",
-        mochaAsync(async () => {
-            const agent = new MindConnectAgent(sharedSecretConfig);
-            if (!agent.IsOnBoarded()) {
-                await agent.OnBoard();
-            }
-            const result = await agent.Upload("CODE_OF_CONDUCT.md", "text/plain", "blubb", true, undefined, 1024);
-            result.should.be.equal("2b9b7c5ad3e71a431c7e5b4bf762bcdf");
-        })
-    );
-
-    it(
         "should be able to upload a text file in one piece as well",
         mochaAsync(async () => {
             const agent = new MindConnectAgent(sharedSecretConfig);
@@ -662,36 +651,49 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
     );
 
     it.only(
-        "should be able to upload files",
+        "should be able to upload a file in 3 different ways",
         mochaAsync(async () => {
             const agent = new MindConnectAgent(sharedSecretConfig);
             if (!agent.IsOnBoarded()) {
                 await agent.OnBoard();
             }
-            const result1 = await agent.UploadFile(agent.ClientId(), `test14/package-lock.json`, "package-lock.json");
+            const result1 = await agent.UploadFile(agent.ClientId(), `test1/package-lock.json`, "package-lock.json");
+            const result2 = await agent.UploadFile(
+                agent.ClientId(),
+                `test2/package-lock.json`,
+                fs.readFileSync("package-lock.json")
+            );
+            const result3 = await agent.Upload(
+                "package-lock.json",
+                "application/json",
+                "",
+                false,
+                undefined,
+                undefined,
+                undefined,
+                `test3/upload-package-lock.json`
+            );
+            result1.should.be.equal(result2);
+            result1.should.be.equal(result3);
+        })
+    );
 
-            const buffer = new Buffer(24 * 1024 * 1024);
+    it.only(
+        "should be able to upload a big file",
+        mochaAsync(async () => {
+            const agent = new MindConnectAgent(sharedSecretConfig);
+            if (!agent.IsOnBoarded()) {
+                await agent.OnBoard();
+            }
 
-            const result2 = await agent.UploadFile(agent.ClientId(), `test/no-etags.bin`, buffer, {
-                chunkSize: 8 * 1024 * 1024,
-                type: "application/octet-stream",
-                chunk: true
-            });
+            const bigfile = await agent.UploadFile(
+                agent.ClientId(),
+                `test/36_25_mb_file.bin`,
+                Buffer.alloc(36.25 * 1024 * 1024),
+                { chunk: true }
+            );
 
-            console.log("4567");
-
-            // const result3 = await agent.Upload(
-            //     "package-lock.json",
-            //     "application/json",
-            //     "",
-            //     false,
-            //     undefined,
-            //     undefined,
-            //     undefined,
-            //     `x/test/upload-package-lock.json`
-            // );
-            // result1.should.be.equal(result2);
-            // result1.should.be.equal(result3);
+            console.log(bigfile);
         })
     );
 });

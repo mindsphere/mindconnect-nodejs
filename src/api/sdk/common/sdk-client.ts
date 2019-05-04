@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import { CredentialAuth } from "../../credential-auth";
+import { throwError } from "../../utils";
 
 const debug = require("debug");
 const log = debug("sdk-client");
@@ -45,13 +46,10 @@ export abstract class SdkClient extends CredentialAuth {
                 request.body = octetStream ? body : JSON.stringify(body);
             }
             const response = await fetch(url, request);
-            if (!response.ok) {
-                throw new Error(`${response.statusText} ${await response.text()}`);
-            }
 
-            if (response.status < 200 || response.status > 299) {
-                throw new Error(`invalid response ${JSON.stringify(response)}`);
-            }
+            !response.ok && throwError(`${response.statusText} ${await response.text()}`);
+            (response.status < 200 || response.status > 299) &&
+                throwError(`invalid response ${JSON.stringify(response)}`);
 
             if (noResponse) {
                 if (returnHeaders) {

@@ -13,6 +13,7 @@ import { BaseEvent, DataPointValue, TimeStampedDataPoint } from "./mindconnect-m
 import { bulkDataTemplate, dataTemplate } from "./mindconnect-template";
 import { dataValidator, eventValidator } from "./mindconnect-validators";
 import { throwError } from "./utils";
+import _ = require("lodash");
 const mime = require("mime-types");
 const log = debug("mindconnect-agent");
 /**
@@ -376,6 +377,7 @@ export class MindConnectAgent extends AgentAuth {
             chunkSize?: number;
             retry?: number;
             chunk?: boolean;
+            paralelUploads?: number;
         }
     ): Promise<string> {
         optional = optional || {};
@@ -383,7 +385,7 @@ export class MindConnectAgent extends AgentAuth {
         optional.chunk &&
             chunkSize < 5 * 1024 * 1024 &&
             throwError("The chunk size must be at least 5 MB for multipart upload.");
-            
+
         const fileLength = file instanceof Buffer ? file.length : fs.statSync(file).size;
         const totalChunks = this.getTotalChunks(fileLength, chunkSize, optional);
 
@@ -443,10 +445,23 @@ export class MindConnectAgent extends AgentAuth {
                 .pipe(hash)
                 .once("finish", async () => {
                     try {
-                        for (const promise of promises) {
-                            await promise();
+                        const lastPromise = promises.pop();
+
+                        const maxParalellUploads = (optional && optional.paralelUploads) || 25;
+
+                        const splitedPromises = _.chunk(promises, maxParalellUploads);
+
+                        for (const partPromises of splitedPromises) {
+                            const uploadParts: any = [];
+                            partPromises.forEach(async f => {
+                                uploadParts.push(f());
+                            });
+
+                            await Promise.all(uploadParts);
                         }
-                        log(promises);
+                        await lastPromise();
+
+                        console.log(promises);
                         resolve(hash.read().toString("hex"));
                     } catch (err) {
                         reject(new Error("upload failed" + err));
@@ -460,7 +475,6 @@ export class MindConnectAgent extends AgentAuth {
         chunkSize: number,
         optional: {
             part?: number | undefined;
-            "If-Match"?: number | undefined;
             timestamp?: Date | undefined;
             description?: string | undefined;
             type?: string | undefined;
@@ -478,7 +492,6 @@ export class MindConnectAgent extends AgentAuth {
     private getTimeStamp(
         optional: {
             part?: number | undefined;
-            "If-Match"?: number | undefined;
             timestamp?: Date | undefined;
             description?: string | undefined;
             type?: string | undefined;
@@ -494,7 +507,6 @@ export class MindConnectAgent extends AgentAuth {
     private getFileType(
         optional: {
             part?: number | undefined;
-            "If-Match"?: number | undefined;
             timestamp?: Date | undefined;
             description?: string | undefined;
             type?: string | undefined;
@@ -599,7 +611,7 @@ export class MindConnectAgent extends AgentAuth {
             ...this._octetStreamHeaders,
             Authorization: `Bearer ${token}`,
             description: description,
-            type: totalChunks === 1 ? fileType : `${fileType}.chunked`,
+            type: fileType,
             timestamp: timeStamp.toISOString()
         };
 
@@ -609,28 +621,58 @@ export class MindConnectAgent extends AgentAuth {
         }
 
         const url = `${this._configuration.content.baseUrl}/api/iotfile/v3/files/${entityId}/${uploadPath}${part}`;
-        this.readEtag(url, headers);
-
+        const previousEtag = this.setIfMatch(url, headers);
         const result = await this.SendMessage("PUT", url, buffer, headers);
-        await this.addUrl(url, result);
 
+        // * only set the eTag after the upload is complete
+        if (totalChunks > 1 && !url.endsWith(`upload=complete`)) {
+            return true;
+        }
+
+        const newEtag = this.fix_iotFileUpload_3_2_0(result, previousEtag);
+        await this.addUrl(url, newEtag);
         return true;
     }
 
-    private readEtag(url: string, headers: Object) {
-        if (this._configuration.urls && (<any>this._configuration.urls)[url]) {
-            const eTag = (<any>this._configuration.urls)[url];
-            const etagNumber = parseInt(eTag);
-            (<any>headers)["If-Match"] = etagNumber;
-        }
+    private fix_iotFileUpload_3_2_0(result: string | boolean, previousEtag: number | undefined) {
+        // ! guess etag for the upload
+        // ! in may 2019 mindsphere was not returning eTags for multipart uploads in the header
+        // ! but was still expecting them for the new upload
+        // ! this fix guesses the new value of the eTag
+        return typeof result === "boolean"
+            ? previousEtag !== undefined
+                ? (previousEtag + 1).toString()
+                : "0"
+            : result;
     }
 
-    private async addUrl(url: string, result: string | boolean) {
+    private setIfMatch(url: string, headers: Object): number | undefined {
+        let result;
+
+        const bareUrl = this.getBareUrl(url);
+        if (this._configuration.urls && (<any>this._configuration.urls)[bareUrl]) {
+            const eTag = (<any>this._configuration.urls)[bareUrl];
+            const etagNumber = parseInt(eTag);
+            result = etagNumber;
+            (<any>headers)["If-Match"] = etagNumber;
+        }
+        return result;
+    }
+
+    private async addUrl(url: string, result: string) {
         if (!this._configuration.urls) {
             this._configuration.urls = {};
         }
-        (<any>this._configuration.urls)[url] = result;
+
+        const log = this.getBareUrl(url);
+        (<any>this._configuration.urls)[log] = result;
         await retry(5, () => this.SaveConfig());
+    }
+
+    private getBareUrl(url: string) {
+        const parsedUrl = new URL(url);
+        const log = url.replace(parsedUrl.search, "");
+        return log;
     }
 
     private async MultipartOperation(mode: "start" | "complete" | "abort", entityId: string, filePath: string) {
@@ -645,16 +687,10 @@ export class MindConnectAgent extends AgentAuth {
             Authorization: `Bearer ${token}`
         };
 
-        if (this._configuration.urls && (<any>this._configuration.urls)[url]) {
-            const eTag = (<any>this._configuration.urls)[url];
-            const etagNumber = parseInt(eTag);
-            (<any>headers)["If-Match"] = etagNumber;
-        }
-
-        this.readEtag(url, headers);
-
+        const previousEtag = this.setIfMatch(url, headers);
         const result = await this.SendMessage("PUT", url, new Buffer(""), headers);
-        await this.addUrl(url, result);
+        // const newEtag = this.fix_iotFileUpload_3_2_0(result, previousEtag);
+        // await this.addUrl(url, newEtag);
         return result;
     }
 
@@ -681,7 +717,7 @@ export class MindConnectAgent extends AgentAuth {
             const text = await response.text();
             if (response.status >= 200 && response.status <= 299) {
                 const etag = response.headers.get("eTag");
-                return etag ? etag : "0";
+                return etag ? etag : true;
             } else {
                 throw new Error(`Error occured response status ${response.status} ${text}`);
             }
