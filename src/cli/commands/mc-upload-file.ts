@@ -94,12 +94,13 @@ export default (program: CommanderStatic) => {
                     );
                     verboseLog(chunked ? `Using chunked upload` : `No chunked upload`, options.verbose);
 
-                    await retry(
-                        options.retry,
-                        () => agent.Upload(uploadFile, mimeType, description, chunked, assetid),
-                        300,
-                        retrylog("FileUpload")
-                    );
+                    await agent.UploadFile(assetid, path.basename(uploadFile), uploadFile, {
+                        description: description,
+                        chunk: chunked,
+                        retry: options.retry,
+                        logFunction: retrylog("UploadFile")
+                    });
+
                     log(`Your file ${chalk.cyanBright(uploadFile)} was succesfully uploaded.`);
                 } catch (err) {
                     errorLog(err, options.verbose);

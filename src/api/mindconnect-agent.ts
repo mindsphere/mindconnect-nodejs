@@ -1,18 +1,15 @@
 // Copyright (C), Siemens AG 2017
 import * as ajv from "ajv";
-import * as crypto from "crypto";
 import * as debug from "debug";
-import * as fs from "fs";
 import fetch from "node-fetch";
 import * as path from "path";
-import * as stream from "stream";
 import "url-search-params-polyfill";
 import { DataSourceConfiguration, Mapping, retry } from "..";
 import { AgentAuth } from "./agent-auth";
-import { BaseEvent, DataPointValue, TimeStampedDataPoint } from "./mindconnect-models";
+import { BaseEvent, DataPointValue, IMindConnectConfiguration, TimeStampedDataPoint } from "./mindconnect-models";
 import { bulkDataTemplate, dataTemplate } from "./mindconnect-template";
 import { dataValidator, eventValidator } from "./mindconnect-validators";
-import { throwError } from "./utils";
+import { MultipartUploader, optionalParameters } from "./sdk/common/multipart-uploader";
 import _ = require("lodash");
 const mime = require("mime-types");
 const log = debug("mindconnect-agent");
@@ -364,178 +361,15 @@ export class MindConnectAgent extends AgentAuth {
         return <boolean>result;
     }
 
-    // TODO: think about saving the config!
     public async UploadFile(
         entityId: string,
         filepath: string,
         file: string | Buffer,
-        optional?: {
-            part?: number;
-            "If-Match"?: number;
-            timestamp?: Date;
-            description?: string;
-            type?: string;
-            chunkSize?: number;
-            retry?: number;
-            chunk?: boolean;
-            paralelUploads?: number;
-        }
+        optional?: optionalParameters
     ): Promise<string> {
-        optional = optional || {};
-        const chunkSize = optional.chunkSize || 8 * 1024 * 1024;
-        optional.chunk &&
-            chunkSize < 5 * 1024 * 1024 &&
-            throwError("The chunk size must be at least 5 MB for multipart upload.");
-
-        const fileLength = file instanceof Buffer ? file.length : fs.statSync(file).size;
-        const totalChunks = this.getTotalChunks(fileLength, chunkSize, optional);
-
-        const shortFileName = path.basename(filepath);
-        const fileInfo = {
-            description: optional.description || shortFileName,
-            timeStamp: this.getTimeStamp(optional, file),
-            fileType: this.getFileType(optional, file),
-            uploadPath: filepath,
-            totalChunks: totalChunks,
-            entityId: entityId
-        };
-
-        const mystream = this.getStreamFromFile(file, chunkSize);
-        const hash = crypto.createHash("md5");
-        const promises: any[] = [];
-
-        let current = new Uint8Array(0);
-        let chunks = 0;
-
-        // console.log(totalChunks);
-        optional.chunk && totalChunks > 1 && (await this.MultipartOperation("start", entityId, filepath));
-
-        return new Promise((resolve, reject) => {
-            mystream
-                .on("error", err => reject(err))
-                .on("data", async (data: Buffer) => {
-                    if (current.byteLength + data.byteLength < chunkSize) {
-                        current = this.addDataToBuffer(current, data);
-                    } else {
-                        if (current.byteLength > 0) {
-                            const currentBuffer = Buffer.from(current);
-                            promises.push(() =>
-                                this.UploadChunk({
-                                    ...fileInfo,
-                                    chunks: ++chunks,
-                                    buffer: currentBuffer
-                                })
-                            );
-                        }
-                        current = new Uint8Array(data.byteLength);
-                        current.set(data, 0);
-                    }
-                })
-                .on("end", () => {
-                    const currentBuffer = Buffer.from(current);
-                    promises.push(() =>
-                        this.UploadChunk({
-                            ...fileInfo,
-                            chunks: ++chunks,
-                            buffer: currentBuffer
-                        })
-                    );
-                })
-                .pipe(hash)
-                .once("finish", async () => {
-                    try {
-                        // * this is the last promise (for multipart) the one which completes the upload
-                        // * this has to be awaited last.
-                        const lastPromise = promises.pop();
-
-                        // * the chunks before last can be uploaded in paralell to mindsphere
-                        const maxParalellUploads = (optional && optional.paralelUploads) || 25;
-                        const splitedPromises = _.chunk(promises, maxParalellUploads);
-
-                        for (const partPromises of splitedPromises) {
-                            const uploadParts: any = [];
-                            partPromises.forEach(async f => {
-                                uploadParts.push(f());
-                            });
-
-                            await Promise.all(uploadParts);
-                        }
-                        // * for non-multipart-upload this is the only promise which is ever resolved
-                        await lastPromise();
-                        await retry(5, () => this.SaveConfig());
-                        resolve(hash.read().toString("hex"));
-                    } catch (err) {
-                        reject(new Error("upload failed" + err));
-                    }
-                });
-        });
-    }
-
-    private getTotalChunks(
-        fileLength: number,
-        chunkSize: number,
-        optional: {
-            part?: number | undefined;
-            timestamp?: Date | undefined;
-            description?: string | undefined;
-            type?: string | undefined;
-            chunkSize?: number | undefined;
-            retry?: number | undefined;
-            chunk?: boolean | undefined;
-        }
-    ) {
-        const totalChunks = Math.ceil(fileLength / chunkSize);
-        !optional.chunk && totalChunks > 1 && throwError("File is too big.");
-        optional.chunk && totalChunks > 1 && log("WARN: Chunking is experimental!");
-        return totalChunks;
-    }
-
-    private getTimeStamp(
-        optional: {
-            part?: number | undefined;
-            timestamp?: Date | undefined;
-            description?: string | undefined;
-            type?: string | undefined;
-            chunkSize?: number | undefined;
-            retry?: number | undefined;
-            chunk?: boolean | undefined;
-        },
-        file: string | Buffer
-    ) {
-        return optional.timestamp || (file instanceof Buffer ? new Date() : fs.statSync(file).ctime);
-    }
-
-    private getFileType(
-        optional: {
-            part?: number | undefined;
-            timestamp?: Date | undefined;
-            description?: string | undefined;
-            type?: string | undefined;
-            chunkSize?: number | undefined;
-            retry?: number | undefined;
-            chunk?: boolean | undefined;
-        },
-        file: string | Buffer
-    ) {
-        return (
-            optional.type ||
-            (file instanceof Buffer ? "application/octet-stream" : mime.lookup(file) || "application/octet-stream")
-        );
-    }
-
-    private getStreamFromFile(file: string | Buffer, chunksize: number) {
-        return file instanceof Buffer
-            ? (() => {
-                  const bufferStream = new stream.PassThrough({ highWaterMark: chunksize });
-                  for (let index = 0; index < file.length; ) {
-                      const end = Math.min(index + chunksize, file.length);
-                      bufferStream.write(file.slice(index, end));
-                      index = end;
-                  }
-                  bufferStream.end();
-                  return bufferStream;
-              })()
-            : fs.createReadStream(path.resolve(file), { highWaterMark: chunksize });
+        const result = await this.uploader.UploadFile(entityId, filepath, file, optional);
+        await retry(5, () => this.SaveConfig());
+        return result;
     }
 
     /**
@@ -575,122 +409,6 @@ export class MindConnectAgent extends AgentAuth {
             chunkSize: chunkSize,
             paralelUploads: maxSockets
         });
-    }
-
-    private addDataToBuffer(current: Uint8Array, data: Buffer) {
-        const newLength = current.byteLength + data.byteLength;
-        const newBuffer = new Uint8Array(newLength);
-        newBuffer.set(current, 0);
-        newBuffer.set(data, current.byteLength);
-        current = newBuffer;
-        return current;
-    }
-
-    private async UploadChunk({
-        description,
-        chunks,
-        totalChunks,
-        fileType,
-        timeStamp,
-        uploadPath,
-        entityId,
-        buffer
-    }: {
-        description: string;
-        chunks: number;
-        totalChunks: number;
-        fileType: string;
-        timeStamp: Date;
-        uploadPath: string;
-        entityId: string;
-        buffer: Uint8Array;
-    }): Promise<boolean> {
-        if (buffer.length <= 0) return false;
-
-        const token = await this.GetAgentToken();
-
-        const headers = {
-            ...this._octetStreamHeaders,
-            Authorization: `Bearer ${token}`,
-            description: description,
-            type: fileType,
-            timestamp: timeStamp.toISOString()
-        };
-
-        let part = totalChunks === 1 ? "" : `?part=${chunks}`;
-        if (part === `?part=${totalChunks}`) {
-            part = `?upload=complete`;
-        }
-
-        const url = `${this._configuration.content.baseUrl}/api/iotfile/v3/files/${entityId}/${uploadPath}${part}`;
-        const previousEtag = this.setIfMatch(url, headers);
-        const result = await this.SendMessage("PUT", url, buffer, headers);
-
-        // * only set the eTag after the upload is complete
-        if (totalChunks > 1 && !url.endsWith(`upload=complete`)) {
-            return true;
-        }
-
-        const newEtag = this.fix_iotFileUpload_3_2_0(result, previousEtag);
-        this.addUrl(url, newEtag);
-        return true;
-    }
-
-    private fix_iotFileUpload_3_2_0(result: string | boolean, previousEtag: number | undefined) {
-        // ! guess etag for the upload
-        // ! in may 2019 mindsphere was not returning eTags for multipart uploads in the header
-        // ! but was still expecting them for the new upload
-        // ! this fix guesses the new value of the eTag
-        return typeof result === "boolean"
-            ? previousEtag !== undefined
-                ? (previousEtag + 1).toString()
-                : "0"
-            : result;
-    }
-
-    private setIfMatch(url: string, headers: Object): number | undefined {
-        let result;
-
-        const bareUrl = this.getBareUrl(url);
-        if (this._configuration.urls && (<any>this._configuration.urls)[bareUrl]) {
-            const eTag = (<any>this._configuration.urls)[bareUrl];
-            const etagNumber = parseInt(eTag);
-            result = etagNumber;
-            (<any>headers)["If-Match"] = etagNumber;
-        }
-        return result;
-    }
-
-    private addUrl(url: string, result: string) {
-        if (!this._configuration.urls) {
-            this._configuration.urls = {};
-        }
-
-        const log = this.getBareUrl(url);
-        (<any>this._configuration.urls)[log] = result;
-    }
-
-    private getBareUrl(url: string) {
-        const parsedUrl = new URL(url);
-        const log = url.replace(parsedUrl.search, "");
-        return log;
-    }
-
-    private async MultipartOperation(mode: "start" | "complete" | "abort", entityId: string, filePath: string) {
-        const url = `${
-            this._configuration.content.baseUrl
-        }/api/iotfile/v3/files/${entityId}/${filePath}?upload=${mode}`;
-
-        const token = await this.GetAgentToken();
-
-        const headers = {
-            ...this._octetStreamHeaders,
-            Authorization: `Bearer ${token}`
-        };
-
-        this.setIfMatch(url, headers);
-        const result = await this.SendMessage("PUT", url, Buffer.alloc(0), headers);
-        return result;
     }
 
     private async SendMessage(
@@ -742,4 +460,10 @@ export class MindConnectAgent extends AgentAuth {
         }
         return this._eventValidator;
     }
+
+    public GetMindConnectConfiguration(): IMindConnectConfiguration {
+        return this._configuration;
+    }
+
+    private uploader = new MultipartUploader(this);
 }

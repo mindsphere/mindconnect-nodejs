@@ -1,4 +1,5 @@
 import * as debug from "debug";
+import fetch from "node-fetch";
 import { throwError } from "./utils";
 const HttpsProxyAgent = require("https-proxy-agent");
 const log = debug("mindconnect");

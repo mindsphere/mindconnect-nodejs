@@ -3,9 +3,10 @@ import * as debug from "debug";
 import * as fs from "fs";
 import * as path from "path";
 import * as stream from "stream";
+import { MindConnectAgent } from "../../..";
 import { MindConnectBase } from "../../mindconnect-base";
-import { IMindConnectConfiguration } from "../../mindconnect-models";
-import { throwError } from "../../utils";
+import { retry, throwError } from "../../utils";
+import { SdkClient } from "./sdk-client";
 import _ = require("lodash");
 
 const mime = require("mime-types");
@@ -18,7 +19,10 @@ export type optionalParameters = {
     type?: string | undefined;
     chunkSize?: number | undefined;
     retry?: number | undefined;
+    logFunction?: Function | undefined;
     chunk?: boolean | undefined;
+    paralelUploads?: number | undefined;
+    ifmatch?: number | undefined;
 };
 
 type uploadChunkParameters = {
@@ -42,9 +46,6 @@ type uploadChunkParameters = {
  * @extends {MindConnectBase}
  */
 export class MultipartUploader extends MindConnectBase {
-    GetToken: () => Promise<string>;
-    getConfiguration: (() => IMindConnectConfiguration) | undefined;
-    gateway: () => string;
     private getTotalChunks(fileLength: number, chunkSize: number, optional: optionalParameters) {
         const totalChunks = Math.ceil(fileLength / chunkSize);
         !optional.chunk && totalChunks > 1 && throwError("File is too big.");
@@ -109,11 +110,11 @@ export class MultipartUploader extends MindConnectBase {
         let result;
         const bareUrl = this.getBareUrl(url);
 
-        (!this.getConfiguration || headers["If-Match"] !== undefined) &&
+        (!this.GetConfiguration || headers["If-Match"] !== undefined) &&
             throwError("You have to set if-match if you are using this outside the MindConnectAgent");
 
-        if (this.getConfiguration) {
-            const config = this.getConfiguration() as any;
+        if (this.GetConfiguration) {
+            const config = this.GetConfiguration() as any;
             if (config.urls && config.urls[bareUrl]) {
                 const eTag = config.urls[bareUrl];
                 const etagNumber = parseInt(eTag);
@@ -125,9 +126,9 @@ export class MultipartUploader extends MindConnectBase {
     }
 
     private addUrl(url: string, result: string) {
-        if (!this.getConfiguration) return;
+        if (!this.GetConfiguration) return;
 
-        const config = this.getConfiguration() as any;
+        const config = this.GetConfiguration() as any;
 
         if (!config.urls) {
             config.urls = {};
@@ -164,12 +165,12 @@ export class MultipartUploader extends MindConnectBase {
         };
 
         ifmatch && ((headers as any)["If-Match"] = ifmatch);
-        this.setIfMatch(url, headers);
+        this.setIfMatch(`${this.GetGateway()}${url}`, headers);
 
         const result = await this.HttpAction({
             verb: "PUT",
             authorization: token,
-            gateway: this.gateway(),
+            gateway: this.GetGateway(),
             baseUrl: url,
             octetStream: true,
             additionalHeaders: headers,
@@ -207,28 +208,32 @@ export class MultipartUploader extends MindConnectBase {
         }
 
         const url = `/api/iotfile/v3/files/${entityId}/${uploadPath}${part}`;
-        const previousEtag = this.setIfMatch(`${this.gateway}${url}`, headers);
+        const previousEtag = this.setIfMatch(`${this.GetGateway()}${url}`, headers);
 
         const token = await this.GetToken();
 
-        const result = await this.HttpAction({
+        const gateway = this.GetGateway();
+
+        const resultHeaders = (await this.HttpAction({
             verb: "PUT",
             baseUrl: url,
-            gateway: this.gateway(),
+            gateway: gateway,
             authorization: token,
             body: buffer,
             octetStream: true,
             additionalHeaders: headers,
             noResponse: true,
             returnHeaders: true
-        });
+        })) as Headers;
+
+        const result = resultHeaders.get("ETag") || true;
 
         // * only set the eTag after the upload is complete
         if (totalChunks > 1 && !url.endsWith(`upload=complete`)) {
             return true;
         }
-        const newEtag = this.fix_iotFileUpload_3_2_0(!!result, previousEtag);
-        this.addUrl(url, newEtag);
+        const newEtag = this.fix_iotFileUpload_3_2_0(result, previousEtag);
+        this.addUrl(`${gateway}${url}`, newEtag);
         return true;
     }
 
@@ -236,17 +241,7 @@ export class MultipartUploader extends MindConnectBase {
         entityId: string,
         filepath: string,
         file: string | Buffer,
-        optional?: {
-            part?: number;
-            ifmatch?: number;
-            timestamp?: Date;
-            description?: string;
-            type?: string;
-            chunkSize?: number;
-            retry?: number;
-            chunk?: boolean;
-            paralelUploads?: number;
-        }
+        optional?: optionalParameters
     ): Promise<string> {
         optional = optional || {};
         const chunkSize = optional.chunkSize || 8 * 1024 * 1024;
@@ -267,6 +262,10 @@ export class MultipartUploader extends MindConnectBase {
             entityId: entityId
         };
 
+        const RETRIES = optional.retry || 1;
+        const logFunction = optional.logFunction;
+        logFunction && logFunction();
+
         optional.ifmatch && ((fileInfo as any)["If-Match"] = optional.ifmatch);
 
         const mystream = this.getStreamFromFile(file, chunkSize);
@@ -276,13 +275,18 @@ export class MultipartUploader extends MindConnectBase {
         let current = new Uint8Array(0);
         let chunks = 0;
 
-        // console.log(totalChunks);
         optional.chunk &&
             totalChunks > 1 &&
-            (await this.MultipartOperation({
-                mode: "start",
-                ...fileInfo
-            }));
+            (await retry(
+                RETRIES,
+                () =>
+                    this.MultipartOperation({
+                        mode: "start",
+                        ...fileInfo
+                    }),
+                undefined,
+                logFunction
+            ));
 
         return new Promise((resolve, reject) => {
             mystream
@@ -294,11 +298,17 @@ export class MultipartUploader extends MindConnectBase {
                         if (current.byteLength > 0) {
                             const currentBuffer = Buffer.from(current);
                             promises.push(() =>
-                                this.UploadChunk({
-                                    ...fileInfo,
-                                    chunks: ++chunks,
-                                    buffer: currentBuffer
-                                })
+                                retry(
+                                    RETRIES,
+                                    () =>
+                                        this.UploadChunk({
+                                            ...fileInfo,
+                                            chunks: ++chunks,
+                                            buffer: currentBuffer
+                                        }),
+                                    undefined,
+                                    logFunction
+                                )
                             );
                         }
                         current = new Uint8Array(data.byteLength);
@@ -308,11 +318,17 @@ export class MultipartUploader extends MindConnectBase {
                 .on("end", () => {
                     const currentBuffer = Buffer.from(current);
                     promises.push(() =>
-                        this.UploadChunk({
-                            ...fileInfo,
-                            chunks: ++chunks,
-                            buffer: currentBuffer
-                        })
+                        retry(
+                            RETRIES,
+                            () =>
+                                this.UploadChunk({
+                                    ...fileInfo,
+                                    chunks: ++chunks,
+                                    buffer: currentBuffer
+                                }),
+                            undefined,
+                            logFunction
+                        )
                     );
                 })
                 .pipe(hash)
@@ -335,7 +351,7 @@ export class MultipartUploader extends MindConnectBase {
                             await Promise.all(uploadParts);
                         }
                         // * for non-multipart-upload this is the only promise which is ever resolved
-                        await lastPromise();
+                        await retry(RETRIES, () => lastPromise(), undefined, logFunction);
                         resolve(hash.read().toString("hex"));
                     } catch (err) {
                         reject(new Error("upload failed" + err));
@@ -344,18 +360,39 @@ export class MultipartUploader extends MindConnectBase {
         });
     }
 
-    constructor({
-        getToken,
-        getConfiguration,
-        gateway
-    }: {
-        getToken: () => Promise<string>;
-        getConfiguration?: () => IMindConnectConfiguration;
-        gateway: () => string;
-    }) {
+    private async GetToken() {
+        !this.agent && !this.sdkClient && throwError("invalid conifguraiton for multipart upload");
+        if (this.agent) {
+            return await this.agent.GetAgentToken();
+        }
+
+        if (this.sdkClient) {
+            return await this.sdkClient.GetServiceToken();
+        }
+        return "";
+    }
+
+    private GetGateway() {
+        !this.agent && !this.sdkClient && throwError("invalid conifguraiton for multipart upload");
+        if (this.agent) {
+            return `${this.agent.GetMindConnectConfiguration().content.baseUrl}`;
+        }
+
+        if (this.sdkClient) {
+            return this.sdkClient.GetGateway();
+        }
+        return "";
+    }
+
+    private GetConfiguration() {
+        !this.agent && !this.sdkClient && throwError("invalid conifguraiton for multipart upload");
+        if (this.agent) {
+            return this.agent.GetMindConnectConfiguration();
+        }
+    }
+
+    constructor(private agent?: MindConnectAgent, private sdkClient?: SdkClient) {
         super();
-        this.GetToken = getToken;
-        this.gateway = gateway;
-        this.getConfiguration = getConfiguration;
+        !agent && !sdkClient && throwError("you have to specify either agent or sdkclient");
     }
 }
