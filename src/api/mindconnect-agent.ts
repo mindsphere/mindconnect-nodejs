@@ -364,6 +364,7 @@ export class MindConnectAgent extends AgentAuth {
         return <boolean>result;
     }
 
+    // TODO: think about saving the config!
     public async UploadFile(
         entityId: string,
         filepath: string,
@@ -461,6 +462,7 @@ export class MindConnectAgent extends AgentAuth {
                         }
                         // * for non-multipart-upload this is the only promise which is ever resolved
                         await lastPromise();
+                        await retry(5, () => this.SaveConfig());
                         resolve(hash.read().toString("hex"));
                     } catch (err) {
                         reject(new Error("upload failed" + err));
@@ -570,7 +572,8 @@ export class MindConnectAgent extends AgentAuth {
             type: fileType,
             description: description,
             chunk: chunk,
-            chunkSize: chunkSize
+            chunkSize: chunkSize,
+            paralelUploads: maxSockets
         });
     }
 
@@ -629,7 +632,7 @@ export class MindConnectAgent extends AgentAuth {
         }
 
         const newEtag = this.fix_iotFileUpload_3_2_0(result, previousEtag);
-        await this.addUrl(url, newEtag);
+        this.addUrl(url, newEtag);
         return true;
     }
 
@@ -658,14 +661,13 @@ export class MindConnectAgent extends AgentAuth {
         return result;
     }
 
-    private async addUrl(url: string, result: string) {
+    private addUrl(url: string, result: string) {
         if (!this._configuration.urls) {
             this._configuration.urls = {};
         }
 
         const log = this.getBareUrl(url);
         (<any>this._configuration.urls)[log] = result;
-        await retry(5, () => this.SaveConfig());
     }
 
     private getBareUrl(url: string) {
