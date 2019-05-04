@@ -31,6 +31,8 @@ export class TimeSeriesClient extends SdkClient {
         const qs = toQueryString(optional);
         return (await this.HttpAction({
             verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/timeseries/${entity}/${propertysetname}?${qs}`,
             message: "GetTimeSeries"
         })) as TimeSeriesModels.Timeseries[];
@@ -50,6 +52,8 @@ export class TimeSeriesClient extends SdkClient {
         checkAssetId(entity);
         return await this.HttpAction({
             verb: "PUT",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/timeseries/${entity}/${propertysetname}`,
             body: timeseries,
             message: "PutTimeSeries",
@@ -74,6 +78,8 @@ export class TimeSeriesClient extends SdkClient {
         const qs = toQueryString({ from: from, to: to });
         return await this.HttpAction({
             verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/timeseries/${entity}/${propertysetname}?${qs}`,
             message: "DeleteTimeSeries",
             noResponse: true

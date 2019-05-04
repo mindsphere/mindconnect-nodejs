@@ -1,4 +1,5 @@
 import * as debug from "debug";
+import { throwError } from "./utils";
 const HttpsProxyAgent = require("https-proxy-agent");
 const log = debug("mindconnect");
 
@@ -79,6 +80,67 @@ export abstract class MindConnectBase {
         ...this._headers,
         "Content-Type": "application/x-www-form-urlencoded"
     };
+
+    protected async HttpAction({
+        verb,
+        gateway,
+        baseUrl,
+        authorization,
+        body,
+        message,
+        octetStream,
+        additionalHeaders,
+        noResponse,
+        returnHeaders
+    }: {
+        verb: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
+        gateway: string;
+        baseUrl: string;
+        authorization: string;
+        body?: Object;
+        message?: string;
+        octetStream?: boolean;
+        additionalHeaders?: Object;
+        noResponse?: boolean;
+        returnHeaders?: boolean;
+    }): Promise<Object> {
+        additionalHeaders = additionalHeaders || {};
+        const apiheaders = octetStream ? this._octetStreamHeaders : this._apiHeaders;
+
+        const headers: any = {
+            ...apiheaders,
+            Authorization: `Bearer ${authorization}`,
+            ...additionalHeaders
+        };
+
+        const url = `${gateway}${baseUrl}`;
+        log(`${message} Headers ${JSON.stringify(headers)} Url ${url}`);
+        try {
+            const request: any = { method: verb, headers: headers, agent: this._proxyHttpAgent };
+            if (verb !== "GET" && verb !== "DELETE") {
+                request.body = octetStream ? body : JSON.stringify(body);
+            }
+            const response = await fetch(url, request);
+
+            !response.ok && throwError(`${response.statusText} ${await response.text()}`);
+            (response.status < 200 || response.status > 299) &&
+                throwError(`invalid response ${JSON.stringify(response)}`);
+
+            if (noResponse) {
+                if (returnHeaders) {
+                    return response.headers;
+                }
+                return {};
+            }
+
+            const json = await response.json();
+            log(`${message} Response ${JSON.stringify(json)}`);
+            return json;
+        } catch (err) {
+            log(err);
+            throw new Error(`Network error occured ${err.message}`);
+        }
+    }
 
     constructor() {
         const proxy = process.env.http_proxy || process.env.HTTP_PROXY;

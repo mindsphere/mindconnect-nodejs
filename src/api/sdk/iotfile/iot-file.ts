@@ -12,6 +12,8 @@ export class IotFileClient extends SdkClient {
         checkAssetId(entityid);
         return (await (this.HttpAction({
             verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/files/${entityid}`,
             additionalHeaders: optional,
             message: "SearchFiles"
@@ -31,6 +33,8 @@ export class IotFileClient extends SdkClient {
 
         return (await this.HttpAction({
             verb: "PUT",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/files/${entityId}/${filepath}`,
             body: myBuffer,
             additionalHeaders: { ...optional },
