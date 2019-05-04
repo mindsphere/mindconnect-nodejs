@@ -650,7 +650,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         })
     );
 
-    it.only(
+    it(
         "should be able to upload a file in 3 different ways",
         mochaAsync(async () => {
             const agent = new MindConnectAgent(sharedSecretConfig);
@@ -678,22 +678,80 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         })
     );
 
-    it.only(
-        "should be able to upload a big file",
+    it(
+        "should be able to upload a 16.25 mb big file [CI ONLY]",
+        mochaAsync(async () => {
+            if (!process.env.CI) {
+                return;
+            }
+
+            const agent = new MindConnectAgent(sharedSecretConfig);
+            if (!agent.IsOnBoarded()) {
+                await agent.OnBoard();
+            }
+
+            const checksum = await agent.UploadFile(
+                agent.ClientId(),
+                `test/16_25_mb_file.bin`,
+                Buffer.alloc(16.25 * 1024 * 1024),
+                { chunk: true }
+            );
+
+            checksum.should.be.equal("84c8648b8aa9b803ff92515a63aa4580");
+        })
+    );
+
+    it(
+        "should be able to upload 8 MB and 1 byte big file [CI ONLY]",
+        mochaAsync(async () => {
+            if (!process.env.CI) {
+                return;
+            }
+            const agent = new MindConnectAgent(sharedSecretConfig);
+            if (!agent.IsOnBoarded()) {
+                await agent.OnBoard();
+            }
+
+            const checksum = await agent.UploadFile(
+                agent.ClientId(),
+                `test/8mb_1byte_file.bin`,
+                Buffer.alloc(8 * 1024 * 1024 + 1),
+                { chunk: true }
+            );
+
+            checksum.should.be.equal("cba5242e77abe5709a262350cf64d835");
+        })
+    );
+
+    it(
+        "should be able to upload 1 byte big file",
         mochaAsync(async () => {
             const agent = new MindConnectAgent(sharedSecretConfig);
             if (!agent.IsOnBoarded()) {
                 await agent.OnBoard();
             }
 
-            const bigfile = await agent.UploadFile(
-                agent.ClientId(),
-                `test/36_25_mb_file.bin`,
-                Buffer.alloc(36.25 * 1024 * 1024),
-                { chunk: true }
-            );
+            const checksum = await agent.UploadFile(agent.ClientId(), `test/1_byte.bin`, Buffer.alloc(1), {
+                chunk: true
+            });
 
-            console.log(bigfile);
+            checksum.should.be.equal("93b885adfe0da089cdf634904fd59f71");
+        })
+    );
+
+    it(
+        "should be able to upload 0 byte big file",
+        mochaAsync(async () => {
+            const agent = new MindConnectAgent(sharedSecretConfig);
+            if (!agent.IsOnBoarded()) {
+                await agent.OnBoard();
+            }
+
+            const checksum = await agent.UploadFile(agent.ClientId(), `test/0_byte.bin`, Buffer.alloc(0), {
+                chunk: true
+            });
+
+            checksum.should.be.equal("d41d8cd98f00b204e9800998ecf8427e");
         })
     );
 });

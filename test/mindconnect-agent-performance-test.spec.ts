@@ -21,7 +21,7 @@ describe("MindConnectApi RSA_3072 Agent performance test", () => {
         "should function under heavy load",
         mochaAsync(async () => {
             if (!process.env.CI) {
-                return true; // run only during CI
+                return; // run only during CI
             }
 
             const agent = new MindConnectAgent(rsaConfig);

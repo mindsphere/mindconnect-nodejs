@@ -431,24 +431,24 @@ export class MindConnectAgent extends AgentAuth {
                     }
                 })
                 .on("end", () => {
-                    if (current.byteLength > 0) {
-                        const currentBuffer = Buffer.from(current);
-                        promises.push(() =>
-                            this.UploadChunk({
-                                ...fileInfo,
-                                chunks: ++chunks,
-                                buffer: currentBuffer
-                            })
-                        );
-                    }
+                    const currentBuffer = Buffer.from(current);
+                    promises.push(() =>
+                        this.UploadChunk({
+                            ...fileInfo,
+                            chunks: ++chunks,
+                            buffer: currentBuffer
+                        })
+                    );
                 })
                 .pipe(hash)
                 .once("finish", async () => {
                     try {
+                        // * this is the last promise (for multipart) the one which completes the upload
+                        // * this has to be awaited last.
                         const lastPromise = promises.pop();
 
+                        // * the chunks before last can be uploaded in paralell to mindsphere
                         const maxParalellUploads = (optional && optional.paralelUploads) || 25;
-
                         const splitedPromises = _.chunk(promises, maxParalellUploads);
 
                         for (const partPromises of splitedPromises) {
@@ -459,9 +459,8 @@ export class MindConnectAgent extends AgentAuth {
 
                             await Promise.all(uploadParts);
                         }
+                        // * for non-multipart-upload this is the only promise which is ever resolved
                         await lastPromise();
-
-                        console.log(promises);
                         resolve(hash.read().toString("hex"));
                     } catch (err) {
                         reject(new Error("upload failed" + err));
@@ -687,10 +686,8 @@ export class MindConnectAgent extends AgentAuth {
             Authorization: `Bearer ${token}`
         };
 
-        const previousEtag = this.setIfMatch(url, headers);
-        const result = await this.SendMessage("PUT", url, new Buffer(""), headers);
-        // const newEtag = this.fix_iotFileUpload_3_2_0(result, previousEtag);
-        // await this.addUrl(url, newEtag);
+        this.setIfMatch(url, headers);
+        const result = await this.SendMessage("PUT", url, Buffer.alloc(0), headers);
         return result;
     }
 
