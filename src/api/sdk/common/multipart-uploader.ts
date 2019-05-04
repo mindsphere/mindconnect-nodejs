@@ -13,15 +13,73 @@ const mime = require("mime-types");
 const log = debug("multipart-uploader");
 
 export type optionalParameters = {
+    /**
+     * Multipart/upload part.
+     *
+     * @type {(number | undefined)}
+     */
     part?: number | undefined;
+
+    /**
+     * File timestamp in mindsphere.
+     *
+     * @type {(Date | undefined)}
+     */
     timestamp?: Date | undefined;
+    /**
+     * Description in mindsphere.
+     *
+     * @type {(string | undefined)}
+     */
     description?: string | undefined;
+
+    /**
+     * Mime type in mindsphere.
+     *
+     * @type {(string | undefined)}
+     */
     type?: string | undefined;
+
+    /**
+     * chunkSize. It must be bigger than 5 MB. Default 8 MB.
+     *
+     * @type {(number | undefined)}
+     */
     chunkSize?: number | undefined;
+
+    /**
+     * Number of retries.
+     *
+     * @type {(number | undefined)}
+     */
     retry?: number | undefined;
+
+    /**
+     * log function is called every time a retry happens
+     *
+     * @type {(Function | undefined)}
+     */
     logFunction?: Function | undefined;
+
+    /**
+     * enables multipart/upload
+     *
+     * @type {(boolean | undefined)}
+     */
     chunk?: boolean | undefined;
+
+    /**
+     * max paralell uploads for parts (default: 3)
+     *
+     * @type {(number | undefined)}
+     */
     paralelUploads?: number | undefined;
+
+    /**
+     *  The etag for the upload. if not set the agent will try to guess it.
+     *
+     * @type {(number | undefined)}
+     */
     ifmatch?: number | undefined;
 };
 
@@ -48,7 +106,9 @@ type uploadChunkParameters = {
 export class MultipartUploader extends MindConnectBase {
     private getTotalChunks(fileLength: number, chunkSize: number, optional: optionalParameters) {
         const totalChunks = Math.ceil(fileLength / chunkSize);
-        !optional.chunk && totalChunks > 1 && throwError("File is too big.");
+        !optional.chunk &&
+            totalChunks > 1 &&
+            throwError("File is too big. Enable chunked/multipart upload (CLI: --chunked) to upload it.");
         optional.chunk && totalChunks > 1 && log("WARN: Chunking is experimental!");
         return totalChunks;
     }
@@ -237,6 +297,17 @@ export class MultipartUploader extends MindConnectBase {
         return true;
     }
 
+    /**
+     * The new upload file operation.
+     *
+     * @param {string} entityId
+     * @param {string} filepath
+     * @param {(string | Buffer)} file
+     * @param {optionalParameters} [optional]
+     * @returns {Promise<string>}
+     *
+     * @memberOf MultipartUploader
+     */
     public async UploadFile(
         entityId: string,
         filepath: string,
@@ -264,7 +335,6 @@ export class MultipartUploader extends MindConnectBase {
 
         const RETRIES = optional.retry || 1;
         const logFunction = optional.logFunction;
-        logFunction && logFunction();
 
         optional.ifmatch && ((fileInfo as any)["If-Match"] = optional.ifmatch);
 
@@ -284,7 +354,7 @@ export class MultipartUploader extends MindConnectBase {
                         mode: "start",
                         ...fileInfo
                     }),
-                undefined,
+                300,
                 logFunction
             ));
 
@@ -297,6 +367,7 @@ export class MultipartUploader extends MindConnectBase {
                     } else {
                         if (current.byteLength > 0) {
                             const currentBuffer = Buffer.from(current);
+
                             promises.push(() =>
                                 retry(
                                     RETRIES,
@@ -306,7 +377,7 @@ export class MultipartUploader extends MindConnectBase {
                                             chunks: ++chunks,
                                             buffer: currentBuffer
                                         }),
-                                    undefined,
+                                    300,
                                     logFunction
                                 )
                             );
@@ -317,6 +388,7 @@ export class MultipartUploader extends MindConnectBase {
                 })
                 .on("end", () => {
                     const currentBuffer = Buffer.from(current);
+
                     promises.push(() =>
                         retry(
                             RETRIES,
@@ -326,7 +398,7 @@ export class MultipartUploader extends MindConnectBase {
                                     chunks: ++chunks,
                                     buffer: currentBuffer
                                 }),
-                            undefined,
+                            300,
                             logFunction
                         )
                     );
@@ -339,7 +411,7 @@ export class MultipartUploader extends MindConnectBase {
                         const lastPromise = promises.pop();
 
                         // * the chunks before last can be uploaded in paralell to mindsphere
-                        const maxParalellUploads = (optional && optional.paralelUploads) || 25;
+                        const maxParalellUploads = (optional && optional.paralelUploads) || 3;
                         const splitedPromises = _.chunk(promises, maxParalellUploads);
 
                         for (const partPromises of splitedPromises) {
@@ -351,10 +423,12 @@ export class MultipartUploader extends MindConnectBase {
                             await Promise.all(uploadParts);
                         }
                         // * for non-multipart-upload this is the only promise which is ever resolved
-                        await retry(RETRIES, () => lastPromise(), undefined, logFunction);
+                        // ! don't retry as this is already a retry operation! (from uploadchunk push)
+
+                        await lastPromise();
                         resolve(hash.read().toString("hex"));
                     } catch (err) {
-                        reject(new Error("upload failed" + err));
+                        reject(new Error("upload failed: " + err));
                     }
                 });
         });

@@ -97,8 +97,7 @@ export default (program: CommanderStatic) => {
                     await agent.UploadFile(assetid, path.basename(uploadFile), uploadFile, {
                         description: description,
                         chunk: chunked,
-                        retry: options.retry,
-                        logFunction: retrylog("UploadFile")
+                        retry: options.retry
                     });
 
                     log(`Your file ${chalk.cyanBright(uploadFile)} was succesfully uploaded.`);
