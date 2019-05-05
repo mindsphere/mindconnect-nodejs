@@ -191,11 +191,11 @@ export const retry = async (n: number, func: Function, timoutinMilliseconds: num
     throw error;
 };
 
-export const retrylog = function(operation: string) {
+export const retrylog = function(operation: string, c: Function = chalk.cyanBright) {
     let x = 0;
     return () => {
         if (x > 0) {
-            console.log(`Retry no ${chalk.cyanBright("" + x)} for ${chalk.cyanBright(operation)} operation.`);
+            console.log(`Retry no ${c("" + x)} for ${c(operation)} operation.`);
         }
         x++;
     };

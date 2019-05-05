@@ -13,6 +13,8 @@ export class AssetManagementClient extends SdkClient {
     ): Promise<AssetManagementModels.AssetTypeResource> {
         const result = await this.HttpAction({
             verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/assettypes/${typeId}?exploded=${exploded}`,
             additionalHeaders: { "If-Match": ifNoneMatch }
         });
@@ -23,6 +25,8 @@ export class AssetManagementClient extends SdkClient {
         checkAssetId(assetId);
         const result = await this.HttpAction({
             verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/assets/${assetId}`,
             message: "GetAsset"
         });
@@ -33,6 +37,8 @@ export class AssetManagementClient extends SdkClient {
         checkAssetId(assetId);
         const result = await this.HttpAction({
             verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/assets/${assetId}/aspects`,
             message: "GetAspects"
         });
@@ -43,6 +49,8 @@ export class AssetManagementClient extends SdkClient {
         checkAssetId(assetId);
         await this.HttpAction({
             verb: "PUT",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/assets/${assetId}`,
             body: asset,
             message: "PutAsset",
@@ -56,6 +64,8 @@ export class AssetManagementClient extends SdkClient {
     ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
         const result = await this.HttpAction({
             verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/assets`,
             body: asset,
             message: "PostAsset"
@@ -66,6 +76,8 @@ export class AssetManagementClient extends SdkClient {
     public async GetRootAsset(): Promise<AssetManagementModels.RootAssetResource> {
         const result = await this.HttpAction({
             verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/assets/root`,
             message: "PostAsset"
         });

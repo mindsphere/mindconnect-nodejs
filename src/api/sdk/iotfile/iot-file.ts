@@ -12,6 +12,8 @@ export class IotFileClient extends SdkClient {
         checkAssetId(entityid);
         return (await (this.HttpAction({
             verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/files/${entityid}`,
             additionalHeaders: optional,
             message: "SearchFiles"
@@ -19,19 +21,21 @@ export class IotFileClient extends SdkClient {
     }
 
     public async PutFile(
-        entityid: string,
+        entityId: string,
         filepath: string,
         file: string | Buffer,
         optional?: { part?: number; "If-Match"?: number; timestamp?: Date; description?: string; type?: string }
     ): Promise<Headers> {
-        checkAssetId(entityid);
+        checkAssetId(entityId);
 
         const myBuffer = typeof file === "string" ? fs.readFileSync(file) : (file as Buffer);
         optional = optional || {};
 
         return (await this.HttpAction({
             verb: "PUT",
-            baseUrl: `${this._baseUrl}/files/${entityid}/${filepath}`,
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/files/${entityId}/${filepath}`,
             body: myBuffer,
             additionalHeaders: { ...optional },
             octetStream: true,

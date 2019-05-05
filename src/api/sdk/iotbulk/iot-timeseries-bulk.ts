@@ -27,6 +27,8 @@ export class TimeSeriesBulkClient extends SdkClient {
     public async PostImportJob(job: TimeSeriesBulkModels.BulkImportInput): Promise<TimeSeriesBulkModels.JobStatus> {
         const result = (await this.HttpAction({
             verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/importJobs`,
             body: job,
             message: "PostImportJob"
@@ -47,6 +49,8 @@ export class TimeSeriesBulkClient extends SdkClient {
     public async GetJobStatus(jobId: string): Promise<TimeSeriesBulkModels.JobStatus> {
         const result = (await this.HttpAction({
             verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/importJobs/${jobId}`,
             message: "GetJobStatus"
         })) as any;
@@ -93,6 +97,8 @@ export class TimeSeriesBulkClient extends SdkClient {
         if (qs !== "") qs = `&${qs}`;
         return (await this.HttpAction({
             verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/timeseries/${entity}/${propertysetname}?${fromto}${qs}`,
             message: "GetTimeSeries"
         })) as TimeSeriesBulkModels.Timeseries[];
