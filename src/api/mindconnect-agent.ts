@@ -361,6 +361,20 @@ export class MindConnectAgent extends AgentAuth {
         return <boolean>result;
     }
 
+    /**
+     * Upload file to MindSphere IOTFileService
+     *
+     * @param {string} entityId - asset id or agent.ClientId() for agent
+     * @param {string} filepath - mindsphere file path
+     * @param {(string | Buffer)} file - local path or Buffer
+     * @param {optionalParameters} [optional] - optional parameters: enable chunking, define retries etc.
+     * @returns {Promise<string>} - md5 hash of the file
+     *
+     * @memberOf MindConnectAgent
+     *
+     * @example await agent.UploadFile (agent.GetClientId(), "some/mindsphere/path/file.txt", "file.txt");
+     * @example await agent.UploadFile (agent.GetClientId(), "some/other/path/10MB.bin", "bigFile.bin",{chunked:true, retry:5});
+     */
     public async UploadFile(
         entityId: string,
         filepath: string,
@@ -383,7 +397,7 @@ export class MindConnectAgent extends AgentAuth {
      * @param {boolean} [chunk=true]  if this is set to false the system will only upload smaller files
      * @param {string} [entityId] entityid can be used to define the asset for upload, otherwise the agent is used.
      * @param {number} [chunkSize=8 * 1024 * 1024]  - at the moment 8MB as per restriction of mindgate
-     * @param {number} [maxSockets=3] - maxSockets for http Upload -
+     * @param {number} [maxSockets=3] - maxSockets for http Upload - number of parallel multipart uploads
      * @returns {Promise<string>} md5 hash of the uploaded file
      *
      * @memberOf MindConnectAgent
@@ -399,7 +413,6 @@ export class MindConnectAgent extends AgentAuth {
         filePath?: string
     ): Promise<string> {
         const clientId = entityId || this.ClientId();
-
         const filepath = filePath || (file instanceof Buffer ? "no-filepath-for-buffer" : path.basename(file));
 
         return await this.UploadFile(clientId, filepath, file, {

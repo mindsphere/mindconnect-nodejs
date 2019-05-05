@@ -298,15 +298,16 @@ export class MultipartUploader extends MindConnectBase {
     }
 
     /**
-     * The new upload file operation.
+     * Upload file to MindSphere IOTFileService
      *
-     * @param {string} entityId
-     * @param {string} filepath
-     * @param {(string | Buffer)} file
-     * @param {optionalParameters} [optional]
-     * @returns {Promise<string>}
+     * @param {string} entityId - asset id or agent.ClientId() for agent
+     * @param {string} filepath - mindsphere file path
+     * @param {(string | Buffer)} file - local path or Buffer
+     * @param {optionalParameters} [optional] - optional parameters: enable chunking, define retries etc.
+     * @returns {Promise<string>} - md5 hash of the file
      *
      * @memberOf MultipartUploader
+     *
      */
     public async UploadFile(
         entityId: string,
