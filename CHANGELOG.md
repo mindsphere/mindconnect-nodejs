@@ -8,10 +8,27 @@
 - CLI Command: prepare-bulk - creates a template directory for timeseries (bulk) upload
 - CLI Command: run-bulk - runs the timeseries (bulk) upload jobs
 - CLI Command: check-bulk - checks the progress of the upload jobs
+- mindconnect-agent: created new UploadFile method capable of running the multipart upload (#4)
+- mindconnect-agent: the UploadFile can now take a buffer additionally to file (#23)
+- mindconnect-agent: the MindSphere path name can be configured (#23)
+- mindconnect-agent: deprecated  (#23)
+- SDK: started a SDK for the new commands which require additional mindsphere APIs 
+- SDK: the SDK will be extracted to a separate package in the version major version (4.0.0)
+- CLI: the CLI will be extracted to a separate package in the future major version (4.0.0)
 
 ## Bugfixes and improvements 3.5.0
 
 - CLI Command: upload-timeseries - improved help and error messages during parsing #20
+
+## Contributions <3
+
+- Thanks to ahmedi92 and goko for the contributions on this version. You rock!
+
+## Announcements
+
+- SDK: the SDK will be extracted to a separate package in the version major version (4.0.0)
+- CLI: the CLI will be extracted to a separate package in the future major version (4.0.0)
+- We <3 contributions! We are working on the legal framework to let outside (non-Siemens collabarators) contribute. Stay tuned :)
 
 ## 3.4.0 - (Malachite Vienna) - April 2019
 
