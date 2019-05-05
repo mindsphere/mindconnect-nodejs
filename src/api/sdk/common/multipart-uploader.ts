@@ -1,6 +1,7 @@
 import * as crypto from "crypto";
 import * as debug from "debug";
 import * as fs from "fs";
+import * as http from "http";
 import * as path from "path";
 import * as stream from "stream";
 import { MindConnectAgent } from "../../..";
@@ -60,6 +61,13 @@ export type optionalParameters = {
      * @type {(Function | undefined)}
      */
     logFunction?: Function | undefined;
+
+    /**
+     * verboseLog for CLI
+     *
+     * @type {(Function | undefined)}
+     */
+    verboseFunction?: Function | undefined;
 
     /**
      * enables multipart/upload
@@ -335,7 +343,9 @@ export class MultipartUploader extends MindConnectBase {
         };
 
         const RETRIES = optional.retry || 1;
+
         const logFunction = optional.logFunction;
+        const verboseFunction = optional.verboseFunction;
 
         optional.ifmatch && ((fileInfo as any)["If-Match"] = optional.ifmatch);
 
@@ -345,6 +355,16 @@ export class MultipartUploader extends MindConnectBase {
 
         let current = new Uint8Array(0);
         let chunks = 0;
+
+        if (verboseFunction) verboseFunction(`file upload started for ${file}`);
+        const multipartLog = logFunction ? logFunction("multipart") : undefined;
+
+        if (verboseFunction)
+            verboseFunction(
+                totalChunks > 1
+                    ? `starting multipart upload: There are: ${totalChunks} total parts.`
+                    : `the file is small enough for normal upload`
+            );
 
         optional.chunk &&
             totalChunks > 1 &&
@@ -356,7 +376,7 @@ export class MultipartUploader extends MindConnectBase {
                         ...fileInfo
                     }),
                 300,
-                logFunction
+                multipartLog
             ));
 
         return new Promise((resolve, reject) => {
@@ -369,6 +389,8 @@ export class MultipartUploader extends MindConnectBase {
                         if (current.byteLength > 0) {
                             const currentBuffer = Buffer.from(current);
 
+                            const uploadLog = logFunction ? logFunction(`part upload (${chunks} part)`) : undefined;
+
                             promises.push(() =>
                                 retry(
                                     RETRIES,
@@ -379,7 +401,7 @@ export class MultipartUploader extends MindConnectBase {
                                             buffer: currentBuffer
                                         }),
                                     300,
-                                    logFunction
+                                    uploadLog
                                 )
                             );
                         }
@@ -389,7 +411,7 @@ export class MultipartUploader extends MindConnectBase {
                 })
                 .on("end", () => {
                     const currentBuffer = Buffer.from(current);
-
+                    const uploadLog = logFunction ? logFunction(`part upload (last part)`) : undefined;
                     promises.push(() =>
                         retry(
                             RETRIES,
@@ -400,7 +422,7 @@ export class MultipartUploader extends MindConnectBase {
                                     buffer: currentBuffer
                                 }),
                             300,
-                            logFunction
+                            uploadLog
                         )
                     );
                 })
@@ -413,8 +435,10 @@ export class MultipartUploader extends MindConnectBase {
 
                         // * the chunks before last can be uploaded in paralell to mindsphere
                         const maxParalellUploads = (optional && optional.paralelUploads) || 3;
+                        http.globalAgent.maxSockets = 50;
                         const splitedPromises = _.chunk(promises, maxParalellUploads);
 
+                        if (verboseFunction) verboseFunction(`max parallel uploads ${maxParalellUploads}`);
                         for (const partPromises of splitedPromises) {
                             const uploadParts: any = [];
                             partPromises.forEach(async f => {
@@ -422,12 +446,20 @@ export class MultipartUploader extends MindConnectBase {
                             });
 
                             await Promise.all(uploadParts);
+                            if (verboseFunction) verboseFunction(`uploaded ${uploadParts.length} part(s)`);
                         }
                         // * for non-multipart-upload this is the only promise which is ever resolved
                         // ! don't retry as this is already a retry operation! (from uploadchunk push)
 
+                        if (verboseFunction)
+                            verboseFunction(
+                                totalChunks > 1 ? `uploading last chunk of ${totalChunks} parts.` : `uploading file`
+                            );
                         await lastPromise();
-                        resolve(hash.read().toString("hex"));
+
+                        const md5 = hash.read().toString("hex");
+                        if (verboseFunction) verboseFunction(`uploaded file. md5 hash: ${md5}`);
+                        resolve(md5);
                     } catch (err) {
                         reject(new Error("upload failed: " + err));
                     }
