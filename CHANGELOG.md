@@ -13,14 +13,14 @@
 - mindconnect-agent: the MindSphere path name can be configured (#23)
 - mindconnect-agent: deprecated  (#23)
 - SDK: started a SDK for the new commands which require additional mindsphere APIs 
-- SDK: the SDK will be extracted to a separate package in the version major version (4.0.0)
+- SDK: the SDK will be extracted to a separate package in the future major version (4.0.0)
 - CLI: the CLI will be extracted to a separate package in the future major version (4.0.0)
 
 ## Bugfixes and improvements 3.5.0
 
 - CLI Command: upload-timeseries - improved help and error messages during parsing #20
 
-## Contributions <3
+## Contributions :heart: <3
 
 - Thanks to ahmedi92 and goko for the contributions on this version. You rock!
 

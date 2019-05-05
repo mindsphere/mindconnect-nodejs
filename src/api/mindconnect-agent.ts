@@ -11,7 +11,6 @@ import { bulkDataTemplate, dataTemplate } from "./mindconnect-template";
 import { dataValidator, eventValidator } from "./mindconnect-validators";
 import { MultipartUploader, optionalParameters } from "./sdk/common/multipart-uploader";
 import _ = require("lodash");
-const mime = require("mime-types");
 const log = debug("mindconnect-agent");
 /**
  * MindConnect Agent implements the V3 of the Mindsphere API.
