@@ -10,7 +10,7 @@ import { DataPointValue, MindConnectAgent, MindsphereStandardEvent, retry, TimeS
     };
     const RETRYTIMES = 5; // retry the operation before giving up and throwing exception
 
-    for (let index = 0; index < 1000000; index++) {
+    for (let index = 0; index < 5; index++) {
         try {
             log(`Iteration : ${index}`);
             // onboarding the agent
@@ -67,9 +67,14 @@ import { DataPointValue, MindConnectAgent, MindsphereStandardEvent, retry, TimeS
             log("event posted");
             await sleep(1000);
 
-            // upload file, as this can be multipart operation the UploadFile method does its' own retrying
+            // upload file
+            // the upload-file can be a multipart operation and therefore can be configured to
+            // retry the upload of the chunks instead the upload of the whole file.
+            // if you don't specify the type , the mimetype is automatically determined by the library
             await agent.UploadFile(agent.ClientId(), "custom/mindsphere/path/package.json", "package.json", {
-                retry: RETRYTIMES
+                retry: RETRYTIMES,
+                description: "File uploaded with MindConnect-NodeJS Library",
+                chunk: true // the chunk parameter activates multipart upload
             });
 
             log("file uploaded");
