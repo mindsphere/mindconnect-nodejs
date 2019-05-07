@@ -213,6 +213,9 @@ export const throwError = (error: string) => {
 
 export const toQueryString = (qs: any) => {
     return Object.keys(qs || {})
+        .filter(key => {
+            return qs[key] !== undefined;
+        })
         .map(key => {
             const value = qs[key] instanceof Date ? qs[key].toISOString() : qs[key];
             return encodeURIComponent(key) + "=" + encodeURIComponent(value);

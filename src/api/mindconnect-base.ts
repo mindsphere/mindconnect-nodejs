@@ -108,11 +108,16 @@ export abstract class MindConnectBase {
         additionalHeaders = additionalHeaders || {};
         const apiheaders = octetStream ? this._octetStreamHeaders : this._apiHeaders;
 
-        const headers: any = {
+        let headers: any = {
             ...apiheaders,
-            Authorization: `Bearer ${authorization}`,
-            ...additionalHeaders
+            Authorization: `Bearer ${authorization}`
         };
+
+        if (verb === "GET" || verb === "DELETE") {
+            delete headers["Content-Type"];
+        }
+
+        headers = { ...headers, ...additionalHeaders };
 
         const url = `${gateway}${baseUrl}`;
         log(`${message} Headers ${JSON.stringify(headers)} Url ${url}`);
