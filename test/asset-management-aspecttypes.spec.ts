@@ -2,6 +2,7 @@ import * as chai from "chai";
 import "url-search-params-polyfill";
 import { AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
+import { sleep } from "./test-utils";
 chai.should();
 
 describe("[SDK] AssetManagementClient.AspectTypes", () => {
@@ -41,6 +42,7 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         await am.PutAspectType(`${tenant}.UnitTestEngineC`, testAspectType);
     });
     after(async () => {
+        await sleep(2000);
         const aspectTypes = (await am.GetAspectTypes({
             filter: JSON.stringify({
                 and: {
