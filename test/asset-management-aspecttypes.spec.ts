@@ -62,18 +62,18 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         }
     });
 
-    it.only("SDK should not be undefined", async () => {
+    it("SDK should not be undefined", async () => {
         sdk.should.not.be.undefined;
     });
 
-    it.only("standard properties shoud be defined", async () => {
+    it("standard properties shoud be defined", async () => {
         am.should.not.be.undefined;
         am.GetGateway().should.be.equal(auth.gateway);
         (await am.GetToken()).length.should.be.greaterThan(200);
         (await am.GetServiceToken()).length.should.be.greaterThan(200);
     });
 
-    it.only("should GET aspecttypes", async () => {
+    it("should GET aspecttypes", async () => {
         am.should.not.be.undefined;
         const aspectTypes = await am.GetAspectTypes();
         aspectTypes.should.not.be.undefined;
@@ -83,7 +83,7 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         (aspectTypes as any)._embedded.aspectTypes.length.should.be.equal(10);
     });
 
-    it.only("should GET aspecttypes with filter", async () => {
+    it("should GET aspecttypes with filter", async () => {
         am.should.not.be.undefined;
         const aspectTypes = await am.GetAspectTypes({
             filter: JSON.stringify({
@@ -99,7 +99,7 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         (aspectTypes as any)._embedded.aspectTypes.length.should.be.equal(10);
     });
 
-    it.only("should GET aspecttypes with sorting", async () => {
+    it("should GET aspecttypes with sorting", async () => {
         am.should.not.be.undefined;
         const aspectTypes = await am.GetAspectTypes({
             filter: JSON.stringify({
@@ -123,14 +123,14 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         (aspectTypes as any)._embedded.aspectTypes.length.should.be.equal(3);
     });
 
-    it.only("should GET specific asset type ", async () => {
+    it("should GET specific aspect type ", async () => {
         am.should.not.be.undefined;
         const aspectType = await am.GetAspectType(`${tenant}.UnitTestEngineA`);
 
         aspectType.should.not.be.null;
     });
 
-    it.only("should PUT specific asset type ", async () => {
+    it("should PUT specific aspect type ", async () => {
         am.should.not.be.undefined;
         testAspectType.name = `UnitTestEngineD`;
         const aspectType = await am.PutAspectType(`${tenant}.UnitTestEngineD`, testAspectType);
@@ -139,7 +139,7 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         await am.DeleteAspectType(`${tenant}.UnitTestEngineD`, { ifMatch: aspectType.etag as number });
     });
 
-    it.only("should PATCH specific asset type ", async () => {
+    it("should PATCH specific aspect type ", async () => {
         am.should.not.be.undefined;
         testAspectType.name = `UnitTestEngineD`;
         const aspectType = await am.PutAspectType(`${tenant}.UnitTestEngineD`, testAspectType);
@@ -156,7 +156,7 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         await am.DeleteAspectType(`${tenant}.UnitTestEngineD`, { ifMatch: patchedAspectType.etag as number });
     });
 
-    it.only("should DELETE specific asset type ", async () => {
+    it("should DELETE specific aspect type ", async () => {
         am.should.not.be.undefined;
         testAspectType.name = `UnitTestEngineE`;
         const aspectType = await am.PutAspectType(`${tenant}.UnitTestEngineE`, testAspectType);

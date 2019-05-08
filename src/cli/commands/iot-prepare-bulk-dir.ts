@@ -115,7 +115,7 @@ async function getAssetAndAspects(auth: authJson, options: any) {
         }
     }
     if (options.typeid) {
-        const assetType = await assetMgmt.GetAssetType(options.typeid);
+        const assetType = await assetMgmt.GetAssetType(options.typeid, { exploded: true });
         if (assetType.aspects) {
             aspects = assetType.aspects.filter(x => {
                 return x.aspectType && x.aspectType.category === "dynamic";
