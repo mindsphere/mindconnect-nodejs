@@ -320,8 +320,7 @@ export class AssetManagementClient extends SdkClient {
      *
      * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
      * @param {{ ifMatch: number }} params
-     * @param {{ ifMatch: number }} params.ifMatch Last known version to facilitate optimistic locking, required for deleting
-     * @returns {Promise<Object>} - return empty object
+     * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking, required for deleting
      *
      * @example await am.DeleteAssetType("mdsp.SimulationEnigine", {ifMatch:0})
      * @memberOf AssetManagementClient
@@ -339,12 +338,12 @@ export class AssetManagementClient extends SdkClient {
     }
 
     /**
-     * Read and asset type
+     * Read an asset type
      * ! important: the default setting for inherited properties is false
      * ! important: @see [params.exploded]
      *
      * @param {string} id
-     * @param {{ ifNoneMatch?: number; exploded?: boolean }} [params]
+     * @param {{ ifNoneMatch?: string; exploded?: boolean }} [params]
      * @returns {Promise<AssetManagementModels.AssetTypeResource>}
      *
      * @example await am.GetAssetType("mdsp.SimulationEngine")
@@ -352,7 +351,7 @@ export class AssetManagementClient extends SdkClient {
      */
     public async GetAssetType(
         id: string,
-        params?: { ifNoneMatch?: number; exploded?: boolean }
+        params?: { ifNoneMatch?: string; exploded?: boolean }
     ): Promise<AssetManagementModels.AssetTypeResource> {
         const parameters = params || {};
         const { ifNoneMatch, exploded } = parameters;
@@ -362,9 +361,66 @@ export class AssetManagementClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/assettypes/${id}?exploded=${ex}`,
-            additionalHeaders: { "If-Match": ifNoneMatch }
+            additionalHeaders: { "If-None-Match": ifNoneMatch }
         });
         return result as AssetManagementModels.AssetTypeResource;
+    }
+
+    /**
+     * Add a new file assignment to a given asset type. All asset which extends these types will have its file by default.
+     *
+     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {string} key Keyword for the file to be assigned to an asset or asset type.
+     * @param {AssetManagementModels.KeyedFileAssignment} assignment Data for file assignment
+     * @param {{ ifMatch: number }} params
+     * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
+     * @returns {Promise<AssetManagementModels.AssetTypeResource>}
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async PutFileAssignment(
+        id: string,
+        key: string,
+        assignment: AssetManagementModels.KeyedFileAssignment,
+        params: { ifMatch: number }
+    ): Promise<AssetManagementModels.AssetTypeResource> {
+        const parameters = params || {};
+        const { ifMatch } = parameters;
+        const result = await this.HttpAction({
+            verb: "PUT",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/assettypes/${id}/fileAssignments/${key}`,
+            body: assignment,
+            additionalHeaders: { "If-Match": ifMatch }
+        });
+
+        return result as AssetManagementModels.AssetTypeResource;
+    }
+
+    /**
+     * Deletes a file assignment from an asset type.
+     * If the type’s parent has defined a file with the same key, the key will be displayed with the inherited value.
+     *
+     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {string} key Keyword for the file to be assigned to an asset or asset type.
+     * @param {AssetManagementModels.KeyedFileAssignment} assignment Data for file assignment
+     * @param {{ ifMatch: number }} params
+     * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async DeleteFileAssignment(id: string, key: string, params: { ifMatch: number }) {
+        const parameters = params || {};
+        const { ifMatch } = parameters;
+        await this.HttpAction({
+            verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/assettypes/${id}/fileAssignments/${key}`,
+            additionalHeaders: { "If-Match": ifMatch },
+            noResponse: true
+        });
     }
 
     public async GetAsset(assetId: string): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
