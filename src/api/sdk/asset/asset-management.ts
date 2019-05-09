@@ -870,4 +870,253 @@ export class AssetManagementClient extends SdkClient {
 
         return result as AssetManagementModels.AssetResourceWithHierarchyPath;
     }
+
+    /**
+     * * Asset Files
+     *
+     * Upload files to be used in Asset Management.
+     *
+     * @param {Buffer} file
+     * @param {string} name
+     * @param {{
+     *             scope?: AssetManagementModels.FileMetadataResource.ScopeEnum;
+     *             description?: string;
+     *             mimeType?: string;
+     *         }} [params]
+     * @returns {Promise<AssetManagementModels.FileMetadataResource>}
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async PostFile(
+        file: Buffer,
+        name: string,
+        params?: {
+            scope?: AssetManagementModels.FileMetadataResource.ScopeEnum;
+            description?: string;
+            mimeType?: string;
+        }
+    ): Promise<AssetManagementModels.FileMetadataResource> {
+        const parameters = params || {};
+        const { scope, description, mimeType } = parameters;
+
+        const template = `----mindsphere\r\nContent-Disposition: form-data; name="file"; filename="${name}"\r\nContent-Type: ${mimeType ||
+            "application/octet-stream"}\r\n\r\n${file}\r\n----mindsphere\r\nContent-Disposition: form-data; name="name"\r\n\r\n${name}\r\n----mindsphere\r\nContent-Disposition: form-data; name="description"\r\n\r\n${description ||
+            "uploaded file"}\r\n\----mindsphere\r\nContent-Disposition: form-data; name="scope"\r\n\r\n${scope ||
+            "PRIVATE"}\r\n----mindsphere--`;
+
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/files`,
+            body: template,
+            multiPartFormData: true
+        });
+
+        return result as AssetManagementModels.FileMetadataResource;
+    }
+
+    /**
+     * * Asset files
+     *
+     * Get metadata of uploaded files.
+     * Returns all visible file metadata for the tenant. Will NOT return the files.
+     *
+     * @param {{
+     *         page?: number;
+     *         size?: number;
+     *         sort?: string;
+     *         filter?: string;
+     *         ifNoneMatch?: number;
+     *     }} [params]
+     * * @param {{
+     *             page?: number;
+     *             size?: number;
+     *             sort?: string;
+     *             filter?: string;
+     *             ifNoneMatch?: number;
+     *         }} [params]
+     * @param [params.page] Specifies the requested page index
+     * @param [params.size] Specifies the number of elements in a page
+     * @param [params.sort] Specifies the ordering of returned elements
+     * @param [params.filter] Specifies the additional filtering criteria
+     * @param [params.ifnonematch] ETag hash of previous request to allow caching
+
+     * @returns {Promise<AssetManagementModels.FileMetadataListResource>}
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async GetFiles(params?: {
+        page?: number;
+        size?: number;
+        sort?: string;
+        filter?: string;
+        ifNoneMatch?: number;
+    }): Promise<AssetManagementModels.FileMetadataListResource> {
+        const parameters = params || {};
+        const { page, size, sort, filter, ifNoneMatch } = parameters;
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/files?${toQueryString({ page, size, sort, filter })}`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch }
+        });
+
+        return result as AssetManagementModels.FileMetadataListResource;
+    }
+
+    /**
+     * * Asset Files
+     *
+     * Get metadata of uploaded files.
+     *
+     * @param {string} fileId
+     * @param {{
+     *             ifNoneMatch?: number;
+     *         }} [params]
+     * @returns {Promise<AssetManagementModels.FileMetadataResource>}
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async GetFile(
+        fileId: string,
+        params?: {
+            ifNoneMatch?: number;
+        }
+    ): Promise<AssetManagementModels.FileMetadataResource> {
+        const parameters = params || {};
+        const { ifNoneMatch } = parameters;
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/files/${fileId}`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch }
+        });
+        return result as AssetManagementModels.FileMetadataResource;
+    }
+
+    /**
+     * Returns a file by its id
+     *
+     * @param {string} fileId
+     * @param {{
+     *             ifNoneMatch?: number;
+     *         }} [params]
+     * @returns {Promise<Response>} Response Context Type is base64
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async DownloadFile(
+        fileId: string,
+        params?: {
+            ifNoneMatch?: number;
+        }
+    ): Promise<Response> {
+        const parameters = params || {};
+        const { ifNoneMatch } = parameters;
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/files/${fileId}/file`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch },
+            rawResponse: true
+        });
+        return result as Response;
+    }
+
+    /**
+     * * Asset Files
+     *
+     * Update a previously uploaded file.
+     * Max file size is 5 MB.
+     *
+     * @param {string} fileid
+     * @param {Buffer} file
+     * @param {string} name
+     * @param {{
+     *             scope: AssetManagementModels.FileMetadataResource.ScopeEnum;
+     *             description?: string;
+     *             mimeType?: string;
+     *             ifMatch: number;
+     *         }} params
+     * @returns {Promise<AssetManagementModels.FileMetadataResource>}
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async PutFile(
+        fileid: string,
+        file: Buffer,
+        name: string,
+        params: {
+            scope: AssetManagementModels.FileMetadataResource.ScopeEnum;
+            description?: string;
+            mimeType?: string;
+            ifMatch: number;
+        }
+    ): Promise<AssetManagementModels.FileMetadataResource> {
+        const parameters = params || {};
+        const { scope, description, mimeType, ifMatch } = parameters;
+
+        const template = `----mindsphere\r\nContent-Disposition: form-data; name="file"; filename="${name}"\r\nContent-Type: ${mimeType ||
+            "application/octet-stream"}\r\n\r\n${file}\r\n----mindsphere\r\nContent-Disposition: form-data; name="name"\r\n\r\n${name}\r\n----mindsphere\r\nContent-Disposition: form-data; name="description"\r\n\r\n${description ||
+            "uploaded file"}\r\n\----mindsphere\r\nContent-Disposition: form-data; name="scope"\r\n\r\n${scope ||
+            "PRIVATE"}\r\n----mindsphere--`;
+
+        const result = await this.HttpAction({
+            verb: "PUT",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/files/${fileid}`,
+            body: template,
+            multiPartFormData: true,
+            additionalHeaders: { "If-Match": ifMatch }
+        });
+
+        return result as AssetManagementModels.FileMetadataResource;
+    }
+
+    /**
+     * * Asset Files
+     *
+     * Delete a file
+     * Deletion is blocked if there are any file assignment with the given fileId.
+     *
+     * @param {string} fileId
+     * @param {{ ifMatch: number }} params
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async DeleteFile(fileId: string, params: { ifMatch: number }) {
+        const parameters = params || {};
+        const { ifMatch } = parameters;
+        await this.HttpAction({
+            verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/files/${fileId}`,
+            additionalHeaders: { "If-Match": ifMatch },
+            noResponse: true
+        });
+    }
+
+    /**
+     * List all links for available resources
+     *
+     * @returns {Promise<AssetManagementModels.BillboardResource>}
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async GetBillboard(): Promise<AssetManagementModels.BillboardResource> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/`
+        });
+
+        return result as AssetManagementModels.BillboardResource;
+    }
 }

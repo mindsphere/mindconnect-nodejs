@@ -55,6 +55,11 @@ export abstract class MindConnectBase {
         "Content-Type": "multipart/mixed; boundary=mindspheremessage"
     };
 
+    protected _multipartFormData = {
+        ...this._headers,
+        "Content-Type": "multipart/form-data; boundary=--mindsphere"
+    };
+
     /**
      * Http headers used for onboarding message.
      *
@@ -90,8 +95,10 @@ export abstract class MindConnectBase {
         body,
         message,
         octetStream,
+        multiPartFormData,
         additionalHeaders,
         noResponse,
+        rawResponse,
         returnHeaders
     }: {
         verb: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
@@ -101,12 +108,15 @@ export abstract class MindConnectBase {
         body?: Object;
         message?: string;
         octetStream?: boolean;
+        multiPartFormData?: boolean;
         additionalHeaders?: Object;
         noResponse?: boolean;
+        rawResponse?: boolean;
         returnHeaders?: boolean;
     }): Promise<Object> {
         additionalHeaders = additionalHeaders || {};
-        const apiheaders = octetStream ? this._octetStreamHeaders : this._apiHeaders;
+        let apiheaders = octetStream ? this._octetStreamHeaders : this._apiHeaders;
+        apiheaders = multiPartFormData ? this._multipartFormData : apiheaders;
 
         let headers: any = {
             ...apiheaders,
@@ -124,13 +134,15 @@ export abstract class MindConnectBase {
         try {
             const request: any = { method: verb, headers: headers, agent: this._proxyHttpAgent };
             if (verb !== "GET" && verb !== "DELETE") {
-                request.body = octetStream ? body : JSON.stringify(body);
+                request.body = octetStream || multiPartFormData ? body : JSON.stringify(body);
             }
             const response = await fetch(url, request);
 
             !response.ok && throwError(`${response.statusText} ${await response.text()}`);
             (response.status < 200 || response.status > 299) &&
                 throwError(`invalid response ${JSON.stringify(response)}`);
+
+            if (rawResponse) return response;
 
             if (noResponse) {
                 if (returnHeaders) {
