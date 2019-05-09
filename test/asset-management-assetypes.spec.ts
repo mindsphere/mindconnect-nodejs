@@ -36,6 +36,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
     };
 
     before(async () => {
+        await deleteAssetTypes(am, tenant);
         testAssetType.name = "SpaceShipTypeA";
         await am.PutAssetType(`${tenant}.SpaceShipTypeA`, testAssetType);
         testAssetType.name = "SpaceShipTypeB";
@@ -44,25 +45,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
         await am.PutAssetType(`${tenant}.SpaceShipTypeC`, testAssetType);
     });
     after(async () => {
-        await sleep(2000);
-        const assetTypes = (await am.GetAssetTypes({
-            filter: JSON.stringify({
-                and: {
-                    id: {
-                        startsWith: `${tenant}`
-                    },
-                    name: {
-                        startsWith: "SpaceShipType"
-                    }
-                }
-            }),
-            sort: "DESC",
-            page: 0,
-            size: 0
-        })) as any;
-        for (const x of assetTypes._embedded.assetTypes) {
-            await am.DeleteAssetType(x.id, { ifMatch: x.etag });
-        }
+        await deleteAssetTypes(am, tenant);
     });
 
     it("SDK should not be undefined", async () => {
@@ -226,3 +209,27 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
         }
     });
 });
+async function deleteAssetTypes(
+    am: import("c:/git/github/mindconnect-nodejs/src/api/sdk/index").AssetManagementClient,
+    tenant: string
+) {
+    await sleep(2000);
+    const assetTypes = (await am.GetAssetTypes({
+        filter: JSON.stringify({
+            and: {
+                id: {
+                    startsWith: `${tenant}`
+                },
+                name: {
+                    startsWith: "SpaceShipType"
+                }
+            }
+        }),
+        sort: "DESC",
+        page: 0,
+        size: 0
+    })) as any;
+    for (const x of assetTypes._embedded.assetTypes) {
+        await am.DeleteAssetType(x.id, { ifMatch: x.etag });
+    }
+}

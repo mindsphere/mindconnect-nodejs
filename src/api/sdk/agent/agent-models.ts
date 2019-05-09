@@ -1,4 +1,4 @@
-namespace AgentManagementModels {
+export namespace AgentManagementModels {
     /**
      *
      * @export

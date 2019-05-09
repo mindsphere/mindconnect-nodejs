@@ -14,22 +14,11 @@ describe("[SDK] AssetManagementClient.Files", () => {
     const am = sdk.GetAssetManagementClient();
 
     before(async () => {
-        const files = (await am.GetFiles({
-            filter: JSON.stringify({
-                and: {
-                    name: {
-                        endsWith: ".text"
-                    }
-                }
-            }),
-            sort: "DESC",
-            page: 0,
-            size: 0
-        })) as any;
+        await deleteFiles(am);
+    });
 
-        for (const x of files._embedded.files) {
-            await am.DeleteFile(x.id, { ifMatch: x.etag });
-        }
+    after(async () => {
+        await deleteFiles(am);
     });
 
     it("SDK should not be undefined", async () => {
@@ -87,3 +76,20 @@ describe("[SDK] AssetManagementClient.Files", () => {
         billboard.should.not.be.undefined;
     });
 });
+async function deleteFiles(am: import("c:/git/github/mindconnect-nodejs/src/api/sdk/index").AssetManagementClient) {
+    const files = (await am.GetFiles({
+        filter: JSON.stringify({
+            and: {
+                name: {
+                    endsWith: ".text"
+                }
+            }
+        }),
+        sort: "DESC",
+        page: 0,
+        size: 0
+    })) as any;
+    for (const x of files._embedded.files) {
+        await am.DeleteFile(x.id, { ifMatch: x.etag });
+    }
+}

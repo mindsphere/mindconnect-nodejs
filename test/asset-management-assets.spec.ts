@@ -39,6 +39,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
     };
 
     before(async () => {
+        await deleteAssets(am);
         testAsset.parentId = (await am.GetRootAsset()).assetId;
         testAsset.name = "FalconA";
         const result = await am.PostAsset(testAsset);
@@ -49,27 +50,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         await am.PostAsset(testAsset);
     });
     after(async () => {
-        // await sleep(2000);
-
-        const assets = (await am.GetAssets({
-            filter: JSON.stringify({
-                and: {
-                    deleted: null,
-                    name: {
-                        startsWith: "Falcon"
-                    }
-                }
-            }),
-            sort: "DESC",
-            page: 0,
-            size: 0
-        })) as any;
-
-        await sleep(2000);
-
-        for (const x of assets._embedded.assets) {
-            await am.DeleteAsset(x.assetId, { ifMatch: x.etag });
-        }
+        await deleteAssets(am);
     });
 
     it("SDK should not be undefined", async () => {
@@ -238,3 +219,22 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         (patchedAsset as any).location.country.should.not.be.undefined;
     });
 });
+async function deleteAssets(am: import("c:/git/github/mindconnect-nodejs/src/api/sdk/index").AssetManagementClient) {
+    const assets = (await am.GetAssets({
+        filter: JSON.stringify({
+            and: {
+                deleted: null,
+                name: {
+                    startsWith: "Falcon"
+                }
+            }
+        }),
+        sort: "DESC",
+        page: 0,
+        size: 0
+    })) as any;
+    await sleep(2000);
+    for (const x of assets._embedded.assets) {
+        await am.DeleteAsset(x.assetId, { ifMatch: x.etag });
+    }
+}

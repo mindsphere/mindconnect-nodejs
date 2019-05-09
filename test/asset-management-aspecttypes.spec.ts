@@ -34,6 +34,8 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
     };
 
     before(async () => {
+        await sleep(2000);
+        await deleteAspectTypes(am, tenant);
         testAspectType.name = "UnitTestEngineA";
         await am.PutAspectType(`${tenant}.UnitTestEngineA`, testAspectType);
         testAspectType.name = "UnitTestEngineB";
@@ -43,25 +45,7 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
     });
     after(async () => {
         await sleep(2000);
-        const aspectTypes = (await am.GetAspectTypes({
-            filter: JSON.stringify({
-                and: {
-                    id: {
-                        startsWith: `${tenant}`
-                    },
-                    name: {
-                        startsWith: "UnitTestEngine"
-                    }
-                }
-            }),
-            sort: "DESC",
-            page: 0,
-            size: 0
-        })) as any;
-
-        for (const x of aspectTypes._embedded.aspectTypes) {
-            await am.DeleteAspectType(x.id, { ifMatch: x.etag });
-        }
+        await deleteAspectTypes(am, tenant);
     });
 
     it("SDK should not be undefined", async () => {
@@ -165,3 +149,26 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         await am.DeleteAspectType(`${tenant}.UnitTestEngineE`, { ifMatch: aspectType.etag as number });
     });
 });
+async function deleteAspectTypes(
+    am: import("c:/git/github/mindconnect-nodejs/src/api/sdk/index").AssetManagementClient,
+    tenant: string
+) {
+    const aspectTypes = (await am.GetAspectTypes({
+        filter: JSON.stringify({
+            and: {
+                id: {
+                    startsWith: `${tenant}`
+                },
+                name: {
+                    startsWith: "UnitTestEngine"
+                }
+            }
+        }),
+        sort: "DESC",
+        page: 0,
+        size: 0
+    })) as any;
+    for (const x of aspectTypes._embedded.aspectTypes) {
+        await am.DeleteAspectType(x.id, { ifMatch: x.etag });
+    }
+}
