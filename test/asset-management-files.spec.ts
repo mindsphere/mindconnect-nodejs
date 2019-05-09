@@ -82,7 +82,7 @@ describe("[SDK] AssetManagementClient.Files", () => {
         await am.DeleteFile(`${result.id}`, { ifMatch: updatedFile.etag as number });
     });
 
-    it.only("should be able to Get Billboard", async () => {
+    it("should be able to Get Billboard", async () => {
         const billboard = await am.GetBillboard();
         billboard.should.not.be.undefined;
     });
