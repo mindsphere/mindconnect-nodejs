@@ -1,4 +1,5 @@
 import { CredentialAuth } from "../../credential-auth";
+import { AgentManagementClient } from "../agent/agent-management";
 import { AssetManagementClient } from "../asset/asset-management";
 
 export abstract class SdkClient extends CredentialAuth {
@@ -25,6 +26,13 @@ export class MindSphereSdk {
         this._assetManagementClient =
             this._assetManagementClient || new AssetManagementClient(this._gateway, this._basicAuth, this._tenant);
         return this._assetManagementClient;
+    }
+
+    private _agentManagementClient?: AgentManagementClient;
+    public GetAgentManagementClient(): AgentManagementClient {
+        this._agentManagementClient =
+            this._agentManagementClient || new AgentManagementClient(this._gateway, this._basicAuth, this._tenant);
+        return this._agentManagementClient;
     }
 
     public GetTenant() {
