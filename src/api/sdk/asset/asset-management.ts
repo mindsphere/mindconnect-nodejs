@@ -221,7 +221,7 @@ export class AssetManagementClient extends SdkClient {
         size?: number;
         sort?: string;
         filter?: string;
-        ifNoneMatch?: number;
+        ifNoneMatch?: string;
         exploded?: boolean;
     }): Promise<AssetManagementModels.AssetTypeListResource> {
         const parameters = params || {};
@@ -249,7 +249,7 @@ export class AssetManagementClient extends SdkClient {
      * @param {AssetManagementModels.AssetType} assetType
      * @param {{ ifMatch?: number; ifNoneMatch?: string; exploded?: boolean }} [params]
      * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking. Required for modification.
-     * @param {{number}} [params.ifNoneMatch] Set ifNoneMatch header to “*” for ensuring create request
+     * @param {{string}} [params.ifNoneMatch] Set ifNoneMatch header to “*” for ensuring create request
      * @param {{boolean}} [params.exploded] Specifies if the asset type should include all of it’s inherited variables and aspects. Default is false.
      * @returns {Promise<AssetManagementModels.AssetTypeResource>}
      *
@@ -423,16 +423,205 @@ export class AssetManagementClient extends SdkClient {
         });
     }
 
-    public async GetAsset(assetId: string): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
+    /**
+     * * Asset
+     *
+     * List all assets available for the authenticated user.
+     *
+     * @param {{
+     *         page?: number;
+     *         size?: number;
+     *         sort?: string;
+     *         filter?: string;
+     *         ifNoneMatch?: string;
+     *     }} [params]
+     * @param [params.page] Specifies the requested page index
+     * @param [params.size] Specifies the number of elements in a page
+     * @param [params.sort] Specifies the ordering of returned elements
+     * @param [params.filter] Specifies the additional filtering criteria
+     * @param [params.ifnonematch] ETag hash of previous request to allow caching
+
+     * @returns {Promise<AssetManagementModels.AssetListResource>}
+     *
+     * @example await assetManagement.GetAssets();
+     * @example await assetManagement.GetAssetTypes({filter: "typeid eq mdsp.spaceship"});
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async GetAssets(params?: {
+        page?: number;
+        size?: number;
+        sort?: string;
+        filter?: string;
+        ifNoneMatch?: string;
+    }): Promise<AssetManagementModels.AssetListResource> {
+        const parameters = params || {};
+        const { page, size, sort, filter, ifNoneMatch } = parameters;
+
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/assets?${toQueryString({ page, size, sort, filter })}`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch }
+        });
+
+        return result as AssetManagementModels.AssetListResource;
+    }
+
+    /**
+     * * Asset
+     *
+     * Creates a new asset with the provided content. Only instantiable types could be used.
+     *
+     * @param {AssetManagementModels.Asset} asset
+     * @returns {Promise<AssetManagementModels.AssetResourceWithHierarchyPath>}
+     *
+     * @example await assetManagement.PostAsset(myasset);
+     * @memberOf AssetManagementClient
+     */
+    public async PostAsset(
+        asset: AssetManagementModels.Asset
+    ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/assets`,
+            body: asset
+        });
+        return result as AssetManagementModels.AssetResourceWithHierarchyPath;
+    }
+
+    /**
+     * * Asset
+     *
+     * Read a single asset. All static properties of asset are returned.
+     *
+     * @param {string} assetId Unique identifier
+     * @param {{ ifNoneMatch?: string }} [params]
+     * @param {{string}} [params.ifNoneMatch]
+     * @returns {Promise<AssetManagementModels.AssetResourceWithHierarchyPath>}
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async GetAsset(
+        assetId: string,
+        params?: { ifNoneMatch?: string }
+    ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
         checkAssetId(assetId);
+        const parameters = params || {};
+        const { ifNoneMatch } = parameters;
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/assets/${assetId}`,
-            message: "GetAsset"
+            additionalHeaders: { "If-None-Match": ifNoneMatch }
         });
+
         return result as AssetManagementModels.AssetResourceWithHierarchyPath;
+    }
+
+    /**
+     * * Asset
+     *
+     * Updates an asset with the provided content.
+     * Only values can be modified, asset’s structure have to be modified in asset’s type
+     *
+     * @param {string} assetId
+     * @param {AssetManagementModels.AssetUpdate} asset
+     * @param {{ ifMatch: number }} params
+     * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking. Required for modification.
+     * @returns {Promise<boolean>}
+     *
+     * @example await assetManagement.PutAsset (myAsset, {ifMatch: myAsset.etag as number})
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async PutAsset(
+        assetId: string,
+        asset: AssetManagementModels.AssetUpdate,
+        params: { ifMatch: number }
+    ): Promise<boolean> {
+        checkAssetId(assetId);
+        const parameters = params || {};
+        const { ifMatch } = parameters;
+
+        await this.HttpAction({
+            verb: "PUT",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/assets/${assetId}`,
+            body: asset,
+            additionalHeaders: { "If-Match": ifMatch }
+        });
+        return true;
+    }
+
+    /**
+     * * Asset
+     *
+     * Patch an asset with the provided content.
+     * Only values can be modified, asset’s structure have to be modified in asset’s type.
+     * Conforms to RFC 7396 - JSON merge Patch.
+     *
+     * @param {string} assetId
+     * @param {AssetManagementModels.AssetUpdate} asset
+     * @param {{ ifMatch: number }} params
+     * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking. Required for modification.
+     * @returns {Promise<boolean>}
+     *
+     * @example await assetManagement.Patch (myAsset, {ifMatch: myAsset.etag as number})
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async PatchAsset(
+        assetId: string,
+        asset: AssetManagementModels.AssetUpdate,
+        params: { ifMatch: number }
+    ): Promise<boolean> {
+        checkAssetId(assetId);
+        const parameters = params || {};
+        const { ifMatch } = parameters;
+
+        await this.HttpAction({
+            verb: "PATCH",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/assets/${assetId}`,
+            body: asset,
+            additionalHeaders: { "If-Match": ifMatch, "Content-Type": "application/merge-patch+json" }
+        });
+        return true;
+    }
+
+    /**
+     * * Asset
+     *
+     * Deletes the given asset.
+     * After deletion only users with admin role can read it,
+     * but modification is not possible anymore.
+     * It’s not possible to delete an asset if it has children.
+     *
+     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {{ ifMatch: number }} params
+     * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking, required for deleting
+     *
+     * @example await assetManagement.DeleteAsset(id, {ifMatch:0})
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async DeleteAsset(id: string, params: { ifMatch: number }) {
+        checkAssetId(id);
+        await this.HttpAction({
+            verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/assets/${id}`,
+            additionalHeaders: { "If-Match": params.ifMatch },
+            noResponse: true
+        });
     }
 
     public async GetAspects(assetId: string): Promise<AssetManagementModels.AspectListResource> {
@@ -445,34 +634,6 @@ export class AssetManagementClient extends SdkClient {
             message: "GetAspects"
         });
         return result as AssetManagementModels.AspectListResource;
-    }
-
-    public async PutAsset(assetId: string, asset: any): Promise<boolean> {
-        checkAssetId(assetId);
-        await this.HttpAction({
-            verb: "PUT",
-            gateway: this.GetGateway(),
-            authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assets/${assetId}`,
-            body: asset,
-            message: "PutAsset",
-            additionalHeaders: { "If-Match": (<any>asset)["etag"] }
-        });
-        return true;
-    }
-
-    public async PostAsset(
-        asset: AssetManagementModels.Asset
-    ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
-        const result = await this.HttpAction({
-            verb: "POST",
-            gateway: this.GetGateway(),
-            authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assets`,
-            body: asset,
-            message: "PostAsset"
-        });
-        return result as AssetManagementModels.AssetResourceWithHierarchyPath;
     }
 
     public async GetRootAsset(): Promise<AssetManagementModels.RootAssetResource> {

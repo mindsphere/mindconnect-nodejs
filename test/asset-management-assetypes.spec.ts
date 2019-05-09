@@ -197,7 +197,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
         await am.DeleteAssetType(`${tenant}.SpaceShipTypeF`, { ifMatch: assetType.etag as number });
     });
 
-    it.only("should throw error on Put File assignment ", async () => {
+    it("should throw error on Put File assignment ", async () => {
         am.should.not.be.undefined;
         const assetType = await am.GetAssetType(`${tenant}.SpaceShipTypeA`);
 
@@ -215,12 +215,12 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
         }
     });
 
-    it.only("should throw error on Delete File assignment ", async () => {
+    it("should throw error on Delete File assignment ", async () => {
         am.should.not.be.undefined;
         const assetType = await am.GetAssetType(`${tenant}.SpaceShipTypeA`);
 
         try {
-            await am.DeleteFileAssignment(`${assetType.id}`, "xyz", {ifMatch:0});
+            await am.DeleteFileAssignment(`${assetType.id}`, "xyz", { ifMatch: 0 });
         } catch (err) {
             err.message.should.contain("xyz");
         }
