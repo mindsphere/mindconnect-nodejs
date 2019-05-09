@@ -202,7 +202,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
         const assetType = await am.GetAssetType(`${tenant}.SpaceShipTypeA`);
 
         try {
-            await am.PutFileAssignment(
+            await am.PutAssetTypeFileAssignment(
                 `${assetType.id}`,
                 "Keyword",
                 {
@@ -220,7 +220,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
         const assetType = await am.GetAssetType(`${tenant}.SpaceShipTypeA`);
 
         try {
-            await am.DeleteFileAssignment(`${assetType.id}`, "xyz", { ifMatch: 0 });
+            await am.DeleteAssetTypeFileAssignment(`${assetType.id}`, "xyz", { ifMatch: 0 });
         } catch (err) {
             err.message.should.contain("xyz");
         }

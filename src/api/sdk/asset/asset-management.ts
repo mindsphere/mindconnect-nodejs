@@ -338,6 +338,8 @@ export class AssetManagementClient extends SdkClient {
     }
 
     /**
+     * * AssetTypes
+     *
      * Read an asset type
      * ! important: the default setting for inherited properties is false
      * ! important: @see [params.exploded]
@@ -367,6 +369,8 @@ export class AssetManagementClient extends SdkClient {
     }
 
     /**
+     * * AssetTypes
+     *
      * Add a new file assignment to a given asset type. All asset which extends these types will have its file by default.
      *
      * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
@@ -378,7 +382,7 @@ export class AssetManagementClient extends SdkClient {
      *
      * @memberOf AssetManagementClient
      */
-    public async PutFileAssignment(
+    public async PutAssetTypeFileAssignment(
         id: string,
         key: string,
         assignment: AssetManagementModels.KeyedFileAssignment,
@@ -399,6 +403,8 @@ export class AssetManagementClient extends SdkClient {
     }
 
     /**
+     * *AssetTypes
+     *
      * Deletes a file assignment from an asset type.
      * If the type’s parent has defined a file with the same key, the key will be displayed with the inherited value.
      *
@@ -410,7 +416,7 @@ export class AssetManagementClient extends SdkClient {
      *
      * @memberOf AssetManagementClient
      */
-    public async DeleteFileAssignment(id: string, key: string, params: { ifMatch: number }) {
+    public async DeleteAssetTypeFileAssignment(id: string, key: string, params: { ifMatch: number }) {
         const parameters = params || {};
         const { ifMatch } = parameters;
         await this.HttpAction({
@@ -533,7 +539,7 @@ export class AssetManagementClient extends SdkClient {
      * @param {AssetManagementModels.AssetUpdate} asset
      * @param {{ ifMatch: number }} params
      * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking. Required for modification.
-     * @returns {Promise<boolean>}
+     * @returns {Promise<AssetManagementModels.AssetResourceWithHierarchyPath>}
      *
      * @example await assetManagement.PutAsset (myAsset, {ifMatch: myAsset.etag as number})
      *
@@ -543,12 +549,12 @@ export class AssetManagementClient extends SdkClient {
         assetId: string,
         asset: AssetManagementModels.AssetUpdate,
         params: { ifMatch: number }
-    ): Promise<boolean> {
+    ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
         checkAssetId(assetId);
         const parameters = params || {};
         const { ifMatch } = parameters;
 
-        await this.HttpAction({
+        const result = await this.HttpAction({
             verb: "PUT",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
@@ -556,7 +562,7 @@ export class AssetManagementClient extends SdkClient {
             body: asset,
             additionalHeaders: { "If-Match": ifMatch }
         });
-        return true;
+        return result as AssetManagementModels.AssetResourceWithHierarchyPath;
     }
 
     /**
@@ -570,7 +576,7 @@ export class AssetManagementClient extends SdkClient {
      * @param {AssetManagementModels.AssetUpdate} asset
      * @param {{ ifMatch: number }} params
      * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking. Required for modification.
-     * @returns {Promise<boolean>}
+     * @returns {Promise<AssetManagementModels.AssetResourceWithHierarchyPath>}
      *
      * @example await assetManagement.Patch (myAsset, {ifMatch: myAsset.etag as number})
      *
@@ -580,12 +586,12 @@ export class AssetManagementClient extends SdkClient {
         assetId: string,
         asset: AssetManagementModels.AssetUpdate,
         params: { ifMatch: number }
-    ): Promise<boolean> {
+    ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
         checkAssetId(assetId);
         const parameters = params || {};
         const { ifMatch } = parameters;
 
-        await this.HttpAction({
+        const result = await this.HttpAction({
             verb: "PATCH",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
@@ -593,7 +599,7 @@ export class AssetManagementClient extends SdkClient {
             body: asset,
             additionalHeaders: { "If-Match": ifMatch, "Content-Type": "application/merge-patch+json" }
         });
-        return true;
+        return result as AssetManagementModels.AssetResourceWithHierarchyPath;
     }
 
     /**
@@ -624,6 +630,91 @@ export class AssetManagementClient extends SdkClient {
         });
     }
 
+    /**
+     * * Asset
+     *
+     * Save a file assignment to a given asset
+     *
+     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {string} key Keyword for the file to be assigned to an asset or asset type.
+     * @param {AssetManagementModels.KeyedFileAssignment} assignment Data for file assignment
+     * @param {{ ifMatch: number }} params
+     * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
+     * @returns {Promise<AssetManagementModels.AssetTypeResource>}
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async PutAssetFileAssignment(
+        id: string,
+        key: string,
+        assignment: AssetManagementModels.KeyedFileAssignment,
+        params: { ifMatch: number }
+    ): Promise<AssetManagementModels.AssetTypeResource> {
+        const parameters = params || {};
+        const { ifMatch } = parameters;
+        const result = await this.HttpAction({
+            verb: "PUT",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/assets/${id}/fileAssignments/${key}`,
+            body: assignment,
+            additionalHeaders: { "If-Match": ifMatch }
+        });
+
+        return result as AssetManagementModels.AssetTypeResource;
+    }
+
+    /**
+     * * Asset
+     *
+     * Deletes a file assignment from an asset.
+     * If the asset’s parent type has defined a file with the same key, the key will be displayed with the inherited value.
+     *
+     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {string} key Keyword for the file to be assigned to an asset or asset type.
+     * @param {AssetManagementModels.KeyedFileAssignment} assignment Data for file assignment
+     * @param {{ ifMatch: number }} params
+     * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async DeleteAssetFileAssignment(id: string, key: string, params: { ifMatch: number }) {
+        const parameters = params || {};
+        const { ifMatch } = parameters;
+        await this.HttpAction({
+            verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/assets/${id}/fileAssignments/${key}`,
+            additionalHeaders: { "If-Match": ifMatch },
+            noResponse: true
+        });
+    }
+
+    /**
+     * * Asset
+     * Returns the root asset of the user.
+     * Read the root asset of the user, from which the whole asset hierarchy can be rebuilt.
+     *
+     * @returns {Promise<AssetManagementModels.RootAssetResource>}
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async GetRootAsset(): Promise<AssetManagementModels.RootAssetResource> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/assets/root`,
+            message: "PostAsset"
+        });
+        return result as AssetManagementModels.RootAssetResource;
+    }
+
+
+    
+
+
     public async GetAspects(assetId: string): Promise<AssetManagementModels.AspectListResource> {
         checkAssetId(assetId);
         const result = await this.HttpAction({
@@ -634,16 +725,5 @@ export class AssetManagementClient extends SdkClient {
             message: "GetAspects"
         });
         return result as AssetManagementModels.AspectListResource;
-    }
-
-    public async GetRootAsset(): Promise<AssetManagementModels.RootAssetResource> {
-        const result = await this.HttpAction({
-            verb: "GET",
-            gateway: this.GetGateway(),
-            authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assets/root`,
-            message: "PostAsset"
-        });
-        return result as AssetManagementModels.RootAssetResource;
     }
 }

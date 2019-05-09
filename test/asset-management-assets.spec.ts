@@ -14,6 +14,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
     });
     const am = sdk.GetAssetManagementClient();
     const tenant = sdk.GetTenant();
+    let falconAassetId = "";
 
     const testAsset: AssetManagementModels.Asset = {
         name: "MilleniumFalcon",
@@ -40,7 +41,8 @@ describe("[SDK] AssetManagementClient.Assets", () => {
     before(async () => {
         testAsset.parentId = (await am.GetRootAsset()).assetId;
         testAsset.name = "FalconA";
-        await am.PostAsset(testAsset);
+        const result = await am.PostAsset(testAsset);
+        falconAassetId = `${result.assetId}`;
         testAsset.name = "FalconB";
         await am.PostAsset(testAsset);
         testAsset.name = "FalconC";
@@ -128,9 +130,10 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         (assets as any)._embedded.assets.length.should.be.equal(3);
     });
 
-    it("should GET specific asset ", async () => {
+    it.only("should GET specific asset ", async () => {
         am.should.not.be.undefined;
-        const asset = await am.GetAsset(`${tenant}.FalconA`);
+
+        const asset = await am.GetAsset(falconAassetId);
         asset.should.not.be.undefined;
     });
 
@@ -143,55 +146,60 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         await am.DeleteAsset(`${asset.assetId}`, { ifMatch: asset.etag as number });
     });
 
-    it("should PATCH specific asset ", async () => {
-        // am.should.not.be.undefined;
-        // testAssetType.name = `SpaceShipTypeD`;
-        // const asset = await am.PutAssetType(`${tenant}.SpaceShipTypeD`, testAssetType);
-        // asset.variables = asset.variables || new Array<AssetManagementModels.VariableDefinitionResource>();
-        // asset.variables.push({
-        //     dataType: AssetManagementModels.VariableDefinition.DataTypeEnum.BOOLEAN,
-        //     name: "test"
-        // });
-        // const patchedAssetType = await am.PatchAssetType(`${tenant}.SpaceShipTypeD`, asset, {
-        //     ifMatch: asset.etag as number
-        // });
-        // patchedAssetType.should.not.be.null;
-        // (patchedAssetType as any).variables.length.should.be.equal(2);
-        // asset.should.not.be.null;
-        // await am.DeleteAssetType(`${tenant}.SpaceShipTypeD`, { ifMatch: patchedAssetType.etag as number });
+    it.only("should PATCH specific asset ", async () => {
+        am.should.not.be.undefined;
+        testAsset.name = `FalconE`;
+        const asset = await am.PostAsset(testAsset);
+
+        asset.externalId = "12354";
+        const patchedAssetType = await am.PatchAsset(`${asset.assetId}`, asset, {
+            ifMatch: asset.etag as number
+        });
+        patchedAssetType.should.not.be.null;
+        (patchedAssetType as any).externalId.should.be.equal("12354");
+
+        asset.should.not.be.null;
+        await am.DeleteAsset(`${asset.assetId}`, { ifMatch: patchedAssetType.etag as number });
     });
 
     it("should DELETE specific asset ", async () => {
-        // am.should.not.be.undefined;
-        // testAssetType.name = `SpaceShipTypeF`;
-        // const asset = await am.PutAssetType(`${tenant}.SpaceShipTypeF`, testAssetType);
-        // await am.DeleteAssetType(`${tenant}.SpaceShipTypeF`, { ifMatch: asset.etag as number });
+        am.should.not.be.undefined;
+        testAsset.name = `FalconF`;
+        const asset = await am.PostAsset(testAsset);
+        await am.DeleteAsset(`${asset.assetId}`, { ifMatch: asset.etag as number });
     });
 
-    it("should throw error on Put File assignment ", async () => {
-        // am.should.not.be.undefined;
-        // const asset = await am.GetAssetType(`${tenant}.SpaceShipTypeA`);
-        // try {
-        //     await am.PutFileAssignment(
-        //         `${asset.id}`,
-        //         "Keyword",
-        //         {
-        //             fileId: "abcd"
-        //         },
-        //         { ifMatch: asset.etag as number }
-        //     );
-        // } catch (err) {
-        //     err.message.should.contain("abcd");
-        // }
+    it.only("should throw error on Put File assignment ", async () => {
+        am.should.not.be.undefined;
+        const asset = await am.GetAsset(falconAassetId);
+        try {
+            await am.PutAssetFileAssignment(
+                `${asset.assetId}`,
+                "Keyword",
+                {
+                    fileId: "abcd"
+                },
+                { ifMatch: asset.etag as number }
+            );
+        } catch (err) {
+            err.message.should.contain("abcd");
+        }
     });
 
-    it("should throw error on Delete File assignment ", async () => {
-        // am.should.not.be.undefined;
-        // const asset = await am.GetAssetType(`${tenant}.SpaceShipTypeA`);
-        // try {
-        //     await am.DeleteFileAssignment(`${asset.id}`, "xyz", { ifMatch: 0 });
-        // } catch (err) {
-        //     err.message.should.contain("xyz");
-        // }
+    it.only("should throw error on Delete File assignment ", async () => {
+        am.should.not.be.undefined;
+        const asset = await am.GetAsset(falconAassetId);
+        try {
+            await am.DeleteAssetFileAssignment(`${asset.assetId}`, "xyz", { ifMatch: asset.etag as number });
+        } catch (err) {
+            err.message.should.contain("xyz");
+        }
+    });
+
+    it.only("should GET root asset  ", async () => {
+        am.should.not.be.undefined;
+        const asset = await am.GetRootAsset();
+        asset.should.not.be.undefined;
+        `${asset.assetId}`.length.should.equal(32);
     });
 });
