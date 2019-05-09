@@ -72,18 +72,18 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         }
     });
 
-    it.only("SDK should not be undefined", async () => {
+    it("SDK should not be undefined", async () => {
         sdk.should.not.be.undefined;
     });
 
-    it.only("standard properties shoud be defined", async () => {
+    it("standard properties shoud be defined", async () => {
         am.should.not.be.undefined;
         am.GetGateway().should.be.equal(auth.gateway);
         (await am.GetToken()).length.should.be.greaterThan(200);
         (await am.GetServiceToken()).length.should.be.greaterThan(200);
     });
 
-    it.only("should GET asset(s)", async () => {
+    it("should GET asset(s)", async () => {
         am.should.not.be.undefined;
         const assets = await am.GetAssets();
         assets.should.not.be.undefined;
@@ -93,7 +93,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         (assets as any)._embedded.assets.length.should.be.greaterThan(0);
     });
 
-    it.only("should GET asset(s) with filter", async () => {
+    it("should GET asset(s) with filter", async () => {
         am.should.not.be.undefined;
         const assets = await am.GetAssets({
             filter: JSON.stringify({
@@ -108,7 +108,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         (assets as any)._embedded.assets.length.should.be.greaterThan(0);
     });
 
-    it.only("should GET asset(s) with sorting", async () => {
+    it("should GET asset(s) with sorting", async () => {
         am.should.not.be.undefined;
         const assets = await am.GetAssets({
             filter: JSON.stringify({
@@ -119,7 +119,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
                     }
                 }
             }),
-            sort: "DESC",
+            sort: "ASC",
             page: 0,
             size: 0
         });
@@ -130,14 +130,14 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         (assets as any)._embedded.assets.length.should.be.equal(3);
     });
 
-    it.only("should GET specific asset ", async () => {
+    it("should GET specific asset ", async () => {
         am.should.not.be.undefined;
 
         const asset = await am.GetAsset(falconAassetId);
         asset.should.not.be.undefined;
     });
 
-    it.only("should POST specific asset ", async () => {
+    it("should POST specific asset ", async () => {
         am.should.not.be.undefined;
         testAsset.name = `FalconD`;
         const asset = await am.PostAsset(testAsset);
@@ -146,7 +146,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         await am.DeleteAsset(`${asset.assetId}`, { ifMatch: asset.etag as number });
     });
 
-    it.only("should PATCH specific asset ", async () => {
+    it("should PATCH specific asset ", async () => {
         am.should.not.be.undefined;
         testAsset.name = `FalconE`;
         const asset = await am.PostAsset(testAsset);
@@ -169,7 +169,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         await am.DeleteAsset(`${asset.assetId}`, { ifMatch: asset.etag as number });
     });
 
-    it.only("should throw error on Put File assignment ", async () => {
+    it("should throw error on Put File assignment ", async () => {
         am.should.not.be.undefined;
         const asset = await am.GetAsset(falconAassetId);
         try {
@@ -186,7 +186,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         }
     });
 
-    it.only("should throw error on Delete File assignment ", async () => {
+    it("should throw error on Delete File assignment ", async () => {
         am.should.not.be.undefined;
         const asset = await am.GetAsset(falconAassetId);
         try {
@@ -196,10 +196,45 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         }
     });
 
-    it.only("should GET root asset  ", async () => {
+    it("should GET root asset  ", async () => {
         am.should.not.be.undefined;
         const asset = await am.GetRootAsset();
         asset.should.not.be.undefined;
         `${asset.assetId}`.length.should.equal(32);
+    });
+
+    it("should GET aspects  ", async () => {
+        am.should.not.be.undefined;
+        const asset = await am.GetRootAsset();
+        const aspects = await am.GetAspects(`${asset.assetId}`, { size: 2000 });
+        (aspects as any)._embedded.aspects.length.should.be.greaterThan(0);
+    });
+
+    it("should GET Variables  ", async () => {
+        am.should.not.be.undefined;
+        const asset = await am.GetRootAsset();
+        const variables = await am.GetVariables(`${asset.assetId}`, { size: 2000 });
+        (variables as any)._embedded.variables.length.should.be.greaterThan(0);
+    });
+
+    it("should PUT LOCATION  ", async () => {
+        am.should.not.be.undefined;
+        const asset = await am.GetAsset(falconAassetId);
+        const updatedAsset = await am.PutAssetLocation(
+            falconAassetId,
+            { country: "Bosnia", locality: "Sarajevo", streetAddress: "Ferhadija 1" },
+            { ifMatch: asset.etag as number }
+        );
+
+        (updatedAsset as any).location.country.should.be.equal("Bosnia");
+        (updatedAsset as any).location.locality.should.be.equal("Sarajevo");
+        (updatedAsset as any).location.streetAddress.should.be.equal("Ferhadija 1");
+    });
+
+    it("should DELETE LOCATION  ", async () => {
+        am.should.not.be.undefined;
+        const asset = await am.GetAsset(falconAassetId);
+        const patchedAsset = await am.DeleteAssetLocation(falconAassetId, { ifMatch: asset.etag as number });
+        (patchedAsset as any).location.country.should.not.be.undefined;
     });
 });

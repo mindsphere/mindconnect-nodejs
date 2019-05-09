@@ -711,19 +711,163 @@ export class AssetManagementClient extends SdkClient {
         return result as AssetManagementModels.RootAssetResource;
     }
 
-
-    
-
-
-    public async GetAspects(assetId: string): Promise<AssetManagementModels.AspectListResource> {
+    /**
+     * * Asset Structure
+     * Get all static and dynamic aspects of a given asset
+     *
+     * @param {string} assetId
+     * @param {{
+     *             page?: number;
+     *             size?: number;
+     *             sort?: string;
+     *             filter?: string;
+     *             ifNoneMatch?: number;
+     *         }} [params]
+     * @param [params.page] Specifies the requested page index
+     * @param [params.size] Specifies the number of elements in a page
+     * @param [params.sort] Specifies the ordering of returned elements
+     * @param [params.filter] Specifies the additional filtering criteria
+     * @param [params.ifnonematch] ETag hash of previous request to allow caching
+     *
+     * @returns {Promise<AssetManagementModels.AspectListResource>}
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async GetAspects(
+        assetId: string,
+        params?: {
+            page?: number;
+            size?: number;
+            sort?: string;
+            filter?: string;
+            ifNoneMatch?: number;
+        }
+    ): Promise<AssetManagementModels.AspectListResource> {
         checkAssetId(assetId);
+        const parameters = params || {};
+        const { page, size, sort, filter, ifNoneMatch } = parameters;
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assets/${assetId}/aspects`,
-            message: "GetAspects"
+            baseUrl: `${this._baseUrl}/assets/${assetId}/aspects?${toQueryString({ page, size, sort, filter })}`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch }
         });
         return result as AssetManagementModels.AspectListResource;
+    }
+
+    /**
+     * * Asset Structure
+     * Get all variables of a given asset including inherited ones
+     *
+     * @param {string} assetId
+     * @param {{
+     *             page?: number;
+     *             size?: number;
+     *             sort?: string;
+     *             filter?: string;
+     *             ifNoneMatch?: number;
+     *         }} [params]
+     * @param [params.page] Specifies the requested page index
+     * @param [params.size] Specifies the number of elements in a page
+     * @param [params.sort] Specifies the ordering of returned elements
+     * @param [params.filter] Specifies the additional filtering criteria
+     * @param [params.ifnonematch] ETag hash of previous request to allow caching
+     *
+     * @returns {Promise<AssetManagementModels.AspectListResource>}
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async GetVariables(
+        assetId: string,
+        params?: {
+            page?: number;
+            size?: number;
+            sort?: string;
+            filter?: string;
+            ifNoneMatch?: number;
+        }
+    ): Promise<AssetManagementModels.VariableListResource> {
+        checkAssetId(assetId);
+        const parameters = params || {};
+        const { page, size, sort, filter, ifNoneMatch } = parameters;
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/assets/${assetId}/variables?${toQueryString({ page, size, sort, filter })}`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch }
+        });
+        return result as AssetManagementModels.VariableListResource;
+    }
+
+    /**
+     * * Asset Location
+     *
+     * Create or Update location assigned to given asset
+     *
+     * * If the given asset has own location, this endpoint will update that location.
+     * * If the given asset has no location, this endpoint will create a new location and update the given asset.
+     * * If the given asset has inherited location, this endpoint will create a new location and update the given asset.
+     * * If you wanted to update the inherited location you have to use the ‘location’ url in AssetResource object (with PUT method).
+     *
+     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {AssetManagementModels.Location} location Data for location
+     * @param {{ ifMatch: number }} params
+     * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
+     * @returns {Promise<AssetManagementModels.Location>}
+     *
+     * ! fix: 3.11. : the swagger documentation says that the method is returning Location but it returns AssetResourceWithHierarchyPath
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async PutAssetLocation(
+        id: string,
+        location: AssetManagementModels.Location,
+        params: { ifMatch: number }
+    ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
+        const parameters = params || {};
+        const { ifMatch } = parameters;
+        const result = await this.HttpAction({
+            verb: "PUT",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/assets/${id}/location`,
+            body: location,
+            additionalHeaders: { "If-Match": ifMatch }
+        });
+
+        return result as AssetManagementModels.AssetResourceWithHierarchyPath;
+    }
+
+    /**
+     * * Asset Location
+     *
+     * Delete location assigned to given asset.
+     *
+     * * Only those locations can be deleted here which assigned to the given asset.
+     * * If the location inherited from an ancestor asset, you have to delete the location with the assigned assetId (using ‘location’ url in AssetResource object with DELETE method).
+     * * The response contains the updated AssetResource with the inherited Location details.
+     *
+     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {AssetManagementModels.Location} location Data for location
+     * @param {{ ifMatch: number }} params
+     * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
+     * @returns {Promise<AssetManagementModels.AssetResourceWithHierarchyPath>}
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async DeleteAssetLocation(id: string, params: { ifMatch: number }) {
+        const parameters = params || {};
+        const { ifMatch } = parameters;
+        const result = await this.HttpAction({
+            verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/assets/${id}/location`,
+            additionalHeaders: { "If-Match": ifMatch }
+        });
+
+        return result as AssetManagementModels.AssetResourceWithHierarchyPath;
     }
 }
