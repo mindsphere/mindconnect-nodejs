@@ -212,7 +212,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         (updatedAsset as any).location.streetAddress.should.be.equal("Ferhadija 1");
     });
 
-    it.only("should DELETE LOCATION  ", async () => {
+    it("should DELETE LOCATION  ", async () => {
         am.should.not.be.undefined;
         const asset = await am.GetAsset(falconAassetId);
         const updatedAsset = await am.PutAssetLocation(
