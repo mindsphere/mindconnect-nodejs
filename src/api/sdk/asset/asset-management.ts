@@ -1,4 +1,4 @@
-import { checkAssetId, toQueryString } from "../../utils";
+import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
 import { AssetManagementModels } from "./asset-models";
 
@@ -515,7 +515,6 @@ export class AssetManagementClient extends SdkClient {
         assetId: string,
         params?: { ifNoneMatch?: string }
     ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
-        checkAssetId(assetId);
         const parameters = params || {};
         const { ifNoneMatch } = parameters;
         const result = await this.HttpAction({
@@ -550,7 +549,6 @@ export class AssetManagementClient extends SdkClient {
         asset: AssetManagementModels.AssetUpdate,
         params: { ifMatch: number }
     ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
-        checkAssetId(assetId);
         const parameters = params || {};
         const { ifMatch } = parameters;
 
@@ -587,7 +585,6 @@ export class AssetManagementClient extends SdkClient {
         asset: AssetManagementModels.AssetUpdate,
         params: { ifMatch: number }
     ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
-        checkAssetId(assetId);
         const parameters = params || {};
         const { ifMatch } = parameters;
 
@@ -619,7 +616,6 @@ export class AssetManagementClient extends SdkClient {
      * @memberOf AssetManagementClient
      */
     public async DeleteAsset(id: string, params: { ifMatch: number }) {
-        checkAssetId(id);
         await this.HttpAction({
             verb: "DELETE",
             gateway: this.GetGateway(),
@@ -743,7 +739,6 @@ export class AssetManagementClient extends SdkClient {
             ifNoneMatch?: number;
         }
     ): Promise<AssetManagementModels.AspectListResource> {
-        checkAssetId(assetId);
         const parameters = params || {};
         const { page, size, sort, filter, ifNoneMatch } = parameters;
         const result = await this.HttpAction({
@@ -788,7 +783,6 @@ export class AssetManagementClient extends SdkClient {
             ifNoneMatch?: number;
         }
     ): Promise<AssetManagementModels.VariableListResource> {
-        checkAssetId(assetId);
         const parameters = params || {};
         const { page, size, sort, filter, ifNoneMatch } = parameters;
         const result = await this.HttpAction({
