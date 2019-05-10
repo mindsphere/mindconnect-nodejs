@@ -1,6 +1,6 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
-import { AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
+import { AssetManagementModels, MindSphereSdk, AssetManagementClient } from "../src/api/sdk";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import { sleep } from "./test-utils";
 chai.should();
@@ -219,7 +219,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         (patchedAsset as any).location.country.should.not.be.undefined;
     });
 });
-async function deleteAssets(am: import("c:/git/github/mindconnect-nodejs/src/api/sdk/index").AssetManagementClient) {
+async function deleteAssets(am: AssetManagementClient) {
     const assets = (await am.GetAssets({
         filter: JSON.stringify({
             and: {

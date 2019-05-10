@@ -1,6 +1,6 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
-import { AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
+import { AssetManagementClient, AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import { sleep } from "./test-utils";
 chai.should();
@@ -209,10 +209,8 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
         }
     });
 });
-async function deleteAssetTypes(
-    am: import("c:/git/github/mindconnect-nodejs/src/api/sdk/index").AssetManagementClient,
-    tenant: string
-) {
+
+async function deleteAssetTypes(am: AssetManagementClient, tenant: string) {
     await sleep(2000);
     const assetTypes = (await am.GetAssetTypes({
         filter: JSON.stringify({
