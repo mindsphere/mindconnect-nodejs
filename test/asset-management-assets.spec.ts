@@ -1,6 +1,6 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
-import { AssetManagementModels, MindSphereSdk, AssetManagementClient } from "../src/api/sdk";
+import { AssetManagementClient, AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import { sleep } from "./test-utils";
 chai.should();
@@ -220,6 +220,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
     });
 });
 async function deleteAssets(am: AssetManagementClient) {
+    await sleep(2000);
     const assets = (await am.GetAssets({
         filter: JSON.stringify({
             and: {

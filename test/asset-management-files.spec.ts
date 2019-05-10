@@ -2,6 +2,7 @@ import * as chai from "chai";
 import "url-search-params-polyfill";
 import { AssetManagementClient, AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
 import { decrypt, loadAuth } from "../src/api/utils";
+import { sleep } from "./test-utils";
 chai.should();
 
 describe("[SDK] AssetManagementClient.Files", () => {
@@ -77,6 +78,7 @@ describe("[SDK] AssetManagementClient.Files", () => {
     });
 });
 async function deleteFiles(am: AssetManagementClient) {
+    await sleep(2000);
     const files = (await am.GetFiles({
         filter: JSON.stringify({
             and: {
