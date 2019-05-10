@@ -212,10 +212,15 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         (updatedAsset as any).location.streetAddress.should.be.equal("Ferhadija 1");
     });
 
-    it("should DELETE LOCATION  ", async () => {
+    it.only("should DELETE LOCATION  ", async () => {
         am.should.not.be.undefined;
         const asset = await am.GetAsset(falconAassetId);
-        const patchedAsset = await am.DeleteAssetLocation(falconAassetId, { ifMatch: asset.etag as number });
+        const updatedAsset = await am.PutAssetLocation(
+            falconAassetId,
+            { country: "Bosnia", locality: "Sarajevo", streetAddress: "Ferhadija 1" },
+            { ifMatch: asset.etag as number }
+        );
+        const patchedAsset = await am.DeleteAssetLocation(falconAassetId, { ifMatch: updatedAsset.etag as number });
         (patchedAsset as any).location.country.should.not.be.undefined;
     });
 });
