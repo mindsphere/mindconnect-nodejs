@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { checkAssetId } from "../../utils";
+import { toQueryString } from "../../utils";
 import { fileUploadOptionalParameters, MultipartUploader } from "../common/multipart-uploader";
 import { SdkClient } from "../common/sdk-client";
 import { IotFileModels } from "./iot-file-models";
@@ -33,7 +33,7 @@ export class IotFileClient extends SdkClient {
         entityId: string,
         filepath: string,
         file: string | Buffer,
-        params?: { part?: number; ifMatch: number; timestamp?: Date; description?: string; type?: string }
+        params?: { part?: number; ifMatch?: number; timestamp?: Date; description?: string; type?: string }
     ): Promise<Headers> {
         const myBuffer = typeof file === "string" ? fs.readFileSync(file) : (file as Buffer);
         const parameters = params || {};
@@ -68,10 +68,8 @@ export class IotFileClient extends SdkClient {
     public async GetFile(
         entityId: string,
         filepath: string,
-        file: string | Buffer,
         params?: { ifNoneMatch?: number; range?: string }
     ): Promise<Response> {
-        const myBuffer = typeof file === "string" ? fs.readFileSync(file) : (file as Buffer);
         const parameters = params || {};
 
         return (await this.HttpAction({
@@ -79,7 +77,6 @@ export class IotFileClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/files/${entityId}/${filepath}`,
-            body: myBuffer,
             additionalHeaders: parameters,
             rawResponse: true
         })) as Response;
@@ -98,14 +95,14 @@ export class IotFileClient extends SdkClient {
         entityid: string,
         params?: { offset?: number; limit?: number; count?: number; order?: string; filter?: string }
     ): Promise<IotFileModels.File[]> {
-        checkAssetId(entityid);
+        const parameters = params || {};
+        const { offset, limit, count, order, filter } = parameters;
         return (await (this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/files/${entityid}`,
-            additionalHeaders: params,
-            message: "SearchFiles"
+            baseUrl: `${this._baseUrl}/files/${entityid}?${toQueryString({ filter })}`,
+            additionalHeaders: { offset, limit, count, order }
         }) as unknown)) as IotFileModels.File[];
     }
 

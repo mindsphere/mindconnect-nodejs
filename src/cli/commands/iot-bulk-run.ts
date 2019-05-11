@@ -236,17 +236,13 @@ async function uploadFiles(options: any, jobstate: jobState, spinner?: any) {
             }
         );
 
+        verboseLog(`uploaded ${entry.filepath} with md5 checksum: ${result}`, options.verbose, spinner);
         const fileInfo = await fileUploadClient.GetFiles(`${jobstate.options.asset.assetId}`, {
-            filter: JSON.stringify({
-                and: {
-                    name: path.basename(entry.filepath),
-                    path: `${path.dirname(entry.filepath)}/`
-                }
-            })
+            filter: `name eq ${path.basename(entry.filepath)} and path eq ${path.dirname(entry.filepath)}/`
         });
 
         entry.etag = `${fileInfo[0].etag}`;
-        verboseLog(`uploaded ${entry.filepath} with md5 checksum: ${result}`, options.verbose, spinner);
+        verboseLog(`Entry etag:  ${entry.etag}`, options.verbose, spinner);
     }
 }
 

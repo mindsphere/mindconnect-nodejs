@@ -38,7 +38,7 @@ export abstract class MindConnectBase {
      */
     protected _proxyHttpAgent: any;
 
-    private _headers = {
+    protected _headers = {
         Accept: "*/*",
         "X-Powered-By": "meowz",
         "User-Agent": "mindconnect-nodejs (3.5.0)"
