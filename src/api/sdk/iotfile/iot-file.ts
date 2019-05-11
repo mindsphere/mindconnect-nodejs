@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { checkAssetId } from "../../utils";
-import { MultipartUploader, optionalParameters } from "../common/multipart-uploader";
+import { fileUploadOptionalParameters, MultipartUploader } from "../common/multipart-uploader";
 import { SdkClient } from "../common/sdk-client";
 import { IotFileModels } from "./iot-file-models";
 /**
@@ -152,7 +152,7 @@ export class IotFileClient extends SdkClient {
      * @param {string} entityId
      * @param {string} filepath
      * @param {(string | Buffer)} file
-     * @param {optionalParameters} [params] optional parameters
+     * @param {fileUploadOptionalParameters} [params] optional parameters
      * @param {(number | undefined)}[params.part] multipart/upload part
      * @param {(Date | undefined)} [params.timestamp] File timestamp in mindsphere.
      * @param {(string | undefined)} [params.description] Description in mindsphere.
@@ -162,8 +162,8 @@ export class IotFileClient extends SdkClient {
      * @param {(Function | undefined)} [params.logFunction] log functgion is called every time a retry happens.
      * @param {(Function | undefined)} [params.verboseFunction] verboseLog function.
      * @param {(boolean | undefined)} [params.chunk] Set to true to enable multipart uploads
-     * @param {(number | undefined)} [params.paralelUploads] max paralell uploads for parts (default: 3)
-     * @param {(number | undefined)} [params.ifmatch] The etag for the upload.
+     * @param {(number | undefined)} [params.parallelUploads] max paralell uploads for parts (default: 3)
+     * @param {(number | undefined)} [params.ifMatch] The etag for the upload.
      * @returns {Promise<string>} md5 hash of the file
      *
      * @memberOf IotFileClient
@@ -172,7 +172,7 @@ export class IotFileClient extends SdkClient {
         entityId: string,
         filepath: string,
         file: string | Buffer,
-        params?: optionalParameters
+        params?: fileUploadOptionalParameters
     ): Promise<string> {
         const result = await this.uploader.UploadFile(entityId, filepath, file, params);
         return result;

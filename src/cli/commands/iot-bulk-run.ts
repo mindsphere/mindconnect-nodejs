@@ -226,12 +226,12 @@ async function uploadFiles(options: any, jobstate: jobState, spinner?: any) {
                 description: "bulk upload",
                 chunk: true,
                 retry: options.retry,
-                paralelUploads: options.parallel,
+                parallelUploads: options.parallel,
                 logFunction: (p: string) => {
                     return retrylog(p, chalk.magentaBright);
                 },
                 verboseFunction: (p: string) => {
-                    verboseLog(p, options.verbose);
+                    verboseLog(p, options.verbose, spinner);
                 }
             }
         );
