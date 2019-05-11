@@ -143,13 +143,20 @@ describe("[SDK] AgentManagementClient", () => {
 
         const status = await agentMgmt.GetOnboardingStatus(testAgentId);
         (status.status as any).should.equal("ONBOARDED");
-        await agentMgmt.OffboardAgent(testAgentId);
-
-        const newStatus = await agentMgmt.GetOnboardingStatus(testAgentId);
-        newStatus.should.not.equal("ONBOARDED");
 
         const onlineStatus = await agentMgmt.GetAgentOnlineStatus(testAgentId);
         onlineStatus.should.not.be.undefined;
+
+        for (let i = 0; i < 5; i++) {
+            const boardingStatus = await agentMgmt.GetOnboardingStatus(testAgentId);
+
+            if (`${boardingStatus.status}` === "ONBOARDED") {
+                await sleep(i * 1000);
+                await agentMgmt.OffboardAgent(testAgentId);
+                continue;
+            }
+            break;
+        }
     });
 
     async function deleteAgents() {
