@@ -135,7 +135,7 @@ export class MultipartUploader extends MindConnectBase {
     private getStreamFromFile(file: string | Buffer, chunksize: number) {
         return file instanceof Buffer
             ? (() => {
-                  const bufferStream = new stream.PassThrough({ highWaterMark: chunksize });
+                  const bufferStream = new stream.PassThrough();
                   for (let index = 0; index < file.length; ) {
                       const end = Math.min(index + chunksize, file.length);
                       bufferStream.write(file.slice(index, end));
@@ -144,7 +144,7 @@ export class MultipartUploader extends MindConnectBase {
                   bufferStream.end();
                   return bufferStream;
               })()
-            : fs.createReadStream(path.resolve(file), { highWaterMark: chunksize });
+            : fs.createReadStream(path.resolve(file));
     }
 
     private addDataToBuffer(current: Uint8Array, data: Buffer) {
@@ -178,10 +178,7 @@ export class MultipartUploader extends MindConnectBase {
         let result;
         const bareUrl = this.getBareUrl(url);
 
-        (!this.GetConfiguration || headers["If-Match"] !== undefined) &&
-            throwError("You have to set if-match if you are using this outside the MindConnectAgent");
-
-        if (this.GetConfiguration) {
+        if (this.agent) {
             const config = this.GetConfiguration() as any;
             if (config.urls && config.urls[bareUrl]) {
                 const eTag = config.urls[bareUrl];
@@ -194,7 +191,7 @@ export class MultipartUploader extends MindConnectBase {
     }
 
     private addUrl(url: string, result: string) {
-        if (!this.GetConfiguration) return;
+        if (!this.agent) return;
 
         const config = this.GetConfiguration() as any;
 

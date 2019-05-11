@@ -102,7 +102,7 @@ export function modeInformation(asset: AssetManagementModels.AssetResourceWithHi
     const MAX_SIZE_FOR_TS = 200;
     console.log(
         `\nRunning timeseries ${
-            asset.twinType === AssetManagementModels.TwinType.Performance ? "bulk API" : "API"
+            asset.twinType === AssetManagementModels.TwinType.Simulation ? "bulk API" : "API"
         } ingest for ${chalk.magentaBright(asset.name)} of type ${chalk.magentaBright(
             "" + asset.typeId
         )} with twintype ${chalk.magentaBright("" + asset.twinType)}`

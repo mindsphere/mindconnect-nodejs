@@ -6,15 +6,9 @@ import * as fs from "fs";
 import * as _ from "lodash";
 import * as path from "path";
 import { sleep } from "../../../test/test-utils";
-import {
-    AssetManagementClient,
-    AssetManagementModels,
-    TimeSeriesBulkClient,
-    TimeSeriesBulkModels,
-    TimeSeriesClient
-} from "../../api/sdk";
+import { AssetManagementClient, AssetManagementModels, TimeSeriesBulkClient, TimeSeriesBulkModels, TimeSeriesClient } from "../../api/sdk";
 import { IotFileClient } from "../../api/sdk/iotfile/iot-file";
-import { decrypt, errorLog, loadAuth, retry, throwError, verboseLog } from "../../api/utils";
+import { decrypt, errorLog, loadAuth, retry, retrylog, throwError, verboseLog } from "../../api/utils";
 import { modeInformation } from "./command-utils";
 import ora = require("ora");
 
@@ -214,19 +208,41 @@ async function uploadFiles(options: any, jobstate: jobState, spinner?: any) {
             );
             continue;
         }
-        const result = await retry(
-            options.retry,
-            () =>
-                fileUploadClient.PutFile(`${jobstate.options.asset.assetId}`, entry.filepath, entry.path, {
-                    type: "application/json",
-                    timestamp: fs.statSync(entry.path).mtime,
-                    description: "bulk upload"
-                }),
-            500,
-            () => verboseLog(`Uploading the file again...`, options.verbose, spinner)
+
+        console.log(options.retry);
+
+        const result = await fileUploadClient.UploadFile(
+            `${jobstate.options.asset.assetId}`,
+            entry.filepath,
+            entry.path,
+            {
+                type: "application/json",
+                timestamp: fs.statSync(entry.path).mtime,
+                description: "bulk upload",
+                chunk: true,
+                retry: options.retry,
+                logFunction: (p: string) => {
+                    return retrylog(p, chalk.magentaBright);
+                },
+                verboseFunction: (p: string) => {
+                    verboseLog(p, options.verbose);
+                }
+            }
         );
-        entry.etag = result.get("etag") || "0";
-        verboseLog(`uploaded ${entry.filepath}`, options.verbose, spinner);
+
+        console.log(entry.filepath + "..uploaded");
+        const fileInfo = await fileUploadClient.GetFiles(`${jobstate.options.asset.assetId}`, {
+            filter: JSON.stringify({
+                and: {
+                    name: path.basename(entry.filepath),
+                    path: `${path.dirname(entry.filepath)}/`
+                }
+            })
+        });
+
+        entry.etag = `${fileInfo[0].etag}`;
+        console.log(fileInfo);
+        verboseLog(`uploaded ${entry.filepath} with md5 checksum: ${result}`, options.verbose, spinner);
     }
 }
 
@@ -354,11 +370,10 @@ function writeDataAsJson({
     data: any[];
 }) {
     mintime || maxtime || throwError("the data is ivalid the timestamps are corrupted");
-    const newFileName = `${aspect}_from_${mintime && mintime.toISOString()}_to_${maxtime && maxtime.toISOString()}_${
-        data.length
-    }_records`.replace(/[^a-z0-9]/gi, "_");
+    const newFileName = `${aspect}_${mintime && mintime.toISOString()}`.replace(/[^a-z0-9]/gi, "_");
     verboseLog(`writing ${options.dir}/json/${aspect}/${chalk.magentaBright(newFileName + ".json")}`, options.verbose);
     const newPath = `${options.dir}/json/${aspect}/${newFileName}.json`;
+
     fs.writeFileSync(newPath, JSON.stringify(data));
     return [newPath, newFileName];
 }
