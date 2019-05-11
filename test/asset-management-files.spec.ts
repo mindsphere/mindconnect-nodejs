@@ -34,7 +34,7 @@ describe("[SDK] AssetManagementClient.Files", () => {
         const files = await am.GetFiles({ filter: JSON.stringify({ name: "xyz.text" }) });
         (files._embedded as any).files.length.should.equal(1);
 
-        await am.DeleteFile(`${result.id}`, { ifMatch: result.etag as number });
+        await am.DeleteFile(`${result.id}`, { ifMatch: `${result.etag}` });
     });
 
     it("should be able to Download file", async () => {
@@ -46,7 +46,7 @@ describe("[SDK] AssetManagementClient.Files", () => {
         const text = await file.text();
         text.should.be.equal("xyz");
 
-        await am.DeleteFile(`${result.id}`, { ifMatch: result.etag as number });
+        await am.DeleteFile(`${result.id}`, { ifMatch: `${result.etag}` });
     });
 
     it("should be able to DELETE file", async () => {
@@ -54,7 +54,7 @@ describe("[SDK] AssetManagementClient.Files", () => {
             mimeType: "text/plain",
             description: "Blubb2"
         });
-        await am.DeleteFile(`${result.id}`, { ifMatch: result.etag as number });
+        await am.DeleteFile(`${result.id}`, { ifMatch: `${result.etag}` });
     });
 
     it("should be able to PUT file", async () => {
@@ -66,10 +66,10 @@ describe("[SDK] AssetManagementClient.Files", () => {
         const updatedFile = await am.PutFile(`${result.id}`, Buffer.from("abcabc"), "test2.txt", {
             scope: AssetManagementModels.FileMetadataResource.ScopeEnum.PRIVATE,
             description: result.description,
-            ifMatch: result.etag as number
+            ifMatch: `${result.etag}`
         });
 
-        await am.DeleteFile(`${result.id}`, { ifMatch: updatedFile.etag as number });
+        await am.DeleteFile(`${result.id}`, { ifMatch: `${updatedFile.etag}` });
     });
 
     it("should be able to Get Billboard", async () => {

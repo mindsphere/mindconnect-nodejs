@@ -13,7 +13,7 @@ import { AgentManagementModels } from "./agent-models";
  * @extends {SdkClient}
  */
 export class AgentManagementClient extends SdkClient {
-    private _baseUrl: string = "/api/assetmanagement/v3";
+    private _baseUrl: string = "/api/agentmanagement/v3";
 
     /**
      * * Agents
@@ -98,7 +98,7 @@ export class AgentManagementClient extends SdkClient {
      *
      * @param {string} id
      * @param {AgentManagementModels.AgentUpdate} agent
-     * @param {{ ifMatch: number }} params
+     * @param {{ ifMatch: string }} params
      * @returns {Promise<AgentManagementModels.Agent>}
      *
      * @memberOf AgentManagementClient
@@ -106,7 +106,7 @@ export class AgentManagementClient extends SdkClient {
     public async PutAgent(
         id: string,
         agent: AgentManagementModels.AgentUpdate,
-        params: { ifMatch: number }
+        params: { ifMatch: string }
     ): Promise<AgentManagementModels.Agent> {
         const parameters = params || {};
         const { ifMatch } = parameters;
@@ -128,12 +128,12 @@ export class AgentManagementClient extends SdkClient {
      * Deletes the agent for the given agent id.
      *
      * @param {string} id
-     * @param {{ ifMatch: number }} params
+     * @param {{ ifMatch: string }} params
      * @returns {Promise<AgentManagementModels.Agent>}
      *
      * @memberOf AgentManagementClient
      */
-    public async DeleteAgent(id: string, params: { ifMatch: number }): Promise<AgentManagementModels.Agent> {
+    public async DeleteAgent(id: string, params: { ifMatch: string }): Promise<AgentManagementModels.Agent> {
         const parameters = params || {};
         const { ifMatch } = parameters;
         const result = await this.HttpAction({
@@ -197,7 +197,7 @@ export class AgentManagementClient extends SdkClient {
      *
      * @param {string} id
      * @param {AgentManagementModels.DataSourceConfiguration} dataSourceConfiguration
-     * @param {{ ifMatch: number }} params
+     * @param {{ ifMatch: string }} params
      * @returns {Promise<AgentManagementModels.DataSourceConfiguration>}
      *
      * @memberOf AgentManagementClient
@@ -205,7 +205,7 @@ export class AgentManagementClient extends SdkClient {
     public async PutDataSourceConfiguration(
         id: string,
         dataSourceConfiguration: AgentManagementModels.DataSourceConfiguration,
-        params: { ifMatch: number }
+        params: { ifMatch: string }
     ): Promise<AgentManagementModels.DataSourceConfiguration> {
         const parameters = params || {};
         const { ifMatch } = parameters;
@@ -264,6 +264,8 @@ export class AgentManagementClient extends SdkClient {
     }
 
     /**
+     * * Boarding
+     *
      * Gets onboarding status.
      *
      * @param {string} id

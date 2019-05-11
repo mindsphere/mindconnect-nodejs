@@ -124,7 +124,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         const asset = await am.PostAsset(testAsset);
         asset.should.not.be.null;
 
-        await am.DeleteAsset(`${asset.assetId}`, { ifMatch: asset.etag as number });
+        await am.DeleteAsset(`${asset.assetId}`, { ifMatch: `${asset.etag}` });
     });
 
     it("should PATCH specific asset ", async () => {
@@ -134,20 +134,20 @@ describe("[SDK] AssetManagementClient.Assets", () => {
 
         asset.externalId = "12354";
         const patchedAssetType = await am.PatchAsset(`${asset.assetId}`, asset, {
-            ifMatch: asset.etag as number
+            ifMatch: `${asset.etag}`
         });
         patchedAssetType.should.not.be.null;
         (patchedAssetType as any).externalId.should.be.equal("12354");
 
         asset.should.not.be.null;
-        await am.DeleteAsset(`${asset.assetId}`, { ifMatch: patchedAssetType.etag as number });
+        await am.DeleteAsset(`${asset.assetId}`, { ifMatch: `${patchedAssetType.etag}` });
     });
 
     it("should DELETE specific asset ", async () => {
         am.should.not.be.undefined;
         testAsset.name = `FalconF`;
         const asset = await am.PostAsset(testAsset);
-        await am.DeleteAsset(`${asset.assetId}`, { ifMatch: asset.etag as number });
+        await am.DeleteAsset(`${asset.assetId}`, { ifMatch: `${asset.etag}` });
     });
 
     it("should throw error on Put File assignment ", async () => {
@@ -160,7 +160,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
                 {
                     fileId: "abcd"
                 },
-                { ifMatch: asset.etag as number }
+                { ifMatch: `${asset.etag}` }
             );
         } catch (err) {
             err.message.should.contain("abcd");
@@ -171,7 +171,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         am.should.not.be.undefined;
         const asset = await am.GetAsset(falconAassetId);
         try {
-            await am.DeleteAssetFileAssignment(`${asset.assetId}`, "xyz", { ifMatch: asset.etag as number });
+            await am.DeleteAssetFileAssignment(`${asset.assetId}`, "xyz", { ifMatch: `${asset.etag}` });
         } catch (err) {
             err.message.should.contain("xyz");
         }
@@ -204,7 +204,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         const updatedAsset = await am.PutAssetLocation(
             falconAassetId,
             { country: "Bosnia", locality: "Sarajevo", streetAddress: "Ferhadija 1" },
-            { ifMatch: asset.etag as number }
+            { ifMatch: `${asset.etag}` }
         );
 
         (updatedAsset as any).location.country.should.be.equal("Bosnia");
@@ -218,9 +218,9 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         const updatedAsset = await am.PutAssetLocation(
             falconAassetId,
             { country: "Bosnia", locality: "Sarajevo", streetAddress: "Ferhadija 1" },
-            { ifMatch: asset.etag as number }
+            { ifMatch: `${asset.etag}` }
         );
-        const patchedAsset = await am.DeleteAssetLocation(falconAassetId, { ifMatch: updatedAsset.etag as number });
+        const patchedAsset = await am.DeleteAssetLocation(falconAassetId, { ifMatch: `${updatedAsset.etag}` });
         (patchedAsset as any).location.country.should.not.be.undefined;
     });
 });

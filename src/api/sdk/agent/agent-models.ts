@@ -42,35 +42,32 @@ export namespace AgentManagementModels {
      * @export
      * @interface Agent
      */
-    export interface Agent {
+    export interface Agent extends AgentUpdate {
         /**
-         * Name must be unique per tenant.
+         * Unique identifier of the agent
          * @type {string}
          * @memberof Agent
          */
-        name: string;
+        id?: string;
         /**
          *
          * @type {string}
          * @memberof Agent
          */
-        securityProfile: Agent.SecurityProfileEnum;
+        eTag?: string;
+        /**
+         * Unique identifier of the entity
+         * @type {string}
+         * @memberof Agent
+         */
+        entityId: string;
     }
 
     /**
      * @export
      * @namespace Agent
      */
-    export namespace Agent {
-        /**
-         * @export
-         * @enum {string}
-         */
-        export enum SecurityProfileEnum {
-            SHAREDSECRET = <any>"SHARED_SECRET",
-            RSA3072 = <any>"RSA_3072"
-        }
-    }
+    export namespace Agent {}
 
     /**
      *
@@ -804,31 +801,25 @@ export namespace AgentManagementModels {
      * @export
      * @interface TokenKey
      */
-    export interface TokenKey {
+    export interface TokenKey extends Key {
         /**
          *
          * @type {string}
          * @memberof TokenKey
          */
-        e: string;
+        alg?: string;
         /**
          *
          * @type {string}
          * @memberof TokenKey
          */
-        n: string;
+        use?: string;
         /**
          *
          * @type {string}
          * @memberof TokenKey
          */
-        kty: string;
-        /**
-         *
-         * @type {string}
-         * @memberof TokenKey
-         */
-        kid: string;
+        value?: string;
     }
 
     /**

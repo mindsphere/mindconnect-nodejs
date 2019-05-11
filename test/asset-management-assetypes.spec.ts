@@ -148,7 +148,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
         testAssetType.name = `SpaceShipTypeD`;
         const assetType = await am.PutAssetType(`${tenant}.SpaceShipTypeD`, testAssetType);
         assetType.should.not.be.null;
-        await am.DeleteAssetType(`${tenant}.SpaceShipTypeD`, { ifMatch: assetType.etag as number });
+        await am.DeleteAssetType(`${tenant}.SpaceShipTypeD`, { ifMatch: `${assetType.etag}` });
     });
 
     it("should PATCH specific asset type ", async () => {
@@ -164,20 +164,20 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
         });
 
         const patchedAssetType = await am.PatchAssetType(`${tenant}.SpaceShipTypeD`, assetType, {
-            ifMatch: assetType.etag as number
+            ifMatch: `${assetType.etag}`
         });
 
         patchedAssetType.should.not.be.null;
         (patchedAssetType as any).variables.length.should.be.equal(2);
         assetType.should.not.be.null;
-        await am.DeleteAssetType(`${tenant}.SpaceShipTypeD`, { ifMatch: patchedAssetType.etag as number });
+        await am.DeleteAssetType(`${tenant}.SpaceShipTypeD`, { ifMatch: `${patchedAssetType.etag}` });
     });
 
     it("should DELETE specific asset type ", async () => {
         am.should.not.be.undefined;
         testAssetType.name = `SpaceShipTypeF`;
         const assetType = await am.PutAssetType(`${tenant}.SpaceShipTypeF`, testAssetType);
-        await am.DeleteAssetType(`${tenant}.SpaceShipTypeF`, { ifMatch: assetType.etag as number });
+        await am.DeleteAssetType(`${tenant}.SpaceShipTypeF`, { ifMatch: `${assetType.etag}` });
     });
 
     it("should throw error on Put File assignment ", async () => {
@@ -191,7 +191,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
                 {
                     fileId: "abcd"
                 },
-                { ifMatch: assetType.etag as number }
+                { ifMatch: `${assetType.etag}` }
             );
         } catch (err) {
             err.message.should.contain("abcd");
@@ -203,7 +203,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
         const assetType = await am.GetAssetType(`${tenant}.SpaceShipTypeA`);
 
         try {
-            await am.DeleteAssetTypeFileAssignment(`${assetType.id}`, "xyz", { ifMatch: 0 });
+            await am.DeleteAssetTypeFileAssignment(`${assetType.id}`, "xyz", { ifMatch: "0" });
         } catch (err) {
             err.message.should.contain("xyz");
         }

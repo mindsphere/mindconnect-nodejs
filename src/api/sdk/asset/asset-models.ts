@@ -1185,10 +1185,11 @@ export namespace AssetManagementModels {
 
     /**
      * incremental counter for optimistic locking
+     * ! fix: manually converted ETag interface to string.
      * @export
      * @interface ETag
      */
-    export interface ETag {}
+    export type ETag = string;
 
     /**
      *

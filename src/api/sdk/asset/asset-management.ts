@@ -70,7 +70,7 @@ export class AssetManagementClient extends SdkClient {
      *
      * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
      * @param {AssetManagementModels.AspectType} aspectType aspect type
-     * @param {{ ifMatch?: number; ifNoneMatch?: string }} [params]
+     * @param {{ ifMatch?: string; ifNoneMatch?: string }} [params]
      * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking. Required for modification.
      * @param {{number}} [params.ifNoneMatch] Set ifNoneMatch header to “*” for ensuring create request
      * @returns {Promise<AssetManagementModels.AspectTypeResource>}
@@ -81,7 +81,7 @@ export class AssetManagementClient extends SdkClient {
     public async PutAspectType(
         id: string,
         aspectType: AssetManagementModels.AspectType,
-        params?: { ifMatch?: number; ifNoneMatch?: string }
+        params?: { ifMatch?: string; ifNoneMatch?: string }
     ): Promise<AssetManagementModels.AspectTypeResource> {
         const parameters = params || {};
         const { ifMatch, ifNoneMatch } = parameters;
@@ -106,7 +106,7 @@ export class AssetManagementClient extends SdkClient {
      *
      * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
      * @param {AssetManagementModels.AspectType} aspectType aspect type
-     * @param {{ ifMatch: number}} params
+     * @param {{ ifMatch: string}} params
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking. Required for modification.
      * @returns {Promise<AssetManagementModels.AspectTypeResource>}
      *
@@ -116,7 +116,7 @@ export class AssetManagementClient extends SdkClient {
     public async PatchAspectType(
         id: string,
         aspectType: AssetManagementModels.AspectType,
-        params: { ifMatch: number }
+        params: { ifMatch: string }
     ): Promise<AssetManagementModels.AspectTypeResource> {
         const parameters = params || {};
         const { ifMatch } = parameters;
@@ -138,15 +138,15 @@ export class AssetManagementClient extends SdkClient {
      * Delete an aspect type. Aspect type can only be deleted if there is no asset type using it.
      *
      * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
-     * @param {{ ifMatch: number }} params
-     * @param {{ ifMatch: number }} params.ifMatch Last known version to facilitate optimistic locking, required for deleting
+     * @param {{ ifMatch: string }} params
+     * @param {{ ifMatch: string }} params.ifMatch Last known version to facilitate optimistic locking, required for deleting
      * @returns {Promise<Object>} - return empty object
      *
      * @example await am.DeleteAspectType("mdsp.EnvironmentAspect", {ifMatch:0})
      * @memberOf AssetManagementClient
      *
      */
-    public async DeleteAspectType(id: string, params: { ifMatch: number }) {
+    public async DeleteAspectType(id: string, params: { ifMatch: string }) {
         await this.HttpAction({
             verb: "DELETE",
             gateway: this.GetGateway(),
@@ -247,7 +247,7 @@ export class AssetManagementClient extends SdkClient {
      *
      * @param {string} id
      * @param {AssetManagementModels.AssetType} assetType
-     * @param {{ ifMatch?: number; ifNoneMatch?: string; exploded?: boolean }} [params]
+     * @param {{ ifMatch?: string; ifNoneMatch?: string; exploded?: boolean }} [params]
      * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking. Required for modification.
      * @param {{string}} [params.ifNoneMatch] Set ifNoneMatch header to “*” for ensuring create request
      * @param {{boolean}} [params.exploded] Specifies if the asset type should include all of it’s inherited variables and aspects. Default is false.
@@ -259,7 +259,7 @@ export class AssetManagementClient extends SdkClient {
     public async PutAssetType(
         id: string,
         assetType: AssetManagementModels.AssetType,
-        params?: { ifMatch?: number; ifNoneMatch?: string; exploded?: boolean }
+        params?: { ifMatch?: string; ifNoneMatch?: string; exploded?: boolean }
     ): Promise<AssetManagementModels.AssetTypeResource> {
         const parameters = params || {};
         const { ifMatch, ifNoneMatch, exploded } = parameters;
@@ -285,7 +285,7 @@ export class AssetManagementClient extends SdkClient {
      *
      * @param {string} id
      * @param {AssetManagementModels.AssetType} assetType
-     * @param {{ ifMatch: number; exploded?: boolean }} params
+     * @param {{ ifMatch: string; exploded?: boolean }} params
      * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking. Required for modification.
      * @param {{boolean}} [params.exploded] Specifies if the asset type should include all of it’s inherited variables and aspects. Default is false.
      * @returns {Promise<AssetManagementModels.AssetTypeResource>}
@@ -296,7 +296,7 @@ export class AssetManagementClient extends SdkClient {
     public async PatchAssetType(
         id: string,
         assetType: AssetManagementModels.AssetType,
-        params: { ifMatch: number; exploded?: boolean }
+        params: { ifMatch: string; exploded?: boolean }
     ): Promise<AssetManagementModels.AssetTypeResource> {
         const parameters = params || {};
         const { ifMatch, exploded } = parameters;
@@ -319,14 +319,14 @@ export class AssetManagementClient extends SdkClient {
      * Deletion only possible when the type has no child-type and there is no asset that instantiate it.
      *
      * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
-     * @param {{ ifMatch: number }} params
+     * @param {{ ifMatch: string }} params
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking, required for deleting
      *
      * @example await am.DeleteAssetType("mdsp.SimulationEnigine", {ifMatch:0})
      * @memberOf AssetManagementClient
      *
      */
-    public async DeleteAssetType(id: string, params: { ifMatch: number }) {
+    public async DeleteAssetType(id: string, params: { ifMatch: string }) {
         await this.HttpAction({
             verb: "DELETE",
             gateway: this.GetGateway(),
@@ -376,7 +376,7 @@ export class AssetManagementClient extends SdkClient {
      * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
      * @param {string} key Keyword for the file to be assigned to an asset or asset type.
      * @param {AssetManagementModels.KeyedFileAssignment} assignment Data for file assignment
-     * @param {{ ifMatch: number }} params
+     * @param {{ ifMatch: string }} params
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
      * @returns {Promise<AssetManagementModels.AssetTypeResource>}
      *
@@ -386,7 +386,7 @@ export class AssetManagementClient extends SdkClient {
         id: string,
         key: string,
         assignment: AssetManagementModels.KeyedFileAssignment,
-        params: { ifMatch: number }
+        params: { ifMatch: string }
     ): Promise<AssetManagementModels.AssetTypeResource> {
         const parameters = params || {};
         const { ifMatch } = parameters;
@@ -411,12 +411,12 @@ export class AssetManagementClient extends SdkClient {
      * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
      * @param {string} key Keyword for the file to be assigned to an asset or asset type.
      * @param {AssetManagementModels.KeyedFileAssignment} assignment Data for file assignment
-     * @param {{ ifMatch: number }} params
+     * @param {{ ifMatch: string }} params
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
      *
      * @memberOf AssetManagementClient
      */
-    public async DeleteAssetTypeFileAssignment(id: string, key: string, params: { ifMatch: number }) {
+    public async DeleteAssetTypeFileAssignment(id: string, key: string, params: { ifMatch: string }) {
         const parameters = params || {};
         const { ifMatch } = parameters;
         await this.HttpAction({
@@ -536,18 +536,18 @@ export class AssetManagementClient extends SdkClient {
      *
      * @param {string} assetId
      * @param {AssetManagementModels.AssetUpdate} asset
-     * @param {{ ifMatch: number }} params
+     * @param {{ ifMatch: string }} params
      * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking. Required for modification.
      * @returns {Promise<AssetManagementModels.AssetResourceWithHierarchyPath>}
      *
-     * @example await assetManagement.PutAsset (myAsset, {ifMatch: myAsset.etag as number})
+     * @example await assetManagement.PutAsset (myAsset, {ifMatch: `${myAsset.etag}`})
      *
      * @memberOf AssetManagementClient
      */
     public async PutAsset(
         assetId: string,
         asset: AssetManagementModels.AssetUpdate,
-        params: { ifMatch: number }
+        params: { ifMatch: string }
     ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
         const parameters = params || {};
         const { ifMatch } = parameters;
@@ -572,18 +572,18 @@ export class AssetManagementClient extends SdkClient {
      *
      * @param {string} assetId
      * @param {AssetManagementModels.AssetUpdate} asset
-     * @param {{ ifMatch: number }} params
+     * @param {{ ifMatch: string }} params
      * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking. Required for modification.
      * @returns {Promise<AssetManagementModels.AssetResourceWithHierarchyPath>}
      *
-     * @example await assetManagement.Patch (myAsset, {ifMatch: myAsset.etag as number})
+     * @example await assetManagement.Patch (myAsset, {ifMatch: `${myAsset.etag}`})
      *
      * @memberOf AssetManagementClient
      */
     public async PatchAsset(
         assetId: string,
         asset: AssetManagementModels.AssetUpdate,
-        params: { ifMatch: number }
+        params: { ifMatch: string }
     ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
         const parameters = params || {};
         const { ifMatch } = parameters;
@@ -608,14 +608,14 @@ export class AssetManagementClient extends SdkClient {
      * It’s not possible to delete an asset if it has children.
      *
      * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
-     * @param {{ ifMatch: number }} params
+     * @param {{ ifMatch: string }} params
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking, required for deleting
      *
      * @example await assetManagement.DeleteAsset(id, {ifMatch:0})
      *
      * @memberOf AssetManagementClient
      */
-    public async DeleteAsset(id: string, params: { ifMatch: number }) {
+    public async DeleteAsset(id: string, params: { ifMatch: string }) {
         await this.HttpAction({
             verb: "DELETE",
             gateway: this.GetGateway(),
@@ -634,7 +634,7 @@ export class AssetManagementClient extends SdkClient {
      * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
      * @param {string} key Keyword for the file to be assigned to an asset or asset type.
      * @param {AssetManagementModels.KeyedFileAssignment} assignment Data for file assignment
-     * @param {{ ifMatch: number }} params
+     * @param {{ ifMatch: string }} params
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
      * @returns {Promise<AssetManagementModels.AssetTypeResource>}
      *
@@ -644,7 +644,7 @@ export class AssetManagementClient extends SdkClient {
         id: string,
         key: string,
         assignment: AssetManagementModels.KeyedFileAssignment,
-        params: { ifMatch: number }
+        params: { ifMatch: string }
     ): Promise<AssetManagementModels.AssetTypeResource> {
         const parameters = params || {};
         const { ifMatch } = parameters;
@@ -669,12 +669,12 @@ export class AssetManagementClient extends SdkClient {
      * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
      * @param {string} key Keyword for the file to be assigned to an asset or asset type.
      * @param {AssetManagementModels.KeyedFileAssignment} assignment Data for file assignment
-     * @param {{ ifMatch: number }} params
+     * @param {{ ifMatch: string }} params
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
      *
      * @memberOf AssetManagementClient
      */
-    public async DeleteAssetFileAssignment(id: string, key: string, params: { ifMatch: number }) {
+    public async DeleteAssetFileAssignment(id: string, key: string, params: { ifMatch: string }) {
         const parameters = params || {};
         const { ifMatch } = parameters;
         await this.HttpAction({
@@ -807,7 +807,7 @@ export class AssetManagementClient extends SdkClient {
      *
      * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
      * @param {AssetManagementModels.Location} location Data for location
-     * @param {{ ifMatch: number }} params
+     * @param {{ ifMatch: string }} params
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
      * @returns {Promise<AssetManagementModels.Location>}
      *
@@ -818,7 +818,7 @@ export class AssetManagementClient extends SdkClient {
     public async PutAssetLocation(
         id: string,
         location: AssetManagementModels.Location,
-        params: { ifMatch: number }
+        params: { ifMatch: string }
     ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
         const parameters = params || {};
         const { ifMatch } = parameters;
@@ -845,13 +845,13 @@ export class AssetManagementClient extends SdkClient {
      *
      * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
      * @param {AssetManagementModels.Location} location Data for location
-     * @param {{ ifMatch: number }} params
+     * @param {{ ifMatch: string }} params
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
      * @returns {Promise<AssetManagementModels.AssetResourceWithHierarchyPath>}
      *
      * @memberOf AssetManagementClient
      */
-    public async DeleteAssetLocation(id: string, params: { ifMatch: number }) {
+    public async DeleteAssetLocation(id: string, params: { ifMatch: string }) {
         const parameters = params || {};
         const { ifMatch } = parameters;
         const result = await this.HttpAction({
@@ -1034,7 +1034,7 @@ export class AssetManagementClient extends SdkClient {
      *             scope: AssetManagementModels.FileMetadataResource.ScopeEnum;
      *             description?: string;
      *             mimeType?: string;
-     *             ifMatch: number;
+     *             ifMatch: string;
      *         }} params
      * @returns {Promise<AssetManagementModels.FileMetadataResource>}
      *
@@ -1048,7 +1048,7 @@ export class AssetManagementClient extends SdkClient {
             scope: AssetManagementModels.FileMetadataResource.ScopeEnum;
             description?: string;
             mimeType?: string;
-            ifMatch: number;
+            ifMatch: string;
         }
     ): Promise<AssetManagementModels.FileMetadataResource> {
         const parameters = params || {};
@@ -1079,11 +1079,11 @@ export class AssetManagementClient extends SdkClient {
      * Deletion is blocked if there are any file assignment with the given fileId.
      *
      * @param {string} fileId
-     * @param {{ ifMatch: number }} params
+     * @param {{ ifMatch: string }} params
      *
      * @memberOf AssetManagementClient
      */
-    public async DeleteFile(fileId: string, params: { ifMatch: number }) {
+    public async DeleteFile(fileId: string, params: { ifMatch: string }) {
         const parameters = params || {};
         const { ifMatch } = parameters;
         await this.HttpAction({

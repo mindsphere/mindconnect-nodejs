@@ -1,6 +1,6 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
-import { AssetManagementModels, MindSphereSdk, AssetManagementClient } from "../src/api/sdk";
+import { AssetManagementClient, AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import { sleep } from "./test-utils";
 chai.should();
@@ -122,7 +122,7 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         const aspectType = await am.PutAspectType(`${tenant}.UnitTestEngineD`, testAspectType);
 
         aspectType.should.not.be.null;
-        await am.DeleteAspectType(`${tenant}.UnitTestEngineD`, { ifMatch: aspectType.etag as number });
+        await am.DeleteAspectType(`${tenant}.UnitTestEngineD`, { ifMatch: `${aspectType.etag}` });
     });
 
     it("should PATCH specific aspect type ", async () => {
@@ -135,24 +135,21 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         });
 
         const patchedAspectType = await am.PatchAspectType(`${tenant}.UnitTestEngineD`, aspectType, {
-            ifMatch: aspectType.etag as number
+            ifMatch: `${aspectType.etag}`
         });
         patchedAspectType.should.not.be.null;
         patchedAspectType.variables.length.should.be.equal(2);
-        await am.DeleteAspectType(`${tenant}.UnitTestEngineD`, { ifMatch: patchedAspectType.etag as number });
+        await am.DeleteAspectType(`${tenant}.UnitTestEngineD`, { ifMatch: `${patchedAspectType.etag}` });
     });
 
     it("should DELETE specific aspect type ", async () => {
         am.should.not.be.undefined;
         testAspectType.name = `UnitTestEngineE`;
         const aspectType = await am.PutAspectType(`${tenant}.UnitTestEngineE`, testAspectType);
-        await am.DeleteAspectType(`${tenant}.UnitTestEngineE`, { ifMatch: aspectType.etag as number });
+        await am.DeleteAspectType(`${tenant}.UnitTestEngineE`, { ifMatch: `${aspectType.etag}` });
     });
 });
-async function deleteAspectTypes(
-    am: AssetManagementClient,
-    tenant: string
-) {
+async function deleteAspectTypes(am: AssetManagementClient, tenant: string) {
     const aspectTypes = (await am.GetAspectTypes({
         filter: JSON.stringify({
             and: {
