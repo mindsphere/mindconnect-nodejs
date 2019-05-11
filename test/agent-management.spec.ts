@@ -137,12 +137,9 @@ describe("[SDK] AgentManagementClient", () => {
         (configuration as any).content.should.not.be.undefined;
         (configuration as any).content.clientCredentialProfile[0].should.not.be.undefined;
 
-        if (!configuration) throwError("invalidConfiguration");
+        if (!configuration) throwError("Invalid Configuration");
         const mindConnectAgent = new MindConnectAgent(configuration);
         await mindConnectAgent.OnBoard();
-
-        const status = await agentMgmt.GetOnboardingStatus(testAgentId);
-        (status.status as any).should.equal("ONBOARDED");
 
         const onlineStatus = await agentMgmt.GetAgentOnlineStatus(testAgentId);
         onlineStatus.should.not.be.undefined;
@@ -157,6 +154,8 @@ describe("[SDK] AgentManagementClient", () => {
             }
             break;
         }
+
+        await sleep(2000); // give time for async methods to settle
     });
 
     async function deleteAgents() {
