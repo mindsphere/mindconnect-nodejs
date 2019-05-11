@@ -134,7 +134,7 @@ export class MindConnectAgent extends AgentAuth {
         if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
         if (!this._configuration.content.clientId) throw new Error("No client id in the configuration of the agent.");
 
-        const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
+        const headers = { ...this._headers, Authorization: `Bearer ${this._accessToken.access_token}` };
         const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/agents/${
             this._configuration.content.clientId
         }/dataSourceConfiguration`;
@@ -167,7 +167,7 @@ export class MindConnectAgent extends AgentAuth {
         if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
         if (!this._configuration.content.clientId) throw new Error("No client id in the configuration of the agent.");
 
-        const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
+        const headers = { ...this._headers, Authorization: `Bearer ${this._accessToken.access_token}` };
         const agentFilter = encodeURIComponent(JSON.stringify({ agentId: `${this._configuration.content.clientId}` }));
         const url = `${
             this._configuration.content.baseUrl
