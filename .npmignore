@@ -30,3 +30,6 @@ Jenkinsfile
 report.xml
 .github
 .prettier*
+
+bulkupload
+

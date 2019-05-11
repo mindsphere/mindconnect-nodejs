@@ -6,7 +6,13 @@ import * as fs from "fs";
 import * as _ from "lodash";
 import * as path from "path";
 import { sleep } from "../../../test/test-utils";
-import { AssetManagementClient, AssetManagementModels, TimeSeriesBulkClient, TimeSeriesBulkModels, TimeSeriesClient } from "../../api/sdk";
+import {
+    AssetManagementClient,
+    AssetManagementModels,
+    TimeSeriesBulkClient,
+    TimeSeriesBulkModels,
+    TimeSeriesClient
+} from "../../api/sdk";
 import { IotFileClient } from "../../api/sdk/iotfile/iot-file";
 import { decrypt, errorLog, loadAuth, retry, retrylog, throwError, verboseLog } from "../../api/utils";
 import { modeInformation } from "./command-utils";
@@ -18,6 +24,7 @@ export default (program: CommanderStatic) => {
         .alias("rb")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
+        .option("-l, --parallel <number>", "parallel chunk uploads", 3)
         .option("-s, --size <size>", "entries per file ", Number.MAX_SAFE_INTEGER)
         .option("-p, --skip", " skip json generation (if already generated)")
         .option("-k, --passkey <passkey>", "passkey")
@@ -209,8 +216,6 @@ async function uploadFiles(options: any, jobstate: jobState, spinner?: any) {
             continue;
         }
 
-        console.log(options.retry);
-
         const result = await fileUploadClient.UploadFile(
             `${jobstate.options.asset.assetId}`,
             entry.filepath,
@@ -221,6 +226,7 @@ async function uploadFiles(options: any, jobstate: jobState, spinner?: any) {
                 description: "bulk upload",
                 chunk: true,
                 retry: options.retry,
+                paralelUploads: options.parallel,
                 logFunction: (p: string) => {
                     return retrylog(p, chalk.magentaBright);
                 },
@@ -230,7 +236,6 @@ async function uploadFiles(options: any, jobstate: jobState, spinner?: any) {
             }
         );
 
-        console.log(entry.filepath + "..uploaded");
         const fileInfo = await fileUploadClient.GetFiles(`${jobstate.options.asset.assetId}`, {
             filter: JSON.stringify({
                 and: {
@@ -241,7 +246,6 @@ async function uploadFiles(options: any, jobstate: jobState, spinner?: any) {
         });
 
         entry.etag = `${fileInfo[0].etag}`;
-        console.log(fileInfo);
         verboseLog(`uploaded ${entry.filepath} with md5 checksum: ${result}`, options.verbose, spinner);
     }
 }
