@@ -25,12 +25,12 @@ describe("[SDK] IotFileClient", () => {
         await deleteFiles();
     });
 
-    it.only("SDK should not be undefined", async () => {
+    it("SDK should not be undefined", async () => {
         sdk.should.not.be.undefined;
         iotFile.should.not.be.undefined;
     });
 
-    it.only("should be able to PUT AND GET file", async () => {
+    it("should be able to PUT AND GET file", async () => {
         await iotFile.PutFile(rootId, "unit/test/xyz.txt", Buffer.from("xyz"), {
             description: "blubb",
             type: "text/plain"
@@ -40,7 +40,7 @@ describe("[SDK] IotFileClient", () => {
         text.should.be.equal("xyz");
     });
 
-    it.only("should be able to upload 8 mb 1byte large file", async () => {
+    it("should be able to upload 8 mb 1byte large file", async () => {
         const checksum = await iotFile.UploadFile(rootId, `unit/test/xyz8xmb.txt`, Buffer.alloc(8 * 1024 * 1024 + 1), {
             chunk: true
         });
@@ -48,7 +48,7 @@ describe("[SDK] IotFileClient", () => {
         checksum.should.be.equal("cba5242e77abe5709a262350cf64d835");
     });
 
-    it.only("should be able to upload 16.25 mb 1byte large file", async () => {
+    it("should be able to upload 16.25 mb 1byte large file", async () => {
         if (!process.env.CI) return;
 
         const checksum = await iotFile.UploadFile(
@@ -63,7 +63,7 @@ describe("[SDK] IotFileClient", () => {
         checksum.should.be.equal("84c8648b8aa9b803ff92515a63aa4580");
     });
 
-    it.only("should be able to upload 1 byte large file", async () => {
+    it("should be able to upload 1 byte large file", async () => {
         const checksum = await iotFile.UploadFile(rootId, `unit/test/xyz1by.txt`, Buffer.alloc(1), {
             chunk: true
         });
@@ -71,7 +71,7 @@ describe("[SDK] IotFileClient", () => {
         checksum.should.be.equal("93b885adfe0da089cdf634904fd59f71");
     });
 
-    it.only("should be able to upload 0 byte large file", async () => {
+    it("should be able to upload 0 byte large file", async () => {
         const checksum = await iotFile.UploadFile(rootId, `unit/test/xyz0by.txt`, Buffer.alloc(0), {
             chunk: true
         });
