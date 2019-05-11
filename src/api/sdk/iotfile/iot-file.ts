@@ -1,7 +1,7 @@
 import * as fs from "fs";
-import { SdkClient } from "..";
 import { checkAssetId } from "../../utils";
 import { MultipartUploader, optionalParameters } from "../common/multipart-uploader";
+import { SdkClient } from "../common/sdk-client";
 import { IotFileModels } from "./iot-file-models";
 /**
  *

@@ -57,18 +57,18 @@ describe("[SDK] AgentManagementClient", () => {
         await deleteAgents();
     });
 
-    it.only("SDK should not be undefined", async () => {
+    it("SDK should not be undefined", async () => {
         sdk.should.not.be.undefined;
     });
 
-    it.only("standard properties shoud be defined", async () => {
+    it("standard properties shoud be defined", async () => {
         agentMgmt.should.not.be.undefined;
         agentMgmt.GetGateway().should.be.equal(auth.gateway);
         (await agentMgmt.GetToken()).length.should.be.greaterThan(200);
         (await agentMgmt.GetServiceToken()).length.should.be.greaterThan(200);
     });
 
-    it.only("should GET agent(s)", async () => {
+    it("should GET agent(s)", async () => {
         agentMgmt.should.not.be.undefined;
         const agents = await agentMgmt.GetAgents({ size: 10 });
         agents.should.not.be.undefined;
@@ -77,7 +77,7 @@ describe("[SDK] AgentManagementClient", () => {
         agents.size.should.be.lessThan(11);
     });
 
-    it.only("should GET agent(s) with filter", async () => {
+    it("should GET agent(s) with filter", async () => {
         agentMgmt.should.not.be.undefined;
         const agents = await agentMgmt.GetAgents({
             filter: JSON.stringify({
@@ -91,7 +91,7 @@ describe("[SDK] AgentManagementClient", () => {
         agents.totalElements.should.equal(1);
     });
 
-    it.only("should GET agent(s) with sorting", async () => {
+    it("should GET agent(s) with sorting", async () => {
         agentMgmt.should.not.be.undefined;
         const agents = await agentMgmt.GetAgents({
             filter: JSON.stringify({
@@ -107,13 +107,13 @@ describe("[SDK] AgentManagementClient", () => {
         agents.should.not.be.null;
     });
 
-    it.only("should GET specific agent ", async () => {
+    it("should GET specific agent ", async () => {
         agentMgmt.should.not.be.undefined;
         const agent = await agentMgmt.GetAgent(testAssetId);
         agent.should.not.be.undefined;
     });
 
-    it.only("should PUT specific agent ", async () => {
+    it("should PUT specific agent ", async () => {
         const agent = await agentMgmt.GetAgent(testAgentId);
         agent.securityProfile = AgentManagementModels.AgentUpdate.SecurityProfileEnum.SHAREDSECRET;
         const { securityProfile } = agent;
@@ -128,7 +128,7 @@ describe("[SDK] AgentManagementClient", () => {
         patchedAgent.securityProfile.should.equal("SHARED_SECRET");
     });
 
-    it.only("should work with onboarding/offboarding ", async () => {
+    it("should work with onboarding/offboarding ", async () => {
         let configuration;
 
         configuration = await getBoardingConfiguration(agentMgmt, testAgentId);

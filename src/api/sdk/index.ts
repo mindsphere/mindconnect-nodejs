@@ -9,3 +9,5 @@ export * from "./iot/iot-timeseries";
 export * from "./iot/iot-timeseries-models";
 export * from "./iotbulk/iot-timeseries-bulk";
 export * from "./iotbulk/iot-timeseries-bulk-models";
+export * from "./iotfile/iot-file";
+export * from "./iotfile/iot-file-models";

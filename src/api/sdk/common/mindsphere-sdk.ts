@@ -1,5 +1,6 @@
 import { AgentManagementClient } from "../agent/agent-management";
 import { AssetManagementClient } from "../asset/asset-management";
+import { IotFileClient } from "../iotfile/iot-file";
 import { isSdkConfiguration, SdkConfiguration } from "./sdk-client";
 export class MindSphereSdk {
     private _assetManagementClient?: AssetManagementClient;
@@ -14,6 +15,12 @@ export class MindSphereSdk {
         this._agentManagementClient =
             this._agentManagementClient || new AgentManagementClient(this._gateway, this._basicAuth, this._tenant);
         return this._agentManagementClient;
+    }
+
+    private _iotFileClient?: IotFileClient;
+    public GetIoTFileClient(): IotFileClient {
+        this._iotFileClient = this._iotFileClient || new IotFileClient(this._gateway, this._basicAuth, this._tenant);
+        return this._iotFileClient;
     }
 
     public GetTenant() {
