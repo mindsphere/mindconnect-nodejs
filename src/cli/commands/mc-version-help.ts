@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import { getColor } from "./command-utils";
@@ -17,7 +16,7 @@ export default (program: CommanderStatic) => {
         log(`    the ${cyan("cyan colored commands ")}require mindconnectlib (agent) credentials`);
         log(`    the ${green("green colored commands #")} are used to setup starter projects`);
         log(`    the service credentials should only be used in secure environments for setup tasks`);
-        log(`    Full documentation: ${cyan("https://mindconnect-nodejs.github.com")}\n`);
+        log(`    Full documentation: ${cyan("https://mindsphere.github.io")}\n`);
     });
 
     program.on("command:*", function() {

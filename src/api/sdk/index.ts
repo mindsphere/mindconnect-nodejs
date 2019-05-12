@@ -5,6 +5,8 @@ export * from "./asset/asset-management";
 export * from "./asset/asset-models";
 export * from "./common/mindsphere-sdk";
 export * from "./common/sdk-client";
+export * from "./event/event-management";
+export * from "./event/event-models";
 export * from "./iot/iot-timeseries";
 export * from "./iot/iot-timeseries-models";
 export * from "./iotbulk/iot-timeseries-bulk";

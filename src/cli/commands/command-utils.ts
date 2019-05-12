@@ -1,8 +1,7 @@
 import chalk from "chalk";
 import { log } from "console";
-import * as fs from "fs";
 import { AssetManagementModels } from "../../api/sdk";
-import { authJson, getHomeDotMcDir } from "../../api/utils";
+import { getHomeDotMcDir } from "../../api/utils";
 
 const magenta = getColor("magenta");
 const yellow = getColor("yellow");
@@ -135,10 +134,10 @@ export function agentConfigLog({
         "\t" +
             color(
                 `${gateway.replace(host, tenant + "-assetmanager")}/entity/${agentid}/plugin/uipluginassetmanagermclib`
-            )
+            ) +
+            "\n"
     );
 }
-
 
 export const errorLog = (err: any, verbose: any) => {
     if (err.message) {
