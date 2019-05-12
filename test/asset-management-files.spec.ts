@@ -27,10 +27,16 @@ describe("[SDK] AssetManagementClient.Files", () => {
     });
 
     it("should be able to POST AND GET file", async () => {
-        const result = await am.PostFile(Buffer.from("xyz"), "xyz.text", {
-            mimeType: "text/plain",
-            description: "Blubb2"
-        });
+        // ! the behavior here is asynchronous...
+        const result = await retry(
+            5,
+            () =>
+                am.PostFile(Buffer.from("xyz"), "xyz.text", {
+                    mimeType: "text/plain",
+                    description: "Blubb2"
+                }),
+            1000
+        );
         const files = await am.GetFiles({ filter: JSON.stringify({ name: "xyz.text" }) });
         (files._embedded as any).files.length.should.equal(1);
 
@@ -43,7 +49,7 @@ describe("[SDK] AssetManagementClient.Files", () => {
             description: "Blubb2"
         });
         // ! the behavior here is asynchronous...
-        const file = (await retry(5, () => am.DownloadFile(`${result.id}`))) as Response;
+        const file = (await retry(5, () => am.DownloadFile(`${result.id}`), 1000)) as Response;
         const text = await file.text();
         text.should.be.equal("xyz");
 

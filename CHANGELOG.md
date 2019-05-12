@@ -8,16 +8,31 @@
 - CLI Command: prepare-bulk - creates a template directory for timeseries (bulk) upload
 - CLI Command: run-bulk - runs the timeseries (bulk) upload jobs
 - CLI Command: check-bulk - checks the progress of the upload jobs
-- CLI Command: create-agent - creates a new agent in the mindsphere
+- CLI Command: create-agent - creates a new agent in the mindsphere (#12)
+- CLI Command: offboard-agent - offboards the agent in the mindsphere (#11)
+- CLI Command: renew-agent  - renews the agent secrets (#13)
 - mindconnect-agent: created new UploadFile method capable of running the multipart upload (#4)
 - mindconnect-agent: the UploadFile can now take a buffer additionally to file (#23)
+- mindconnect-agent: the UploadFile can now run in parallel (#23)
 - mindconnect-agent: the MindSphere path name can be configured (#23)
 - mindconnect-agent: deprecated the old upload method (#23)
 - SDK: started a  PRELIMINARY SDK for the new commands which require additional mindsphere APIs
+- SDK: preliminary Support for
+
+    - Asset Management Service
+    - Agent Management Service
+    - IoT File Service
+    - Time Series Bulk Service
+    - Time Series Bulk Service
+    - Event Management Service
+
+- CLI: color support for low color terminals
 
 ## Bugfixes and improvements 3.5.0
 
 - CLI Command: upload-timeseries - improved help and error messages during parsing #20
+- mindconnect-agent: removed content-type header from GET Messages according to MindSphere recommendation
+
 
 ## Contributions :heart: <3
 

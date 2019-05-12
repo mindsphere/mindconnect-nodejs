@@ -338,6 +338,16 @@ Vibration data:
 The CLI commands should only be used **in secure enviroments!** (e.g on your working station, not on the agents). In the next major version the CLI will be
 moved to a separate package to reduce the size of the library.
 
+Here is an overview of CLI commands:
+
+```bash
+# run mc --help to get a full list of the commands
+mc --help
+```
+
+![CLI](images/cli.png)
+
+
 ### Setup and diagnostic
 
 The diagnostic endpoint gives informations about the possible problems which an agent might have on the cloud side. However, these operations require service credentials which should only be used for setup and diagnostic tasks in secure environments.
