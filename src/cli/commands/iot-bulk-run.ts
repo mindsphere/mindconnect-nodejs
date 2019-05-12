@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as csv from "csvtojson";
@@ -14,9 +13,11 @@ import {
     TimeSeriesClient
 } from "../../api/sdk";
 import { IotFileClient } from "../../api/sdk/iotfile/iot-file";
-import { decrypt, errorLog, loadAuth, retry, throwError, verboseLog } from "../../api/utils";
-import { modeInformation } from "./command-utils";
+import { decrypt, retry, throwError, loadAuth } from "../../api/utils";
 import ora = require("ora");
+import { getColor, modeInformation, verboseLog, errorLog, retrylog } from "./command-utils";
+
+const color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -24,12 +25,13 @@ export default (program: CommanderStatic) => {
         .alias("rb")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
+        .option("-l, --parallel <number>", "parallel chunk uploads", 3)
         .option("-s, --size <size>", "entries per file ", Number.MAX_SAFE_INTEGER)
         .option("-p, --skip", " skip json generation (if already generated)")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
         .option("-st, --start", "start sending data to mindsphere")
-        .description(chalk.magentaBright("runs the timeseries (bulk) upload job from <directoryname> directory *"))
+        .description(color("runs the timeseries (bulk) upload job from <directoryname> directory *"))
         .action(options => {
             (async () => {
                 try {
@@ -74,9 +76,7 @@ export default (program: CommanderStatic) => {
                     !options.verbose && spinner.succeed("done converting files to json");
                     !options.start &&
                         console.log(
-                            `\nrun mc bulk-run with ${chalk.magentaBright(
-                                "--start"
-                            )} option to start sending data to mindsphere\n`
+                            `\nrun mc bulk-run with ${color("--start")} option to start sending data to mindsphere\n`
                         );
 
                     // *
@@ -93,11 +93,7 @@ export default (program: CommanderStatic) => {
                         !options.verbose && spinner.succeed("Done");
 
                         asset.twinType === AssetManagementModels.TwinType.Simulation &&
-                            console.log(
-                                `\t run mc ${chalk.magentaBright(
-                                    "check-bulk"
-                                )} command to check the progress of the job`
-                            );
+                            console.log(`\t run mc ${color("check-bulk")} command to check the progress of the job`);
                     }
                 } catch (err) {
                     errorLog(err, options.verbose);
@@ -106,9 +102,9 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc run-bulk runs the upload job from the  ${chalk.magentaBright("bulkimport")} directory`);
+            log(`    mc run-bulk runs the upload job from the  ${color("bulkimport")} directory`);
             log(
-                `    mc run-bulk --dir asset1 --verbose runs the upload job from the ${chalk.magentaBright(
+                `    mc run-bulk --dir asset1 --verbose runs the upload job from the ${color(
                     "asset1"
                 )} with verbose output`
             );
@@ -123,7 +119,7 @@ async function runTimeSeriesUpload(options: any, jobstate: jobState, spinner: or
 
         if (jobstate.timeSeriesFiles.indexOf(file.path) >= 0) {
             verboseLog(
-                `${chalk.magentaBright(timeSeries.length)} records from ${formatDate(file.mintime)} to ${formatDate(
+                `${color(timeSeries.length)} records from ${formatDate(file.mintime)} to ${formatDate(
                     file.maxtime
                 )} were already posted`,
                 options.verbose,
@@ -135,7 +131,7 @@ async function runTimeSeriesUpload(options: any, jobstate: jobState, spinner: or
 
         await retry(options.retry, () => tsClient.PutTimeSeries(file.entity, file.propertyset, timeSeries), 2000);
         verboseLog(
-            `posted ${chalk.magentaBright(timeSeries.length)} records from ${formatDate(file.mintime)} to ${formatDate(
+            `posted ${color(timeSeries.length)} records from ${formatDate(file.mintime)} to ${formatDate(
                 file.maxtime
             )}`,
             options.verbose,
@@ -149,8 +145,8 @@ async function runTimeSeriesUpload(options: any, jobstate: jobState, spinner: or
 
 function formatDate(date: string | Date) {
     if (date instanceof Date) {
-        return `${chalk.magentaBright(date.toISOString())}`;
-    } else return `${chalk.magentaBright(date)}`;
+        return `${color(date.toISOString())}`;
+    } else return `${color(date)}`;
 }
 
 async function runSimulationUpload(options: any, jobstate: jobState, spinner: ora.Ora) {
@@ -191,7 +187,7 @@ async function createUploadJobs(jobstate: jobState, options: any, spinner: ora.O
         const job = await bulkupload.PostImportJob(bulkImport);
         (bulkImport as any).jobid = job.id;
         verboseLog(
-            `Job with ${chalk.magentaBright("" + job.jobId)} is in status : ${job.status} [${job.message}]`,
+            `Job with ${color("" + job.jobId)} is in status : ${job.status} [${job.message}]`,
             options.verbose,
             spinner
         );
@@ -207,26 +203,37 @@ async function uploadFiles(options: any, jobstate: jobState, spinner?: any) {
     const fileUploadClient = new IotFileClient(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
     for (const entry of jobstate.uploadFiles) {
         if (entry.etag) {
-            verboseLog(
-                `The file  ${chalk.magentaBright(entry.filepath)} was already uploaded`,
-                options.verbose,
-                spinner
-            );
+            verboseLog(`The file  ${color(entry.filepath)} was already uploaded`, options.verbose, spinner);
             continue;
         }
-        const result = await retry(
-            options.retry,
-            () =>
-                fileUploadClient.PutFile(`${jobstate.options.asset.assetId}`, entry.filepath, entry.path, {
-                    type: "application/json",
-                    timestamp: fs.statSync(entry.path).mtime,
-                    description: "bulk upload"
-                }),
-            500,
-            () => verboseLog(`Uploading the file again...`, options.verbose, spinner)
+
+        const result = await fileUploadClient.UploadFile(
+            `${jobstate.options.asset.assetId}`,
+            entry.filepath,
+            entry.path,
+            {
+                type: "application/json",
+                timestamp: fs.statSync(entry.path).mtime,
+                description: "bulk upload",
+                chunk: true,
+                retry: options.retry,
+                parallelUploads: options.parallel,
+                logFunction: (p: string) => {
+                    return retrylog(p, color);
+                },
+                verboseFunction: (p: string) => {
+                    verboseLog(p, options.verbose, spinner);
+                }
+            }
         );
-        entry.etag = result.get("etag") || "0";
-        verboseLog(`uploaded ${entry.filepath}`, options.verbose, spinner);
+
+        verboseLog(`uploaded ${entry.filepath} with md5 checksum: ${result}`, options.verbose, spinner);
+        const fileInfo = await fileUploadClient.GetFiles(`${jobstate.options.asset.assetId}`, {
+            filter: `name eq ${path.basename(entry.filepath)} and path eq ${path.dirname(entry.filepath)}/`
+        });
+
+        entry.etag = `${fileInfo[0].etag}`;
+        verboseLog(`Entry etag:  ${entry.etag}`, options.verbose, spinner);
     }
 }
 
@@ -251,11 +258,7 @@ async function createJsonFilesForUpload({
             let maxtime: Date | undefined;
             const maxSize = options.size;
             maxSize > 0 || throwError("the size must be greater than 0");
-            await verboseLog(
-                `reading file: ${options.dir}/csv/${aspect}/${chalk.magentaBright(file)}`,
-                options.verbose,
-                spinner
-            );
+            await verboseLog(`reading file: ${options.dir}/csv/${aspect}/${color(file)}`, options.verbose, spinner);
             await csv()
                 .fromFile(`${options.dir}/csv/${aspect}/${file}`)
                 .subscribe(async json => {
@@ -300,11 +303,7 @@ async function createJsonFilesForUpload({
                     maxtime: maxtime as Date
                 });
             }
-            verboseLog(
-                `total record count in ${file}: ${chalk.magentaBright(recordCount.toString())}`,
-                options.verbose,
-                spinner
-            );
+            verboseLog(`total record count in ${file}: ${color(recordCount.toString())}`, options.verbose, spinner);
         }
     }
     return uploadJobs;
@@ -354,17 +353,16 @@ function writeDataAsJson({
     data: any[];
 }) {
     mintime || maxtime || throwError("the data is ivalid the timestamps are corrupted");
-    const newFileName = `${aspect}_from_${mintime && mintime.toISOString()}_to_${maxtime && maxtime.toISOString()}_${
-        data.length
-    }_records`.replace(/[^a-z0-9]/gi, "_");
-    verboseLog(`writing ${options.dir}/json/${aspect}/${chalk.magentaBright(newFileName + ".json")}`, options.verbose);
+    const newFileName = `${aspect}_${mintime && mintime.toISOString()}`.replace(/[^a-z0-9]/gi, "_");
+    verboseLog(`writing ${options.dir}/json/${aspect}/${color(newFileName + ".json")}`, options.verbose);
     const newPath = `${options.dir}/json/${aspect}/${newFileName}.json`;
+
     fs.writeFileSync(newPath, JSON.stringify(data));
     return [newPath, newFileName];
 }
 
 function getFiles(options: any, aspect: string, csvorjson: "csv" | "json" = "csv") {
-    verboseLog(`reading directory ${options.dir}/${csvorjson}/${chalk.magentaBright(aspect)}`, options.verbose);
+    verboseLog(`reading directory ${options.dir}/${csvorjson}/${color(aspect)}`, options.verbose);
     const files = fs.readdirSync(`${options.dir}/${csvorjson}/${aspect}`).filter(x => {
         return fs.statSync(`${options.dir}/${csvorjson}/${aspect}/${x}`).isFile();
     });
@@ -384,24 +382,13 @@ async function createOrReadAsset(options: any) {
     const auth = loadAuth();
     const assetMgmt = new AssetManagementClient(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
     if (!asset.assetId) {
-        verboseLog(`creating new asset ${chalk.magentaBright(asset.name)}`, options.verbose);
+        verboseLog(`creating new asset ${color(asset.name)}`, options.verbose);
         asset = await assetMgmt.PostAsset(asset);
-        verboseLog(
-            `$asset ${chalk.magentaBright(asset.name)} with id ${chalk.magentaBright(asset.assetId)} created`,
-            options.verbose
-        );
+        verboseLog(`$asset ${color(asset.name)} with id ${color(asset.assetId)} created`, options.verbose);
     } else {
-        verboseLog(
-            `reading asset ${chalk.magentaBright(asset.name)} ${chalk.magentaBright(asset.assetId)}`,
-            options.verbose
-        );
+        verboseLog(`reading asset ${color(asset.name)} ${color(asset.assetId)}`, options.verbose);
         asset = await assetMgmt.GetAsset(asset.assetId);
-        verboseLog(
-            `asset ${chalk.magentaBright(asset.name)} ${chalk.magentaBright(
-                asset.assetId
-            )} was read from the MindSphere`,
-            options.verbose
-        );
+        verboseLog(`asset ${color(asset.name)} ${color(asset.assetId)} was read from the MindSphere`, options.verbose);
     }
     fs.writeFileSync(`${options.dir}/asset.json`, JSON.stringify(asset, null, 2));
     return asset;
@@ -412,33 +399,27 @@ function checkRequiredParamaters(options: any) {
         options.dir = `${options.dir}`.slice(0, -1);
     }
 
-    verboseLog(`reading directory: ${chalk.magentaBright(options.dir)}`, options.verbose);
-    !fs.existsSync(options.dir) && throwError(`the directory ${chalk.magentaBright(options.dir)} doesn't exist!`);
+    verboseLog(`reading directory: ${color(options.dir)}`, options.verbose);
+    !fs.existsSync(options.dir) && throwError(`the directory ${color(options.dir)} doesn't exist!`);
 
     !fs.existsSync(`${options.dir}/asset.json`) &&
         throwError(
-            `the directory ${chalk.magentaBright(
-                options.dir
-            )} must contain the asset.json file. run mc prepare-bulk command first!`
+            `the directory ${color(options.dir)} must contain the asset.json file. run mc prepare-bulk command first!`
         );
 
     !fs.existsSync(`${options.dir}/json/`) &&
         throwError(
-            `the directory ${chalk.magentaBright(
-                options.dir
-            )} must contain the json/ folder. run mc prepare-bulk command first!`
+            `the directory ${color(options.dir)} must contain the json/ folder. run mc prepare-bulk command first!`
         );
 
     !fs.existsSync(`${options.dir}/csv/`) &&
         throwError(
-            `the directory ${chalk.magentaBright(
-                options.dir
-            )} must contain the csv/ folder. run mc prepare-bulk command first!`
+            `the directory ${color(options.dir)} must contain the csv/ folder. run mc prepare-bulk command first!`
         );
 
     !options.passkey &&
         errorLog(
-            "you have to provide a passkey to get the service token (run mc ibr --help for full description)",
+            "you have to provide a passkey to get the service token (run mc rb --help for full description)",
             true
         );
 }

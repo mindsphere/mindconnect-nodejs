@@ -129,8 +129,9 @@ export namespace IotFileModels {
          *
          * @type {number}
          * @memberof File
+         * !fix: manually fixed to correspond with implementation
          */
-        eTag?: number;
+        etag?: number;
     }
 
     /**

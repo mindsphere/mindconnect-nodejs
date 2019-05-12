@@ -1185,10 +1185,11 @@ export namespace AssetManagementModels {
 
     /**
      * incremental counter for optimistic locking
+     * ! fix: manually converted ETag interface to string.
      * @export
      * @interface ETag
      */
-    export interface ETag {}
+    export type ETag = string;
 
     /**
      *
@@ -1744,7 +1745,7 @@ export namespace AssetManagementModels {
      * @interface UniqueId
      */
     // * manual fix for the interface *Unique id extends string* otherwise the usage becomes very complicated
-    export interface UniqueId extends String {}
+    export type UniqueId = string;
 
     /**
      *

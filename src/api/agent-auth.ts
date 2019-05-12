@@ -295,7 +295,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
 
         if (!this._oauthPublicKey) {
             const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/oauth/token_key`;
-            const headers = this._urlEncodedHeaders;
+            const headers = this._headers;
             log(`Validate Token Headers ${JSON.stringify(headers)} Url: ${url}`);
             try {
                 const response = await fetch(url, { method: "GET", headers: headers, agent: this._proxyHttpAgent });

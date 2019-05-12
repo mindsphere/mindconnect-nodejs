@@ -1,14 +1,11 @@
 // Copyright (C), Siemens AG 2017
-import chalk from "chalk";
 import * as crypto from "crypto";
 import * as fs from "fs";
 import * as os from "os";
 import { URL } from "url";
 import { TimeStampedDataPoint } from "..";
 import { IMindConnectConfiguration } from "./mindconnect-models";
-import debug = require("debug");
 const groupby = require("json-groupby");
-const log = debug("mindconnect-util");
 
 export const convertToTdpArray = (data: any[]): TimeStampedDataPoint[] => {
     const tdpArray: TimeStampedDataPoint[] = [];
@@ -86,49 +83,15 @@ export const storeAuth = (encryptedAuth: authJson) => {
 
     const pathName = `${getHomeDotMcDir()}auth.json`;
     fs.writeFileSync(pathName, JSON.stringify(encryptedAuth));
-    log(`The technical user data has been stored in: ${chalk.magentaBright(pathName)}.`);
+
 };
 
 export const loadAuth = (): authJson => {
     const pathName = `${getHomeDotMcDir()}auth.json`;
-    log(`Loading the data from: ${chalk.magentaBright(pathName)}.`);
     const buffer = fs.readFileSync(pathName);
     return <authJson>JSON.parse(buffer.toString());
 };
 
-export const errorLog = (err: any, verbose: any) => {
-    if (err.message) {
-        console.error(`\n${chalk.redBright(err.message.toString())}`);
-        if (verbose && err.stack) {
-            console.error(chalk.redBright(err.stack));
-        }
-    } else {
-        console.error(chalk.redBright(err.toString()));
-    }
-    process.exit(1);
-};
-
-export const verboseLog = (message: any, verbose: any, spinner?: any) => {
-    verbose && console.log(`... ${message}`);
-    if (!verbose && spinner) {
-        spinner.text = `... ${message}`;
-    }
-};
-
-export const proxyLog = (verbose: any, color?: Function) => {
-    const proxy = process.env.HTTP_PROXY || process.env.http_proxy;
-    if (!color) {
-        color = chalk.cyanBright;
-    }
-    verboseLog(proxy ? `Using ${color(proxy)} as proxy server` : "No proxy configured.", verbose);
-};
-
-export const homeDirLog = (verbose: any, color?: Function) => {
-    if (!color) {
-        color = chalk.cyanBright;
-    }
-    verboseLog(`Using configuration stored in ${color(getHomeDotMcDir())}`, verbose);
-};
 
 export const getConfigProfile = (config: IMindConnectConfiguration): string => {
     try {
@@ -191,16 +154,6 @@ export const retry = async (n: number, func: Function, timoutinMilliseconds: num
     throw error;
 };
 
-export const retrylog = function(operation: string, c: Function = chalk.cyanBright) {
-    let x = 0;
-    return () => {
-        if (x > 0) {
-            console.log(`Retry no ${c("" + x)} for ${c(operation)} operation.`);
-        }
-        x++;
-    };
-};
-
 export const checkAssetId = (agentId: string) => {
     if (!/[a-f0-9]{32}/gi.test(agentId)) {
         throw new Error("You have to pass valid 32 char long asset id");
@@ -213,6 +166,9 @@ export const throwError = (error: string) => {
 
 export const toQueryString = (qs: any) => {
     return Object.keys(qs || {})
+        .filter(key => {
+            return qs[key] !== undefined;
+        })
         .map(key => {
             const value = qs[key] instanceof Date ? qs[key].toISOString() : qs[key];
             return encodeURIComponent(key) + "=" + encodeURIComponent(value);

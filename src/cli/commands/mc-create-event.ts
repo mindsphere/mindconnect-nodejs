@@ -1,19 +1,18 @@
-import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import { MindConnectAgent, MindsphereStandardEvent, retry } from "../..";
-import {
-    checkCertificate,
-    errorLog,
-    getHomeDotMcDir,
-    homeDirLog,
-    proxyLog,
-    retrylog,
-    verboseLog
-} from "../../api/utils";
+import { retry } from "../..";
+import { MindConnectAgent } from "../../api/mindconnect-agent";
+import { EventManagementClient, MindSphereSdk } from "../../api/sdk";
+import { decrypt, loadAuth } from "../../api/utils";
+import { errorLog, getColor, homeDirLog, proxyLog, retrylog, verboseLog } from "./command-utils";
+import { getMindConnectAgent } from "./mc-upload-file";
+import ora = require("ora");
+
+let color = getColor("cyan");
+const adminColor = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -32,48 +31,42 @@ export default (program: CommanderStatic) => {
         .option("-d, --desc <description>", "Event description", "CLI created event")
         .option("-t, --timestamp <timestamp>", "Timestamp", new Date().toISOString())
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
+        .option(
+            "-p, --passkey <passkey>",
+            `passkey (optional, file upload uses ${adminColor("service credentials *")})`
+        )
         .option("-v, --verbose", "verbose output")
-        .description(chalk.cyanBright("create an event in the mindsphere"))
+        .description(`${color("create an event in the mindsphere")} ${adminColor("(optional: passkey) *")}`)
         .action(options => {
             (async () => {
                 try {
+                    color = options.passkey ? adminColor : color;
+                    checkParameters(options);
                     homeDirLog(options.verbose);
                     proxyLog(options.verbose);
 
+                    const spinner = ora("creating event");
+                    !options.verbose && spinner.start();
+
                     const configFile = path.resolve(options.config);
                     verboseLog(
-                        `Event upload using the agent configuration stored in: ${chalk.cyanBright(configFile)}.`,
+                        `Event upload using the agent configuration stored in: ${color(configFile)}.`,
                         options.verbose
                     );
                     if (!fs.existsSync(configFile)) {
                         throw new Error(`Can't find file ${configFile}`);
                     }
 
-                    const configuration = require(configFile);
-                    const profile = checkCertificate(configuration, options);
-                    const agent = new MindConnectAgent(configuration, undefined, getHomeDotMcDir());
-                    if (profile) {
-                        agent.SetupAgentCertificate(fs.readFileSync(options.cert));
+                    let uploader: MindConnectAgent | EventManagementClient;
+                    let assetid = options.assetid;
+
+                    if (options.passkey === undefined) {
+                        ({ assetid, uploader } = await getMindConnectAgent(assetid, options, spinner, color));
+                    } else {
+                        uploader = getEventManager(options);
                     }
 
-                    if (!agent.IsOnBoarded()) {
-                        await retry(options.retry, () => agent.OnBoard(), 300, retrylog("OnBoard"));
-                        log(chalk.cyanBright(`Your agent with id ${agent.ClientId()} was succesfully onboarded.`));
-                    }
-
-                    if (!agent.HasDataSourceConfiguration()) {
-                        await retry(
-                            options.retry,
-                            () => agent.GetDataSourceConfiguration(),
-                            300,
-                            retrylog("GetDataSourceConfiguration")
-                        );
-                        verboseLog("Getting client configuration", options.verbose);
-                    }
-
-                    const assetid = options.assetid || agent.ClientId();
-
-                    const event: MindsphereStandardEvent = {
+                    const event = {
                         entityId: assetid, // use assetid if you want to send event somewhere else :)
                         sourceType: options.sourceType,
                         sourceId: options.sourceId,
@@ -83,11 +76,19 @@ export default (program: CommanderStatic) => {
                         description: options.desc
                     };
 
-                    verboseLog(`creating event : ${JSON.stringify(event)}`, options.verbose);
+                    verboseLog(`creating event : ${JSON.stringify(event)}`, options.verbose, spinner);
+                    verboseLog(`AssetId ${assetid}`, options.verbose, spinner);
+                    verboseLog(
+                        options.assetid === undefined ? "Sending event to agent." : "Sending event to another asset.",
+                        options.verbose,
+                        spinner
+                    );
 
-                    await retry(options.retry, () => agent.PostEvent(event), 300, retrylog("PostEvent"));
+                    await retry(options.retry, () => uploader.PostEvent(event), 300, retrylog("PostEvent"));
 
-                    log(`Your event with severity ${chalk.cyanBright(event.severity + "")} was succesfully created.`);
+                    !options.verbose && spinner.succeed("Done");
+
+                    log(`Your event with severity ${color(event.severity + "")} was succesfully created.`);
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
@@ -100,3 +101,19 @@ export default (program: CommanderStatic) => {
             log(`    mc ce --desc \"custom event\" --i 123....4 \t create error event for asset with id 123....4`);
         });
 };
+
+function getEventManager(options: any) {
+    const auth = loadAuth();
+    const sdk = new MindSphereSdk({
+        tenant: auth.tenant,
+        basicAuth: decrypt(auth, options.passkey),
+        gateway: auth.gateway
+    });
+    const uploader = sdk.GetEventManagementClient();
+    return uploader;
+}
+function checkParameters(options: any) {
+    options.passkey &&
+        !options.assetid &&
+        errorLog(" You have to specify assetid when using service credential upload", true);
+}

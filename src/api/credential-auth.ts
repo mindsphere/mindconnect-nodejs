@@ -53,7 +53,7 @@ export abstract class CredentialAuth extends MindConnectBase implements TokenRot
 
     private async AcquirePublicKey(): Promise<boolean> {
         if (!this._oauthResponse) {
-            const headers = this._urlEncodedHeaders;
+            const headers = this._headers;
             const url = `${getPiamUrl(this._gateway, this._tenant)}token_keys`;
             log(`AcquirePublicKey Headers: ${JSON.stringify(headers)} Url: ${url}`);
 

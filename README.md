@@ -245,7 +245,8 @@ await agent.PostEvent(event);
 
 Files can now be uploaded via the library. You can upload files for your agent or for your entities. In order to create an event for your entity you need to know the assetid of the asset.
 
-The file upload will automatically chunk your files if they are bigger then 8MB. This feature is **experimental** and can be switched off with a parameter.
+Since version 3.5.0. the agents are using the multipart upload API of the MindSphere. This means that the agents can upload files also bigger > 8 MB, The
+multipart upload must be switched on (chunk:true) if you want to activate this behavior. The parameter parallelUploads determine the maximal number of paraellel uploads. You can increase this on a powerfull computer to speed up the upload or decrease to prevent network congestion.
 
 ```javascript
 const configuration = require("../../agentconfig.json");
@@ -255,9 +256,13 @@ if (!agent.IsOnBoarded()) {
     await agent.OnBoard();
 }
 
-// see generated documentation for full docs
-await agent.Upload("package.json", "application/json", "Demo File");
 
+await agent.UploadFile(agent.ClientId(), "custom/mindsphere/path/package.json", "package.json", {
+    retry: RETRYTIMES,
+    description: "File uploaded with MindConnect-NodeJS Library",
+    parallelUploads: 5,
+    chunk: true
+});
 ```
 
 ![files](images/files.png)
@@ -328,27 +333,37 @@ Vibration data:
 
 ![Vibration Data](images/vibrationdata.PNG)
 
-## Bonus: Setup and diagnostic
+## Command Line Interface
+
+The CLI commands should only be used **in secure enviroments!** (e.g on your working station, not on the agents). In the next major version the CLI will be
+moved to a separate package to reduce the size of the library.
+
+Here is an overview of CLI commands:
+
+```bash
+# run mc --help to get a full list of the commands
+mc --help
+```
+
+![CLI](images/cli.png)
+
+
+### Setup and diagnostic
 
 The diagnostic endpoint gives informations about the possible problems which an agent might have on the cloud side. However, these operations require service credentials which should only be used for setup and diagnostic tasks in secure environments.
 
-### Using setup and diagnostic from CLI
-
-This should only be used **in secure enviroments!** (e.g on your working station, not on the agents).
-
 ![setup](images/setup.gif)
 
-### Using setup and diagnostic from code
+### Bulk Import and Standard Import of the historical data
 
-You can use setup and diagnostic from code like this:
+The CLI provides the commands to import historical data to the MindSphere IoT services.
+The commands use bulk import API for simulation assets and standard time series for performance assets.
 
-```typescript
-// don't do this on the agents!
-const setup = new MindConnectSetup ("https://gateway.eu1.mindsphere.io", "Basic: <base64encodedauth>", "mytenant");
-await mcsetup.RegisterForDiagnostic("0-agentid-00000000000000000000");
-await mcsetup.GetDiagnosticInformation("0-agentid-00000000000000000000");
-await mcsetup.DeleteDiagnostic("0-agentid-00000000000000000000");
-```
+If you use the standard import to the IoT services, the calls to the API will be **throttled** to match your throttling limits.
+The number of the records per message will be reduced to max 200 per message. Using this feature has direct impact on mindsphere resource consumption.
+You might get a notice that you will need to upgrade your account's data ingest rate.
+
+The feature will be deprecated once bulk upload also works for performance assets.
 
 ## Legal
 

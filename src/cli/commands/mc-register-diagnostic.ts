@@ -1,11 +1,12 @@
-import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { MindConnectSetup } from "../..";
-import { decrypt, errorLog, homeDirLog, loadAuth, proxyLog, verboseLog } from "../../api/utils";
-import { serviceCredentialLog } from "./command-utils";
+import { decrypt, loadAuth } from "../../api/utils";
+import { errorLog, getColor, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
+
+const color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -14,15 +15,15 @@ export default (program: CommanderStatic) => {
         .option("-c, --config <agentconfig>", "config file with agent configuration", "agentconfig.json")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
-        .description(chalk.magentaBright("register agent for diagnostic *"))
+        .description(color("register agent for diagnostic *"))
         .action(options => {
             (async () => {
                 try {
                     if (!options.passkey) {
                         errorLog("you have to provide a passkey (run mc rd --help for full description)", true);
                     }
-                    homeDirLog(options.verbose, chalk.magentaBright);
-                    proxyLog(options.verbose, chalk.magentaBright);
+                    homeDirLog(options.verbose, color);
+                    proxyLog(options.verbose, color);
 
                     const auth = loadAuth();
                     const setup = new MindConnectSetup(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
@@ -32,23 +33,18 @@ export default (program: CommanderStatic) => {
                     }
                     const configuration = require(configFile);
                     verboseLog(
-                        `registering for diagnostic with agent id ${chalk.magentaBright(
-                            configuration.content.clientId
-                        )}`,
+                        `registering for diagnostic with agent id ${color(configuration.content.clientId)}`,
                         options.verbose
                     );
                     await setup.RegisterForDiagnostic(configuration.content.clientId);
                     verboseLog(
-                        `successfully registered the agent with agent id ${chalk.magentaBright(
+                        `successfully registered the agent with agent id ${color(
                             configuration.content.clientId
                         )} for diagnostic`,
                         true
                     );
                 } catch (err) {
-                    verboseLog(
-                        chalk.magentaBright("This operation requires additionaly the service credentials."),
-                        options.verbose
-                    );
+                    verboseLog(color("This operation requires additionaly the service credentials."), options.verbose);
                     errorLog(err, options.verbose);
                 }
             })();

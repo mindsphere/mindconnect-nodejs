@@ -9,7 +9,7 @@ import { AgentAuth } from "./agent-auth";
 import { BaseEvent, DataPointValue, IMindConnectConfiguration, TimeStampedDataPoint } from "./mindconnect-models";
 import { bulkDataTemplate, dataTemplate } from "./mindconnect-template";
 import { dataValidator, eventValidator } from "./mindconnect-validators";
-import { MultipartUploader, optionalParameters } from "./sdk/common/multipart-uploader";
+import { fileUploadOptionalParameters, MultipartUploader } from "./sdk/common/multipart-uploader";
 import _ = require("lodash");
 const log = debug("mindconnect-agent");
 /**
@@ -134,7 +134,7 @@ export class MindConnectAgent extends AgentAuth {
         if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
         if (!this._configuration.content.clientId) throw new Error("No client id in the configuration of the agent.");
 
-        const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
+        const headers = { ...this._headers, Authorization: `Bearer ${this._accessToken.access_token}` };
         const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/agents/${
             this._configuration.content.clientId
         }/dataSourceConfiguration`;
@@ -167,7 +167,7 @@ export class MindConnectAgent extends AgentAuth {
         if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
         if (!this._configuration.content.clientId) throw new Error("No client id in the configuration of the agent.");
 
-        const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
+        const headers = { ...this._headers, Authorization: `Bearer ${this._accessToken.access_token}` };
         const agentFilter = encodeURIComponent(JSON.stringify({ agentId: `${this._configuration.content.clientId}` }));
         const url = `${
             this._configuration.content.baseUrl
@@ -366,7 +366,7 @@ export class MindConnectAgent extends AgentAuth {
      * @param {string} entityId - asset id or agent.ClientId() for agent
      * @param {string} filepath - mindsphere file path
      * @param {(string | Buffer)} file - local path or Buffer
-     * @param {optionalParameters} [optional] - optional parameters: enable chunking, define retries etc.
+     * @param {fileUploadOptionalParameters} [optional] - optional parameters: enable chunking, define retries etc.
      * @returns {Promise<string>} - md5 hash of the file
      *
      * @memberOf MindConnectAgent
@@ -378,7 +378,7 @@ export class MindConnectAgent extends AgentAuth {
         entityId: string,
         filepath: string,
         file: string | Buffer,
-        optional?: optionalParameters
+        optional?: fileUploadOptionalParameters
     ): Promise<string> {
         const result = await this.uploader.UploadFile(entityId, filepath, file, optional);
         await retry(5, () => this.SaveConfig());
@@ -419,7 +419,7 @@ export class MindConnectAgent extends AgentAuth {
             description: description,
             chunk: chunk,
             chunkSize: chunkSize,
-            paralelUploads: maxSockets
+            parallelUploads: maxSockets
         });
     }
 

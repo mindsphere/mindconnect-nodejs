@@ -6,10 +6,13 @@ import iotBulkRunCommand from "./commands/iot-bulk-run";
 import iotBulkDirCommand from "./commands/iot-prepare-bulk-dir";
 import agentStatusCommand from "./commands/mc-agent-status";
 import agentTokenCommand from "./commands/mc-agent-token";
+import createAgentCommand from "./commands/mc-create-agent";
 import createEventCommand from "./commands/mc-create-event";
 import getDiagnosticCommand from "./commands/mc-get-diagnostic";
+import offboardCommand from "./commands/mc-offboard-agent";
 import onboardCommand from "./commands/mc-onboard";
 import registerDiagnosticCommand from "./commands/mc-register-diagnostic";
+import renewAgentCommand from "./commands/mc-renew-agent";
 import serviceCredentialsCommand from "./commands/mc-service-credentials";
 import serviceTokenCommand from "./commands/mc-service-token";
 import starterJsCommand from "./commands/mc-starter-js";
@@ -18,19 +21,23 @@ import unregisterDiagnoticCommand from "./commands/mc-unregister-diagnostic";
 import uploadFileCommand from "./commands/mc-upload-file";
 import uploadTimeSeriesCommand from "./commands/mc-upload-timeseries";
 import versionAndHelp from "./commands/mc-version-help";
-
 // * generic commands
 versionAndHelp(program);
 
 // * agent commands
 onboardCommand(program);
-uploadFileCommand(program);
-uploadTimeSeriesCommand(program);
-createEventCommand(program);
 agentTokenCommand(program);
+uploadTimeSeriesCommand(program);
+
+// * common commands
+uploadFileCommand(program);
+createEventCommand(program);
 agentStatusCommand(program);
 
 // * setup commands
+createAgentCommand(program);
+offboardCommand(program);
+renewAgentCommand(program);
 serviceCredentialsCommand(program);
 serviceTokenCommand(program);
 registerDiagnosticCommand(program);

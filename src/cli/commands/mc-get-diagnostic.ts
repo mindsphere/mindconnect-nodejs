@@ -4,8 +4,10 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { DiagnosticInformation, MindConnectSetup } from "../..";
-import { decrypt, errorLog, homeDirLog, loadAuth, proxyLog, verboseLog } from "../../api/utils";
-import { serviceCredentialLog } from "./command-utils";
+import { getColor, errorLog, homeDirLog, proxyLog, verboseLog, serviceCredentialLog } from "./command-utils";
+import { decrypt, loadAuth } from "../../api/utils";
+
+const color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -17,15 +19,15 @@ export default (program: CommanderStatic) => {
         .option("-j, --json", "json output")
         .option("-t, --text", "text (raw) output")
         .option("-v, --verbose", "verbose output")
-        .description(chalk.magentaBright("get diagnostic information *"))
+        .description(color("get diagnostic information *"))
         .action(options => {
             (async () => {
                 try {
                     if (!options.passkey) {
                         errorLog("you have to provide a passkey (run mc gd --help for full description)", true);
                     }
-                    homeDirLog(options.verbose, chalk.magentaBright);
-                    proxyLog(options.verbose, chalk.magentaBright);
+                    homeDirLog(options.verbose, color);
+                    proxyLog(options.verbose, color);
 
                     const auth = loadAuth();
                     const setup = new MindConnectSetup(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
@@ -35,18 +37,12 @@ export default (program: CommanderStatic) => {
                     }
                     const configuration = require(configFile);
                     verboseLog(
-                        `getting diagnostic data for agent with agent id ${chalk.magentaBright(
-                            configuration.content.clientId
-                        )}`,
+                        `getting diagnostic data for agent with agent id ${color(configuration.content.clientId)}`,
                         options.verbose
                     );
 
                     const activations = await setup.GetDiagnosticActivations();
-                    log(
-                        `There are ${chalk.magentaBright(
-                            activations.content.length + " agent(s)"
-                        )} registered for diagnostic`
-                    );
+                    log(`There are ${color(activations.content.length + " agent(s)")} registered for diagnostic`);
                     verboseLog(JSON.stringify(activations.content), options.verbose);
 
                     function printDiagnosticInformation(diag: DiagnosticInformation[], options: any) {
@@ -65,7 +61,7 @@ export default (program: CommanderStatic) => {
                                 log(
                                     `${chalk.cyanBright(element.timestamp)} ${chalk.greenBright(
                                         element.severity
-                                    )} ${chalk.magentaBright(element.source)} ${element.message}`
+                                    )} ${color(element.source)} ${element.message}`
                                 );
                             }
                         }
@@ -76,12 +72,9 @@ export default (program: CommanderStatic) => {
                         options,
                         !options.all
                     );
-                    log(`There are ${chalk.magentaBright(information.totalElements + " ")}total log entries`);
+                    log(`There are ${color(information.totalElements + " ")}total log entries`);
                 } catch (err) {
-                    verboseLog(
-                        chalk.magentaBright("This operation requires additionaly the service credentials."),
-                        options.verbose
-                    );
+                    verboseLog(color("This operation requires additionaly the service credentials."), options.verbose);
                     errorLog(err, options.verbose);
                 }
             })();

@@ -13,7 +13,7 @@ import _ = require("lodash");
 const mime = require("mime-types");
 const log = debug("multipart-uploader");
 
-export type optionalParameters = {
+export type fileUploadOptionalParameters = {
     /**
      * Multipart/upload part.
      *
@@ -81,14 +81,14 @@ export type optionalParameters = {
      *
      * @type {(number | undefined)}
      */
-    paralelUploads?: number | undefined;
+    parallelUploads?: number | undefined;
 
     /**
      *  The etag for the upload. if not set the agent will try to guess it.
      *
      * @type {(number | undefined)}
      */
-    ifmatch?: number | undefined;
+    ifMatch?: number | undefined;
 };
 
 type uploadChunkParameters = {
@@ -100,7 +100,7 @@ type uploadChunkParameters = {
     uploadPath: string;
     entityId: string;
     buffer: Uint8Array;
-    ifmatch?: number;
+    ifMatch?: number;
 };
 
 /**
@@ -112,7 +112,7 @@ type uploadChunkParameters = {
  * @extends {MindConnectBase}
  */
 export class MultipartUploader extends MindConnectBase {
-    private getTotalChunks(fileLength: number, chunkSize: number, optional: optionalParameters) {
+    private getTotalChunks(fileLength: number, chunkSize: number, optional: fileUploadOptionalParameters) {
         const totalChunks = Math.ceil(fileLength / chunkSize);
         !optional.chunk &&
             totalChunks > 1 &&
@@ -121,11 +121,11 @@ export class MultipartUploader extends MindConnectBase {
         return totalChunks;
     }
 
-    private getTimeStamp(optional: optionalParameters, file: string | Buffer) {
+    private getTimeStamp(optional: fileUploadOptionalParameters, file: string | Buffer) {
         return optional.timestamp || (file instanceof Buffer ? new Date() : fs.statSync(file).ctime);
     }
 
-    private getFileType(optional: optionalParameters, file: string | Buffer) {
+    private getFileType(optional: fileUploadOptionalParameters, file: string | Buffer) {
         return (
             optional.type ||
             (file instanceof Buffer ? "application/octet-stream" : `${mime.lookup(file)}` || "application/octet-stream")
@@ -135,7 +135,7 @@ export class MultipartUploader extends MindConnectBase {
     private getStreamFromFile(file: string | Buffer, chunksize: number) {
         return file instanceof Buffer
             ? (() => {
-                  const bufferStream = new stream.PassThrough({ highWaterMark: chunksize });
+                  const bufferStream = new stream.PassThrough();
                   for (let index = 0; index < file.length; ) {
                       const end = Math.min(index + chunksize, file.length);
                       bufferStream.write(file.slice(index, end));
@@ -144,7 +144,7 @@ export class MultipartUploader extends MindConnectBase {
                   bufferStream.end();
                   return bufferStream;
               })()
-            : fs.createReadStream(path.resolve(file), { highWaterMark: chunksize });
+            : fs.createReadStream(path.resolve(file));
     }
 
     private addDataToBuffer(current: Uint8Array, data: Buffer) {
@@ -178,10 +178,7 @@ export class MultipartUploader extends MindConnectBase {
         let result;
         const bareUrl = this.getBareUrl(url);
 
-        (!this.GetConfiguration || headers["If-Match"] !== undefined) &&
-            throwError("You have to set if-match if you are using this outside the MindConnectAgent");
-
-        if (this.GetConfiguration) {
+        if (this.agent) {
             const config = this.GetConfiguration() as any;
             if (config.urls && config.urls[bareUrl]) {
                 const eTag = config.urls[bareUrl];
@@ -194,7 +191,7 @@ export class MultipartUploader extends MindConnectBase {
     }
 
     private addUrl(url: string, result: string) {
-        if (!this.GetConfiguration) return;
+        if (!this.agent) return;
 
         const config = this.GetConfiguration() as any;
 
@@ -210,7 +207,7 @@ export class MultipartUploader extends MindConnectBase {
         mode,
         entityId,
         uploadPath,
-        ifmatch,
+        ifMatch,
         description,
         fileType,
         timeStamp
@@ -221,7 +218,7 @@ export class MultipartUploader extends MindConnectBase {
         fileType: string;
         uploadPath: string;
         timeStamp: Date;
-        ifmatch?: number;
+        ifMatch?: number;
     }) {
         const url = `/api/iotfile/v3/files/${entityId}/${uploadPath}?upload=${mode}`;
         const token = await this.GetToken();
@@ -232,7 +229,7 @@ export class MultipartUploader extends MindConnectBase {
             timestamp: timeStamp.toISOString()
         };
 
-        ifmatch && ((headers as any)["If-Match"] = ifmatch);
+        ifMatch && ((headers as any)["If-Match"] = ifMatch);
         this.setIfMatch(`${this.GetGateway()}${url}`, headers);
 
         const result = await this.HttpAction({
@@ -258,7 +255,7 @@ export class MultipartUploader extends MindConnectBase {
         uploadPath,
         entityId,
         buffer,
-        ifmatch
+        ifMatch
     }: uploadChunkParameters): Promise<boolean> {
         if (buffer.length <= 0) return false;
 
@@ -268,7 +265,7 @@ export class MultipartUploader extends MindConnectBase {
             timestamp: timeStamp.toISOString()
         };
 
-        ifmatch && ((headers as any)["If-Match"] = ifmatch);
+        ifMatch && ((headers as any)["If-Match"] = ifMatch);
 
         let part = totalChunks === 1 ? "" : `?part=${chunks}`;
         if (part === `?part=${totalChunks}`) {
@@ -311,7 +308,7 @@ export class MultipartUploader extends MindConnectBase {
      * @param {string} entityId - asset id or agent.ClientId() for agent
      * @param {string} filepath - mindsphere file path
      * @param {(string | Buffer)} file - local path or Buffer
-     * @param {optionalParameters} [optional] - optional parameters: enable chunking, define retries etc.
+     * @param {fileUploadOptionalParameters} [optional] - optional parameters: enable chunking, define retries etc.
      * @returns {Promise<string>} - md5 hash of the file
      *
      * @memberOf MultipartUploader
@@ -321,7 +318,7 @@ export class MultipartUploader extends MindConnectBase {
         entityId: string,
         filepath: string,
         file: string | Buffer,
-        optional?: optionalParameters
+        optional?: fileUploadOptionalParameters
     ): Promise<string> {
         optional = optional || {};
         const chunkSize = optional.chunkSize || 8 * 1024 * 1024;
@@ -347,7 +344,7 @@ export class MultipartUploader extends MindConnectBase {
         const logFunction = optional.logFunction;
         const verboseFunction = optional.verboseFunction;
 
-        optional.ifmatch && ((fileInfo as any)["If-Match"] = optional.ifmatch);
+        optional.ifMatch && ((fileInfo as any)["If-Match"] = optional.ifMatch);
 
         const mystream = this.getStreamFromFile(file, chunkSize);
         const hash = crypto.createHash("md5");
@@ -434,7 +431,7 @@ export class MultipartUploader extends MindConnectBase {
                         const lastPromise = promises.pop();
 
                         // * the chunks before last can be uploaded in paralell to mindsphere
-                        const maxParalellUploads = (optional && optional.paralelUploads) || 3;
+                        const maxParalellUploads = (optional && optional.parallelUploads) || 3;
                         http.globalAgent.maxSockets = 50;
                         const splitedPromises = _.chunk(promises, maxParalellUploads);
 
@@ -445,6 +442,7 @@ export class MultipartUploader extends MindConnectBase {
                                 uploadParts.push(f());
                             });
 
+                            if (verboseFunction) verboseFunction(`uploading next ${uploadParts.length} part(s)`);
                             await Promise.all(uploadParts);
                             if (verboseFunction) verboseFunction(`uploaded ${uploadParts.length} part(s)`);
                         }

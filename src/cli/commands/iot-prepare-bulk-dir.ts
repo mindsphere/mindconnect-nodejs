@@ -1,11 +1,12 @@
-import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import { AssetManagementClient, AssetManagementModels } from "../../api/sdk";
-import { authJson, checkAssetId, decrypt, errorLog, loadAuth, throwError, verboseLog } from "../../api/utils";
-import { directoryReadyLog, subtractSecond } from "./command-utils";
+import { authJson, checkAssetId, decrypt, throwError, loadAuth  } from "../../api/utils";
 import ora = require("ora");
+import { getColor, directoryReadyLog, errorLog, verboseLog, subtractSecond } from "./command-utils";
+
+const color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -21,7 +22,7 @@ export default (program: CommanderStatic) => {
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
-        .description(chalk.magentaBright("creates a template directory for timeseries (bulk) upload *"))
+        .description(color("creates a template directory for timeseries (bulk) upload *"))
         .action(options => {
             (async () => {
                 try {
@@ -73,30 +74,26 @@ export default (program: CommanderStatic) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc prepare-bulk  --typeid castidev.Engine \t this creates a directory called ${chalk.magentaBright(
+                `    mc prepare-bulk  --typeid castidev.Engine \t this creates a directory called ${color(
                     "bulkimport"
                 )} for new asset of type castidev.Engine`
             );
             log(
-                `    mc pb --dir asset1 -i 123456...abc \t\t this creates a directory called ${chalk.magentaBright(
+                `    mc pb --dir asset1 -i 123456...abc \t\t this creates a directory called ${color(
                     "asset1"
                 )} for existing asset`
             );
 
             log(`    mc pb -of 3 -t castidev.Engine \t\t start data creation template 3 days before now`);
             log(
-                `\n\tuse --mode ${chalk.magentaBright(
-                    "performance"
-                )} for standard data generation or --mode ${chalk.magentaBright(
+                `\n\tuse --mode ${color("performance")} for standard data generation or --mode ${color(
                     "simulation"
                 )} for high frequency data generation `
             );
             log(
-                `\tThe typeid must be derived from ${chalk.magentaBright(
-                    "core.basicdevice"
-                )} and asset ${chalk.magentaBright("twintype")} must be ${chalk.magentaBright(
-                    "simulation"
-                )} for high frequency data upload\n`
+                `\tThe typeid must be derived from ${color("core.basicdevice")} and asset ${color(
+                    "twintype"
+                )} must be ${color("simulation")} for high frequency data upload\n`
             );
         });
 };
@@ -115,7 +112,7 @@ async function getAssetAndAspects(auth: authJson, options: any) {
         }
     }
     if (options.typeid) {
-        const assetType = await assetMgmt.GetAssetType(options.typeid);
+        const assetType = await assetMgmt.GetAssetType(options.typeid, { exploded: true });
         if (assetType.aspects) {
             aspects = assetType.aspects.filter(x => {
                 return x.aspectType && x.aspectType.category === "dynamic";
@@ -133,14 +130,11 @@ function checkRequiredParamaters(options: any) {
         throwError("you have to specify the twin type performance or simulation");
     !options.typeid && !options.assetid && throwError("You have to specify either a typeid or assetid");
     !!options.typeid === !!options.assetid && throwError("You can't specify typeid and assetid at the same time");
-    verboseLog(
-        `creating directory template for: ${chalk.magentaBright(options.typeid || options.assetid)}`,
-        options.verbose
-    );
+    verboseLog(`creating directory template for: ${color(options.typeid || options.assetid)}`, options.verbose);
     options.assetid && checkAssetId(options.assetid);
 
-    verboseLog(`creating directory: ${chalk.magentaBright(options.dir)}`, options.verbose);
-    fs.existsSync(options.dir) && throwError(`the directory ${chalk.magentaBright(options.dir)} already exists`);
+    verboseLog(`creating directory: ${color(options.dir)}`, options.verbose);
+    fs.existsSync(options.dir) && throwError(`the directory ${color(options.dir)} already exists`);
 
     !options.passkey &&
         errorLog(
@@ -214,7 +208,7 @@ async function generateCsv(
         }
 
         const fileName = `${path}/csv/${name}/${file}.csv`;
-        verboseLog(`generating: ${chalk.magentaBright(fileName)}`, options.verbose, spinner);
+        verboseLog(`generating: ${color(fileName)}`, options.verbose, spinner);
         const stream = fs.createWriteStream(fileName, { highWaterMark: 12 * 16384 } as any);
 
         let headers = `_time, `;
@@ -272,16 +266,16 @@ function writeNewAssetJson(options: any, root: AssetManagementModels.RootAssetRe
         }
     };
     const newAssetJson = `${path}/asset.json`;
-    verboseLog(`Writing ${chalk.magentaBright(newAssetJson)}`, options.verbose);
+    verboseLog(`Writing ${color(newAssetJson)}`, options.verbose);
     fs.writeFileSync(`${path}/asset.json`, JSON.stringify(asset, null, 2));
 }
 
 function createAspectDirs(path: any, element: AssetManagementModels.AssetTypeResourceAspects, options: any) {
     const csvDir = `${path}/csv/${element.name}`;
-    verboseLog(`creating directory: ${chalk.magentaBright(csvDir)}`, options.verbose);
+    verboseLog(`creating directory: ${color(csvDir)}`, options.verbose);
     fs.mkdirSync(csvDir);
     const jsonDir = `${path}/json/${element.name}`;
-    verboseLog(`creating directory: ${chalk.magentaBright(jsonDir)}`, options.verbose);
+    verboseLog(`creating directory: ${color(jsonDir)}`, options.verbose);
     fs.mkdirSync(jsonDir);
 }
 
@@ -296,7 +290,5 @@ function makeCsvAndJsonDir(options: any) {
 function checkTwinTypeOfAsset(asset: AssetManagementModels.AssetResourceWithHierarchyPath | undefined, options: any) {
     asset &&
         asset.twinType !== options.twintype &&
-        throwError(
-            `You can't use the twintype mode ${chalk.magentaBright(options.twintype)} for ${asset.twinType} asset`
-        );
+        throwError(`You can't use the twintype mode ${color(options.twintype)} for ${asset.twinType} asset`);
 }

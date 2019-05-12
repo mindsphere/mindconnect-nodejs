@@ -1,15 +1,16 @@
-import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { sleep } from "../../../test/test-utils";
 import { AssetManagementModels, TimeSeriesBulkClient } from "../../api/sdk";
-import { decrypt, errorLog, loadAuth, retry, throwError, verboseLog } from "../../api/utils";
-import { colorizeStatus } from "./command-utils";
+import { decrypt, retry, throwError, loadAuth } from "../../api/utils";
 import { jobState } from "./iot-bulk-run";
 import _ = require("lodash");
 import ora = require("ora");
+import { getColor, verboseLog, colorizeStatus, errorLog } from "./command-utils";
+
+const color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -19,7 +20,7 @@ export default (program: CommanderStatic) => {
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
-        .description(chalk.magentaBright("checks the progress of the upload jobs from <directoryname> directory *"))
+        .description(color("checks the progress of the upload jobs from <directoryname> directory *"))
         .action(options => {
             (async () => {
                 try {
@@ -31,7 +32,7 @@ export default (program: CommanderStatic) => {
                         const totalMessages = jobState.uploadFiles.length;
                         const postedMessages = jobState.timeSeriesFiles.length;
 
-                        console.log(`Statistics for perormance asset ${chalk.magentaBright(asset.name)}`);
+                        console.log(`Statistics for perormance asset ${color(asset.name)}`);
                         console.log(`total timeseries messages: ${totalMessages}`);
                         console.log(`posted timeseries messages: ${postedMessages}`);
                         process.exit(0);
@@ -53,9 +54,9 @@ export default (program: CommanderStatic) => {
                         await sleep(500);
                         newStatus.push(js);
                         verboseLog(
-                            `Job with id ${chalk.magentaBright(jobid)} is in status : ${colorizeStatus(
-                                `${js.status}`
-                            )} [${js.message}]`,
+                            `Job with id ${color(jobid)} is in status : ${colorizeStatus(`${js.status}`)} [${
+                                js.message
+                            }]`,
                             options.verbose,
                             spinner
                         );
@@ -74,9 +75,9 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc bulk-check \t displays job progress of ${chalk.magentaBright("bulkimport")} directory`);
+            log(`    mc check-bulk \t displays job progress of ${color("bulkimport")} directory`);
             log(
-                `    mc br --dir asset1 --verbose \tdisplays job progress of ${chalk.magentaBright(
+                `    mc check-bulk --dir asset1 --verbose \tdisplays job progress of ${color(
                     "asset1"
                 )} directory with verbose output`
             );
@@ -88,33 +89,27 @@ function checkRequiredParamaters(options: any) {
         options.dir = `${options.dir}`.slice(0, -1);
     }
 
-    verboseLog(`reading directory: ${chalk.magentaBright(options.dir)}`, options.verbose);
-    !fs.existsSync(options.dir) && throwError(`the directory ${chalk.magentaBright(options.dir)} doesn't exist!`);
+    verboseLog(`reading directory: ${color(options.dir)}`, options.verbose);
+    !fs.existsSync(options.dir) && throwError(`the directory ${color(options.dir)} doesn't exist!`);
 
     !fs.existsSync(`${options.dir}/asset.json`) &&
         throwError(
-            `the directory ${chalk.magentaBright(
-                options.dir
-            )} must contain the asset.json file. run mc prepare-bulk command first!`
+            `the directory ${color(options.dir)} must contain the asset.json file. run mc prepare-bulk command first!`
         );
 
     !fs.existsSync(`${options.dir}/json/`) &&
         throwError(
-            `the directory ${chalk.magentaBright(
-                options.dir
-            )} must contain the json/ folder. run mc prepare-bulk command first!`
+            `the directory ${color(options.dir)} must contain the json/ folder. run mc prepare-bulk command first!`
         );
 
     !fs.existsSync(`${options.dir}/csv/`) &&
         throwError(
-            `the directory ${chalk.magentaBright(
-                options.dir
-            )} must contain the csv/ folder. run mc prepare-bulk command first!`
+            `the directory ${color(options.dir)} must contain the csv/ folder. run mc prepare-bulk command first!`
         );
 
     !fs.existsSync(`${options.dir}/jobstate.json`) &&
         throwError(
-            `the directory ${chalk.magentaBright(
+            `the directory ${color(
                 options.dir
             )} must contain the jobstate.json file. run mc run-bulk --start command first!`
         );

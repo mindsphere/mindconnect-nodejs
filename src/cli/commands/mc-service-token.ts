@@ -1,10 +1,11 @@
-import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as jwt from "jsonwebtoken";
-import { MindConnectSetup } from "../..";
-import { decrypt, errorLog, homeDirLog, loadAuth, proxyLog, retry, retrylog, verboseLog } from "../../api/utils";
-import { serviceCredentialLog } from "./command-utils";
+import { MindConnectSetup, retry } from "../..";
+import { decrypt, loadAuth } from "../../api/utils";
+import { errorLog, getColor, homeDirLog, proxyLog, retrylog, serviceCredentialLog, verboseLog } from "./command-utils";
+
+const color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -13,12 +14,12 @@ export default (program: CommanderStatic) => {
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
-        .description(chalk.magentaBright(`displays the service token for use in other tools (e.g. postman) *`))
+        .description(color(`displays the service token for use in other tools (e.g. postman) *`))
         .action(options => {
             (async () => {
                 try {
-                    homeDirLog(options.verbose, chalk.magentaBright);
-                    proxyLog(options.verbose, chalk.magentaBright);
+                    homeDirLog(options.verbose, color);
+                    proxyLog(options.verbose, color);
 
                     if (!options.passkey) {
                         errorLog(
