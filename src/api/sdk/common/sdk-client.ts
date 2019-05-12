@@ -7,6 +7,10 @@ export abstract class SdkClient extends CredentialAuth {
     public GetGateway() {
         return this._gateway;
     }
+
+    public GetTenant() {
+        return this._tenant;
+    }
 }
 
 export type SdkConfiguration = {

@@ -126,3 +126,7 @@ export function modeInformation(asset: AssetManagementModels.AssetResourceWithHi
         console.log(`The feature will be deprecated once bulk upload also works for performance assets.\n`);
     }
 }
+
+export function getColor(name: string) {
+    return chalk.level < 2 ? (chalk as any)[name] : (chalk as any)[`${name}Bright`];
+}

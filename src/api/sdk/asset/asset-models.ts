@@ -1745,7 +1745,7 @@ export namespace AssetManagementModels {
      * @interface UniqueId
      */
     // * manual fix for the interface *Unique id extends string* otherwise the usage becomes very complicated
-    export interface UniqueId extends String {}
+    export type UniqueId = string;
 
     /**
      *

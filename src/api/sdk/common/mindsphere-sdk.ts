@@ -26,6 +26,10 @@ export class MindSphereSdk {
     public GetTenant() {
         return this._tenant;
     }
+
+    public GetGateway() {
+        return this._gateway;
+    }
     private _gateway: string;
     private _basicAuth: string;
     private _tenant: string;

@@ -453,7 +453,7 @@ function checkRequiredParamaters(options: any) {
 
     !options.passkey &&
         errorLog(
-            "you have to provide a passkey to get the service token (run mc ibr --help for full description)",
+            "you have to provide a passkey to get the service token (run mc rb --help for full description)",
             true
         );
 }

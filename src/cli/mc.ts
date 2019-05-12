@@ -6,6 +6,7 @@ import iotBulkRunCommand from "./commands/iot-bulk-run";
 import iotBulkDirCommand from "./commands/iot-prepare-bulk-dir";
 import agentStatusCommand from "./commands/mc-agent-status";
 import agentTokenCommand from "./commands/mc-agent-token";
+import createAgentCommand from "./commands/mc-create-agent";
 import createEventCommand from "./commands/mc-create-event";
 import getDiagnosticCommand from "./commands/mc-get-diagnostic";
 import onboardCommand from "./commands/mc-onboard";
@@ -24,13 +25,16 @@ versionAndHelp(program);
 
 // * agent commands
 onboardCommand(program);
-uploadFileCommand(program);
-uploadTimeSeriesCommand(program);
-createEventCommand(program);
 agentTokenCommand(program);
+uploadTimeSeriesCommand(program);
+
+// * common commands
+uploadFileCommand(program);
+createEventCommand(program);
 agentStatusCommand(program);
 
 // * setup commands
+createAgentCommand(program);
 serviceCredentialsCommand(program);
 serviceTokenCommand(program);
 registerDiagnosticCommand(program);
