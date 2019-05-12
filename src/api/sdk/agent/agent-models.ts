@@ -605,10 +605,10 @@ export namespace AgentManagementModels {
         status?: OnlineStatus.StatusEnum;
         /**
          *
-         * @type {Date}
+         * @type {string}
          * @memberof OnlineStatus
          */
-        since?: Date;
+        since?: string;
     }
 
     /**

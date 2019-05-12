@@ -1,3 +1,4 @@
+import { sleep } from "../../../../test/test-utils";
 import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
 import { AgentManagementModels } from "./agent-models";
@@ -231,13 +232,31 @@ export class AgentManagementClient extends SdkClient {
      *
      * @memberOf AgentManagementClient
      */
-    public async GetBoardingConfiguration(id: string): Promise<AgentManagementModels.Configuration> {
-        const result = await this.HttpAction({
-            verb: "GET",
-            gateway: this.GetGateway(),
-            authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/agents/${id}/boarding/configuration`
-        });
+    public async GetBoardingConfiguration(
+        id: string,
+        params?: { retry?: number }
+    ): Promise<AgentManagementModels.Configuration> {
+        const parameters = params || {};
+        let { retry } = parameters;
+        retry = retry || 1;
+
+        let result;
+
+        for (let index = 0; index < 5; index++) {
+            result = (await this.HttpAction({
+                verb: "GET",
+                gateway: this.GetGateway(),
+                authorization: await this.GetToken(),
+                baseUrl: `${this._baseUrl}/agents/${id}/boarding/configuration`
+            })) as AgentManagementModels.Configuration;
+
+            if (!result.content) {
+                await sleep(500 * index);
+                continue;
+            } else {
+                break;
+            }
+        }
 
         return result as AgentManagementModels.Configuration;
     }

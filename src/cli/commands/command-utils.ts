@@ -130,3 +130,25 @@ export function modeInformation(asset: AssetManagementModels.AssetResourceWithHi
 export function getColor(name: string) {
     return chalk.level < 2 ? (chalk as any)[name] : (chalk as any)[`${name}Bright`];
 }
+
+export function agentConfigLog({
+    gateway,
+    host,
+    tenant,
+    agentid,
+    color
+}: {
+    gateway: string;
+    host: string;
+    tenant: string;
+    agentid: string | undefined;
+    color: Function;
+}) {
+    console.log("\nConfigure your agent at:\n");
+    console.log(
+        "\t" +
+            color(
+                `${gateway.replace(host, tenant + "-assetmanager")}/entity/${agentid}/plugin/uipluginassetmanagermclib`
+            )
+    );
+}

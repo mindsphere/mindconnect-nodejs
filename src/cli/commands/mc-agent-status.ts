@@ -1,10 +1,9 @@
-import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
-import { MindConnectAgent, MindConnectSetup } from "../..";
-import { OnboardingStatus, OnlineStatus } from "../../api/mindconnect-models";
+import { MindConnectAgent } from "../..";
+import { AgentManagementModels, MindSphereSdk } from "../../api/sdk";
 import {
     checkCertificate,
     decrypt,
@@ -17,7 +16,12 @@ import {
     retrylog,
     verboseLog
 } from "../../api/utils";
-import { serviceCredentialLog } from "./command-utils";
+import { getColor, serviceCredentialLog } from "./command-utils";
+
+const color = getColor("magenta");
+const green = getColor("green");
+const red = getColor("red");
+const yellow = getColor("yellow");
 
 export default (program: CommanderStatic) => {
     program
@@ -31,18 +35,15 @@ export default (program: CommanderStatic) => {
         )
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
-        .description(chalk.magentaBright(`displays the agent status and agent onboarding status *`))
+        .description(color(`displays the agent status and agent onboarding status *`))
         .action(options => {
             (async () => {
                 try {
-                    homeDirLog(options.verbose, chalk.magentaBright);
-                    proxyLog(options.verbose, chalk.magentaBright);
+                    homeDirLog(options.verbose, color);
+                    proxyLog(options.verbose, color);
 
                     const configFile = path.resolve(options.config);
-                    verboseLog(
-                        `Agent Status for the agent configuration in: ${chalk.magentaBright(configFile)}.`,
-                        options.verbose
-                    );
+                    verboseLog(`Agent Status for the agent configuration in: ${color(configFile)}.`, options.verbose);
 
                     if (!fs.existsSync(configFile)) {
                         throw new Error(`Can't find file ${configFile}`);
@@ -65,35 +66,38 @@ export default (program: CommanderStatic) => {
                     }
 
                     const auth = loadAuth();
-                    const setup = new MindConnectSetup(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
-                    let onlinestatus: OnlineStatus | undefined;
+                    const sdk = new MindSphereSdk(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
+                    const agentMgmt = sdk.GetAgentManagementClient();
 
-                    await retry(
+                    const onlinestatus = await retry(
                         options.retry,
-                        async () => (onlinestatus = await setup.GetAgentStatus(agent.ClientId())),
+                        async () => await agentMgmt.GetAgentOnlineStatus(agent.ClientId()),
                         300,
                         retrylog("GetAgentStatus")
                     );
                     onlineLog(onlinestatus);
 
-                    let boardingstatus: OnboardingStatus | undefined;
-                    await retry(
+                    const boardingstatus = await retry(
                         options.retry,
-                        async () => (boardingstatus = await setup.GetBoardingStatus(agent.ClientId())),
+                        async () => await agentMgmt.GetOnboardingStatus(agent.ClientId()),
                         300,
                         retrylog("GetBoardingStatus")
                     );
-                    if (boardingstatus && boardingstatus.status) {
+
+                    const { status } = boardingstatus;
+
+                    if (status) {
                         coloredBoardingStatusLog(boardingstatus);
                     }
 
-                    if (agent.HasDataSourceConfiguration()) {
-                        verboseLog(chalk.magentaBright("Data Source Configuration\n"), options.verbose);
+                    if (status === "ONBOARDED" && agent.HasDataSourceConfiguration()) {
+                        verboseLog(color("Data Source Configuration\n"), options.verbose);
                         verboseLog(JSON.stringify(await agent.GetDataSourceConfiguration(), null, 2), options.verbose);
                     }
 
-                    if (agent.HasDataMappings()) {
-                        verboseLog(chalk.magentaBright("Data Mappings\n"), options.verbose);
+                    if (status === "ONBOARDED" && agent.HasDataMappings()) {
+                        console.log("BLBB");
+                        verboseLog(color("Data Mappings\n"), options.verbose);
                         verboseLog(JSON.stringify(await agent.GetDataMappings(), null, 2), options.verbose);
                     }
                 } catch (err) {
@@ -103,7 +107,7 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc agent-status   \t\t\t\t\tuses default ${chalk.magentaBright("agentconfig.json")}`);
+            log(`    mc agent-status   \t\t\t\t\tuses default ${color("agentconfig.json")}`);
             log(`    mc agent-status --config agent.json \t\tuses specified configuration file`);
             log(`    mc agent-status --cert private.key \t\t\tuses specified key for RSA_3072 profile`);
             log(`    mc agent-status --passkey mypasskey \t\tdisplays also the online agent information`);
@@ -116,36 +120,34 @@ export default (program: CommanderStatic) => {
 
 const coloredStatusLog = (agent: MindConnectAgent) => {
     log(
-        `\nAgent status, local information (from .mc folder):\nAgent Id: ${chalk.magentaBright(agent.ClientId())} is ${
-            agent.IsOnBoarded() ? chalk.greenBright("onboarded") : chalk.redBright("not onboarded")
+        `\nAgent status, local information (from .mc folder):\nAgent Id: ${color(agent.ClientId())} is ${
+            agent.IsOnBoarded() ? green("onboarded") : red("not onboarded")
         }, data source is ${
-            agent.HasDataSourceConfiguration() ? chalk.greenBright("configured") : chalk.redBright("not configured")
-        }, mappings are ${
-            agent.HasDataMappings() ? chalk.greenBright("configured") : chalk.redBright("not configured")
-        }.`
+            agent.HasDataSourceConfiguration() ? green("configured") : red("not configured")
+        }, mappings are ${agent.HasDataMappings() ? green("configured") : red("not configured")}.`
     );
 };
 
-const coloredBoardingStatusLog = (boardingstatus: OnboardingStatus) => {
+const coloredBoardingStatusLog = (boardingstatus: AgentManagementModels.OnboardingStatus) => {
     let color;
-    if (boardingstatus.status === OnboardingStatus.StatusEnum.ONBOARDING) {
-        color = chalk.yellowBright;
-    } else if (boardingstatus.status === OnboardingStatus.StatusEnum.NOTONBOARDED) {
-        color = chalk.redBright;
+    if (boardingstatus.status === AgentManagementModels.OnboardingStatus.StatusEnum.ONBOARDING) {
+        color = yellow;
+    } else if (boardingstatus.status === AgentManagementModels.OnboardingStatus.StatusEnum.NOTONBOARDED) {
+        color = red;
     } else {
-        color = chalk.greenBright;
+        color = green;
     }
     log(`Agent is ${color("" + boardingstatus.status)}.`);
 };
 
-const onlineLog = (onlinestatus: OnlineStatus | undefined) => {
+const onlineLog = (onlinestatus?: AgentManagementModels.OnlineStatus) => {
     if (onlinestatus) {
         log(
             `Online Status: ${
-                onlinestatus.status === OnlineStatus.StatusEnum.OFFLINE
-                    ? chalk.redBright("OFFLINE")
-                    : chalk.greenBright("ONLINE")
-            } since: ${chalk.magentaBright(onlinestatus.since)}`
+                onlinestatus.status === AgentManagementModels.OnlineStatus.StatusEnum.OFFLINE
+                    ? red("OFFLINE")
+                    : green("ONLINE")
+            } since: ${color("" + onlinestatus.since)}`
         );
     }
 };

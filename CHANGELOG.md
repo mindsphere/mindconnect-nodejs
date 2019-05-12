@@ -8,13 +8,12 @@
 - CLI Command: prepare-bulk - creates a template directory for timeseries (bulk) upload
 - CLI Command: run-bulk - runs the timeseries (bulk) upload jobs
 - CLI Command: check-bulk - checks the progress of the upload jobs
+- CLI Command: create-agent - creates a new agent in the mindsphere
 - mindconnect-agent: created new UploadFile method capable of running the multipart upload (#4)
 - mindconnect-agent: the UploadFile can now take a buffer additionally to file (#23)
 - mindconnect-agent: the MindSphere path name can be configured (#23)
-- mindconnect-agent: deprecated  (#23)
-- SDK: started a SDK for the new commands which require additional mindsphere APIs 
-- SDK: the SDK will be extracted to a separate package in the future major version (4.0.0)
-- CLI: the CLI will be extracted to a separate package in the future major version (4.0.0)
+- mindconnect-agent: deprecated the old upload method (#23)
+- SDK: started a  PRELIMINARY SDK for the new commands which require additional mindsphere APIs
 
 ## Bugfixes and improvements 3.5.0
 
@@ -28,7 +27,26 @@
 
 - SDK: the SDK will be extracted to a separate package in the version major version (4.0.0)
 - CLI: the CLI will be extracted to a separate package in the future major version (4.0.0)
-- We <3 contributions! We are working on the legal framework to let outside (non-Siemens collabarators) contribute. Stay tuned :)
+- We <3 contributions! We are working on the legal framework to let outside (non-Siemens) collabarators contribute. Stay tuned :)
+
+## About the SDK in the project and what to expect
+
+The SDK in this package is only a **preliminary version** which is used to provide support for the CLI.
+
+Even though you can already play with it, don't rely on it too much because it will be redesigned in the future to support
+different scenarios like deployment in browser and also different authentication mechanisms like frontend authentication,
+backend authentication and token service authentication (for cross tenant access) in the SDK.
+
+This is at the  moment really just a pre-pre-alpha version which was necessary in order to be able to provide the CLI commands and it only
+works with service credetials authentication.
+
+## Bulk Imports and Standard Imports
+
+At this point in time (May 2019) the Bulk Import only works for Simulation Assets and not for Performance Assets. This is why in this version
+we still use the standard APIs for the import of the historical data. Please be aware that the use of this feature has direct impact on mindsphere
+resource consumption and that you might get a notice that you will need to upgrade your account's data ingest rate.
+
+The standard import feature will be deprecated and removed from the CLI once bulk upload also works for performance assets.
 
 ## 3.4.0 - (Malachite Vienna) - April 2019
 

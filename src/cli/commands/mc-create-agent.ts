@@ -14,7 +14,7 @@ import {
     throwError,
     verboseLog
 } from "../../api/utils";
-import { getColor, serviceCredentialLog } from "./command-utils";
+import { agentConfigLog, getColor, serviceCredentialLog } from "./command-utils";
 
 const color = getColor("magenta");
 
@@ -97,15 +97,13 @@ export default (program: CommanderStatic) => {
                         console.log("\nConfigure your certificate by running\n");
                         console.log("\t" + color(`openssl genrsa -out ${options.config}.key 3072`));
                     }
-                    console.log("\nConfigure your agent at:\n");
-                    console.log(
-                        "\t" +
-                            color(
-                                `${sdk.GetGateway().replace("gateway", sdk.GetTenant() + "-assetmanager")}/entity/${
-                                    createdAgent.id
-                                }/plugin/uipluginassetmanagermclib`
-                            )
-                    );
+                    agentConfigLog({
+                        gateway: sdk.GetGateway(),
+                        host: "gateway",
+                        tenant: sdk.GetTenant(),
+                        agentid: `${createdAgent.id}`,
+                        color
+                    });
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }

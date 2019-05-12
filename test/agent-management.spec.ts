@@ -1,6 +1,6 @@
 import * as chai from "chai";
 import { IMindConnectConfiguration, MindConnectAgent } from "../src";
-import { AgentManagementClient, AgentManagementModels, AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
+import { AgentManagementModels, AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import { sleep } from "./test-utils";
 chai.should();
@@ -136,7 +136,9 @@ describe("[SDK] AgentManagementClient", () => {
 
         let configuration;
 
-        configuration = await getBoardingConfiguration(agentMgmt, testAgentId);
+        configuration = (await agentMgmt.GetBoardingConfiguration(testAgentId, {
+            retry: 5
+        })) as IMindConnectConfiguration;
 
         (configuration as any).should.not.be.undefined;
         (configuration as any).content.should.not.be.undefined;
@@ -186,13 +188,3 @@ describe("[SDK] AgentManagementClient", () => {
         }
     }
 });
-async function getBoardingConfiguration(agentMgmt: AgentManagementClient, testAgentId: string) {
-    let configuration;
-    for (let index = 0; index < 5; index++) {
-        configuration = await agentMgmt.GetBoardingConfiguration(testAgentId);
-        if (!configuration.content) {
-            await sleep(1000 * index);
-        }
-    }
-    return configuration as IMindConnectConfiguration;
-}
