@@ -4,19 +4,16 @@ import * as fs from "fs";
 import * as path from "path";
 import { MindConnectAgent } from "../..";
 import { AgentManagementModels, MindSphereSdk } from "../../api/sdk";
+import { checkCertificate, decrypt, getHomeDotMcDir, retry, loadAuth } from "../../api/utils";
 import {
-    checkCertificate,
-    decrypt,
     errorLog,
-    getHomeDotMcDir,
+    getColor,
     homeDirLog,
-    loadAuth,
     proxyLog,
-    retry,
     retrylog,
+    serviceCredentialLog,
     verboseLog
-} from "../../api/utils";
-import { getColor, serviceCredentialLog } from "./command-utils";
+} from "./command-utils";
 
 const color = getColor("magenta");
 const green = getColor("green");

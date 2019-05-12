@@ -2,10 +2,19 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
+import { retry } from "../..";
 import { IMindConnectConfiguration } from "../../api/mindconnect-models";
 import { MindSphereSdk } from "../../api/sdk";
-import { decrypt, errorLog, homeDirLog, loadAuth, proxyLog, retry, retrylog, throwError } from "../../api/utils";
-import { getColor, serviceCredentialLog, agentConfigLog } from "./command-utils";
+import { decrypt, loadAuth, throwError } from "../../api/utils";
+import {
+    agentConfigLog,
+    errorLog,
+    getColor,
+    homeDirLog,
+    proxyLog,
+    retrylog,
+    serviceCredentialLog
+} from "./command-utils";
 
 const color = getColor("magenta");
 

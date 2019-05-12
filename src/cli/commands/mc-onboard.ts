@@ -3,16 +3,8 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { MindConnectAgent, retry } from "../../";
-import {
-    checkCertificate,
-    errorLog,
-    getHomeDotMcDir,
-    homeDirLog,
-    proxyLog,
-    retrylog,
-    verboseLog
-} from "../../api/utils";
-import { getColor } from "./command-utils";
+import { checkCertificate, getHomeDotMcDir } from "../../api/utils";
+import { errorLog, getColor, homeDirLog, proxyLog, retrylog, verboseLog } from "./command-utils";
 
 const color = getColor("cyan");
 

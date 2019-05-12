@@ -3,8 +3,8 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { MindConnectSetup } from "../..";
-import { decrypt, errorLog, homeDirLog, loadAuth, proxyLog, verboseLog } from "../../api/utils";
-import { getColor, serviceCredentialLog } from "./command-utils";
+import { decrypt, loadAuth } from "../../api/utils";
+import { errorLog, getColor, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
 
 const color = getColor("magenta");
 

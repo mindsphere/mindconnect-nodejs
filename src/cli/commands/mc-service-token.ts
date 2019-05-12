@@ -1,9 +1,9 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as jwt from "jsonwebtoken";
-import { MindConnectSetup } from "../..";
-import { decrypt, errorLog, homeDirLog, loadAuth, proxyLog, retry, retrylog, verboseLog } from "../../api/utils";
-import { getColor, serviceCredentialLog } from "./command-utils";
+import { MindConnectSetup, retry } from "../..";
+import { decrypt, loadAuth } from "../../api/utils";
+import { errorLog, getColor, homeDirLog, proxyLog, retrylog, serviceCredentialLog, verboseLog } from "./command-utils";
 
 const color = getColor("magenta");
 

@@ -1,11 +1,14 @@
 import chalk from "chalk";
 import { log } from "console";
+import * as fs from "fs";
 import { AssetManagementModels } from "../../api/sdk";
+import { authJson, getHomeDotMcDir } from "../../api/utils";
 
 const magenta = getColor("magenta");
 const yellow = getColor("yellow");
 const green = getColor("green");
 const red = getColor("red");
+const cyan = getColor("cyan");
 
 export const serviceCredentialLog = () => {
     log(`\n  Important: \n`);
@@ -135,3 +138,44 @@ export function agentConfigLog({
             )
     );
 }
+
+
+export const errorLog = (err: any, verbose: any) => {
+    if (err.message) {
+        console.error(`\n${red(err.message.toString())}`);
+        if (verbose && err.stack) {
+            console.error(red(err.stack));
+        }
+    } else {
+        console.error(red(err.toString()));
+    }
+    process.exit(1);
+};
+
+export const verboseLog = (message: any, verbose: any, spinner?: any) => {
+    verbose && console.log(`... ${message}`);
+    if (!verbose && spinner) {
+        spinner.text = `... ${message}`;
+    }
+};
+
+export const proxyLog = (verbose: any, color?: Function) => {
+    const proxy = process.env.HTTP_PROXY || process.env.http_proxy;
+    const c = color || cyan;
+    verboseLog(proxy ? `Using ${c(proxy)} as proxy server` : "No proxy configured.", verbose);
+};
+
+export const homeDirLog = (verbose: any, color?: Function) => {
+    const c = color || cyan;
+    verboseLog(`Using configuration stored in ${c(getHomeDotMcDir())}`, verbose);
+};
+
+export const retrylog = function(operation: string, c: Function = cyan) {
+    let x = 0;
+    return () => {
+        if (x > 0) {
+            console.log(`Retry no ${c("" + x)} for ${c(operation)} operation.`);
+        }
+        x++;
+    };
+};

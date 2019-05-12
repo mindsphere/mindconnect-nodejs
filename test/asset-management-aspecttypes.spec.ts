@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
 import { AssetManagementClient, AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
-import { decrypt, loadAuth, throwError } from "../src/api/utils";
+import { decrypt, throwError, loadAuth } from "../src/api/utils";
 import { sleep } from "./test-utils";
 chai.should();
 

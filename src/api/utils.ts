@@ -4,15 +4,8 @@ import * as fs from "fs";
 import * as os from "os";
 import { URL } from "url";
 import { TimeStampedDataPoint } from "..";
-import { getColor } from "../cli/commands/command-utils";
 import { IMindConnectConfiguration } from "./mindconnect-models";
-import debug = require("debug");
 const groupby = require("json-groupby");
-const log = debug("mindconnect-util");
-
-const magenta = getColor("magenta");
-const cyan = getColor("cyan");
-const red = getColor("red");
 
 export const convertToTdpArray = (data: any[]): TimeStampedDataPoint[] => {
     const tdpArray: TimeStampedDataPoint[] = [];
@@ -90,45 +83,15 @@ export const storeAuth = (encryptedAuth: authJson) => {
 
     const pathName = `${getHomeDotMcDir()}auth.json`;
     fs.writeFileSync(pathName, JSON.stringify(encryptedAuth));
-    log(`The technical user data has been stored in: ${magenta(pathName)}.`);
+
 };
 
 export const loadAuth = (): authJson => {
     const pathName = `${getHomeDotMcDir()}auth.json`;
-    log(`Loading the data from: ${magenta(pathName)}.`);
     const buffer = fs.readFileSync(pathName);
     return <authJson>JSON.parse(buffer.toString());
 };
 
-export const errorLog = (err: any, verbose: any) => {
-    if (err.message) {
-        console.error(`\n${red(err.message.toString())}`);
-        if (verbose && err.stack) {
-            console.error(red(err.stack));
-        }
-    } else {
-        console.error(red(err.toString()));
-    }
-    process.exit(1);
-};
-
-export const verboseLog = (message: any, verbose: any, spinner?: any) => {
-    verbose && console.log(`... ${message}`);
-    if (!verbose && spinner) {
-        spinner.text = `... ${message}`;
-    }
-};
-
-export const proxyLog = (verbose: any, color?: Function) => {
-    const proxy = process.env.HTTP_PROXY || process.env.http_proxy;
-    const c = color || cyan;
-    verboseLog(proxy ? `Using ${c(proxy)} as proxy server` : "No proxy configured.", verbose);
-};
-
-export const homeDirLog = (verbose: any, color?: Function) => {
-    const c = color || cyan;
-    verboseLog(`Using configuration stored in ${c(getHomeDotMcDir())}`, verbose);
-};
 
 export const getConfigProfile = (config: IMindConnectConfiguration): string => {
     try {
@@ -189,16 +152,6 @@ export const retry = async (n: number, func: Function, timoutinMilliseconds: num
         }
     }
     throw error;
-};
-
-export const retrylog = function(operation: string, c: Function = cyan) {
-    let x = 0;
-    return () => {
-        if (x > 0) {
-            console.log(`Retry no ${c("" + x)} for ${c(operation)} operation.`);
-        }
-        x++;
-    };
 };
 
 export const checkAssetId = (agentId: string) => {

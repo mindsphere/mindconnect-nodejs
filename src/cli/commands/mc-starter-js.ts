@@ -3,8 +3,7 @@ import { log } from "console";
 import * as fs from "fs";
 import { jstemplate } from "../../../templates/js/js-template";
 import { packageTemplateJs } from "../../../templates/js/package_template";
-import { errorLog, verboseLog } from "../../api/utils";
-import { getColor } from "./command-utils";
+import { errorLog, getColor, verboseLog } from "./command-utils";
 
 const color = getColor("green");
 

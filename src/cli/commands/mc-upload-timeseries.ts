@@ -4,17 +4,8 @@ import * as csv from "csvtojson";
 import * as fs from "fs";
 import * as path from "path";
 import { MindConnectAgent, retry } from "../..";
-import {
-    checkCertificate,
-    convertToTdpArray,
-    errorLog,
-    getHomeDotMcDir,
-    homeDirLog,
-    proxyLog,
-    retrylog,
-    verboseLog
-} from "../../api/utils";
-import { displayCsvHelp, getColor } from "./command-utils";
+import { checkCertificate, convertToTdpArray, getHomeDotMcDir } from "../../api/utils";
+import { displayCsvHelp, errorLog, getColor, homeDirLog, proxyLog, retrylog, verboseLog } from "./command-utils";
 const mime = require("mime-types");
 
 const color = getColor("cyan");

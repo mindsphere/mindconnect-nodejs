@@ -1,7 +1,7 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
-import { decrypt, encrypt, errorLog, getPiamUrl, isUrl, storeAuth } from "../../api/utils";
-import { getColor, serviceCredentialLog } from "./command-utils";
+import { decrypt, encrypt, getPiamUrl, isUrl, storeAuth } from "../../api/utils";
+import { errorLog, getColor, serviceCredentialLog } from "./command-utils";
 
 const color = getColor("magenta");
 

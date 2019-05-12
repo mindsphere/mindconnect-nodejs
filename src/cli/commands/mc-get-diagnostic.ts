@@ -4,8 +4,8 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { DiagnosticInformation, MindConnectSetup } from "../..";
-import { decrypt, errorLog, homeDirLog, loadAuth, proxyLog, verboseLog } from "../../api/utils";
-import { getColor, serviceCredentialLog } from "./command-utils";
+import { getColor, errorLog, homeDirLog, proxyLog, verboseLog, serviceCredentialLog } from "./command-utils";
+import { decrypt, loadAuth } from "../../api/utils";
 
 const color = getColor("magenta");
 

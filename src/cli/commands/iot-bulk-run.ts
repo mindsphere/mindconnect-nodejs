@@ -5,11 +5,17 @@ import * as fs from "fs";
 import * as _ from "lodash";
 import * as path from "path";
 import { sleep } from "../../../test/test-utils";
-import { AssetManagementClient, AssetManagementModels, TimeSeriesBulkClient, TimeSeriesBulkModels, TimeSeriesClient } from "../../api/sdk";
+import {
+    AssetManagementClient,
+    AssetManagementModels,
+    TimeSeriesBulkClient,
+    TimeSeriesBulkModels,
+    TimeSeriesClient
+} from "../../api/sdk";
 import { IotFileClient } from "../../api/sdk/iotfile/iot-file";
-import { decrypt, errorLog, loadAuth, retry, retrylog, throwError, verboseLog } from "../../api/utils";
-import { getColor, modeInformation } from "./command-utils";
+import { decrypt, retry, throwError, loadAuth } from "../../api/utils";
 import ora = require("ora");
+import { getColor, modeInformation, verboseLog, errorLog, retrylog } from "./command-utils";
 
 const color = getColor("magenta");
 

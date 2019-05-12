@@ -4,11 +4,11 @@ import * as fs from "fs";
 import * as path from "path";
 import { sleep } from "../../../test/test-utils";
 import { AssetManagementModels, TimeSeriesBulkClient } from "../../api/sdk";
-import { decrypt, errorLog, loadAuth, retry, throwError, verboseLog } from "../../api/utils";
-import { colorizeStatus, getColor } from "./command-utils";
+import { decrypt, retry, throwError, loadAuth } from "../../api/utils";
 import { jobState } from "./iot-bulk-run";
 import _ = require("lodash");
 import ora = require("ora");
+import { getColor, verboseLog, colorizeStatus, errorLog } from "./command-utils";
 
 const color = getColor("magenta");
 

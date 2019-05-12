@@ -3,8 +3,7 @@ import { log } from "console";
 import * as fs from "fs";
 import { packageTemplateTs } from "../../../templates/ts/package_template";
 import { tsconfigjson, tstemplate } from "../../../templates/ts/ts-template";
-import { errorLog, verboseLog } from "../../api/utils";
-import { getColor } from "./command-utils";
+import { getColor, verboseLog, errorLog } from "./command-utils";
 
 const color = getColor("green");
 

@@ -4,8 +4,16 @@ import * as fs from "fs";
 import * as path from "path";
 import { IMindConnectConfiguration } from "../../api/mindconnect-models";
 import { MindSphereSdk } from "../../api/sdk";
-import { decrypt, errorLog, homeDirLog, loadAuth, proxyLog, throwError, verboseLog } from "../../api/utils";
-import { agentConfigLog, getColor, serviceCredentialLog } from "./command-utils";
+import { decrypt, loadAuth, throwError } from "../../api/utils";
+import {
+    agentConfigLog,
+    errorLog,
+    getColor,
+    homeDirLog,
+    proxyLog,
+    serviceCredentialLog,
+    verboseLog
+} from "./command-utils";
 
 const color = getColor("magenta");
 

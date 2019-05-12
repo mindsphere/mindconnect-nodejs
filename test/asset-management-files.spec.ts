@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
 import { AssetManagementClient, AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
-import { decrypt, loadAuth } from "../src/api/utils";
+import { decrypt, loadAuth, retry } from "../src/api/utils";
 import { sleep } from "./test-utils";
 chai.should();
 
@@ -42,7 +42,8 @@ describe("[SDK] AssetManagementClient.Files", () => {
             mimeType: "text/plain",
             description: "Blubb2"
         });
-        const file = await am.DownloadFile(`${result.id}`);
+        // ! the behavior here is asynchronous...
+        const file = (await retry(5, () => am.DownloadFile(`${result.id}`))) as Response;
         const text = await file.text();
         text.should.be.equal("xyz");
 

@@ -2,9 +2,9 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import { AssetManagementClient, AssetManagementModels } from "../../api/sdk";
-import { authJson, checkAssetId, decrypt, errorLog, loadAuth, throwError, verboseLog } from "../../api/utils";
-import { directoryReadyLog, getColor, subtractSecond } from "./command-utils";
+import { authJson, checkAssetId, decrypt, throwError, loadAuth  } from "../../api/utils";
 import ora = require("ora");
+import { getColor, directoryReadyLog, errorLog, verboseLog, subtractSecond } from "./command-utils";
 
 const color = getColor("magenta");
 

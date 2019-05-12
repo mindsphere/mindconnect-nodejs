@@ -5,16 +5,11 @@ import { sleep } from "../../../test/test-utils";
 import { AgentManagementModels, AssetManagementModels, MindSphereSdk } from "../../api/sdk";
 import {
     decrypt,
-    errorLog,
-    homeDirLog,
-    loadAuth,
-    proxyLog,
     retry,
-    retrylog,
     throwError,
-    verboseLog
+    loadAuth
 } from "../../api/utils";
-import { agentConfigLog, getColor, serviceCredentialLog } from "./command-utils";
+import { agentConfigLog, getColor, serviceCredentialLog, homeDirLog, proxyLog, verboseLog, retrylog, errorLog } from "./command-utils";
 
 const color = getColor("magenta");
 
