@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as csv from "csvtojson";
@@ -15,8 +14,10 @@ import {
     retrylog,
     verboseLog
 } from "../../api/utils";
-import { displayCsvHelp } from "./command-utils";
+import { displayCsvHelp, getColor } from "./command-utils";
 const mime = require("mime-types");
+
+const color = getColor("cyan");
 
 export default (program: CommanderStatic) => {
     program
@@ -32,9 +33,7 @@ export default (program: CommanderStatic) => {
         .option("-n, --no-validation", "switch validation off (only if you are sure that the timeseries upload works)")
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
-        .description(
-            chalk.cyanBright("parse .csv file with timeseriesdata and upload the timeseries data to mindsphere")
-        )
+        .description(color("parse .csv file with timeseriesdata and upload the timeseries data to mindsphere"))
         .action(options => {
             (async () => {
                 try {
@@ -51,7 +50,7 @@ export default (program: CommanderStatic) => {
 
                     const configFile = path.resolve(options.config);
                     verboseLog(
-                        `Timeseries upload using the agent configuration stored in: ${chalk.cyanBright(configFile)}.`,
+                        `Timeseries upload using the agent configuration stored in: ${color(configFile)}.`,
                         options.verbose
                     );
                     if (!fs.existsSync(configFile)) {
@@ -63,7 +62,7 @@ export default (program: CommanderStatic) => {
                         throw new Error(`Can't find file ${uploadFile}`);
                     }
 
-                    verboseLog(`Timeseries file to upload: ${chalk.cyanBright(uploadFile)}.`, options.verbose);
+                    verboseLog(`Timeseries file to upload: ${color(uploadFile)}.`, options.verbose);
 
                     if (!fs.existsSync(uploadFile)) {
                         throw new Error(`Can't find file ${uploadFile}`);
@@ -77,7 +76,7 @@ export default (program: CommanderStatic) => {
 
                     if (!agent.IsOnBoarded()) {
                         await retry(options.retry, () => agent.OnBoard(), 300, retrylog("OnBoard"));
-                        log(chalk.cyanBright(`Your agent with id ${agent.ClientId()} was succesfully onboarded.`));
+                        log(color(`Your agent with id ${agent.ClientId()} was succesfully onboarded.`));
                     }
 
                     if (!agent.HasDataSourceConfiguration()) {
@@ -96,14 +95,11 @@ export default (program: CommanderStatic) => {
                     let data: any[] = [];
 
                     const maxSize = parseInt(options.size, 10);
-                    verboseLog(`Using ${chalk.cyanBright("" + maxSize)} http post size.`, options.verbose);
+                    verboseLog(`Using ${color("" + maxSize)} http post size.`, options.verbose);
                     if (isNaN(maxSize) || maxSize < 1) {
                         throw new Error("the size parameter must be a number > 0");
                     }
-                    verboseLog(
-                        `Using ${chalk.cyanBright(options.validation ? "validation" : "no validation")}`,
-                        options.verbose
-                    );
+                    verboseLog(`Using ${color(options.validation ? "validation" : "no validation")}`, options.verbose);
 
                     let messageCount = 0;
                     await csv()
@@ -126,15 +122,13 @@ export default (program: CommanderStatic) => {
             })();
         })
         .on("--help", () => {
-            displayCsvHelp(chalk.cyanBright);
+            displayCsvHelp(color);
         });
 };
 
 async function postChunk(messageCount: number, data: any[], options: any, agent: MindConnectAgent) {
     verboseLog(
-        `posting timeseries message Nr. ${chalk.cyanBright(++messageCount + "")} with ${chalk.cyanBright(
-            data.length + ""
-        )} records `,
+        `posting timeseries message Nr. ${color(++messageCount + "")} with ${color(data.length + "")} records `,
         true
     );
     const tdpArray = convertToTdpArray(data);

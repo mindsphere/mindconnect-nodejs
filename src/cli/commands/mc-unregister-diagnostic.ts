@@ -1,11 +1,12 @@
-import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { MindConnectSetup } from "../..";
 import { decrypt, errorLog, homeDirLog, loadAuth, proxyLog, verboseLog } from "../../api/utils";
-import { serviceCredentialLog } from "./command-utils";
+import { getColor, serviceCredentialLog } from "./command-utils";
+
+const color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -14,7 +15,7 @@ export default (program: CommanderStatic) => {
         .option("-c, --config <agentconfig>", "config file with agent configuration", "agentconfig.json")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
-        .description(chalk.magentaBright("unregister agent from diagnostic *"))
+        .description(color("unregister agent from diagnostic *"))
         .action(options => {
             (async () => {
                 try {
@@ -22,8 +23,8 @@ export default (program: CommanderStatic) => {
                         errorLog("you have to provide a passkey (run mc ud --help for full description)", true);
                     }
 
-                    homeDirLog(options.verbose, chalk.magentaBright);
-                    proxyLog(options.verbose, chalk.magentaBright);
+                    homeDirLog(options.verbose, color);
+                    proxyLog(options.verbose, color);
 
                     const auth = loadAuth();
                     const setup = new MindConnectSetup(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
@@ -33,23 +34,18 @@ export default (program: CommanderStatic) => {
                     }
                     const configuration = require(configFile);
                     verboseLog(
-                        `unregistering from diagnostic with agent id ${chalk.magentaBright(
-                            configuration.content.clientId
-                        )}`,
+                        `unregistering from diagnostic with agent id ${color(configuration.content.clientId)}`,
                         options.verbose
                     );
                     await setup.DeleteDiagnostic(configuration.content.clientId);
                     verboseLog(
-                        `successfully unregistered the agent with agent id ${chalk.magentaBright(
+                        `successfully unregistered the agent with agent id ${color(
                             configuration.content.clientId
                         )} from diagnostic`,
                         true
                     );
                 } catch (err) {
-                    verboseLog(
-                        chalk.magentaBright("This operation requires additionaly the service credentials."),
-                        options.verbose
-                    );
+                    verboseLog(color("This operation requires additionaly the service credentials."), options.verbose);
                     errorLog(err, options.verbose);
                 }
             })();

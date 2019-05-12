@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
@@ -13,7 +12,10 @@ import {
     retrylog,
     verboseLog
 } from "../../api/utils";
+import { getColor } from "./command-utils";
 const mime = require("mime-types");
+
+const color = getColor("cyan");
 
 export default (program: CommanderStatic) => {
     program
@@ -31,7 +33,7 @@ export default (program: CommanderStatic) => {
         .option("-k, --chunked", "Use chunked upload")
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
-        .description(chalk.cyanBright("upload the file to the mindsphere file service"))
+        .description(color("upload the file to the mindsphere file service"))
         .action(options => {
             (async () => {
                 try {
@@ -48,7 +50,7 @@ export default (program: CommanderStatic) => {
 
                     const configFile = path.resolve(options.config);
                     verboseLog(
-                        `Upload using the agent configuration stored in: ${chalk.cyanBright(configFile)}.`,
+                        `Upload using the agent configuration stored in: ${color(configFile)}.`,
                         options.verbose
                     );
 
@@ -61,7 +63,7 @@ export default (program: CommanderStatic) => {
                         throw new Error(`Can't find file ${uploadFile}`);
                     }
 
-                    verboseLog(`File to upload: ${chalk.cyanBright(uploadFile)}.`, options.verbose);
+                    verboseLog(`File to upload: ${color(uploadFile)}.`, options.verbose);
 
                     if (!fs.existsSync(uploadFile)) {
                         throw new Error(`Can't find file ${uploadFile}`);
@@ -75,7 +77,7 @@ export default (program: CommanderStatic) => {
 
                     if (!agent.IsOnBoarded()) {
                         await retry(options.retry, () => agent.OnBoard(), 300, retrylog("OnBoard"));
-                        log(chalk.cyanBright(`Your agent with id ${agent.ClientId()} was succesfully onboarded.`));
+                        log(color(`Your agent with id ${agent.ClientId()} was succesfully onboarded.`));
                     }
 
                     const mimeType = options.mime || mime.lookup(uploadFile) || "application/octet-stream";
@@ -85,7 +87,7 @@ export default (program: CommanderStatic) => {
                     const assetid = options.assetid || agent.ClientId();
                     const chunked = options.chunked ? true : false;
 
-                    log(`Uploading the file: ${chalk.cyanBright(uploadFile)} with mime type ${mimeType}.`);
+                    log(`Uploading the file: ${color(uploadFile)} with mime type ${mimeType}.`);
                     verboseLog(`Description ${description}`, options.verbose);
                     verboseLog(`AssetId ${assetid}`, options.verbose);
                     verboseLog(
@@ -101,7 +103,7 @@ export default (program: CommanderStatic) => {
                         chunk: chunked,
                         retry: options.retry,
                         logFunction: (p: string) => {
-                            return retrylog(p, chalk.cyanBright);
+                            return retrylog(p, color);
                         },
                         verboseFunction: (p: string) => {
                             verboseLog(p, options.verbose);
@@ -111,7 +113,7 @@ export default (program: CommanderStatic) => {
                     const endDate = new Date();
 
                     log(`Upload time: ${(endDate.getTime() - startDate.getTime()) / 1000} seconds`);
-                    log(`Your file ${chalk.cyanBright(uploadFile)} was succesfully uploaded.`);
+                    log(`Your file ${color(uploadFile)} was succesfully uploaded.`);
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }

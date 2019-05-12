@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
@@ -15,6 +14,9 @@ import {
     retrylog,
     verboseLog
 } from "../../api/utils";
+import { getColor } from "./command-utils";
+
+const color = getColor("cyan");
 
 export default (program: CommanderStatic) => {
     program
@@ -28,18 +30,15 @@ export default (program: CommanderStatic) => {
         )
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
-        .description(chalk.cyanBright(`displays the agent token for use in other tools (e.g. postman)`))
+        .description(color(`displays the agent token for use in other tools (e.g. postman)`))
         .action(options => {
             (async () => {
                 try {
-                    homeDirLog(options.verbose, chalk.cyanBright);
-                    proxyLog(options.verbose, chalk.cyanBright);
+                    homeDirLog(options.verbose, color);
+                    proxyLog(options.verbose, color);
 
                     const configFile = path.resolve(options.config);
-                    verboseLog(
-                        `Agent Token for the agent configuration in: ${chalk.cyanBright(configFile)}.`,
-                        options.verbose
-                    );
+                    verboseLog(`Agent Token for the agent configuration in: ${color(configFile)}.`, options.verbose);
 
                     if (!fs.existsSync(configFile)) {
                         throw new Error(`Can't find file ${configFile}`);
@@ -69,7 +68,7 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc agent-token   \t\t\t\tuses default ${chalk.cyanBright("agentconfig.json")}`);
+            log(`    mc agent-token   \t\t\t\tuses default ${color("agentconfig.json")}`);
             log(`    mc agent-token --config agent.json \t\tuses specified configuration file`);
             log(`    mc agent-token --cert private.key \t\tuses specified key for RSA_3072 profile`);
             log(`    mc agent-token --verbose \t\t\tdisplays encoded and decoded version of the token`);

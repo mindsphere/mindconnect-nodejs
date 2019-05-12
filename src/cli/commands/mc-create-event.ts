@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
@@ -14,6 +13,9 @@ import {
     retrylog,
     verboseLog
 } from "../../api/utils";
+import { getColor } from "./command-utils";
+
+const color = getColor("cyan");
 
 export default (program: CommanderStatic) => {
     program
@@ -33,7 +35,7 @@ export default (program: CommanderStatic) => {
         .option("-t, --timestamp <timestamp>", "Timestamp", new Date().toISOString())
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
-        .description(chalk.cyanBright("create an event in the mindsphere"))
+        .description(color("create an event in the mindsphere"))
         .action(options => {
             (async () => {
                 try {
@@ -42,7 +44,7 @@ export default (program: CommanderStatic) => {
 
                     const configFile = path.resolve(options.config);
                     verboseLog(
-                        `Event upload using the agent configuration stored in: ${chalk.cyanBright(configFile)}.`,
+                        `Event upload using the agent configuration stored in: ${color(configFile)}.`,
                         options.verbose
                     );
                     if (!fs.existsSync(configFile)) {
@@ -58,7 +60,7 @@ export default (program: CommanderStatic) => {
 
                     if (!agent.IsOnBoarded()) {
                         await retry(options.retry, () => agent.OnBoard(), 300, retrylog("OnBoard"));
-                        log(chalk.cyanBright(`Your agent with id ${agent.ClientId()} was succesfully onboarded.`));
+                        log(color(`Your agent with id ${agent.ClientId()} was succesfully onboarded.`));
                     }
 
                     if (!agent.HasDataSourceConfiguration()) {
@@ -87,7 +89,7 @@ export default (program: CommanderStatic) => {
 
                     await retry(options.retry, () => agent.PostEvent(event), 300, retrylog("PostEvent"));
 
-                    log(`Your event with severity ${chalk.cyanBright(event.severity + "")} was succesfully created.`);
+                    log(`Your event with severity ${color(event.severity + "")} was succesfully created.`);
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }

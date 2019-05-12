@@ -1,8 +1,9 @@
-import chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import { decrypt, encrypt, errorLog, getPiamUrl, isUrl, storeAuth } from "../../api/utils";
-import { serviceCredentialLog } from "./command-utils";
+import { getColor, serviceCredentialLog } from "./command-utils";
+
+const color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -20,7 +21,7 @@ export default (program: CommanderStatic) => {
             "passkey (you will use this in the commands which require service credentials)"
         )
         .option("-v, --verbose", "verbose output")
-        .description(chalk.magentaBright("provide login for commands which require technical user credentials *"))
+        .description(color("provide login for commands which require technical user credentials *"))
         .action(options => {
             (async () => {
                 try {
