@@ -242,7 +242,7 @@ export class AgentManagementClient extends SdkClient {
 
         let result;
 
-        for (let index = 0; index < 5; index++) {
+        for (let index = 0; index < retry; index++) {
             result = (await this.HttpAction({
                 verb: "GET",
                 gateway: this.GetGateway(),
