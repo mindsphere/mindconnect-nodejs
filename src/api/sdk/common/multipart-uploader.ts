@@ -442,6 +442,7 @@ export class MultipartUploader extends MindConnectBase {
                                 uploadParts.push(f());
                             });
 
+                            if (verboseFunction) verboseFunction(`uploading next ${uploadParts.length} part(s)`);
                             await Promise.all(uploadParts);
                             if (verboseFunction) verboseFunction(`uploaded ${uploadParts.length} part(s)`);
                         }
