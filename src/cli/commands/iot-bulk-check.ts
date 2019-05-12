@@ -75,9 +75,9 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc bulk-check \t displays job progress of ${color("bulkimport")} directory`);
+            log(`    mc check-bulk \t displays job progress of ${color("bulkimport")} directory`);
             log(
-                `    mc br --dir asset1 --verbose \tdisplays job progress of ${color(
+                `    mc check-bulk --dir asset1 --verbose \tdisplays job progress of ${color(
                     "asset1"
                 )} directory with verbose output`
             );
