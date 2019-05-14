@@ -14,10 +14,11 @@ import {
 } from "../../api/sdk";
 import { IotFileClient } from "../../api/sdk/iotfile/iot-file";
 import { decrypt, loadAuth, retry, throwError } from "../../api/utils";
-import { errorLog, getColor, modeInformation, retrylog, verboseLog } from "./command-utils";
+import { errorLog, getColor, modeInformation, verboseLog } from "./command-utils";
 import ora = require("ora");
 
 const color = getColor("magenta");
+const warn = getColor("yellow");
 
 export default (program: CommanderStatic) => {
     program
@@ -27,7 +28,7 @@ export default (program: CommanderStatic) => {
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-l, --parallel <number>", "parallel chunk uploads", 3)
         .option("-s, --size <size>", "entries per file ", Number.MAX_SAFE_INTEGER)
-        .option("-p, --skip", " skip json generation (if already generated)")
+        .option("-f, --force", " force generation of json files")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
         .option("-st, --start", "start sending data to mindsphere")
@@ -40,6 +41,7 @@ export default (program: CommanderStatic) => {
                         options
                     )) as AssetManagementModels.AssetResourceWithHierarchyPath;
 
+                    console.log(options.force);
                     modeInformation(asset, options);
 
                     const aspects = getAspectsFromDirNames(options);
@@ -50,6 +52,8 @@ export default (program: CommanderStatic) => {
                         options.verbose,
                         spinner
                     );
+
+                    const startDate = new Date();
 
                     let jobstate: jobState = {
                         options: { size: options.size, twintype: asset.twinType, asset: asset },
@@ -62,18 +66,30 @@ export default (program: CommanderStatic) => {
                         jobstate = require(path.resolve(`${options.dir}/jobstate.json`)) as jobState;
                     }
 
-                    if (!options.skip) {
+                    options.force &&
+                        verboseLog(
+                            `${warn(
+                                "\nWARNING"
+                            )} forcing the generation of json files can lead to conflicts if files have been already uploaded.\n`,
+                            options.verbose,
+                            spinner
+                        );
+
+                    if (!jobstate.uploadFiles || jobstate.uploadFiles.length === 0 || options.force) {
                         const files: fileInfo[] = await createJsonFilesForUpload({ aspects, options, spinner, asset });
                         jobstate.uploadFiles = files;
                         saveJobState(options, jobstate);
+                    } else {
+                        verboseLog(`${color("skipping")} generation of json files..`, options.verbose, spinner);
+                        await sleep(500);
                     }
 
                     asset.twinType === AssetManagementModels.TwinType.Simulation &&
                         verifySimulationFiles(jobstate.uploadFiles) &&
                         verboseLog("All files verified", options.verbose, spinner);
 
-                    await sleep(1000);
-                    !options.verbose && spinner.succeed("done converting files to json");
+                    await sleep(500);
+                    !options.verbose && spinner.succeed("Done converting files to json.");
                     !options.start &&
                         console.log(
                             `\nrun mc bulk-run with ${color("--start")} option to start sending data to mindsphere\n`
@@ -91,6 +107,8 @@ export default (program: CommanderStatic) => {
                             : await runTimeSeriesUpload(options, jobstate, spinner);
 
                         !options.verbose && spinner.succeed("Done");
+                        const endDate = new Date();
+                        log(`Run time: ${(endDate.getTime() - startDate.getTime()) / 1000} seconds`);
 
                         asset.twinType === AssetManagementModels.TwinType.Simulation &&
                             console.log(`\t run mc ${color("check-bulk")} command to check the progress of the job`);
@@ -112,12 +130,15 @@ export default (program: CommanderStatic) => {
 };
 
 async function runTimeSeriesUpload(options: any, jobstate: jobState, spinner: ora.Ora) {
+    const SLEEP_ON_429 = 5000; // wait 5s on 429
+    const SLEEP_BETWEEN = 1000; // wait 1 sec between posts
+    const pause = Math.max((options.size / 500) * SLEEP_BETWEEN, 1000); // wait at least one second, one second per 1000 records
     const auth = loadAuth();
     const tsClient = new TimeSeriesClient(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
     for (const file of jobstate.uploadFiles) {
         const timeSeries = require(path.resolve(file.path));
 
-        if (jobstate.timeSeriesFiles.indexOf(file.path) >= 0) {
+        if (jobstate.timeSeriesFiles.indexOf(file.path) >= 0 && !options.force) {
             verboseLog(
                 `${color(timeSeries.length)} records from ${formatDate(file.mintime)} to ${formatDate(
                     file.maxtime
@@ -125,21 +146,25 @@ async function runTimeSeriesUpload(options: any, jobstate: jobState, spinner: or
                 options.verbose,
                 spinner
             );
-            await sleep(10);
+            await sleep(100);
             continue;
         }
 
-        await retry(options.retry, () => tsClient.PutTimeSeries(file.entity, file.propertyset, timeSeries), 2000);
+        await retry(
+            options.retry,
+            () => tsClient.PutTimeSeries(file.entity, file.propertyset, timeSeries),
+            SLEEP_ON_429
+        );
         verboseLog(
             `posted ${color(timeSeries.length)} records from ${formatDate(file.mintime)} to ${formatDate(
                 file.maxtime
-            )}`,
+            )} with pause of ${(pause / 1000).toFixed(2)}s between records`,
             options.verbose,
             spinner
         );
         jobstate.timeSeriesFiles.push(file.path);
         saveJobState(options, jobstate);
-        await sleep(500);
+        await sleep(pause); // sleep 1 sec per 100 messages
     }
 }
 
@@ -202,16 +227,25 @@ async function uploadFiles(options: any, jobstate: jobState, spinner?: any) {
     const auth = loadAuth();
     const fileUploadClient = new IotFileClient(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
     for (const entry of jobstate.uploadFiles) {
-        if (entry.etag) {
+        let etag: number | undefined;
+
+        if (options.force) {
+            // force upload of files
+            const fileInfo = await fileUploadClient.GetFiles(entry.entity, {
+                filter: `name eq ${path.basename(entry.filepath)} and path eq ${path.dirname(entry.filepath)}/`
+            });
+
+            if (fileInfo.length === 1) {
+                etag = fileInfo[0].etag;
+            }
+        } else {
             verboseLog(`The file  ${color(entry.filepath)} was already uploaded`, options.verbose, spinner);
+            await sleep(500);
             continue;
         }
 
-        const result = await fileUploadClient.UploadFile(
-            `${jobstate.options.asset.assetId}`,
-            entry.filepath,
-            entry.path,
-            {
+        const result = await retry(options.retry, () =>
+            fileUploadClient.UploadFile(`${jobstate.options.asset.assetId}`, entry.filepath, entry.path, {
                 type: "application/json",
                 timestamp: fs.statSync(entry.path).mtime,
                 description: "bulk upload",
@@ -219,13 +253,17 @@ async function uploadFiles(options: any, jobstate: jobState, spinner?: any) {
                 retry: options.retry,
                 parallelUploads: options.parallel,
                 logFunction: (p: string) => {
-                    return retrylog(p, color);
+                    verboseLog(p, options.verbose, spinner);
                 },
                 verboseFunction: (p: string) => {
                     verboseLog(p, options.verbose, spinner);
-                }
-            }
+                },
+                ifMatch: etag
+            })
         );
+
+        entry.etag = etag === undefined ? "0" : `${etag + 1}`;
+        await saveJobState(options, jobstate);
 
         verboseLog(`uploaded ${entry.filepath} with md5 checksum: ${result}`, options.verbose, spinner);
         const fileInfo = await fileUploadClient.GetFiles(`${jobstate.options.asset.assetId}`, {

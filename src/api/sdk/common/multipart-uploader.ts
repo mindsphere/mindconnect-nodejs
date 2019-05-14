@@ -235,7 +235,7 @@ export class MultipartUploader extends MindConnectBase {
         };
 
         timeStamp && ((headers as any).timeStamp = timeStamp.toISOString());
-        ifMatch && ((headers as any)["If-Match"] = ifMatch);
+        ifMatch !== undefined && ((headers as any)["If-Match"] = ifMatch);
         this.setIfMatch(`${this.GetGateway()}${url}`, headers);
 
         const result = await this.HttpAction({
@@ -271,7 +271,7 @@ export class MultipartUploader extends MindConnectBase {
             timestamp: timeStamp.toISOString()
         };
 
-        ifMatch && ((headers as any)["If-Match"] = ifMatch);
+        ifMatch !== undefined && ((headers as any)["If-Match"] = ifMatch);
 
         let part = totalChunks === 1 ? "" : `?part=${chunks}`;
         if (part === `?part=${totalChunks}`) {
@@ -338,6 +338,42 @@ export class MultipartUploader extends MindConnectBase {
         file: string | Buffer,
         optional?: fileUploadOptionalParameters
     ): Promise<string> {
+        let storedError;
+        let aborted = false;
+        optional = optional || {};
+        const verboseFunction = optional.verboseFunction;
+        try {
+            const result = await this._UploadFile(entityId, filepath, file, optional);
+            return result;
+        } catch (error) {
+            try {
+                storedError = error;
+                await this.AbortUpload(entityId, filepath);
+                verboseFunction && verboseFunction("Aborting previous upload...");
+                aborted = true;
+            } catch {}
+        }
+
+        // console.log(storedError, aborted);
+        storedError &&
+            aborted &&
+            throwError(
+                `Error occurred uploading the file. (Multipart upload was automatically aborted).\n Previous error: ${
+                    storedError.message
+                } `
+            );
+        storedError && !aborted && throwError(storedError.message);
+
+        // typescript issue: https://github.com/microsoft/TypeScript/issues/13958
+        return "";
+    }
+
+    private async _UploadFile(
+        entityId: string,
+        filepath: string,
+        file: string | Buffer,
+        optional?: fileUploadOptionalParameters
+    ): Promise<string> {
         optional = optional || {};
         const chunkSize = optional.chunkSize || 8 * 1024 * 1024;
         optional.chunk &&
@@ -354,15 +390,14 @@ export class MultipartUploader extends MindConnectBase {
             fileType: this.getFileType(optional, file),
             uploadPath: filepath,
             totalChunks: totalChunks,
-            entityId: entityId
+            entityId: entityId,
+            ifMatch: optional.ifMatch
         };
 
         const RETRIES = optional.retry || 1;
 
         const logFunction = optional.logFunction;
         const verboseFunction = optional.verboseFunction;
-
-        optional.ifMatch && ((fileInfo as any)["If-Match"] = optional.ifMatch);
 
         const mystream = this.getStreamFromFile(file, chunkSize);
         const hash = crypto.createHash("md5");

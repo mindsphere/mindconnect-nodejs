@@ -55,7 +55,7 @@ export default (program: CommanderStatic) => {
                         throw new Error(`Can't find file ${uploadFile}`);
                     }
 
-                    let uploader;
+                    let uploader: any;
                     let assetid = options.assetid;
                     const chunked = options.chunked ? true : false;
 
@@ -91,19 +91,28 @@ export default (program: CommanderStatic) => {
 
                     const filePath = options.filepath ? options.filepath : path.basename(uploadFile);
 
-                    const result = await uploader.UploadFile(assetid, filePath, uploadFile, {
-                        description: description,
-                        chunk: chunked,
-                        retry: options.retry,
-                        type: mimeType,
-                        parallelUploads: options.parallel,
-                        logFunction: (p: string) => {
-                            return retrylog(p, color);
-                        },
-                        verboseFunction: (p: string) => {
-                            verboseLog(p, options.verbose, spinner);
-                        }
-                    });
+                    const result = await retry(options.retry, () =>
+                        uploader.UploadFile(
+                            assetid,
+                            filePath,
+                            uploadFile,
+                            {
+                                description: description,
+                                chunk: chunked,
+                                retry: options.retry,
+                                type: mimeType,
+                                parallelUploads: options.parallel,
+                                logFunction: (p: string) => {
+                                    verboseLog(p, options.verbose, spinner);
+                                },
+                                verboseFunction: (p: string) => {
+                                    verboseLog(p, options.verbose, spinner);
+                                }
+                            },
+                            300,
+                            retrylog("retrying")
+                        )
+                    );
 
                     const endDate = new Date();
 
