@@ -20,7 +20,7 @@
         "start-dev": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 cross-env DEBUG=http,mindconnect* concurrently --raw \"npm run ts:watch\" \"npm run test:watch\" ",
         "dev": "npm run ts:build && cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 concurrently --raw \"npm run ts:watch\" \"npm run test:watch\" ",
         "start-agent-dev": "npm run ts:build && cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 cross-env DEBUG=http,mindconnect-agent,mindconnect-fileencoder node ./src/demoagent/test-agent.js ",
-        "doc": "typedoc -out docs --excludePrivate --readme ./README.md --target es6 --name mindconnect-nodejs --exclude \"**/*+(test-agent|index|.spec|.e2e).ts\" --externalPattern \"**/node_modules/**\" --ignoreCompilerErrors && cp -R images docs/images/ && cp CHANGELOG.md docs/CHANGELOG.md",
+        "doc": "compodoc -p tsconfig.json --output docs --name \"@mindconnect/mindconnect-nodejs\" --theme material && cp -r images/ docs/ ",
         "createkey": "openssl genrsa -out private.key 3072"
     },
     "keywords": [
@@ -51,6 +51,7 @@
         "uuid": "^3.3.2"
     },
     "devDependencies": {
+        "@compodoc/compodoc": "^1.1.9",
         "@types/async-lock": "^1.1.1",
         "@types/chai": "^4.1.7",
         "@types/csvtojson": "^1.1.5",

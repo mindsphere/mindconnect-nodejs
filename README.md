@@ -17,7 +17,7 @@ This project has started as a community effort at Siemens AG and is now availabl
 
 There are several ways to install the library. The most common one is via npm registry:
 
-```bash
+```
 # install the latest stable library from the npm registry
 npm install @mindconnect/mindconnect-nodejs
 
@@ -27,7 +27,7 @@ npm install @mindconnect/mindconnect-nodejs@alpha
 
 As an alternative, you can also clone the repository, pack and install the files from local file:
 
-```bash
+```
 # clone the repository and run in the library directory
 npm install
 npm pack
@@ -42,7 +42,7 @@ npm install mindconnect-...tgz --save
 
 The library comes with a command line interface which can also be installed globally. You can use the command line mode to upload timeseries, files and create events in the mindsphere.
 
-```bash
+```
 # install the library globaly if you want to use its command line interface.
  npm install -g @mindconnect/mindconnect-nodejs
 ```
@@ -51,7 +51,7 @@ The library comes with a command line interface which can also be installed glob
 
 The CLI can be used to create starter projects, upload timeseries, events and files, read agent diagnostics etc.
 
-```bash
+```
 # run mc --help to see the full help inforamtion
 mc --help
 ```
@@ -64,7 +64,7 @@ Here are some examples how to use the CLI:
 
 ## Using CLI to generate starter projects
 
-```bash
+```
 # install the library globaly if you want to use its command line interface.
  npm install -g @mindconnect/mindconnect-nodejs
 
@@ -308,7 +308,7 @@ await retry(5, () => agent.BulkPostData(bulk));
 
 You can always generate the current HTML documentation by running the command below.
 
-```bash
+```
 #this generates a docs/ folder the with full documentation of the library.
 npm run doc
 ```
@@ -317,7 +317,7 @@ npm run doc
 
 Set the http_proxy or HTTP_PROXY environment variable if you need to connect via proxy.
 
-```bash
+```
 # set http proxy environment variable if you are using e.g. fiddler on the localhost.
 
 export HTTP_PROXY=http://localhost:8888
@@ -340,7 +340,7 @@ moved to a separate package to reduce the size of the library.
 
 Here is an overview of CLI commands:
 
-```bash
+```
 # run mc --help to get a full list of the commands
 mc --help
 ```
