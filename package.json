@@ -1,6 +1,6 @@
 {
     "name": "@mindconnect/mindconnect-nodejs",
-    "version": "3.5.0-7",
+    "version": "3.5.0-8",
     "description": "MindConnect Library for NodeJS (community based)",
     "main": "./dist/src/index.js",
     "types": "./dist/src/index.d.ts",
