@@ -110,7 +110,7 @@ export default (program: CommanderStatic) => {
                     !options.verbose && spinner.succeed("Done");
 
                     log(`Upload time: ${(endDate.getTime() - startDate.getTime()) / 1000} seconds`);
-                    log(`\nYour file ${color(uploadFile)} with ${result} md5 hash was succesfully uploaded.\n`);
+                    log(`\nYour file ${color(uploadFile)} with ${color(result)} md5 hash was succesfully uploaded.\n`);
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
