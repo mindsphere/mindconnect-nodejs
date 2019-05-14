@@ -91,7 +91,7 @@ export default (program: CommanderStatic) => {
 
                     const filePath = options.filepath ? options.filepath : path.basename(uploadFile);
 
-                    await uploader.UploadFile(assetid, filePath, uploadFile, {
+                    const result = await uploader.UploadFile(assetid, filePath, uploadFile, {
                         description: description,
                         chunk: chunked,
                         retry: options.retry,
@@ -110,7 +110,7 @@ export default (program: CommanderStatic) => {
                     !options.verbose && spinner.succeed("Done");
 
                     log(`Upload time: ${(endDate.getTime() - startDate.getTime()) / 1000} seconds`);
-                    log(`Your file ${color(uploadFile)} was succesfully uploaded.`);
+                    log(`\nYour file ${color(uploadFile)} with ${result} md5 hash was succesfully uploaded.\n`);
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }

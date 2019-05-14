@@ -173,7 +173,7 @@ export const retrylog = function(operation: string, c: Function = cyan) {
     let x = 0;
     return () => {
         if (x > 0) {
-            console.log(`Retry no ${c("" + x)} for ${c(operation)} operation.`);
+            console.log(`...Retry no ${c("" + x)} for ${c(operation)} operation.`);
         }
         x++;
     };
