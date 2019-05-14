@@ -423,6 +423,18 @@ export class MindConnectAgent extends AgentAuth {
         });
     }
 
+    /**
+     * Abort the multipart upload operation
+     *
+     * @param {string} entityId
+     * @param {string} filePath
+     *
+     * @memberOf MindConnectAgent
+     */
+    public async AbortUpload(entityId: string, filePath: string) {
+        await this.uploader.AbortUpload(entityId, filePath);
+    }
+
     private async SendMessage(
         method: "POST" | "PUT",
         url: string,

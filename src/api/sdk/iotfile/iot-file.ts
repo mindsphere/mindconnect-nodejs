@@ -175,5 +175,17 @@ export class IotFileClient extends SdkClient {
         return result;
     }
 
+    /**
+     * Abort the multipart upload.
+     *
+     * @param {string} entityId
+     * @param {string} filePath
+     *
+     * @memberOf IotFileClient
+     */
+    public async AbortUpload(entityId: string, filePath: string) {
+        await this.uploader.AbortUpload(entityId, filePath);
+    }
+
     private uploader = new MultipartUploader(undefined, this);
 }

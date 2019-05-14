@@ -220,10 +220,10 @@ export class MultipartUploader extends MindConnectBase {
     }: {
         mode: "start" | "complete" | "abort";
         entityId: string;
-        description: string;
-        fileType: string;
-        uploadPath: string;
-        timeStamp: Date;
+        description?: string;
+        fileType?: string;
+        uploadPath?: string;
+        timeStamp?: Date;
         ifMatch?: number;
     }) {
         const url = `/api/iotfile/v3/files/${entityId}/${uploadPath}?upload=${mode}`;
@@ -231,10 +231,10 @@ export class MultipartUploader extends MindConnectBase {
 
         const headers = {
             description: description,
-            type: fileType,
-            timestamp: timeStamp.toISOString()
+            type: fileType
         };
 
+        timeStamp && ((headers as any).timeStamp = timeStamp.toISOString());
         ifMatch && ((headers as any)["If-Match"] = ifMatch);
         this.setIfMatch(`${this.GetGateway()}${url}`, headers);
 
@@ -306,6 +306,18 @@ export class MultipartUploader extends MindConnectBase {
         const newEtag = this.fix_iotFileUpload_3_2_0(result, previousEtag);
         this.addUrl(`${gateway}${url}`, newEtag);
         return true;
+    }
+
+    /**
+     * Abort the multipart operation.
+     *
+     * @param {string} entityId
+     * @param {string} filePath
+     *
+     * @memberOf MultipartUploader
+     */
+    public async AbortUpload(entityId: string, filePath: string) {
+        await this.MultipartOperation({ mode: "abort", entityId: entityId, uploadPath: filePath });
     }
 
     /**
