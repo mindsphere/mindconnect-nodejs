@@ -33,3 +33,5 @@ report.xml
 
 bulkupload
 
+# nyc
+.nyc_output

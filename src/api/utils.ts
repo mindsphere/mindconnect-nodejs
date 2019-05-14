@@ -83,7 +83,6 @@ export const storeAuth = (encryptedAuth: authJson) => {
 
     const pathName = `${getHomeDotMcDir()}auth.json`;
     fs.writeFileSync(pathName, JSON.stringify(encryptedAuth));
-
 };
 
 export const loadAuth = (): authJson => {
@@ -91,7 +90,6 @@ export const loadAuth = (): authJson => {
     const buffer = fs.readFileSync(pathName);
     return <authJson>JSON.parse(buffer.toString());
 };
-
 
 export const getConfigProfile = (config: IMindConnectConfiguration): string => {
     try {
@@ -174,4 +172,9 @@ export const toQueryString = (qs: any) => {
             return encodeURIComponent(key) + "=" + encodeURIComponent(value);
         })
         .join("&");
+};
+
+export const removeUndefined = (obj: any) => {
+    Object.keys(obj).forEach(key => obj[key] === undefined && delete obj[key]);
+    return obj;
 };

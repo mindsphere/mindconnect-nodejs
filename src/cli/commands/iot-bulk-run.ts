@@ -13,9 +13,9 @@ import {
     TimeSeriesClient
 } from "../../api/sdk";
 import { IotFileClient } from "../../api/sdk/iotfile/iot-file";
-import { decrypt, retry, throwError, loadAuth } from "../../api/utils";
+import { decrypt, loadAuth, retry, throwError } from "../../api/utils";
+import { errorLog, getColor, modeInformation, retrylog, verboseLog } from "./command-utils";
 import ora = require("ora");
-import { getColor, modeInformation, verboseLog, errorLog, retrylog } from "./command-utils";
 
 const color = getColor("magenta");
 
@@ -170,12 +170,12 @@ async function createUploadJobs(jobstate: jobState, options: any, spinner: ora.O
         })
         .map()
         .value();
-    for (const fileInfos of results) {
+    for (const fileInfos of results as any) {
         const first = (_(fileInfos).first() as fileInfo) || throwError("no data in results");
         const data: TimeSeriesBulkModels.Data = {
             entity: first.entity,
             propertySetName: first.propertyset,
-            timeseriesFiles: fileInfos.map(x => {
+            timeseriesFiles: fileInfos.map((x: { filepath: any; mintime: any; maxtime: any }) => {
                 return { filepath: x.filepath, from: x.mintime, to: x.maxtime };
             })
         };
