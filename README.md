@@ -245,7 +245,7 @@ await agent.PostEvent(event);
 
 Files can now be uploaded via the library. You can upload files for your agent or for your entities. In order to create an event for your entity you need to know the assetid of the asset.
 
-Since version 3.5.0. the agents are using the multipart upload API of the MindSphere. This means that the agents can upload files also bigger > 8 MB, The
+Since version 3.5.1. the agents are using the multipart upload API of the MindSphere. This means that the agents can upload files also bigger > 8 MB, The
 multipart upload must be switched on (chunk:true) if you want to activate this behavior. The parameter parallelUploads determine the maximal number of paraellel uploads. You can increase this on a powerfull computer to speed up the upload or decrease to prevent network congestion.
 
 ```javascript
