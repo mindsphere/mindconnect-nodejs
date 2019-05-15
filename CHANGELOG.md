@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.5.0 - (Venetian Red Vienna) - May 2019
+## 3.5.1 - (Venetian Red Vienna) - May 2019
 
 - CLI Command: agent-status displays agent status
 - CLI Command: agent-token provides a valid agent token for use in tools (e.g. postman)
@@ -32,7 +32,7 @@
 - CLI: color support for low color terminals
  -CLI: progress tracking for long-running commands (upload-file, bulk-run...)
 
-## Bugfixes and improvements 3.5.0
+## Bugfixes and improvements 3.5.1
 
 - CLI Command: upload-timeseries - improved help and error messages during parsing #20
 - mindconnect-agent: removed content-type header from GET Messages according to MindSphere recommendation
