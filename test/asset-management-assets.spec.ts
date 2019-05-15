@@ -108,7 +108,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         assets.should.not.be.null;
 
         assets._embedded || throwError("there have to be some assets with that filter!");
-        (assets as any)._embedded.assets.length.should.be.equal(3);
+        (assets as any)._embedded.assets.length.should.be.greaterThan(0);
     });
 
     it("should GET specific asset ", async () => {
