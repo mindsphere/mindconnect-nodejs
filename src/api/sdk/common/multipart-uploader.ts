@@ -113,7 +113,11 @@ type uploadChunkParameters = {
  */
 export class MultipartUploader extends MindConnectBase {
     private getTotalChunks(fileLength: number, chunkSize: number, optional: fileUploadOptionalParameters) {
-        const totalChunks = Math.ceil(fileLength / chunkSize);
+        let totalChunks = Math.ceil(fileLength / chunkSize);
+
+        if (totalChunks > 1) {
+            totalChunks = Math.ceil(fileLength / (Math.floor(chunkSize / this.highWatermark) * this.highWatermark));
+        }
         !optional.chunk &&
             totalChunks > 1 &&
             throwError("File is too big. Enable chunked/multipart upload (CLI: --chunked) to upload it.");
@@ -132,10 +136,12 @@ export class MultipartUploader extends MindConnectBase {
         );
     }
 
+    private highWatermark = 1 * 1024 * 1024;
+
     private getStreamFromFile(file: string | Buffer, chunksize: number) {
         return file instanceof Buffer
             ? (() => {
-                  const bufferStream = new stream.PassThrough();
+                  const bufferStream = new stream.PassThrough({ highWaterMark: this.highWatermark });
                   for (let index = 0; index < file.length; ) {
                       const end = Math.min(index + chunksize, file.length);
                       bufferStream.write(file.slice(index, end));
@@ -144,7 +150,7 @@ export class MultipartUploader extends MindConnectBase {
                   bufferStream.end();
                   return bufferStream;
               })()
-            : fs.createReadStream(path.resolve(file));
+            : fs.createReadStream(path.resolve(file), { highWaterMark: this.highWatermark });
     }
 
     private addDataToBuffer(current: Uint8Array, data: Buffer) {
@@ -214,10 +220,10 @@ export class MultipartUploader extends MindConnectBase {
     }: {
         mode: "start" | "complete" | "abort";
         entityId: string;
-        description: string;
-        fileType: string;
-        uploadPath: string;
-        timeStamp: Date;
+        description?: string;
+        fileType?: string;
+        uploadPath?: string;
+        timeStamp?: Date;
         ifMatch?: number;
     }) {
         const url = `/api/iotfile/v3/files/${entityId}/${uploadPath}?upload=${mode}`;
@@ -225,11 +231,11 @@ export class MultipartUploader extends MindConnectBase {
 
         const headers = {
             description: description,
-            type: fileType,
-            timestamp: timeStamp.toISOString()
+            type: fileType
         };
 
-        ifMatch && ((headers as any)["If-Match"] = ifMatch);
+        timeStamp && ((headers as any).timeStamp = timeStamp.toISOString());
+        ifMatch !== undefined && ((headers as any)["If-Match"] = ifMatch);
         this.setIfMatch(`${this.GetGateway()}${url}`, headers);
 
         const result = await this.HttpAction({
@@ -265,7 +271,7 @@ export class MultipartUploader extends MindConnectBase {
             timestamp: timeStamp.toISOString()
         };
 
-        ifMatch && ((headers as any)["If-Match"] = ifMatch);
+        ifMatch !== undefined && ((headers as any)["If-Match"] = ifMatch);
 
         let part = totalChunks === 1 ? "" : `?part=${chunks}`;
         if (part === `?part=${totalChunks}`) {
@@ -303,6 +309,18 @@ export class MultipartUploader extends MindConnectBase {
     }
 
     /**
+     * Abort the multipart operation.
+     *
+     * @param {string} entityId
+     * @param {string} filePath
+     *
+     * @memberOf MultipartUploader
+     */
+    public async AbortUpload(entityId: string, filePath: string) {
+        await this.MultipartOperation({ mode: "abort", entityId: entityId, uploadPath: filePath });
+    }
+
+    /**
      * Upload file to MindSphere IOTFileService
      *
      * @param {string} entityId - asset id or agent.ClientId() for agent
@@ -315,6 +333,42 @@ export class MultipartUploader extends MindConnectBase {
      *
      */
     public async UploadFile(
+        entityId: string,
+        filepath: string,
+        file: string | Buffer,
+        optional?: fileUploadOptionalParameters
+    ): Promise<string> {
+        let storedError;
+        let aborted = false;
+        optional = optional || {};
+        const verboseFunction = optional.verboseFunction;
+        try {
+            const result = await this._UploadFile(entityId, filepath, file, optional);
+            return result;
+        } catch (error) {
+            try {
+                storedError = error;
+                await this.AbortUpload(entityId, filepath);
+                verboseFunction && verboseFunction("Aborting previous upload...");
+                aborted = true;
+            } catch {}
+        }
+
+        // console.log(storedError, aborted);
+        storedError &&
+            aborted &&
+            throwError(
+                `Error occurred uploading the file. (Multipart upload was automatically aborted).\n Previous error: ${
+                    storedError.message
+                } `
+            );
+        storedError && !aborted && throwError(storedError.message);
+
+        // typescript issue: https://github.com/microsoft/TypeScript/issues/13958
+        return "";
+    }
+
+    private async _UploadFile(
         entityId: string,
         filepath: string,
         file: string | Buffer,
@@ -336,15 +390,14 @@ export class MultipartUploader extends MindConnectBase {
             fileType: this.getFileType(optional, file),
             uploadPath: filepath,
             totalChunks: totalChunks,
-            entityId: entityId
+            entityId: entityId,
+            ifMatch: optional.ifMatch
         };
 
         const RETRIES = optional.retry || 1;
 
         const logFunction = optional.logFunction;
         const verboseFunction = optional.verboseFunction;
-
-        optional.ifMatch && ((fileInfo as any)["If-Match"] = optional.ifMatch);
 
         const mystream = this.getStreamFromFile(file, chunkSize);
         const hash = crypto.createHash("md5");
@@ -363,24 +416,27 @@ export class MultipartUploader extends MindConnectBase {
                     : `the file is small enough for normal upload`
             );
 
-        optional.chunk &&
-            totalChunks > 1 &&
-            (await retry(
-                RETRIES,
-                () =>
-                    this.MultipartOperation({
-                        mode: "start",
-                        ...fileInfo
-                    }),
-                300,
-                multipartLog
-            ));
+        let startMultipart: { (): Promise<any>; (): void };
+
+        if (optional.chunk && totalChunks > 1) {
+            startMultipart = () =>
+                retry(
+                    RETRIES,
+                    () =>
+                        this.MultipartOperation({
+                            mode: "start",
+                            ...fileInfo
+                        }),
+                    300,
+                    multipartLog
+                );
+        }
 
         return new Promise((resolve, reject) => {
             mystream
                 .on("error", err => reject(err))
                 .on("data", async (data: Buffer) => {
-                    if (current.byteLength + data.byteLength < chunkSize) {
+                    if (current.byteLength + data.byteLength <= chunkSize) {
                         current = this.addDataToBuffer(current, data);
                     } else {
                         if (current.byteLength > 0) {
@@ -388,13 +444,24 @@ export class MultipartUploader extends MindConnectBase {
 
                             const uploadLog = logFunction ? logFunction(`part upload (${chunks} part)`) : undefined;
 
+                            chunks++;
+                            const currentChunk = new Number(chunks).valueOf();
+
+                            verboseFunction &&
+                                verboseFunction(
+                                    `reading chunk number ${chunks} with buffersize : ${(
+                                        currentBuffer.length /
+                                        (1024 * 1024)
+                                    ).toFixed(2)} MB`
+                                );
+
                             promises.push(() =>
                                 retry(
                                     RETRIES,
                                     () =>
                                         this.UploadChunk({
                                             ...fileInfo,
-                                            chunks: ++chunks,
+                                            chunks: currentChunk,
                                             buffer: currentBuffer
                                         }),
                                     300,
@@ -409,13 +476,18 @@ export class MultipartUploader extends MindConnectBase {
                 .on("end", () => {
                     const currentBuffer = Buffer.from(current);
                     const uploadLog = logFunction ? logFunction(`part upload (last part)`) : undefined;
+                    chunks++;
+                    verboseFunction &&
+                        verboseFunction(`reading chunk number ${chunks} with buffersize, ${currentBuffer.length}`);
+
+                    const currentChunk = new Number(chunks).valueOf();
                     promises.push(() =>
                         retry(
                             RETRIES,
                             () =>
                                 this.UploadChunk({
                                     ...fileInfo,
-                                    chunks: ++chunks,
+                                    chunks: currentChunk,
                                     buffer: currentBuffer
                                 }),
                             300,
@@ -424,12 +496,17 @@ export class MultipartUploader extends MindConnectBase {
                     );
                 })
                 .pipe(hash)
-                .once("finish", async () => {
+                .on("finish", async () => {
                     try {
                         // * this is the last promise (for multipart) the one which completes the upload
                         // * this has to be awaited last.
-                        const lastPromise = promises.pop();
 
+                        startMultipart &&
+                            (await startMultipart()) &&
+                            verboseFunction &&
+                            verboseFunction("starting multipart upload");
+
+                        const lastPromise = promises.pop();
                         // * the chunks before last can be uploaded in paralell to mindsphere
                         const maxParalellUploads = (optional && optional.parallelUploads) || 3;
                         http.globalAgent.maxSockets = 50;
@@ -454,7 +531,6 @@ export class MultipartUploader extends MindConnectBase {
                                 totalChunks > 1 ? `uploading last chunk of ${totalChunks} parts.` : `uploading file`
                             );
                         await lastPromise();
-
                         const md5 = hash.read().toString("hex");
                         if (verboseFunction) verboseFunction(`uploaded file. md5 hash: ${md5}`);
                         resolve(md5);

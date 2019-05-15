@@ -90,7 +90,7 @@ export const directoryReadyLog = ({
 };
 
 export function modeInformation(asset: AssetManagementModels.AssetResourceWithHierarchyPath, options: any) {
-    const MAX_SIZE_FOR_TS = 200;
+    const MAX_SIZE_FOR_TS = 100;
     console.log(
         `\nRunning timeseries ${
             asset.twinType === AssetManagementModels.TwinType.Simulation ? "bulk API" : "API"
@@ -106,7 +106,7 @@ export function modeInformation(asset: AssetManagementModels.AssetResourceWithHi
         console.log(`\nYou are using the ${magenta("standard timeseries")} ingest for the asset.`);
         console.log(`The calls to the API will be ${magenta("throttled")} to match your throttling limits.`);
         console.log(`The number of the records per message will be reduced to ${magenta(options.size)} per message.\n`);
-        console.log(`Using this feature has direct impact on mindsphere resource consumption.`);
+        console.log(`Using this feature has a direct impact on ${magenta("your")} MindSphere resource consumption.`);
         console.log(`You might get a notice that you will need to upgrade your account's data ingest rate.`);
         console.log(`The feature will be deprecated once bulk upload also works for performance assets.\n`);
     }
@@ -173,7 +173,7 @@ export const retrylog = function(operation: string, c: Function = cyan) {
     let x = 0;
     return () => {
         if (x > 0) {
-            console.log(`Retry no ${c("" + x)} for ${c(operation)} operation.`);
+            console.log(`...Retry no ${c("" + x)} for ${c(operation)} operation.`);
         }
         x++;
     };

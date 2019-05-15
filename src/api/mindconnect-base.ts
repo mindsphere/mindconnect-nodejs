@@ -1,6 +1,6 @@
 import * as debug from "debug";
 import fetch from "node-fetch";
-import { throwError } from "./utils";
+import { removeUndefined, throwError } from "./utils";
 const HttpsProxyAgent = require("https-proxy-agent");
 const log = debug("mindconnect");
 
@@ -127,7 +127,7 @@ export abstract class MindConnectBase {
             delete headers["Content-Type"];
         }
 
-        headers = { ...headers, ...additionalHeaders };
+        headers = removeUndefined({ ...headers, ...additionalHeaders });
 
         const url = `${gateway}${baseUrl}`;
         log(`${message} Headers ${JSON.stringify(headers)} Url ${url}`);

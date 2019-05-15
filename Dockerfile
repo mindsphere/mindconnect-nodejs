@@ -4,11 +4,11 @@ FROM node:latest
 
 WORKDIR /usr/src/app
 
-COPY PACKAGE *.json ./
+COPY package.json ./
 
 RUN npm install
 
 COPY . .
 
-CMD ["npm" "test"]
+CMD [ "npm", "run", "test" ]
 

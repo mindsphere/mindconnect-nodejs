@@ -4,4 +4,4 @@
 .git
 .mc
 node_modules
-
+.nyc_output

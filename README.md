@@ -347,7 +347,6 @@ mc --help
 
 ![CLI](images/cli.png)
 
-
 ### Setup and diagnostic
 
 The diagnostic endpoint gives informations about the possible problems which an agent might have on the cloud side. However, these operations require service credentials which should only be used for setup and diagnostic tasks in secure environments.
