@@ -13,7 +13,7 @@
 - CLI Command: renew-agent  - renews the agent secrets (#13)
 - CLI Command: upload-file -  New option: passkey : enables uploading the files also with service credentials
 - CLI Command: upload-file -  New option: parallel :configures the number of parallel uploads
-- CLI Command: create-event - New option: passkey : enables uploading the files also with service credentials
+- CLI Command: create-event - New option: passkey : enables creation of events also with service credentials
 - CLI Command: renew-agent  - renews the agent secrets (#13)
 - mindconnect-agent: created new UploadFile method capable of running the multipart upload (#4)
 - mindconnect-agent: the UploadFile can now take a buffer additionally to file (#23)
