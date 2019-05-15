@@ -106,7 +106,7 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         aspectTypes.should.not.be.undefined;
         aspectTypes.should.not.be.null;
         aspectTypes._embedded || throwError("there have to be some aspecttypes with that filter!");
-        (aspectTypes as any)._embedded.aspectTypes.length.should.be.equal(3);
+        (aspectTypes as any)._embedded.aspectTypes.length.should.be.greaterThan(0);
     });
 
     it("should GET specific aspect type ", async () => {

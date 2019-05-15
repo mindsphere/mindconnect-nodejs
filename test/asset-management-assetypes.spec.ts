@@ -104,7 +104,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
         assetTypes.should.not.be.undefined;
         assetTypes.should.not.be.null;
         assetTypes._embedded || throwError("there have to be some aspecttypes with that filter!");
-        (assetTypes as any)._embedded.assetTypes.length.should.be.equal(3);
+        (assetTypes as any)._embedded.assetTypes.length.should.be.greaterThan(0);
         (assetTypes as any)._embedded.assetTypes[0].variables.length.should.be.equal(1);
     });
 
