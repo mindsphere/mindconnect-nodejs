@@ -7,8 +7,8 @@ import { IotFileModels } from "./iot-file-models";
  *
  * The IoT File API enables storing and retrieving files for entity instances.
  *
- * ! The IoT File Client provides a Upload File Method which will do the most important things for you.
- * ! It is highly recomended to use the UploadFile method instead of methods which only take care of parts.
+ * * The IoT File Client provides a Upload File Method which will do the most important things for you.
+ * * It is highly recomended to use the UploadFile method instead of the raw api methods.
  *
  * @export
  * @class IotFileClient
@@ -19,7 +19,7 @@ export class IotFileClient extends SdkClient {
 
     /**
      * Create or update a file for the specified entity and path, with the provided content.
-     * ! The most complete function is UploadFile. This is provided for completeness.
+     * * The most complete function is UploadFile. This is provided for completeness.
      *
      * @param {string} entityId
      * @param {string} filepath
@@ -146,6 +146,15 @@ export class IotFileClient extends SdkClient {
     /**
      * Upload file
      *
+     * This method is used to upload the files to the MindSphere.
+     * It supports standard and multipart upload which can be configured with the [params.chunk] parameter.
+     *
+     * * The method will try to abort the multipart upload if an exception occurs.
+     * * Multipart Upload is done in following steps:
+     *     * start multipart upload
+     *     * upload in parallel [params.parallelUploadChunks] the file parts (retrying [params.retry] times if configured)
+     *     * uploading last chunk.
+     *
      * @param {string} entityId
      * @param {string} filepath
      * @param {(string | Buffer)} file
@@ -162,6 +171,9 @@ export class IotFileClient extends SdkClient {
      * @param {(number | undefined)} [params.parallelUploads] max paralell uploads for parts (default: 3)
      * @param {(number | undefined)} [params.ifMatch] The etag for the upload.
      * @returns {Promise<string>} md5 hash of the file
+     *
+     * @example await sdk.GetIotFileClient().UploadFile (agent.GetClientId(), "some/mindsphere/path/file.txt", "file.txt");
+     * @example await sdk.GetIotFileClient().UploadFile (agent.GetClientId(), "some/other/path/10MB.bin", "bigFile.bin",{ chunked:true, retry:5 });
      *
      * @memberOf IotFileClient
      */

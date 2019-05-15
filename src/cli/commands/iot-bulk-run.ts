@@ -28,10 +28,10 @@ export default (program: CommanderStatic) => {
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-l, --parallel <number>", "parallel chunk uploads", 3)
         .option("-s, --size <size>", "entries per file ", Number.MAX_SAFE_INTEGER)
-        .option("-f, --force", " force generation of json files")
+        .option("-f, --force", "force generation of json files, file upload and creation of jobs")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
-        .option("-st, --start", "start sending data to mindsphere")
+        .option("-t, --start", "start sending data to mindsphere")
         .description(color("runs the timeseries (bulk) upload job from <directoryname> directory *"))
         .action(options => {
             (async () => {

@@ -363,16 +363,36 @@ export class MindConnectAgent extends AgentAuth {
     /**
      * Upload file to MindSphere IOTFileService
      *
+     * * This method is used to upload the files to the MindSphere.
+     * * It supports standard and multipart upload which can be configured with the [optional.chunk] parameter.
+     *
+     * * The method will try to abort the multipart upload if an exception occurs.
+     * * Multipart Upload is done in following steps:
+     *     * start multipart upload
+     *     * upload in parallel [optional.parallelUploadChunks] the file parts (retrying [optional.retry] times if configured)
+     *     * uploading last chunk.
+     *
      * @param {string} entityId - asset id or agent.ClientId() for agent
      * @param {string} filepath - mindsphere file path
      * @param {(string | Buffer)} file - local path or Buffer
      * @param {fileUploadOptionalParameters} [optional] - optional parameters: enable chunking, define retries etc.
+     * @param {(number | undefined)}[optional.part] multipart/upload part
+     * @param {(Date | undefined)} [optional.timestamp] File timestamp in mindsphere.
+     * @param {(string | undefined)} [optional.description] Description in mindsphere.
+     * @param {(string | undefined)} [optional.type] Mime type in mindsphere.
+     * @param {(number | undefined)} [optional.chunkSize] chunkSize. It must be bigger than 5 MB. Default 8 MB.
+     * @param {(number | undefined)} [optional.retry] Number of retries
+     * @param {(Function | undefined)} [optional.logFunction] log functgion is called every time a retry happens.
+     * @param {(Function | undefined)} [optional.verboseFunction] verboseLog function.
+     * @param {(boolean | undefined)} [optional.chunk] Set to true to enable multipart uploads
+     * @param {(number | undefined)} [optional.parallelUploads] max paralell uploads for parts (default: 3)
+     * @param {(number | undefined)} [optional.ifMatch] The etag for the upload.
      * @returns {Promise<string>} - md5 hash of the file
      *
      * @memberOf MindConnectAgent
      *
      * @example await agent.UploadFile (agent.GetClientId(), "some/mindsphere/path/file.txt", "file.txt");
-     * @example await agent.UploadFile (agent.GetClientId(), "some/other/path/10MB.bin", "bigFile.bin",{chunked:true, retry:5});
+     * @example await agent.UploadFile (agent.GetClientId(), "some/other/path/10MB.bin", "bigFile.bin",{ chunked:true, retry:5 });
      */
     public async UploadFile(
         entityId: string,
@@ -388,7 +408,7 @@ export class MindConnectAgent extends AgentAuth {
     /**
      * Uploads the file to mindsphere
      *
-     * @deprecated please use UploadFile method instead this method will be deleted in version 4.0.
+     * @deprecated please use UploadFile method instead this method will probably be removed in version 4.0.0
      *
      * @param {string} file filename or buffer for upload
      * @param {string} fileType mime type (e.g. image/png)
@@ -421,18 +441,6 @@ export class MindConnectAgent extends AgentAuth {
             chunkSize: chunkSize,
             parallelUploads: maxSockets
         });
-    }
-
-    /**
-     * Abort the multipart upload operation
-     *
-     * @param {string} entityId
-     * @param {string} filePath
-     *
-     * @memberOf MindConnectAgent
-     */
-    public async AbortUpload(entityId: string, filePath: string) {
-        await this.uploader.AbortUpload(entityId, filePath);
     }
 
     private async SendMessage(
