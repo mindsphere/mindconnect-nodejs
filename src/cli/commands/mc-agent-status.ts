@@ -93,7 +93,6 @@ export default (program: CommanderStatic) => {
                     }
 
                     if (status === "ONBOARDED" && agent.HasDataMappings()) {
-                        console.log("BLBB");
                         verboseLog(color("Data Mappings\n"), options.verbose);
                         verboseLog(JSON.stringify(await agent.GetDataMappings(), null, 2), options.verbose);
                     }
