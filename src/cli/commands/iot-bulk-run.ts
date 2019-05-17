@@ -41,7 +41,6 @@ export default (program: CommanderStatic) => {
                         options
                     )) as AssetManagementModels.AssetResourceWithHierarchyPath;
 
-                    console.log(options.force);
                     modeInformation(asset, options);
 
                     const aspects = getAspectsFromDirNames(options);
@@ -229,7 +228,7 @@ async function uploadFiles(options: any, jobstate: jobState, spinner?: any) {
     for (const entry of jobstate.uploadFiles) {
         let etag: number | undefined;
 
-        if (options.force) {
+        if (entry.etag === undefined || options.force) {
             // force upload of files
             const fileInfo = await fileUploadClient.GetFiles(entry.entity, {
                 filter: `name eq ${path.basename(entry.filepath)} and path eq ${path.dirname(entry.filepath)}/`

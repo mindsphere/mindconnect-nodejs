@@ -41,7 +41,7 @@ export abstract class MindConnectBase {
     protected _headers = {
         Accept: "*/*",
         "X-Powered-By": "meowz",
-        "User-Agent": "mindconnect-nodejs (3.5.1)"
+        "User-Agent": "mindconnect-nodejs (3.5.2)"
     };
 
     /**
