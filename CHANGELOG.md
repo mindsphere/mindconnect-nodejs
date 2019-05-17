@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.5.2 - (Venetian Red Vienna) - May 2019 - Recovery
+
+## Bugfix 3.5.2
+
+ - fixed incorrect handling of --force parameter in mc run-bulk command
+
 ## 3.5.1 - (Venetian Red Vienna) - May 2019
 
 - CLI Command: agent-status displays agent status

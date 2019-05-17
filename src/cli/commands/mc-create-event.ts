@@ -33,7 +33,7 @@ export default (program: CommanderStatic) => {
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option(
             "-p, --passkey <passkey>",
-            `passkey (optional, file upload uses ${adminColor("service credentials *")})`
+            `passkey (optional, event creation uses ${adminColor("service credentials *")})`
         )
         .option("-v, --verbose", "verbose output")
         .description(`${color("create an event in the mindsphere")} ${adminColor("(optional: passkey) *")}`)
