@@ -66,10 +66,9 @@ pipeline {
     always {
       
       lock ('.mc-folder') {
-        sh '''
-            cp -rf .mc/*.json /.mc/
-            '''
+        sh 'cp -rf .mc/*.json /.mc/'
         junit '**/*.xml'
       }
     }
   }
+}
