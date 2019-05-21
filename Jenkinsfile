@@ -34,6 +34,7 @@ pipeline {
     stage('License') {
       steps {
         sh 'npm run license > license-checker.txt'
+        sh 'npm run license:summary >> license-checker.txt'
       }
     }
     stage('Package') {

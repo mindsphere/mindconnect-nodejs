@@ -22,7 +22,8 @@
         "start-agent-dev": "npm run ts:build && cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 cross-env DEBUG=http,mindconnect-agent,mindconnect-fileencoder node ./src/demoagent/test-agent.js ",
         "doc": "compodoc -p tsconfig.json --output docs --name \"@mindconnect/mindconnect-nodejs\" --theme material && cp -r images/ docs/ ",
         "createkey": "openssl genrsa -out private.key 3072",
-        "license": "license-checker --onlyAllow \"Apache-2.0; Apache*; BSD; BSD-2-Clause; BSD-3-Clause; ISC; MIT; Unlicense; WTFPL; CC-BY-3.0; CC0-1.0\" --production"
+        "license": "license-checker --csv --onlyAllow \"Apache-2.0; Apache*; BSD; BSD-2-Clause; BSD-3-Clause; ISC; MIT; Unlicense; WTFPL; CC-BY-3.0; CC0-1.0\" --production",
+        "license:summary": "license-checker --summary --onlyAllow \"Apache-2.0; Apache*; BSD; BSD-2-Clause; BSD-3-Clause; ISC; MIT; Unlicense; WTFPL; CC-BY-3.0; CC0-1.0\" --production"
     },
     "keywords": [
         "MindConnect",
