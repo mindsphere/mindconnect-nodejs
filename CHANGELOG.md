@@ -1,10 +1,12 @@
 # Changelog
 
+## 3.6.0 - (Cosmic Cobalt Vienna)
+
 ## 3.5.2 - (Venetian Red Vienna) - May 2019 - Recovery
 
 ## Bugfix 3.5.2
 
- - fixed incorrect handling of --force parameter in mc run-bulk command
+- fixed incorrect handling of --force parameter in mc run-bulk command
 
 ## 3.5.1 - (Venetian Red Vienna) - May 2019
 

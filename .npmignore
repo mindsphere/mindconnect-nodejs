@@ -35,3 +35,6 @@ bulkupload
 
 # nyc
 .nyc_output
+
+# license-checker
+license-checker.txt
