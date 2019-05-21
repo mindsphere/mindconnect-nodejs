@@ -28,20 +28,26 @@ pipeline {
     }
     stage('Test') {
       steps {
-        sh 'npm run test-jenkins'
+        lock ('.mc-folder') {
+          sh 'npm run test-jenkins'
+        }
       }
     }
     stage('License') {
       steps {
-        sh 'npm run license > license-checker.txt'
-        sh 'npm run license:summary >> license-checker.txt'
+        lock ('license-txt') {
+          sh 'npm run license > license-checker.txt'
+          sh 'npm run license:summary >> license-checker.txt'
+        }
       }
     }
     stage('Package') {
       steps {
-        sh '''
-        npm pack --unsafe-perm
-        '''
+        lock ('package') {
+          sh '''
+          npm pack --unsafe-perm
+          '''
+        }
       }
     }
     stage('Archive Artifacts') {
