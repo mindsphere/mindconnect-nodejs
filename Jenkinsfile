@@ -7,49 +7,43 @@ pipeline {
     }
   }
   stages {
-    stage('Prepare') {
-      steps {
-        lock ('.mc-folder') {
-          sh '''
-          pwd
-          mkdir .mc
-          cp -a /.mc/. .mc/
-          mkdir ~/.mc
-          cp .mc/auth.json ~/.mc/
-          mv .mc/private.key .
-          cp .mc/2903bf15381646d3a8f4aeeff8d9bd29.json agentconfig.json
-          cp .mc/68766a93af834984a8f8decfbeec961e.json agentconfig.rsa.json
-          '''
+    lock ('.mc-folder') {
+      stage('Prepare') {
+        steps {
+            sh '''
+            pwd
+            mkdir .mc
+            cp -a /.mc/. .mc/
+            mkdir ~/.mc
+            cp .mc/auth.json ~/.mc/
+            mv .mc/private.key .
+            cp .mc/2903bf15381646d3a8f4aeeff8d9bd29.json agentconfig.json
+            cp .mc/68766a93af834984a8f8decfbeec961e.json agentconfig.rsa.json
+            '''
         }
       }
-    }
-    stage('Build') {
-      steps {
-        sh 'npm install'
+      stage('Build') {
+        steps {
+          sh 'npm install'
+        }
       }
-    }
-    stage('Test') {
-      steps {
-        lock ('.mc-folder') {
-          sh 'npm run test-jenkins'
+      stage('Test') {
+        steps {
+            sh 'npm run test-jenkins'
         }
       }
     }
     stage('License') {
       steps {
-        lock ('license-txt') {
           sh 'npm run license > license-checker.txt'
           sh 'npm run license:summary >> license-checker.txt'
-        }
       }
     }
     stage('Package') {
       steps {
-        lock ('package') {
           sh '''
           npm pack --unsafe-perm
           '''
-        }
       }
     }
     stage('Archive Artifacts') {
