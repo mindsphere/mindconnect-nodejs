@@ -20,6 +20,7 @@ pipeline {
           cp .mc/2903bf15381646d3a8f4aeeff8d9bd29.json agentconfig.json
           cp .mc/68766a93af834984a8f8decfbeec961e.json agentconfig.rsa.json
           '''
+        }
       }
     }
     stage('Build') {
@@ -63,12 +64,12 @@ pipeline {
   }
   post {
     always {
-      sh '''
-          cp -rf .mc/*.json /.mc/
-          '''
-      junit '**/*.xml'
-
+      
+      lock ('.mc-folder') {
+        sh '''
+            cp -rf .mc/*.json /.mc/
+            '''
+        junit '**/*.xml'
+      }
     }
-
   }
-}
