@@ -33,7 +33,7 @@ pipeline {
     }
     stage('License') {
       steps {
-        sh 'npm run test-jenkins'
+        sh 'npm run license > license-checker.txt'
       }
     }
     stage('Package') {
@@ -46,6 +46,7 @@ pipeline {
     stage('Archive Artifacts') {
       steps {
         archiveArtifacts '*.tgz'
+        archiveArtifacts 'license-checker.txt'
       }
     }
   }
