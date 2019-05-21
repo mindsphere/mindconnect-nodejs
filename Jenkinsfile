@@ -31,6 +31,11 @@ pipeline {
         sh 'npm run test-jenkins'
       }
     }
+    stage('License') {
+      steps {
+        sh 'npm run test-jenkins'
+      }
+    }
     stage('Package') {
       steps {
         sh '''
