@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as http from "http";
 import * as path from "path";
 import * as stream from "stream";
+import { URL } from "url";
 import { MindConnectAgent } from "../../..";
 import { MindConnectBase } from "../../mindconnect-base";
 import { retry, throwError } from "../../utils";
