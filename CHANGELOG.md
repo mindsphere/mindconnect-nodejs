@@ -1,6 +1,10 @@
 # Changelog
 
-## 3.6.0 - (Cosmic Cobalt Vienna)
+## 3.5.3 - (Venetian Red Vienna) - May 2019 - Recovery
+
+## Bugfix 3.5.3
+
+- added node v8 compatible URL import for Raspberry PIs
 
 ## 3.5.2 - (Venetian Red Vienna) - May 2019 - Recovery
 
