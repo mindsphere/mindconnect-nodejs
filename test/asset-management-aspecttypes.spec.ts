@@ -1,10 +1,11 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
 import { AssetManagementClient, AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
-import { decrypt, throwError, loadAuth } from "../src/api/utils";
+import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import { sleep } from "./test-utils";
 chai.should();
 
+const timeOffset = new Date().getTime();
 describe("[SDK] AssetManagementClient.AspectTypes", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
@@ -36,12 +37,12 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
     before(async () => {
         await sleep(2000);
         await deleteAspectTypes(am, tenant);
-        testAspectType.name = "UnitTestEngineA";
-        await am.PutAspectType(`${tenant}.UnitTestEngineA`, testAspectType);
-        testAspectType.name = "UnitTestEngineB";
-        await am.PutAspectType(`${tenant}.UnitTestEngineB`, testAspectType);
-        testAspectType.name = "UnitTestEngineC";
-        await am.PutAspectType(`${tenant}.UnitTestEngineC`, testAspectType);
+        testAspectType.name = `UnitTestEngine_${timeOffset}_A`;
+        await am.PutAspectType(`${tenant}.UnitTestEngine_${timeOffset}_A`, testAspectType);
+        testAspectType.name = `UnitTestEngine_${timeOffset}_B`;
+        await am.PutAspectType(`${tenant}.UnitTestEngine_${timeOffset}_B`, testAspectType);
+        testAspectType.name = `UnitTestEngine_${timeOffset}_C`;
+        await am.PutAspectType(`${tenant}.UnitTestEngine_${timeOffset}_C`, testAspectType);
     });
     after(async () => {
         await sleep(2000);
@@ -94,7 +95,7 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
                         startsWith: `${tenant}`
                     },
                     name: {
-                        startsWith: "UnitTestEngine"
+                        startsWith: `UnitTestEngine_${timeOffset}`
                     }
                 }
             }),
@@ -111,42 +112,42 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
 
     it("should GET specific aspect type ", async () => {
         am.should.not.be.undefined;
-        const aspectType = await am.GetAspectType(`${tenant}.UnitTestEngineA`);
+        const aspectType = await am.GetAspectType(`${tenant}.UnitTestEngine_${timeOffset}_A`);
 
         aspectType.should.not.be.null;
     });
 
     it("should PUT specific aspect type ", async () => {
         am.should.not.be.undefined;
-        testAspectType.name = `UnitTestEngineD`;
-        const aspectType = await am.PutAspectType(`${tenant}.UnitTestEngineD`, testAspectType);
+        testAspectType.name = `UnitTestEngine_${timeOffset}_D`;
+        const aspectType = await am.PutAspectType(`${tenant}.UnitTestEngine_${timeOffset}_D`, testAspectType);
 
         aspectType.should.not.be.null;
-        await am.DeleteAspectType(`${tenant}.UnitTestEngineD`, { ifMatch: `${aspectType.etag}` });
+        await am.DeleteAspectType(`${tenant}.UnitTestEngine_${timeOffset}_D`, { ifMatch: `${aspectType.etag}` });
     });
 
     it("should PATCH specific aspect type ", async () => {
         am.should.not.be.undefined;
-        testAspectType.name = `UnitTestEngineD`;
-        const aspectType = await am.PutAspectType(`${tenant}.UnitTestEngineD`, testAspectType);
+        testAspectType.name = `UnitTestEngine_${timeOffset}_D`;
+        const aspectType = await am.PutAspectType(`${tenant}.UnitTestEngine_${timeOffset}_D`, testAspectType);
         aspectType.variables.push({
             dataType: AssetManagementModels.VariableDefinition.DataTypeEnum.BOOLEAN,
             name: "test"
         });
 
-        const patchedAspectType = await am.PatchAspectType(`${tenant}.UnitTestEngineD`, aspectType, {
+        const patchedAspectType = await am.PatchAspectType(`${tenant}.UnitTestEngine_${timeOffset}_D`, aspectType, {
             ifMatch: `${aspectType.etag}`
         });
         patchedAspectType.should.not.be.null;
         patchedAspectType.variables.length.should.be.equal(2);
-        await am.DeleteAspectType(`${tenant}.UnitTestEngineD`, { ifMatch: `${patchedAspectType.etag}` });
+        await am.DeleteAspectType(`${tenant}.UnitTestEngine_${timeOffset}_D`, { ifMatch: `${patchedAspectType.etag}` });
     });
 
     it("should DELETE specific aspect type ", async () => {
         am.should.not.be.undefined;
-        testAspectType.name = `UnitTestEngineE`;
-        const aspectType = await am.PutAspectType(`${tenant}.UnitTestEngineE`, testAspectType);
-        await am.DeleteAspectType(`${tenant}.UnitTestEngineE`, { ifMatch: `${aspectType.etag}` });
+        testAspectType.name = `UnitTestEngine_${timeOffset}_E`;
+        const aspectType = await am.PutAspectType(`${tenant}.UnitTestEngine_${timeOffset}_E`, testAspectType);
+        await am.DeleteAspectType(`${tenant}.UnitTestEngine_${timeOffset}_E`, { ifMatch: `${aspectType.etag}` });
     });
 });
 async function deleteAspectTypes(am: AssetManagementClient, tenant: string) {
@@ -157,7 +158,7 @@ async function deleteAspectTypes(am: AssetManagementClient, tenant: string) {
                     startsWith: `${tenant}`
                 },
                 name: {
-                    startsWith: "UnitTestEngine"
+                    startsWith: `UnitTestEngine_${timeOffset}`
                 }
             }
         }),

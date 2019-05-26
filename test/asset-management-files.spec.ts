@@ -5,6 +5,8 @@ import { decrypt, loadAuth, retry } from "../src/api/utils";
 import { sleep } from "./test-utils";
 chai.should();
 
+const timeOffset = new Date().getTime();
+
 describe("[SDK] AssetManagementClient.Files", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
@@ -34,13 +36,13 @@ describe("[SDK] AssetManagementClient.Files", () => {
         const result = await retry(
             5,
             () =>
-                am.PostFile(Buffer.from("xyz"), "xyz.text", {
+                am.PostFile(Buffer.from("xyz"), `${timeOffset}xyz.text`, {
                     mimeType: "text/plain",
                     description: "Blubb2"
                 }),
             1000
         );
-        const files = await am.GetFiles({ filter: JSON.stringify({ name: "xyz.text" }) });
+        const files = await am.GetFiles({ filter: JSON.stringify({ name: `${timeOffset}xyz.text` }) });
         (files._embedded as any).files.length.should.equal(1);
 
         await am.DeleteFile(`${result.id}`, { ifMatch: `${result.etag}` });
@@ -50,7 +52,7 @@ describe("[SDK] AssetManagementClient.Files", () => {
         if (process.env.CI) {
             return; // ! lets do this only locally as mindsphere sometimes behaves strange on fast deletion of files
         }
-        const result = await am.PostFile(Buffer.from("xyz"), "xyz.text", {
+        const result = await am.PostFile(Buffer.from("xyz"), `${timeOffset}xyz.text`, {
             mimeType: "text/plain",
             description: "Blubb2"
         });
@@ -63,7 +65,7 @@ describe("[SDK] AssetManagementClient.Files", () => {
     });
 
     it("should be able to DELETE file", async () => {
-        const result = await am.PostFile(Buffer.from("abc"), "abc.text", {
+        const result = await am.PostFile(Buffer.from("abc"), `${timeOffset}abc.text`, {
             mimeType: "text/plain",
             description: "Blubb2"
         });
@@ -71,12 +73,12 @@ describe("[SDK] AssetManagementClient.Files", () => {
     });
 
     it("should be able to PUT file", async () => {
-        const result = await am.PostFile(Buffer.from("abc"), "test2.txt", {
+        const result = await am.PostFile(Buffer.from("abc"), `${timeOffset}test2.text`, {
             mimeType: "text/plain",
             description: "Blubb2"
         });
 
-        const updatedFile = await am.PutFile(`${result.id}`, Buffer.from("abcabc"), "test2.txt", {
+        const updatedFile = await am.PutFile(`${result.id}`, Buffer.from("abcabc"), `${timeOffset}test2.text`, {
             scope: AssetManagementModels.FileMetadataResource.ScopeEnum.PRIVATE,
             description: result.description,
             ifMatch: `${result.etag}`

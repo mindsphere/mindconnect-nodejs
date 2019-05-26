@@ -3,7 +3,7 @@ pipeline {
   agent {
     docker {
       image 'node'
-      args '-v /home/sn0wcat/mc:/.mc -v /home/sn0wcat/jenkins_artefacts/mindconnect_nodejs:/publish'
+      args '-v /home/sn0wcat/mc:/.mc'
     }
   }
   stages {
@@ -17,8 +17,6 @@ pipeline {
           mkdir ~/.mc
           cp .mc/auth.json ~/.mc/
           mv .mc/private.key .
-          cp .mc/2903bf15381646d3a8f4aeeff8d9bd29.json agentconfig.json
-          cp .mc/68766a93af834984a8f8decfbeec961e.json agentconfig.rsa.json
           '''
         }
       }
@@ -30,9 +28,7 @@ pipeline {
     }
     stage('Test') {
       steps {
-        lock ('.mc-folder') {
-          sh 'npm run test-jenkins'
-        }
+        sh 'npm run test-jenkins'
       }
     }
     stage('License') {
@@ -64,11 +60,7 @@ pipeline {
   }
   post {
     always {
-      
-      lock ('.mc-folder') {
-        sh 'cp -rf .mc/*.json /.mc/'
-        junit '**/*.xml'
-      }
+      junit '**/*.xml'
     }
   }
 }

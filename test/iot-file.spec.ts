@@ -5,6 +5,8 @@ import { decrypt, loadAuth } from "../src/api/utils";
 import { sleep } from "./test-utils";
 chai.should();
 
+const timeOffset = new Date().getTime();
+
 describe("[SDK] IotFileClient", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
@@ -31,19 +33,24 @@ describe("[SDK] IotFileClient", () => {
     });
 
     it("should be able to PUT AND GET file", async () => {
-        await iotFile.PutFile(rootId, "unit/test/xyz.txt", Buffer.from("xyz"), {
+        await iotFile.PutFile(rootId, `unit/test/xyz${timeOffset}.txt`, Buffer.from("xyz"), {
             description: "blubb",
             type: "text/plain"
         });
-        const file = await iotFile.GetFile(rootId, "unit/test/xyz.txt");
+        const file = await iotFile.GetFile(rootId, `unit/test/xyz${timeOffset}.txt`);
         const text = await file.text();
         text.should.be.equal("xyz");
     });
 
     it("should be able to upload 8 mb 1byte large file", async () => {
-        const checksum = await iotFile.UploadFile(rootId, `unit/test/xyz8xmb.txt`, Buffer.alloc(8 * 1024 * 1024 + 1), {
-            chunk: true
-        });
+        const checksum = await iotFile.UploadFile(
+            rootId,
+            `unit/test/xyz${timeOffset}_8xmb.txt`,
+            Buffer.alloc(8 * 1024 * 1024 + 1),
+            {
+                chunk: true
+            }
+        );
 
         checksum.should.be.equal("cba5242e77abe5709a262350cf64d835");
     });
@@ -53,7 +60,7 @@ describe("[SDK] IotFileClient", () => {
 
         const checksum = await iotFile.UploadFile(
             rootId,
-            `unit/test/xyz1625mb.txt`,
+            `unit/test/xyz${timeOffset}_1625mb.txt`,
             Buffer.alloc(16.25 * 1024 * 1024),
             {
                 chunk: true
@@ -64,7 +71,7 @@ describe("[SDK] IotFileClient", () => {
     });
 
     it("should be able to upload 1 byte large file", async () => {
-        const checksum = await iotFile.UploadFile(rootId, `unit/test/xyz1by.txt`, Buffer.alloc(1), {
+        const checksum = await iotFile.UploadFile(rootId, `unit/test/xyz${timeOffset}_1by.txt`, Buffer.alloc(1), {
             chunk: true
         });
 
@@ -72,7 +79,7 @@ describe("[SDK] IotFileClient", () => {
     });
 
     it("should be able to upload 0 byte large file", async () => {
-        const checksum = await iotFile.UploadFile(rootId, `unit/test/xyz0by.txt`, Buffer.alloc(0), {
+        const checksum = await iotFile.UploadFile(rootId, `unit/test/xyz${timeOffset}_0by.txt`, Buffer.alloc(0), {
             chunk: true
         });
 
@@ -82,7 +89,7 @@ describe("[SDK] IotFileClient", () => {
     async function deleteFiles() {
         await sleep(2000);
         const files = await iotFile.GetFiles(rootId, {
-            filter: "name eq xyz*.txt and path eq unit/test/"
+            filter: `name eq xyz${timeOffset}*.txt and path eq unit/test/`
         });
 
         for (const file of files) {
