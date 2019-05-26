@@ -3,6 +3,8 @@ import { AgentManagementModels, AssetManagementModels, MindSphereSdk } from "../
 import { decrypt, loadAuth } from "../src/api/utils";
 chai.should();
 
+const timeOffset = new Date().getTime();
+
 describe("[SDK] AgentManagementClient", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
@@ -21,7 +23,7 @@ describe("[SDK] AgentManagementClient", () => {
     };
     // const test asset :
     const testAsset: AssetManagementModels.Asset = {
-        name: `XUnitTestSecret${new Date().getTime()}`,
+        name: `UnitTestShip_${timeOffset}`,
         externalId: "SN 123456-123-123456",
         description: "The ship of Han Solo and Chewbacca",
         location: {

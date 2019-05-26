@@ -5,6 +5,8 @@ import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import { sleep } from "./test-utils";
 chai.should();
 
+const timeOffset = new Date().getTime();
+
 describe("[SDK] AssetManagementClient.AssetTypes", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
@@ -16,7 +18,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
     const tenant = sdk.GetTenant();
 
     const testAssetType = {
-        name: `SpaceShip`,
+        name: `SpaceShipType${timeOffset}`,
         description: "Hyperspace jump capable space ship",
         parentTypeId: `core.basicdevice`,
         instantiable: true,
@@ -36,13 +38,12 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
     };
 
     before(async () => {
-        await deleteAssetTypes(am, tenant);
-        testAssetType.name = "SpaceShipTypeA";
-        await am.PutAssetType(`${tenant}.SpaceShipTypeA`, testAssetType);
-        testAssetType.name = "SpaceShipTypeB";
-        await am.PutAssetType(`${tenant}.SpaceShipTypeB`, testAssetType);
-        testAssetType.name = "SpaceShipTypeC";
-        await am.PutAssetType(`${tenant}.SpaceShipTypeC`, testAssetType);
+        testAssetType.name = `SpaceShipType_${timeOffset}_A`;
+        await am.PutAssetType(`${tenant}.SpaceShipType_${timeOffset}_A`, testAssetType);
+        testAssetType.name = `SpaceShipType_${timeOffset}_B`;
+        await am.PutAssetType(`${tenant}.SpaceShipType_${timeOffset}_B`, testAssetType);
+        testAssetType.name = `SpaceShipType_${timeOffset}_C`;
+        await am.PutAssetType(`${tenant}.SpaceShipType_${timeOffset}_C`, testAssetType);
     });
     after(async () => {
         await deleteAssetTypes(am, tenant);
@@ -93,7 +94,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
                         startsWith: `${tenant}`
                     },
                     name: {
-                        startsWith: "SpaceShipType"
+                        startsWith: `SpaceShipType_${timeOffset}`
                     }
                 }
             }),
@@ -117,7 +118,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
                         startsWith: `${tenant}`
                     },
                     name: {
-                        startsWith: "SpaceShipType"
+                        startsWith: `SpaceShipType_${timeOffset}`
                     }
                 }
             }),
@@ -132,13 +133,13 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
 
     it("should GET specific asset type ", async () => {
         am.should.not.be.undefined;
-        const assetType = await am.GetAssetType(`${tenant}.SpaceShipTypeA`);
+        const assetType = await am.GetAssetType(`${tenant}.SpaceShipType_${timeOffset}_A`);
         (assetType as any).variables.length.should.equal(1);
 
-        const explodedFalse = await am.GetAssetType(`${tenant}.SpaceShipTypeA`, { exploded: false });
+        const explodedFalse = await am.GetAssetType(`${tenant}.SpaceShipType_${timeOffset}_A`, { exploded: false });
         (explodedFalse as any).variables.length.should.equal(1);
 
-        const explodedAssetType = await am.GetAssetType(`${tenant}.SpaceShipTypeA`, { exploded: true });
+        const explodedAssetType = await am.GetAssetType(`${tenant}.SpaceShipType_${timeOffset}_A`, { exploded: true });
         (explodedAssetType as any).variables.length.should.equal(3);
         assetType.should.not.be.null;
     });
@@ -146,15 +147,15 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
     it("should PUT specific asset type ", async () => {
         am.should.not.be.undefined;
         testAssetType.name = `SpaceShipTypeD`;
-        const assetType = await am.PutAssetType(`${tenant}.SpaceShipTypeD`, testAssetType);
+        const assetType = await am.PutAssetType(`${tenant}.SpaceShipType_${timeOffset}_D`, testAssetType);
         assetType.should.not.be.null;
-        await am.DeleteAssetType(`${tenant}.SpaceShipTypeD`, { ifMatch: `${assetType.etag}` });
+        await am.DeleteAssetType(`${tenant}.SpaceShipType_${timeOffset}_D`, { ifMatch: `${assetType.etag}` });
     });
 
     it("should PATCH specific asset type ", async () => {
         am.should.not.be.undefined;
         testAssetType.name = `SpaceShipTypeD`;
-        const assetType = await am.PutAssetType(`${tenant}.SpaceShipTypeD`, testAssetType);
+        const assetType = await am.PutAssetType(`${tenant}.SpaceShipType_${timeOffset}_D`, testAssetType);
 
         assetType.variables = assetType.variables || new Array<AssetManagementModels.VariableDefinitionResource>();
 
@@ -163,26 +164,26 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
             name: "test"
         });
 
-        const patchedAssetType = await am.PatchAssetType(`${tenant}.SpaceShipTypeD`, assetType, {
+        const patchedAssetType = await am.PatchAssetType(`${tenant}.SpaceShipType_${timeOffset}_D`, assetType, {
             ifMatch: `${assetType.etag}`
         });
 
         patchedAssetType.should.not.be.null;
         (patchedAssetType as any).variables.length.should.be.equal(2);
         assetType.should.not.be.null;
-        await am.DeleteAssetType(`${tenant}.SpaceShipTypeD`, { ifMatch: `${patchedAssetType.etag}` });
+        await am.DeleteAssetType(`${tenant}.SpaceShipType_${timeOffset}_D`, { ifMatch: `${patchedAssetType.etag}` });
     });
 
     it("should DELETE specific asset type ", async () => {
         am.should.not.be.undefined;
-        testAssetType.name = `SpaceShipTypeF`;
-        const assetType = await am.PutAssetType(`${tenant}.SpaceShipTypeF`, testAssetType);
-        await am.DeleteAssetType(`${tenant}.SpaceShipTypeF`, { ifMatch: `${assetType.etag}` });
+        testAssetType.name = `SpaceShipType_${timeOffset}_F`;
+        const assetType = await am.PutAssetType(`${tenant}.SpaceShipType_${timeOffset}_F`, testAssetType);
+        await am.DeleteAssetType(`${tenant}.SpaceShipType_${timeOffset}_F`, { ifMatch: `${assetType.etag}` });
     });
 
     it("should throw error on Put File assignment ", async () => {
         am.should.not.be.undefined;
-        const assetType = await am.GetAssetType(`${tenant}.SpaceShipTypeA`);
+        const assetType = await am.GetAssetType(`${tenant}.SpaceShipType_${timeOffset}_A`);
 
         try {
             await am.PutAssetTypeFileAssignment(
@@ -200,7 +201,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
 
     it("should throw error on Delete File assignment ", async () => {
         am.should.not.be.undefined;
-        const assetType = await am.GetAssetType(`${tenant}.SpaceShipTypeA`);
+        const assetType = await am.GetAssetType(`${tenant}.SpaceShipType_${timeOffset}_A`);
 
         try {
             await am.DeleteAssetTypeFileAssignment(`${assetType.id}`, "xyz", { ifMatch: "0" });
@@ -219,7 +220,7 @@ async function deleteAssetTypes(am: AssetManagementClient, tenant: string) {
                     startsWith: `${tenant}`
                 },
                 name: {
-                    startsWith: "SpaceShipType"
+                    startsWith: `SpaceShipType_${timeOffset}`
                 }
             }
         }),
