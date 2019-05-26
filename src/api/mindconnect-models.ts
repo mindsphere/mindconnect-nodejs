@@ -1017,39 +1017,44 @@ export interface Forbidden {
  * @export
  * @interface Mapping
  */
+/**
+ *
+ * @export
+ * @interface Mapping
+ */
 export interface Mapping {
     /**
-     *
+     * Unique identifier of the mapping resource
      * @type {string}
      * @memberof Mapping
      */
     id?: string;
     /**
-     *
+     * Unique identifier of the agent
      * @type {string}
      * @memberof Mapping
      */
     agentId: string;
     /**
-     *
+     * Unique identifier of the data point
      * @type {string}
      * @memberof Mapping
      */
     dataPointId: string;
     /**
-     *
+     * Unit of the data point
      * @type {string}
      * @memberof Mapping
      */
     dataPointUnit?: string;
     /**
-     *
+     * Type of the data point
      * @type {string}
      * @memberof Mapping
      */
     dataPointType?: Mapping.DataPointTypeEnum;
     /**
-     *
+     * Unique identifier of the entity
      * @type {string}
      * @memberof Mapping
      */
@@ -1084,6 +1089,18 @@ export interface Mapping {
      * @memberof Mapping
      */
     qualityEnabled?: boolean;
+    /**
+     * Identifies auto deleting mapping or keeping mapping.
+     * @type {boolean}
+     * @memberof Mapping
+     */
+    keepMapping?: boolean;
+    /**
+     * ! fix: manual fix for swagger in v3.4.1
+     * @type Validity
+     * @memberof Mapping
+     */
+    validity?: Validity;
 }
 
 /**
@@ -1100,7 +1117,9 @@ export namespace Mapping {
         LONG = <any>"LONG",
         DOUBLE = <any>"DOUBLE",
         BOOLEAN = <any>"BOOLEAN",
-        STRING = <any>"STRING"
+        STRING = <any>"STRING",
+        BIGSTRING = <any>"BIG_STRING",
+        TIMESTAMP = <any>"TIMESTAMP"
     }
     /**
      * @export
@@ -1111,7 +1130,54 @@ export namespace Mapping {
         LONG = <any>"LONG",
         DOUBLE = <any>"DOUBLE",
         BOOLEAN = <any>"BOOLEAN",
-        STRING = <any>"STRING"
+        STRING = <any>"STRING",
+        BIGSTRING = <any>"BIG_STRING",
+        TIMESTAMP = <any>"TIMESTAMP"
+    }
+}
+
+/**
+ *
+ * @export
+ * @interface Validity
+ */
+export interface Validity {
+    /**
+     *
+     * @type {string}
+     * @memberof Validity
+     */
+    status: Validity.StatusEnum;
+    /**
+     *
+     * @type {Array<string>}
+     * @memberof Validity
+     */
+    reasons: Array<Validity.ReasonsEnum>;
+}
+
+/**
+ * @export
+ * @namespace Validity
+ */
+export namespace Validity {
+    /**
+     * @export
+     * @enum {string}
+     */
+    export enum StatusEnum {
+        VALID = <any>"VALID",
+        INVALID = <any>"INVALID"
+    }
+    /**
+     * @export
+     * @enum {string}
+     */
+    export enum ReasonsEnum {
+        MISSINGDATAPOINT = <any>"MISSING_DATAPOINT",
+        MISSINGPROPERTY = <any>"MISSING_PROPERTY",
+        INVALIDTYPE = <any>"INVALID_TYPE",
+        INVALIDUNIT = <any>"INVALID_UNIT"
     }
 }
 

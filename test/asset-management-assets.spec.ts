@@ -5,6 +5,8 @@ import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import { sleep } from "./test-utils";
 chai.should();
 
+const timeOffset = new Date().getTime();
+
 describe("[SDK] AssetManagementClient.Assets", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
@@ -41,12 +43,12 @@ describe("[SDK] AssetManagementClient.Assets", () => {
     before(async () => {
         await deleteAssets(am);
         testAsset.parentId = (await am.GetRootAsset()).assetId;
-        testAsset.name = "FalconA";
+        testAsset.name = `Falcon_${timeOffset}_A`;
         const result = await am.PostAsset(testAsset);
         falconAassetId = `${result.assetId}`;
-        testAsset.name = "FalconB";
+        testAsset.name = `Falcon_${timeOffset}_B`;
         await am.PostAsset(testAsset);
-        testAsset.name = "FalconC";
+        testAsset.name = `Falcon_${timeOffset}_C`;
         await am.PostAsset(testAsset);
     });
     after(async () => {
@@ -96,7 +98,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
                 and: {
                     deleted: null,
                     name: {
-                        startsWith: "Falcon"
+                        startsWith: `Falcon_${timeOffset}`
                     }
                 }
             }),
@@ -120,7 +122,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
 
     it("should POST specific asset ", async () => {
         am.should.not.be.undefined;
-        testAsset.name = `FalconD`;
+        testAsset.name = `Falcon_${timeOffset}_D`;
         const asset = await am.PostAsset(testAsset);
         asset.should.not.be.null;
 
@@ -145,7 +147,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
 
     it("should DELETE specific asset ", async () => {
         am.should.not.be.undefined;
-        testAsset.name = `FalconF`;
+        testAsset.name = `Falcon_${timeOffset}_F`;
         const asset = await am.PostAsset(testAsset);
         await am.DeleteAsset(`${asset.assetId}`, { ifMatch: `${asset.etag}` });
     });
@@ -219,7 +221,7 @@ async function deleteAssets(am: AssetManagementClient) {
             and: {
                 deleted: null,
                 name: {
-                    startsWith: "Falcon"
+                    startsWith: `Falcon_${timeOffset}`
                 }
             }
         }),

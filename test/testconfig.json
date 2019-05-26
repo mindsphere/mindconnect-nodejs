@@ -1,0 +1,19 @@
+{
+    "content": {
+        "baseUrl": "https://southgate.eu1.mindsphere.io",
+        "iat": "test",
+        "clientCredentialProfile": ["RSA_3072"],
+        "clientId": "123456789012345678901234567890ab",
+        "tenant": "thisisnotarealconfig"
+    },
+    "expiration": "2019-03-02T13:02:15.000Z",
+    "response": {
+        "client_id": "123456789012345678901234567890ab",
+        "token_endpoint_auth_method": "client_secret_jwt",
+        "grant_types": ["client_credentials"],
+        "client_secret": "test",
+        "client_secret_expires_at": 1558413497,
+        "registration_access_token": "test",
+        "registration_client_uri": "https://southgate.eu1.mindsphere.io/api/agentmanagement/v3/register/123456789012345678901234567890ab"
+    }
+}
