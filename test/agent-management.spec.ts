@@ -1,8 +1,6 @@
 import * as chai from "chai";
-import { IMindConnectConfiguration, MindConnectAgent } from "../src";
 import { AgentManagementModels, AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
-import { sleep } from "./test-utils";
-import { decrypt, throwError, loadAuth } from "../src/api/utils";
+import { decrypt, loadAuth } from "../src/api/utils";
 chai.should();
 
 describe("[SDK] AgentManagementClient", () => {
@@ -23,7 +21,7 @@ describe("[SDK] AgentManagementClient", () => {
     };
     // const test asset :
     const testAsset: AssetManagementModels.Asset = {
-        name: "UnitTestSecretTestAgent",
+        name: `XUnitTestSecret${new Date().getTime()}`,
         externalId: "SN 123456-123-123456",
         description: "The ship of Han Solo and Chewbacca",
         location: {
@@ -44,7 +42,6 @@ describe("[SDK] AgentManagementClient", () => {
     };
 
     before(async () => {
-        await deleteAgents();
         testAsset.parentId = (await assetMgmt.GetRootAsset()).assetId;
         const result = await assetMgmt.PostAsset(testAsset);
         testAssetId = `${result.assetId}`;
@@ -128,63 +125,12 @@ describe("[SDK] AgentManagementClient", () => {
         patchedAgent.securityProfile.should.equal("SHARED_SECRET");
     });
 
-    it("should work with onboarding/offboarding ", async () => {
-        // lets test this only locally as the behavior of mindsphere is asynchronous and not always deterministic
-        if (process.env.CI) {
-            return;
-        }
-
-        let configuration;
-
-        configuration = (await agentMgmt.GetBoardingConfiguration(testAgentId, {
-            retry: 5
-        })) as IMindConnectConfiguration;
-
-        (configuration as any).should.not.be.undefined;
-        (configuration as any).content.should.not.be.undefined;
-        (configuration as any).content.clientCredentialProfile[0].should.not.be.undefined;
-
-        if (!configuration) throwError("Invalid Configuration");
-        const mindConnectAgent = new MindConnectAgent(configuration);
-        await mindConnectAgent.OnBoard();
-
-        const onlineStatus = await agentMgmt.GetAgentOnlineStatus(testAgentId);
-        onlineStatus.should.not.be.undefined;
-
-        for (let i = 0; i < 5; i++) {
-            const boardingStatus = await agentMgmt.GetOnboardingStatus(testAgentId);
-
-            if (`${boardingStatus.status}` === "ONBOARDED") {
-                await sleep(i * 1000);
-                await agentMgmt.OffboardAgent(testAgentId);
-                continue;
-            }
-            break;
-        }
-
-        await sleep(2000); // give time for async methods to settle
-    });
-
     async function deleteAgents() {
-        const assets = (await assetMgmt.GetAssets({
-            filter: JSON.stringify({
-                and: {
-                    deleted: null,
-                    name: {
-                        startsWith: "UnitTestSecretTestAgent"
-                    }
-                }
-            }),
-            sort: "DESC",
-            page: 0,
-            size: 0
-        })) as any;
         if (testAgentId) {
             const agent = await agentMgmt.GetAgent(testAgentId);
             await agentMgmt.DeleteAgent(testAgentId, { ifMatch: `${agent.eTag}` });
-        }
-        for (const x of assets._embedded.assets) {
-            await assetMgmt.DeleteAsset(x.assetId, { ifMatch: x.etag });
+
+            await assetMgmt.DeleteAsset(testAssetId, { ifMatch: `0` });
         }
     }
 });

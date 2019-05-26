@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.6.0 - (Cobalt Blue Vienna) - July 2019
+
+- shrinked all images
+- made all tests (also agents) self contained
+
+
 ## 3.5.3 - (Venetian Red Vienna) - May 2019 - Recovery
 
 ## Bugfix 3.5.3

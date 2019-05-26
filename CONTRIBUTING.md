@@ -41,3 +41,18 @@ e.g. if the change is done in the MindConnectAgent  the scope should be *Agent*.
 ### Code Style
 
 Please follow the typescript code style which is established in tslint.json. (Works out of the box in many editors, e.g. Visual Studio Code)
+
+### Executing tests locally
+
+First you will need a 3072 bit certificate
+
+```bash
+# run only once to create certificate
+npm run createkey
+```
+
+after that you can start tests with
+
+```bash
+npm run test
+```
