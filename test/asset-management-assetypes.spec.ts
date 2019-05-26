@@ -146,7 +146,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
 
     it("should PUT specific asset type ", async () => {
         am.should.not.be.undefined;
-        testAssetType.name = `SpaceShipTypeD`;
+        testAssetType.name = `SpaceShipType_${timeOffset}_D`;
         const assetType = await am.PutAssetType(`${tenant}.SpaceShipType_${timeOffset}_D`, testAssetType);
         assetType.should.not.be.null;
         await am.DeleteAssetType(`${tenant}.SpaceShipType_${timeOffset}_D`, { ifMatch: `${assetType.etag}` });
@@ -154,7 +154,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
 
     it("should PATCH specific asset type ", async () => {
         am.should.not.be.undefined;
-        testAssetType.name = `SpaceShipTypeD`;
+        testAssetType.name = `SpaceShipType_${timeOffset}_D`;
         const assetType = await am.PutAssetType(`${tenant}.SpaceShipType_${timeOffset}_D`, testAssetType);
 
         assetType.variables = assetType.variables || new Array<AssetManagementModels.VariableDefinitionResource>();
