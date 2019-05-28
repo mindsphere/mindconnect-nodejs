@@ -2,6 +2,7 @@ import { AgentManagementClient } from "../agent/agent-management";
 import { AssetManagementClient } from "../asset/asset-management";
 import { EventManagementClient } from "../event/event-management";
 import { TimeSeriesClient } from "../iot/iot-timeseries";
+import { TimeSeriesAggregateClient } from "../iotaggregate/iot-timeseries-aggregate";
 import { TimeSeriesBulkClient } from "../iotbulk/iot-timeseries-bulk";
 import { IotFileClient } from "../iotfile/iot-file";
 import { isSdkConfiguration, SdkConfiguration } from "./sdk-client";
@@ -86,6 +87,22 @@ export class MindSphereSdk {
         this._timeSeriesClient =
             this._timeSeriesClient || new TimeSeriesClient(this._gateway, this._basicAuth, this._tenant);
         return this._timeSeriesClient;
+    }
+
+    private _timeSeriesAggregateClient?: TimeSeriesAggregateClient;
+
+    /**
+     * * Time Series Aggregates
+     *
+     * @returns {TimeSeriesAggregateClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetTimeSeriesAggregateClient(): TimeSeriesAggregateClient {
+        this._timeSeriesAggregateClient =
+            this._timeSeriesAggregateClient ||
+            new TimeSeriesAggregateClient(this._gateway, this._basicAuth, this._tenant);
+        return this._timeSeriesAggregateClient;
     }
 
     private _eventManagementClient?: EventManagementClient;
