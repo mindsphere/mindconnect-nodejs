@@ -5,6 +5,7 @@ import { TimeSeriesClient } from "../iot/iot-timeseries";
 import { TimeSeriesAggregateClient } from "../iotaggregate/iot-timeseries-aggregate";
 import { TimeSeriesBulkClient } from "../iotbulk/iot-timeseries-bulk";
 import { IotFileClient } from "../iotfile/iot-file";
+import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
 import { isSdkConfiguration, SdkConfiguration } from "./sdk-client";
 /**
  * * Pre-Alpha SDK for the mindsphere APIs
@@ -118,6 +119,22 @@ export class MindSphereSdk {
         this._eventManagementClient =
             this._eventManagementClient || new EventManagementClient(this._gateway, this._basicAuth, this._tenant);
         return this._eventManagementClient;
+    }
+
+    private _spectrumAnalysisClient?: SpectrumAnalysisClient;
+
+    /**
+     *  * Spectrum Analysis Client
+     *
+     * @returns {SpectrumAnalysisClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetSpectrumAnalysisClient(): SpectrumAnalysisClient {
+        this._spectrumAnalysisClient =
+            this._spectrumAnalysisClient || new SpectrumAnalysisClient(this._gateway, this._basicAuth, this._tenant);
+
+        return this._spectrumAnalysisClient;
     }
 
     /**

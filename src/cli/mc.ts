@@ -21,6 +21,8 @@ import unregisterDiagnoticCommand from "./commands/mc-unregister-diagnostic";
 import uploadFileCommand from "./commands/mc-upload-file";
 import uploadTimeSeriesCommand from "./commands/mc-upload-timeseries";
 import versionAndHelp from "./commands/mc-version-help";
+import spectrumAnalysisCommand from "./commands/spectrum-analysis";
+
 // * generic commands
 versionAndHelp(program);
 
@@ -48,6 +50,10 @@ unregisterDiagnoticCommand(program);
 iotBulkDirCommand(program);
 iotBulkRunCommand(program);
 iotCheckBulkComand(program);
+
+// * analytics command
+
+spectrumAnalysisCommand(program);
 
 // * cli for starter projects
 starterTsCommand(program);
