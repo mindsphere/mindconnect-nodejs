@@ -81,3 +81,7 @@ report.xml
 
 # nyc
 .nyc_output
+
+# spectrum analysis
+*.spectrum.json
+

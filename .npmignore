@@ -38,3 +38,7 @@ bulkupload
 
 # license-checker
 license-checker.txt
+
+# spectrum analysis
+*.spectrum.json
+
