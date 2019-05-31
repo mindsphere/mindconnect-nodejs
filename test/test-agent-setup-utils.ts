@@ -9,10 +9,34 @@ export async function unitTestSetup(
 ): Promise<AgentUnitTestConfiguration> {
     const agentMgmt = sdk.GetAgentManagementClient();
     const assetMgmt = sdk.GetAssetManagementClient();
+
+    const { targetAsset, folderid } = await setupStructure(sdk);
+
+    const aspects = await assetMgmt.GetAspects(`${targetAsset.assetId}`);
+    targetAsset.aspects = unroll<AssetManagementModels.Aspect>(aspects);
+
+    const agentAsset = await assetMgmt.PostAsset({
+        name: `Agent${new Date().getTime()}`,
+        parentId: folderid,
+        typeId: "core.mclib"
+    });
+
+    const agent = await agentMgmt.PostAgent({
+        entityId: `${agentAsset.assetId}`,
+        name: `${agentAsset.assetId}`,
+        securityProfile: profile
+    });
+
+    const agentConfig = await agentMgmt.GetBoardingConfiguration(agent.entityId, { retry: 5 });
+
+    return { targetAsset, agentAsset, agent, agentConfig };
+}
+
+export async function setupStructure(sdk: MindSphereSdk) {
+    const agentMgmt = sdk.GetAgentManagementClient();
+    const assetMgmt = sdk.GetAssetManagementClient();
     const tenant = sdk.GetTenant();
-
     const rootassetid = `${(await assetMgmt.GetRootAsset()).assetId}`;
-
     const folders = unroll<AssetManagementModels.AssetResource>(
         await assetMgmt.GetAssets({
             filter: JSON.stringify({
@@ -22,7 +46,6 @@ export async function unitTestSetup(
             })
         })
     );
-
     if (folders.length === 0) {
         const folder = await assetMgmt.PostAsset({
             name: "UnitTestFolder",
@@ -31,10 +54,8 @@ export async function unitTestSetup(
         });
         folders.push(folder);
     }
-
     const folder = folders[0];
     const folderid = `${folder.assetId}`;
-
     // Check if we have the aspect types setup
     const aspectTypes = unroll<AssetManagementModels.AspectTypeResource>(
         await assetMgmt.GetAspectTypes({
@@ -73,7 +94,6 @@ export async function unitTestSetup(
                 }
             ]
         });
-
         await assetMgmt.PutAspectType(`${tenant}.UnitTestVibration`, {
             name: "UnitTestVibration",
             category: AssetManagementModels.AspectType.CategoryEnum.Dynamic,
@@ -106,13 +126,11 @@ export async function unitTestSetup(
             ]
         });
     }
-
     const assetType = unroll(
         await assetMgmt.GetAssetTypes({
             filter: JSON.stringify({ name: { eq: `UnitTestEngine` } })
         })
     );
-
     if (assetType.length === 0) {
         await assetMgmt.PutAssetType(`${tenant}.UnitTestEngine`, {
             name: "UnitTestEngine",
@@ -123,7 +141,6 @@ export async function unitTestSetup(
             ]
         });
     }
-
     const asset = unroll(
         await assetMgmt.GetAssets({
             filter: JSON.stringify({
@@ -138,7 +155,6 @@ export async function unitTestSetup(
             })
         })
     );
-
     if (asset.length === 0) {
         await assetMgmt.PostAsset({
             name: "UnitTestEngineInstance",
@@ -146,7 +162,6 @@ export async function unitTestSetup(
             parentId: folderid
         });
     }
-
     const targetAsset = unroll<AssetManagementModels.AssetResource>(
         await assetMgmt.GetAssets({
             filter: JSON.stringify({
@@ -156,25 +171,7 @@ export async function unitTestSetup(
             })
         })
     )[0];
-
-    const aspects = await assetMgmt.GetAspects(`${targetAsset.assetId}`);
-    targetAsset.aspects = unroll<AssetManagementModels.Aspect>(aspects);
-
-    const agentAsset = await assetMgmt.PostAsset({
-        name: `Agent${new Date().getTime()}`,
-        parentId: folderid,
-        typeId: "core.mclib"
-    });
-
-    const agent = await agentMgmt.PostAgent({
-        entityId: `${agentAsset.assetId}`,
-        name: `${agentAsset.assetId}`,
-        securityProfile: profile
-    });
-
-    const agentConfig = await agentMgmt.GetBoardingConfiguration(agent.entityId, { retry: 5 });
-
-    return { targetAsset, agentAsset, agent, agentConfig };
+    return { targetAsset, folderid };
 }
 
 function unroll<T>(obj: { _embedded?: any }) {

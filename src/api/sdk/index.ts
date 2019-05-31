@@ -9,6 +9,8 @@ export * from "./event/event-management";
 export * from "./event/event-models";
 export * from "./iot/iot-timeseries";
 export * from "./iot/iot-timeseries-models";
+export * from "./iotaggregate/iot-timeseries-aggregate";
+export * from "./iotaggregate/iot-timeseries-aggregate-models";
 export * from "./iotbulk/iot-timeseries-bulk";
 export * from "./iotbulk/iot-timeseries-bulk-models";
 export * from "./iotfile/iot-file";

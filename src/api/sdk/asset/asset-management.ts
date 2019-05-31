@@ -894,7 +894,7 @@ export class AssetManagementClient extends SdkClient {
         const { scope, description, mimeType } = parameters;
 
         const template = `----mindsphere\r\nContent-Disposition: form-data; name="file"; filename="${name}"\r\nContent-Type: ${mimeType ||
-            "application/octet-stream"}\r\n\r\n${file}\r\n----mindsphere\r\nContent-Disposition: form-data; name="name"\r\n\r\n${name}\r\n----mindsphere\r\nContent-Disposition: form-data; name="description"\r\n\r\n${description ||
+            "application/octet-stream"}\r\n\r\n${file.toString("ascii")}\r\n----mindsphere\r\nContent-Disposition: form-data; name="name"\r\n\r\n${name}\r\n----mindsphere\r\nContent-Disposition: form-data; name="description"\r\n\r\n${description ||
             "uploaded file"}\r\n\----mindsphere\r\nContent-Disposition: form-data; name="scope"\r\n\r\n${scope ||
             "PRIVATE"}\r\n----mindsphere--`;
 

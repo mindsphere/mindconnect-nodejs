@@ -9,14 +9,12 @@ const green = getColor("green");
 const red = getColor("red");
 const cyan = getColor("cyan");
 
-export const serviceCredentialLog = () => {
+export const serviceCredentialLog = (color: Function = magenta) => {
     log(`\n  Important: \n`);
-    log(`    you need to supply the ${magenta("service credentials")} for this operation and provide the passkey \n`);
+    log(`    you need to supply the ${color("service credentials")} for this operation and provide the passkey \n`);
     log(`    how to get service credentials: `);
     log(
-        magenta(
-            `    https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials`
-        )
+        color(`    https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials`)
     );
 };
 
