@@ -44,14 +44,22 @@ Please follow the typescript code style which is established in tslint.json. (Wo
 
 ### Executing tests locally
 
-First you will need a 3072 bit certificate
+The unit tests require the configured service credentials and a 3072 bit agent certificate.
+
+First: install the library and CLI globally and run the create service credentials command (see also `mc service-credentials --help'):
+
+```bash
+npm install -g @mindconnect/mindconnect-nodejs
+mc service-credentials --user tenantx001 --password xxxx-xxx-x-x --gateway eu1 --tenant tenantx --passkey mypasskey
+```
+after that you will need a 3072 bit certificate
 
 ```bash
 # run only once to create certificate
 npm run createkey
 ```
 
-after that you can start tests with
+You are now all set and should be able to run the unit tests:
 
 ```bash
 npm run test
