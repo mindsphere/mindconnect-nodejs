@@ -156,14 +156,14 @@ export const verboseLog = (message: any, verbose: any, spinner?: any) => {
     }
 };
 
-export const proxyLog = (verbose: any, color?: Function) => {
+export const proxyLog = (verbose: any, color: Function) => {
     const proxy = process.env.HTTP_PROXY || process.env.http_proxy;
-    const c = color || cyan;
+    const c = color;
     verboseLog(proxy ? `Using ${c(proxy)} as proxy server` : "No proxy configured.", verbose);
 };
 
-export const homeDirLog = (verbose: any, color?: Function) => {
-    const c = color || cyan;
+export const homeDirLog = (verbose: any, color: Function) => {
+    const c = color;
     verboseLog(`Using configuration stored in ${c(getHomeDotMcDir())}`, verbose);
 };
 

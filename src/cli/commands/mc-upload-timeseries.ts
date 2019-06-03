@@ -36,8 +36,8 @@ export default (program: CommanderStatic) => {
                         process.exit(1);
                     }
 
-                    homeDirLog(options.verbose);
-                    proxyLog(options.verbose);
+                    homeDirLog(options.verbose, color);
+                    proxyLog(options.verbose, color);
 
                     const configFile = path.resolve(options.config);
                     verboseLog(

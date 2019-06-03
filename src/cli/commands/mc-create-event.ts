@@ -40,10 +40,10 @@ export default (program: CommanderStatic) => {
         .action(options => {
             (async () => {
                 try {
-                    color = options.passkey ? adminColor : color;
+                    color = options.passkey !== undefined ? adminColor : color;
                     checkParameters(options);
-                    homeDirLog(options.verbose);
-                    proxyLog(options.verbose);
+                    homeDirLog(options.verbose, color);
+                    proxyLog(options.verbose, color);
 
                     const spinner = ora("creating event");
                     !options.verbose && spinner.start();
