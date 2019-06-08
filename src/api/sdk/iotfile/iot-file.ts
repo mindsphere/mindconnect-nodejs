@@ -93,7 +93,7 @@ export class IotFileClient extends SdkClient {
      */
     public async GetFiles(
         entityid: string,
-        params?: { offset?: number; limit?: number; count?: number; order?: string; filter?: string }
+        params?: { offset?: number; limit?: number; count?: boolean; order?: string; filter?: string }
     ): Promise<IotFileModels.File[]> {
         const parameters = params || {};
         const { offset, limit, count, order, filter } = parameters;
@@ -101,8 +101,7 @@ export class IotFileClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/files/${entityid}?${toQueryString({ filter })}`,
-            additionalHeaders: { offset, limit, count, order }
+            baseUrl: `${this._baseUrl}/files/${entityid}?${toQueryString({ filter, offset, limit, count, order })}`
         }) as unknown)) as IotFileModels.File[];
     }
 

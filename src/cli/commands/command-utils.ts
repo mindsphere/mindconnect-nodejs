@@ -176,3 +176,10 @@ export const retrylog = function(operation: string, c: Function = cyan) {
         x++;
     };
 };
+
+export const humanFileSize = (size: number) => {
+    const i = size === 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024));
+    const calculatedSize = (size / Math.pow(1024, i)).toFixed(2);
+    const suffix = ["B", "KB", "MB", "GB", "TB"][i];
+    return `${calculatedSize}${suffix}`;
+};
