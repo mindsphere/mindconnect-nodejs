@@ -48,7 +48,7 @@ export default (program: CommanderStatic) => {
                     let offset = 0;
                     let files;
 
-                    console.log(`timestamp  size  etag  path`);
+                    console.log(`timestamp etag  size  path`);
 
                     do {
                         files = await iotFile.GetFiles(`${options.assetid}`, {
@@ -59,9 +59,8 @@ export default (program: CommanderStatic) => {
                         });
                         for (const file of files) {
                             console.log(
-                                `${file.timestamp}  ${humanFileSize(file.size || 0)}  ${file.etag}  ${file.path}${color(
-                                    file.name
-                                )}`
+                                `${file.timestamp}  ${file.etag}  ${humanFileSize(file.size || 0)}  \t${file.path ||
+                                    ""}${color(file.name)}`
                             );
 
                             verboseLog(`${JSON.stringify(file, null, 2)}`, options.verbose);
