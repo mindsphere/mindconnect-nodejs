@@ -42,8 +42,8 @@ export default (program: CommanderStatic) => {
                 try {
                     color = options.passkey ? adminColor : color;
                     checkParameters(options);
-                    homeDirLog(options.verbose);
-                    proxyLog(options.verbose);
+                    homeDirLog(options.verbose, color);
+                    proxyLog(options.verbose, color);
 
                     const spinner = ora("uploadingFile");
                     !options.verbose && spinner.start();

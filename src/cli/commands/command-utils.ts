@@ -156,14 +156,14 @@ export const verboseLog = (message: any, verbose: any, spinner?: any) => {
     }
 };
 
-export const proxyLog = (verbose: any, color?: Function) => {
+export const proxyLog = (verbose: any, color: Function) => {
     const proxy = process.env.HTTP_PROXY || process.env.http_proxy;
-    const c = color || cyan;
+    const c = color;
     verboseLog(proxy ? `Using ${c(proxy)} as proxy server` : "No proxy configured.", verbose);
 };
 
-export const homeDirLog = (verbose: any, color?: Function) => {
-    const c = color || cyan;
+export const homeDirLog = (verbose: any, color: Function) => {
+    const c = color;
     verboseLog(`Using configuration stored in ${c(getHomeDotMcDir())}`, verbose);
 };
 
@@ -175,4 +175,11 @@ export const retrylog = function(operation: string, c: Function = cyan) {
         }
         x++;
     };
+};
+
+export const humanFileSize = (size: number) => {
+    const i = size === 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024));
+    const calculatedSize = (size / Math.pow(1024, i)).toFixed(2);
+    const suffix = ["B", "KB", "MB", "GB", "TB"][i];
+    return `${calculatedSize}${suffix}`;
 };

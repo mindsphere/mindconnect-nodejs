@@ -37,8 +37,8 @@ export default (program: CommanderStatic) => {
             (async () => {
                 try {
                     checkParameters(options);
-                    homeDirLog(options.verbose);
-                    proxyLog(options.verbose);
+                    homeDirLog(options.verbose, color);
+                    proxyLog(options.verbose, color);
                     const spinner = ora("uploadingFile");
                     !options.verbose && spinner.start();
                     options.file = options.file || "fft.spectrum.json";
