@@ -9,6 +9,7 @@ import agentTokenCommand from "./commands/mc-agent-token";
 import createAgentCommand from "./commands/mc-create-agent";
 import createEventCommand from "./commands/mc-create-event";
 import getDiagnosticCommand from "./commands/mc-get-diagnostic";
+import listAssetsCommand from "./commands/mc-list-assets";
 import listFilesCommand from "./commands/mc-list-files";
 import offboardCommand from "./commands/mc-offboard-agent";
 import onboardCommand from "./commands/mc-onboard";
@@ -52,8 +53,8 @@ iotBulkDirCommand(program);
 iotBulkRunCommand(program);
 iotCheckBulkComand(program);
 
-// * file Handling commands
-
+// * assets and files handling commands
+listAssetsCommand(program);
 listFilesCommand(program);
 
 // * analytics command

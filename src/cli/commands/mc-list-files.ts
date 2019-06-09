@@ -1,7 +1,7 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
-import { MindSphereSdk } from "../../api/sdk";
-import { decrypt, loadAuth } from "../../api/utils";
+import { IotFileModels, MindSphereSdk } from "../../api/sdk";
+import { decrypt, loadAuth, retry } from "../../api/utils";
 import {
     errorLog,
     getColor,
@@ -28,7 +28,7 @@ export default (program: CommanderStatic) => {
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
-        .description(color(`list all files stored with the asset *`))
+        .description(color(`list files stored with the asset *`))
         .action(options => {
             (async () => {
                 try {
@@ -48,20 +48,21 @@ export default (program: CommanderStatic) => {
                     let offset = 0;
                     let files;
 
-                    console.log(`timestamp  size  etag  path`);
+                    console.log(`timestamp etag  size  path`);
 
                     do {
-                        files = await iotFile.GetFiles(`${options.assetid}`, {
-                            offset: offset,
-                            limit: 500,
-                            count: true,
-                            filter: options.filter
-                        });
+                        files = (await retry(options.retry, () =>
+                            iotFile.GetFiles(`${options.assetid}`, {
+                                offset: offset,
+                                limit: 500,
+                                count: true,
+                                filter: options.filter
+                            })
+                        )) as IotFileModels.File[];
                         for (const file of files) {
                             console.log(
-                                `${file.timestamp}  ${humanFileSize(file.size || 0)}  ${file.etag}  ${file.path}${color(
-                                    file.name
-                                )}`
+                                `${file.timestamp}  ${file.etag}  ${humanFileSize(file.size || 0)}  \t${file.path ||
+                                    ""}${color(file.name)}`
                             );
 
                             verboseLog(`${JSON.stringify(file, null, 2)}`, options.verbose);

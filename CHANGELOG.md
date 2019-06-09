@@ -7,11 +7,12 @@
 - SDK: added IotTimeSeriesAggregateClient to the SDK
 - SDK: added SpectrumAnalysisClient to the SDK
 - CLI Command: mc spectrum-analysis: performs spectrum analysis on a sound
-- CLI Command: mc list-files: lists all iot files stored with the asset
+- CLI Command: mc list-files: lists iot files stored with the asset
+- CLI Command: mc list-assets: lists assets in the tenant
 
 ## Bugfix 3.6.0
 
-- SDK: IoTfile - GetFiles -  optional parameters are now in query string 
+- SDK: IoTfile - GetFiles -  optional parameters are now in query string
 
 ## 3.5.3 - (Venetian Red Vienna) - May 2019 - Recovery
 
