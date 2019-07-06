@@ -1,5 +1,7 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
+import { MindSphereSdk } from "../../api/sdk/";
+import { decrypt, loadAuth } from "../../api/utils";
 import { errorLog, getColor } from "./command-utils";
 
 const color = getColor("magenta");
@@ -22,6 +24,16 @@ export default (program: CommanderStatic) => {
             (async () => {
                 try {
                     checkParameters(options);
+
+                    const auth = loadAuth();
+                    const sdk = new MindSphereSdk({
+                        gateway: auth.gateway,
+                        basicAuth: decrypt(auth, options.passkey),
+                        tenant: auth.tenant
+                    });
+                    const iotFile = sdk.GetIoTFileClient();
+                    const download = (await iotFile.GetFile(options.assetid, options.filepath));
+                    
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
