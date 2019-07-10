@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { MindConnectAgent, retry } from "../..";
 import { MindSphereSdk } from "../../api/sdk";
-import { checkCertificate, decrypt, getHomeDotMcDir, loadAuth } from "../../api/utils";
+import { checkCertificate, decrypt, getAgentDir, loadAuth } from "../../api/utils";
 import { errorLog, getColor, homeDirLog, proxyLog, retrylog, verboseLog } from "./command-utils";
 import ora = require("ora");
 const mime = require("mime-types");
@@ -158,7 +158,10 @@ export async function getMindConnectAgent(assetid: any, options: any, spinner: a
     const configuration = require(configFile);
     const profile = checkCertificate(configuration, options);
 
-    const agent = new MindConnectAgent(configuration, undefined, getHomeDotMcDir());
+    const agentFolder = getAgentDir(path.dirname(options.config));
+    verboseLog(`Using .mc folder for agent: ${color(agentFolder)}`, options.verbose);
+
+    const agent = new MindConnectAgent(configuration, undefined, agentFolder);
     if (profile) {
         agent.SetupAgentCertificate(fs.readFileSync(options.cert));
     }

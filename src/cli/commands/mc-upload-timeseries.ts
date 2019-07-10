@@ -4,7 +4,7 @@ import * as csv from "csvtojson";
 import * as fs from "fs";
 import * as path from "path";
 import { MindConnectAgent, retry } from "../..";
-import { checkCertificate, convertToTdpArray, getHomeDotMcDir } from "../../api/utils";
+import { checkCertificate, convertToTdpArray, getAgentDir } from "../../api/utils";
 import { displayCsvHelp, errorLog, getColor, homeDirLog, proxyLog, retrylog, verboseLog } from "./command-utils";
 const mime = require("mime-types");
 
@@ -60,7 +60,10 @@ export default (program: CommanderStatic) => {
                     }
                     const configuration = require(configFile);
                     const profile = checkCertificate(configuration, options);
-                    const agent = new MindConnectAgent(configuration, undefined, getHomeDotMcDir());
+                    const agentFolder = getAgentDir(path.dirname(options.config));
+                    verboseLog(`Using .mc folder for agent: ${color(agentFolder)}`, options.verbose);
+
+                    const agent = new MindConnectAgent(configuration, undefined, agentFolder);
                     if (profile) {
                         agent.SetupAgentCertificate(fs.readFileSync(options.cert));
                     }
