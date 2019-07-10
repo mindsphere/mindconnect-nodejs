@@ -2,15 +2,7 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import { IotFileModels, MindSphereSdk } from "../../api/sdk";
 import { decrypt, loadAuth, retry } from "../../api/utils";
-import {
-    errorLog,
-    getColor,
-    homeDirLog,
-    humanFileSize,
-    proxyLog,
-    serviceCredentialLog,
-    verboseLog
-} from "./command-utils";
+import { errorLog, getColor, homeDirLog, humanFileSize, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
 
 const color = getColor("magenta");
 
@@ -61,8 +53,9 @@ export default (program: CommanderStatic) => {
                         )) as IotFileModels.File[];
                         for (const file of files) {
                             console.log(
-                                `${file.timestamp}  ${file.etag}  ${humanFileSize(file.size || 0)}  \t${file.path ||
-                                    ""}${color(file.name)}`
+                                `${file.timestamp}  ${file.etag!.toString().padStart(4)}  ${humanFileSize(
+                                    file.size || 0
+                                ).padStart(10)}\t${file.path || ""}${color(file.name)}`
                             );
 
                             verboseLog(`${JSON.stringify(file, null, 2)}`, options.verbose);

@@ -178,3 +178,13 @@ export const removeUndefined = (obj: any) => {
     Object.keys(obj).forEach(key => obj[key] === undefined && delete obj[key]);
     return obj;
 };
+
+export async function checksumFile(hashName: string, path: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const hash = crypto.createHash(hashName);
+        const stream = fs.createReadStream(path);
+        stream.on("error", err => reject(err));
+        stream.on("data", chunk => hash.update(chunk));
+        stream.on("end", () => resolve(hash.digest("hex")));
+    });
+}

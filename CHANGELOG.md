@@ -3,12 +3,15 @@
 ## 3.6.0 - (Cobalt Blue Vienna) - July 2019
 
 - shrinked all images
+- upgraded all dependencies
 - made all tests (also agents) self contained
+- added snyk command line protection to build
 - SDK: added IotTimeSeriesAggregateClient to the SDK
 - SDK: added SpectrumAnalysisClient to the SDK
 - CLI Command: mc spectrum-analysis: performs spectrum analysis on a sound
 - CLI Command: mc list-files: lists iot files stored with the asset
 - CLI Command: mc list-assets: lists assets in the tenant
+- CLI Command: mc download-file: downloads file from MindSphere iot file service
 
 ## Bugfix 3.6.0
 

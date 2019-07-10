@@ -83,9 +83,9 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc list-assets --passkey mypasskey \t\t\t\tlist all assets`);
+            log(`    mc list-assets --passkey mypasskey \t\t\t\t\t\tlist all assets`);
             log(
-                `    mc la --typeid core.mclib --name nodered --passkey mypasskey \tlist all agents (assets of type core.mclib) with nodered in the name`
+                `    mc la --typeid core.mclib --assetname nodered --passkey mypasskey \t\tlist all agents (assets of type core.mclib) with nodered in the name`
             );
             log(
                 `    mc la --filter '{"name" : {"contains" : "Engine"}}' --passkey mypasskey \tlist all assets where name contains string Engine`
