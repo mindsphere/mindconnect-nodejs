@@ -492,7 +492,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             }
         ];
 
-        await agent.BulkPostData(bulk);
+        await retry(5, () => agent.BulkPostData(bulk));
     });
 
     it("should be able to post an event", async () => {

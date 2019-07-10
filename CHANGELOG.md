@@ -16,6 +16,7 @@
 ## Bugfix 3.6.0
 
 - SDK: IoTfile - GetFiles -  optional parameters are now in query string
+- CLI - agent commands - precedence for location of the .mc directory:  path to agentconfig.json > currentdir > user home dir (#65)
 
 ## 3.5.3 - (Venetian Red Vienna) - May 2019 - Recovery
 

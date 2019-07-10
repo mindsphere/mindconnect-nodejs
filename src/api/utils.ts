@@ -71,6 +71,19 @@ export const decrypt = (encryptedAuth: authJson, passkey: string): string => {
     return dec;
 };
 
+export const getAgentDir = (path?: string) => {
+    let result;
+    if (fs.existsSync(`${path}/.mc/`)) {
+        result = `${path}/.mc/`;
+    } else if (fs.existsSync(`${process.cwd()}/.mc/`)) {
+        result = `${process.cwd()}/.mc/`;
+    } else {
+        result = getHomeDotMcDir();
+    }
+
+    return result;
+};
+
 export const getHomeDotMcDir = () => {
     return `${os.homedir()}/.mc/`;
 };

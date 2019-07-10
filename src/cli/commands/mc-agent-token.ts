@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as jwt from "jsonwebtoken";
 import * as path from "path";
 import { MindConnectAgent } from "../..";
-import { checkCertificate, getHomeDotMcDir, retry } from "../../api/utils";
+import { checkCertificate, getAgentDir, retry } from "../../api/utils";
 import { errorLog, getColor, homeDirLog, proxyLog, retrylog, verboseLog } from "./command-utils";
 
 const color = getColor("cyan");
@@ -37,7 +37,10 @@ export default (program: CommanderStatic) => {
 
                     const configuration = require(configFile);
                     const profile = checkCertificate(configuration, options);
-                    const agent = new MindConnectAgent(configuration, undefined, getHomeDotMcDir());
+                    const agentFolder = getAgentDir(path.dirname(options.config));
+                    verboseLog(`Using .mc folder for agent: ${color(agentFolder)}`, options.verbose);
+
+                    const agent = new MindConnectAgent(configuration, undefined, agentFolder);
                     if (profile) {
                         agent.SetupAgentCertificate(fs.readFileSync(options.cert));
                     }

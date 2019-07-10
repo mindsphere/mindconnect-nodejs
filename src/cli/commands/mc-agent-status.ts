@@ -4,16 +4,8 @@ import * as fs from "fs";
 import * as path from "path";
 import { MindConnectAgent } from "../..";
 import { AgentManagementModels, MindSphereSdk } from "../../api/sdk";
-import { checkCertificate, decrypt, getHomeDotMcDir, retry, loadAuth } from "../../api/utils";
-import {
-    errorLog,
-    getColor,
-    homeDirLog,
-    proxyLog,
-    retrylog,
-    serviceCredentialLog,
-    verboseLog
-} from "./command-utils";
+import { checkCertificate, decrypt, getAgentDir, loadAuth, retry } from "../../api/utils";
+import { errorLog, getColor, homeDirLog, proxyLog, retrylog, serviceCredentialLog, verboseLog } from "./command-utils";
 
 const color = getColor("magenta");
 const green = getColor("green");
@@ -46,9 +38,12 @@ export default (program: CommanderStatic) => {
                         throw new Error(`Can't find file ${configFile}`);
                     }
 
+                    const agentFolder = getAgentDir(path.dirname(options.config));
+                    verboseLog(`Using .mc folder for agent: ${color(agentFolder)}`, options.verbose);
+
                     const configuration = require(configFile);
                     const profile = checkCertificate(configuration, options);
-                    const agent = new MindConnectAgent(configuration, undefined, getHomeDotMcDir());
+                    const agent = new MindConnectAgent(configuration, undefined, agentFolder);
                     if (profile) {
                         agent.SetupAgentCertificate(fs.readFileSync(options.cert));
                     }
