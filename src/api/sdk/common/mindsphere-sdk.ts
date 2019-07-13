@@ -5,6 +5,7 @@ import { TimeSeriesClient } from "../iot/iot-timeseries";
 import { TimeSeriesAggregateClient } from "../iotaggregate/iot-timeseries-aggregate";
 import { TimeSeriesBulkClient } from "../iotbulk/iot-timeseries-bulk";
 import { IotFileClient } from "../iotfile/iot-file";
+import { SignalValidationClient } from "../signal-validation/signal-validation";
 import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
 import { isSdkConfiguration, SdkConfiguration } from "./sdk-client";
 /**
@@ -135,6 +136,22 @@ export class MindSphereSdk {
             this._spectrumAnalysisClient || new SpectrumAnalysisClient(this._gateway, this._basicAuth, this._tenant);
 
         return this._spectrumAnalysisClient;
+    }
+
+    private _signalValidationClient?: SignalValidationClient;
+
+    /**
+     * * Signal Validation Client
+     *
+     * @returns {SignalValidationClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetSignalValidationClient(): SignalValidationClient {
+        this._signalValidationClient =
+            this._signalValidationClient || new SignalValidationClient(this._gateway, this._basicAuth, this._tenant);
+
+        return this._signalValidationClient;
     }
 
     /**
