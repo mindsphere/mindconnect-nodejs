@@ -17,7 +17,7 @@ export const serviceCredentialLog = (color: Function = magenta) => {
         color(`    https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials`)
     );
 
-    log(`\n  More Informations: \n`);
+    log(`\n  More Information: \n`);
     log(`    ${color("https://opensource.mindsphere.io")}\n`);
 };
 
