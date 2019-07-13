@@ -42,3 +42,6 @@ license-checker.txt
 # spectrum analysis
 *.spectrum.json
 
+# signal validation
+timeseries-sample.json
+signal-validation-*.json

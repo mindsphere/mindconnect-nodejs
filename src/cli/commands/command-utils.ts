@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { log } from "console";
-import { AssetManagementModels } from "../../api/sdk";
+import { AssetManagementModels, SignalValidationModels } from "../../api/sdk";
 import { getHomeDotMcDir } from "../../api/utils";
 
 const magenta = getColor("magenta");
@@ -16,6 +16,9 @@ export const serviceCredentialLog = (color: Function = magenta) => {
     log(
         color(`    https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials`)
     );
+
+    log(`\n  More Information: \n`);
+    log(`    ${color("https://opensource.mindsphere.io")}\n`);
 };
 
 export function colorizeStatus(message: string) {
@@ -183,3 +186,20 @@ export const humanFileSize = (size: number) => {
     const suffix = ["B", "KB", "MB", "GB", "TB"][i];
     return `${calculatedSize}${suffix}`;
 };
+
+export function generateTestData(size: number, fn: (x: number) => number | undefined) {
+    const startDate = new Date();
+    const results: SignalValidationModels.Timeseries[] = [];
+    for (let index = 0; index < size; index++) {
+        const time = subtractSecond(startDate, size - index);
+        const value = fn(index);
+
+        if (value) {
+            results.push({
+                _time: time.toISOString(),
+                variable1: value.toString()
+            });
+        }
+    }
+    return results;
+}

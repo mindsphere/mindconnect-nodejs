@@ -7,7 +7,9 @@
 - made all tests (also agents) self contained
 - SDK: added IotTimeSeriesAggregateClient to the SDK
 - SDK: added SpectrumAnalysisClient to the SDK
-- CLI Command: mc spectrum-analysis: performs spectrum analysis on a sound
+- SDK: added SignalValidationClient to the SDK
+- CLI Command: mc spectrum-analysis: performs spectrum analysis on a sound file
+- CLI Command: mc signal-validation: performs signal validation on the mindsphere data
 - CLI Command: mc list-files: lists iot files stored with the asset
 - CLI Command: mc list-assets: lists assets in the tenant
 - CLI Command: mc download-file: downloads file from MindSphere iot file service

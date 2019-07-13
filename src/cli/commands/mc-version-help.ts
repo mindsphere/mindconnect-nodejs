@@ -18,7 +18,7 @@ export default (program: CommanderStatic) => {
         log(`    the ${blue("blue colored commands @")} use analytical functions of MindSphere`);
         log(`    the ${green("green colored commands #")} are used to setup starter projects`);
         log(`    the service credentials should only be used in secure environments for setup tasks`);
-        log(`    Full documentation: ${cyan("https://mindsphere.github.io")}\n`);
+        log(`    Full documentation: ${cyan("https://opensource.mindsphere.io")}\n`);
     });
 
     program.on("command:*", function() {

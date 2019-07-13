@@ -273,7 +273,7 @@ await agent.UploadFile(agent.ClientId(), "custom/mindsphere/path/package.json", 
 
 Here is a demo agent implementation.
 
- [![mindsphere-agent](https://img.shields.io/badge/mindsphere-agent-green.svg)](src/demoagent/test-agent.ts) [![Greenkeeper badge](https://badges.greenkeeper.io/mindsphere/mindconnect-nodejs.svg)](https://greenkeeper.io/)
+[![mindsphere-agent](https://img.shields.io/badge/mindsphere-agent-green.svg)](src/demoagent/test-agent.ts)
 
 ## Making sure that the data arrives also with flaky internet connection
 
