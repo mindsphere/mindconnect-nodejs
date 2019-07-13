@@ -134,6 +134,13 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
+            log(
+                `    mc signal-validation --mode range --lowerlimit \ -1 --upperlimit 1  \t performes the range validation for range [-1..1]`
+            );
+            log(`    mc signal-validation -mode jumps --windowsize 12  \t\t\t searches for jumps in the data`);
+            log(
+                `    mc signal-validation --mode interpolate --threshold 1000  \t\t interpolates a value for every gap > 1000ms`
+            );
             log("\n  Additional Documentation:\n");
             log(
                 `    ${color(
