@@ -1,11 +1,9 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
-import { MindSphereSdk, SignalValidationModels } from "../src/api/sdk";
+import { MindSphereSdk } from "../src/api/sdk";
 import { decrypt, loadAuth } from "../src/api/utils";
-import { subtractSecond } from "../src/cli/commands/command-utils";
+import { generateTestData } from "../src/cli/commands/command-utils";
 chai.should();
-
-const timeOffset = new Date().getTime();
 
 describe("[SDK] SignalValidationClient", () => {
     const auth = loadAuth();
@@ -27,7 +25,7 @@ describe("[SDK] SignalValidationClient", () => {
         signalValidationClient.should.not.be.undefined;
 
         const data = generateTestData(100, x => {
-            return x % 31 === 0 ? 120 : Math.sin(x);
+            return x === 31 ? 120 : Math.sin(x);
         });
 
         const result = await signalValidationClient.DetectRangeViolations(data, {
@@ -36,7 +34,7 @@ describe("[SDK] SignalValidationClient", () => {
             upperLimit: 1
         });
         result.should.not.be.null;
-        result.length.should.be.equal(3);
+        result.length.should.be.equal(1);
     });
 
     it("Signal Validation should perform a Spike Alert.", async () => {
@@ -49,12 +47,12 @@ describe("[SDK] SignalValidationClient", () => {
             windowSize: 20
         });
 
-        result.length.should.be.equal(1);
+        result.length.should.be.equal(2);
     });
 
     it("Signal Validation should perform Jump Detection.", async () => {
         const data = generateTestData(100, x => {
-            return x >= 84 && x <= 87 ? 500 * Math.cos(x) : Math.sin(x);
+            return x >= 84 && x <= 85 ? 500 * Math.cos(x) : Math.sin(x);
         });
 
         const result = await signalValidationClient.DetectJumps(data, {
@@ -62,7 +60,7 @@ describe("[SDK] SignalValidationClient", () => {
             windowSize: 10
         });
 
-        result.length.should.be.equal(1);
+        result.length.should.be.equal(2);
     });
 
     it("Signal Validation should perform Noise Setection.", async () => {
@@ -123,21 +121,4 @@ describe("[SDK] SignalValidationClient", () => {
 
         result.length.should.equal(97);
     });
-
-    function generateTestData(size: number, fn: (x: number) => number | undefined) {
-        const startDate = new Date();
-        const results: SignalValidationModels.Timeseries[] = [];
-        for (let index = size; index > 0; index--) {
-            const time = subtractSecond(startDate, index);
-            const value = fn(index);
-
-            if (value) {
-                results.push({
-                    _time: time.toISOString(),
-                    variable1: value.toString()
-                });
-            }
-        }
-        return results;
-    }
 });
