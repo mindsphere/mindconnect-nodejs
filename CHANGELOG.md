@@ -7,6 +7,7 @@
 - made all tests (also agents) self contained
 - SDK: added IotTimeSeriesAggregateClient to the SDK
 - SDK: added SpectrumAnalysisClient to the SDK
+- SDK: added SignalValidationClient to the SDK
 - CLI Command: mc spectrum-analysis: performs spectrum analysis on a sound
 - CLI Command: mc list-files: lists iot files stored with the asset
 - CLI Command: mc list-assets: lists assets in the tenant

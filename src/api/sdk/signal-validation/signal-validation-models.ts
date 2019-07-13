@@ -324,28 +324,15 @@ export namespace SignalValidationModels {
      * @interface Timeseries
      */
     export interface Timeseries {
+        [key: string]: string;
+
+        // ! fix API Version 3.0.2 removed variableName1,2,3  and made optional _time required
+
         /**
-         * particular variable (number of variables could be arbitary)
+         * ISO TimeStamp
+         *
          * @type {string}
-         * @memberof Timeseries
-         */
-        variableName1?: string;
-        /**
-         * particular variable (number of variables could be arbitary)
-         * @type {string}
-         * @memberof Timeseries
-         */
-        variableName2?: string;
-        /**
-         * particular variable (number of variables could be arbitary)
-         * @type {string}
-         * @memberof Timeseries
-         */
-        variableName3?: string;
-        /**
-         * time
-         * @type {string}
-         * @memberof Timeseries
+         * @memberOf Timeseries
          */
         _time: string;
     }
