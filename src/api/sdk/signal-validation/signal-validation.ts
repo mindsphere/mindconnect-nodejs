@@ -43,9 +43,9 @@ export class SignalValidationClient extends SdkClient {
      *             upperLimit: number;
      *         }} params
      *
-     * @param param.variableName Target variable name. Only this variable will be taken from given timeseries data.
-     * @param param.lowerLimit Processing lower limit, should be less than upper limit.
-     * @param param.upperLimit Processing upper limit, should be greater than lower limit.
+     * @param params.variableName Target variable name. Only this variable will be taken from given timeseries data.
+     * @param params.lowerLimit Processing lower limit, should be less than upper limit.
+     * @param params.upperLimit Processing upper limit, should be greater than lower limit.
      * @returns {Promise<SignalValidationModels.Range>}
      *
      * @memberOf SignalValidationClient
@@ -67,6 +67,20 @@ export class SignalValidationClient extends SdkClient {
         })) as unknown) as SignalValidationModels.Range[];
     }
 
+    /**
+     * * Launches spike alert task with specific parameters.
+     *
+     * @param {SignalValidationModels.Timeseries[]} timeseries
+     * @param {{
+     *             variableName: string;
+     *             windowSize: number;
+     *         }} params
+     *
+     * @param params.variableName Target variable name. Only this variable will be taken from given timeseries data.
+     * @param params.windowSize The processing windows size, should be positive.
+     * @returns {Promise<SignalValidationModels.Spike[]>}
+     * @memberOf SignalValidationClient
+     */
     public async DetectSpikes(
         timeseries: SignalValidationModels.Timeseries[],
         params: {
@@ -83,6 +97,23 @@ export class SignalValidationClient extends SdkClient {
         })) as unknown) as SignalValidationModels.Spike[];
     }
 
+    /**
+     * This endpoint detects noise for the given sensor. Result is the list of events.
+     *
+     * @param {SignalValidationModels.Timeseries[]} timeseries
+     * @param {{
+     *             variableName: string;
+     *             windowRadius: number;
+     *             threshold: number;
+     *         }} params
+     *
+     * @param params.variableName Target variable name. Only this variable will be taken from given timeseries data.
+     * @param params.windowRadius Processing window radius, should be positive.
+     * @param params.threshold Threshold to consider outlier value as noise.
+     * @returns {Promise<SignalValidationModels.Noise[]>}
+     *
+     * @memberOf SignalValidationClient
+     */
     public async DetectNoise(
         timeseries: SignalValidationModels.Timeseries[],
         params: {
@@ -100,6 +131,22 @@ export class SignalValidationClient extends SdkClient {
         })) as unknown) as SignalValidationModels.Noise[];
     }
 
+    /**
+     * * Lauches jump alert task with specific parameters.
+     *
+     * @param {SignalValidationModels.Timeseries[]} timeseries
+     * @param {{
+     *             variableName: string;
+     *             windowSize: number;
+     *         }} params
+     *
+     * @param params.variableName Target variable name. Only this variable will be taken from given timeseries data.
+     * @param params.windowSize The value to limit window size. Positive value
+     *
+     * @returns {Promise<SignalValidationModels.Jump[]>}
+     *
+     * @memberOf SignalValidationClient
+     */
     public async DetectJumps(
         timeseries: SignalValidationModels.Timeseries[],
         params: {
@@ -116,6 +163,22 @@ export class SignalValidationClient extends SdkClient {
         })) as unknown) as SignalValidationModels.Jump[];
     }
 
+    /**
+     * * Launches data gap analysis task with specific parameters
+     *
+     * @param {SignalValidationModels.Timeseries[]} timeseries
+     * @param {{
+     *             variableName: string;
+     *             threshold: number;
+     *         }} params
+     *
+     * @param params.variableName Target variable name. Only this variable will be taken from given timeseries data.
+     * @param params.threshold Max inteval in milliseconds between two consecutive points which is not considered a gap.
+     *
+     * @returns {Promise<SignalValidationModels.DataGap>}
+     *
+     * @memberOf SignalValidationClient
+     */
     public async DetectGaps(
         timeseries: SignalValidationModels.Timeseries[],
         params: {
@@ -132,6 +195,23 @@ export class SignalValidationClient extends SdkClient {
         })) as unknown) as SignalValidationModels.DataGap;
     }
 
+    /**
+     *
+     * * Launches data gap analysis task with interpolation
+     *
+     * @param {SignalValidationModels.Timeseries[]} timeseries
+     * @param {{
+     *             variableName: string;
+     *             threshold: number;
+     *         }} params
+     *
+     * @param params.variableName Target variable name. Only this variable will be taken from given timeseries data.
+     * @param params.threshold Max inteval in milliseconds between two consecutive points which is not considered a gap.
+     *
+     * @returns {Promise<SignalValidationModels.DataGapInterpolated>}
+     *
+     * @memberOf SignalValidationClient
+     */
     public async DetectGapsAndInterpolate(
         timeseries: SignalValidationModels.Timeseries[],
         params: {
@@ -148,6 +228,26 @@ export class SignalValidationClient extends SdkClient {
         })) as unknown) as SignalValidationModels.DataGapInterpolated;
     }
 
+    /**
+     * Launches bias alert task with specific parameters.
+     *
+     * @param {SignalValidationModels.Timeseries[]} timeseries
+     * @param {{
+     *             variableName: string;
+     *             windowSize: number;
+     *             threshold: number;
+     *             step: number;
+     *         }} params
+     *
+     * @param params.variableName Target variable name. Only this variable will be taken from given timeseries data.
+     * @param params.windowSize Processing window size value, should be positive.
+     * @param params.threshold Processing threshold value, should be positive.
+     * @param params.step Processing step value, should be from 1 to windowSize.
+     *
+     * @returns {Promise<SignalValidationModels.Bias[]>}
+     *
+     * @memberOf SignalValidationClient
+     */
     public async DetectBias(
         timeseries: SignalValidationModels.Timeseries[],
         params: {
