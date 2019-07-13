@@ -22,7 +22,7 @@ describe("[SDK] SignalValidationClient", () => {
         signalValidationClient.should.not.be.undefined;
     });
 
-    it.only("Signal Validation should perform a Range Check.", async () => {
+    it("Signal Validation should perform a Range Check.", async () => {
         sdk.should.not.be.undefined;
         signalValidationClient.should.not.be.undefined;
 
@@ -39,7 +39,7 @@ describe("[SDK] SignalValidationClient", () => {
         result.length.should.be.equal(3);
     });
 
-    it.only("Signal Validation should perform a Spike Alert.", async () => {
+    it("Signal Validation should perform a Spike Alert.", async () => {
         const data = generateTestData(100, x => {
             return x >= 40 && x <= 42 ? 13 * Math.sin(x) : Math.sin(x);
         });
@@ -52,7 +52,7 @@ describe("[SDK] SignalValidationClient", () => {
         result.length.should.be.equal(1);
     });
 
-    it.only("Signal Validation should perform Jump Detection.", async () => {
+    it("Signal Validation should perform Jump Detection.", async () => {
         const data = generateTestData(100, x => {
             return x >= 84 && x <= 87 ? 500 * Math.cos(x) : Math.sin(x);
         });
@@ -65,7 +65,7 @@ describe("[SDK] SignalValidationClient", () => {
         result.length.should.be.equal(1);
     });
 
-    it.only("Signal Validation should perform Noise Setection.", async () => {
+    it("Signal Validation should perform Noise Setection.", async () => {
         const data = generateTestData(1000, x => {
             return x % 100 >= 90 && x % 100 <= 100 ? Math.sin(x) * 3.15 : Math.sin(x);
         });
@@ -79,7 +79,7 @@ describe("[SDK] SignalValidationClient", () => {
         result.length.should.be.equal(7);
     });
 
-    it.only("Signal Validation should detect Data Gaps.", async () => {
+    it("Signal Validation should detect Data Gaps.", async () => {
         const data = generateTestData(1000, x => {
             if (x % 100 === 80 || x % 100 === 81) return undefined;
             return Math.sin(x);
@@ -93,7 +93,7 @@ describe("[SDK] SignalValidationClient", () => {
         result.events!.length.should.be.equal(20);
     });
 
-    it.only("Signal Validation should interpolate Data Gaps.", async () => {
+    it("Signal Validation should interpolate Data Gaps.", async () => {
         const data = generateTestData(1000, x => {
             if (x % 100 === 80 || x % 100 === 81) return undefined;
             return Math.sin(x);
@@ -108,7 +108,7 @@ describe("[SDK] SignalValidationClient", () => {
         result.interpolatedMeasurements!.length.should.be.equal(20);
     });
 
-    it.only("Signal Validation should detect Bias.", async () => {
+    it("Signal Validation should detect Bias.", async () => {
         const data = generateTestData(1000, x => {
             if (x % 100 >= 80 && x % 100 <= 85) return 4 * Math.sin(x);
             else return 4;
