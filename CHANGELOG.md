@@ -5,7 +5,6 @@
 - shrinked all images
 - upgraded all dependencies
 - made all tests (also agents) self contained
-- added snyk command line protection to build
 - SDK: added IotTimeSeriesAggregateClient to the SDK
 - SDK: added SpectrumAnalysisClient to the SDK
 - CLI Command: mc spectrum-analysis: performs spectrum analysis on a sound
