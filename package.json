@@ -36,7 +36,7 @@
     "dependencies": {
         "ajv": "^6.10.1",
         "ajv-keywords": "^3.4.1",
-        "async-lock": "1.2.0",
+        "async-lock": "1.2.2",
         "chalk": "^2.4.2",
         "commander": "^2.20.0",
         "csvtojson": "^2.0.10",
