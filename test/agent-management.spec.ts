@@ -117,13 +117,15 @@ describe("[SDK] AgentManagementClient", () => {
         agent.securityProfile = AgentManagementModels.AgentUpdate.SecurityProfileEnum.SHAREDSECRET;
         const { securityProfile } = agent;
 
+        const newName = `UnitTest${new Date().getTime()}`; 
+        
         const patchedAgent = await agentMgmt.PutAgent(
             testAgentId,
-            { name: `UnitTest${new Date().getTime()}`, securityProfile },
+            { name: newName, securityProfile },
             { ifMatch: `${agent.eTag}` }
         );
 
-        patchedAgent.name.should.equal("TEST");
+        patchedAgent.name.should.equal(newName);
         patchedAgent.securityProfile.should.equal("SHARED_SECRET");
     });
 
