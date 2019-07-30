@@ -119,7 +119,7 @@ describe("[SDK] AgentManagementClient", () => {
 
         const patchedAgent = await agentMgmt.PutAgent(
             testAgentId,
-            { name: "TEST", securityProfile },
+            { name: `UnitTest${new Date().getTime()}`, securityProfile },
             { ifMatch: `${agent.eTag}` }
         );
 
