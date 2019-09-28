@@ -33,9 +33,10 @@ export class DefaultStorage implements IConfigurationStorage {
 
     public GetConfig(configuration: IMindConnectConfiguration): IMindConnectConfiguration {
         try {
-            const json = <IMindConnectConfiguration>(
-                require(path.resolve(`${this._basePath}/${configuration.content.clientId}.json`))
-            );
+
+            const jsonString = fs.readFileSync(path.resolve(`${this._basePath}/${configuration.content.clientId}.json`));
+            const json = JSON.parse(jsonString.toString()) as IMindConnectConfiguration;
+
             if (_.isEqual(json.content, configuration.content)) {
                 return json;
             } else {
