@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.6.1 - (Cobalt Blue Vienna) - September 2019
+
+## Bugfixes and Improvements 3.6.1
+
+- MindConnect Agent Storage: Fixed the bug where the change of configuration. This was causing problems in node-RED when redeploying the flow. (#82)
+
 ## 3.6.0 - (Cobalt Blue Vienna) - July 2019
 
 - SDK: The SDK in this package is stil only a **preliminary version** which is used to provide support for the CLI.
