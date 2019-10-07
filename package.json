@@ -65,7 +65,7 @@
         "@types/node-fetch": "^2.3.7",
         "@types/uuid": "^3.4.5",
         "chai": "^4.2.0",
-        "concurrently": "^4.1.1",
+        "concurrently": "^5.0.0",
         "cross-env": "^6.0.0",
         "license-checker": "^25.0.1",
         "mocha": "^6.1.4",
