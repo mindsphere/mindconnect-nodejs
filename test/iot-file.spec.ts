@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
 import { MindSphereSdk } from "../src/api/sdk";
-import { decrypt, loadAuth } from "../src/api/utils";
+import { decrypt, loadAuth, retry } from "../src/api/utils";
 import { sleep } from "./test-utils";
 chai.should();
 
@@ -33,11 +33,13 @@ describe("[SDK] IotFileClient", () => {
     });
 
     it("should be able to PUT AND GET file", async () => {
-        await iotFile.PutFile(rootId, `unit/test/xyz${timeOffset}.txt`, Buffer.from("xyz"), {
-            description: "blubb",
-            type: "text/plain"
-        });
-        const file = await iotFile.GetFile(rootId, `unit/test/xyz${timeOffset}.txt`);
+        await retry(5, () =>
+            iotFile.PutFile(rootId, `unit/test/xyz${timeOffset}.txt`, Buffer.from("xyz"), {
+                description: "blubb",
+                type: "text/plain"
+            })
+        );
+        const file = await retry(5, () => iotFile.GetFile(rootId, `unit/test/xyz${timeOffset}.txt`));
         const text = await file.text();
         text.should.be.equal("xyz");
     });
@@ -48,7 +50,8 @@ describe("[SDK] IotFileClient", () => {
             `unit/test/xyz${timeOffset}_8xmb.txt`,
             Buffer.alloc(8 * 1024 * 1024 + 1),
             {
-                chunk: true
+                chunk: true,
+                retry: 5
             }
         );
 
@@ -63,7 +66,8 @@ describe("[SDK] IotFileClient", () => {
             `unit/test/xyz${timeOffset}_1625mb.txt`,
             Buffer.alloc(16.25 * 1024 * 1024),
             {
-                chunk: true
+                chunk: true,
+                retry: 5
             }
         );
 
@@ -72,7 +76,8 @@ describe("[SDK] IotFileClient", () => {
 
     it("should be able to upload 1 byte large file", async () => {
         const checksum = await iotFile.UploadFile(rootId, `unit/test/xyz${timeOffset}_1by.txt`, Buffer.alloc(1), {
-            chunk: true
+            chunk: true,
+            retry: 5
         });
 
         checksum.should.be.equal("93b885adfe0da089cdf634904fd59f71");
@@ -80,7 +85,8 @@ describe("[SDK] IotFileClient", () => {
 
     it("should be able to upload 0 byte large file", async () => {
         const checksum = await iotFile.UploadFile(rootId, `unit/test/xyz${timeOffset}_0by.txt`, Buffer.alloc(0), {
-            chunk: true
+            chunk: true,
+            retry: 5
         });
 
         checksum.should.be.equal("d41d8cd98f00b204e9800998ecf8427e");
