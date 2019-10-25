@@ -37,7 +37,7 @@ bulkupload
 .nyc_output
 
 # license-checker
-license-checker.txt
+license-checker.tx
 
 # spectrum analysis
 *.spectrum.json

@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.7.0 - (Boysenberry Vienna) - October 2019
+
+## Bugfixes and Improvements 2019
+
+- Bumped all dependencies
+- Upgraded https-proxy-agent to fix https://snyk.io/vuln/SNYK-JS-HTTPSPROXYAGENT-469131
+- Added stale issues bot watcher to github
+
 ## 3.6.1 - (Cobalt Blue Vienna) - September 2019
 
 ## Bugfixes and Improvements 3.6.1
