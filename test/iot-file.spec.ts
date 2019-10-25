@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
 import { MindSphereSdk } from "../src/api/sdk";
-import { decrypt, loadAuth } from "../src/api/utils";
+import { decrypt, loadAuth, retry } from "../src/api/utils";
 import { sleep } from "./test-utils";
 chai.should();
 
@@ -33,11 +33,13 @@ describe("[SDK] IotFileClient", () => {
     });
 
     it("should be able to PUT AND GET file", async () => {
-        await iotFile.PutFile(rootId, `unit/test/xyz${timeOffset}.txt`, Buffer.from("xyz"), {
-            description: "blubb",
-            type: "text/plain"
-        });
-        const file = await iotFile.GetFile(rootId, `unit/test/xyz${timeOffset}.txt`);
+        await retry(5, () =>
+            iotFile.PutFile(rootId, `unit/test/xyz${timeOffset}.txt`, Buffer.from("xyz"), {
+                description: "blubb",
+                type: "text/plain"
+            })
+        );
+        const file = await retry(5, () => iotFile.GetFile(rootId, `unit/test/xyz${timeOffset}.txt`));
         const text = await file.text();
         text.should.be.equal("xyz");
     });
