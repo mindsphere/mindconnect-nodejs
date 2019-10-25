@@ -669,7 +669,10 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             agent.ClientId(),
             `${new Date().getTime()}/16_25_mb_file.bin`,
             Buffer.alloc(16.25 * 1024 * 1024),
-            { chunk: true }
+            {
+                chunk: true,
+                retry: 5
+            }
         );
 
         checksum.should.be.equal("84c8648b8aa9b803ff92515a63aa4580");
@@ -688,7 +691,10 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             agent.ClientId(),
             `${new Date().getTime()}/8mb_1byte_file.bin`,
             Buffer.alloc(8 * 1024 * 1024 + 1),
-            { chunk: true }
+            {
+                chunk: true,
+                retry: 5
+            }
         );
 
         checksum.should.be.equal("cba5242e77abe5709a262350cf64d835");
