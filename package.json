@@ -38,7 +38,7 @@
         "ajv-keywords": "^3.4.1",
         "async-lock": "^1.2.2",
         "chalk": "^2.4.2",
-        "commander": "^3.0.2",
+        "commander": "^4.0.0",
         "csvtojson": "^2.0.10",
         "debug": "^4.1.1",
         "https-proxy-agent": "^3.0.1",
