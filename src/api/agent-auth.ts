@@ -91,13 +91,13 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
                 headers: headers,
                 agent: this._proxyHttpAgent
             });
-            const json = await response.json();
 
             if (!response.ok) {
-                throw new Error(`${response.statusText} ${JSON.stringify(json)}`);
+                throw new Error(`${response.statusText} ${await response.text()}`);
             }
 
             if (response.status === 201) {
+                const json = await response.json();
                 this._configuration.response = json;
                 await retry(5, () => this.SaveConfig());
                 return OnboardingStatus.StatusEnum.ONBOARDED;
@@ -150,13 +150,13 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
                 headers: headers,
                 agent: this._proxyHttpAgent
             });
-            const json = await response.json();
 
             if (!response.ok) {
-                throw new Error(`${response.statusText} ${JSON.stringify(json)}`);
+                throw new Error(`${response.statusText} ${await response.text()}`);
             }
 
             if (response.status >= 200 && response.status <= 299) {
+                const json = await response.json();
                 this._configuration.response = json;
                 await retry(5, () => this.SaveConfig());
                 return true;
@@ -258,13 +258,13 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
                 headers: headers,
                 agent: this._proxyHttpAgent
             });
-            const json = await response.json();
 
             if (!response.ok) {
-                throw new Error(`${response.statusText} ${JSON.stringify(json)}`);
+                throw new Error(`${response.statusText} ${await response.text()}`);
             }
 
             if (response.status >= 200 && response.status <= 299) {
+                const json = await response.json();
                 log(`AcquireToken Response ${JSON.stringify(json)}`);
                 this._accessToken = <AccessToken>json;
                 return true;
@@ -275,9 +275,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
         } catch (err) {
             log(err);
             throw new Error(
-                `Network error occured ${
-                    err.message
-                } (hint: possible cause for this error is invalid date/time on the device)`
+                `Network error occured ${err.message} (hint: possible cause for this error is invalid date/time on the device)`
             );
         }
     }
@@ -299,13 +297,13 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
             log(`Validate Token Headers ${JSON.stringify(headers)} Url: ${url}`);
             try {
                 const response = await fetch(url, { method: "GET", headers: headers, agent: this._proxyHttpAgent });
-                const json = await response.json();
 
                 if (!response.ok) {
-                    throw new Error(`${response.statusText} ${JSON.stringify(json)}`);
+                    throw new Error(`${response.statusText} ${await response.text()}`);
                 }
 
                 if (response.status >= 200 && response.status <= 299) {
+                    const json = await response.json();
                     log(`OauthPublicKeyResponse ${JSON.stringify(json)}`);
                     this._oauthPublicKey = <TokenKey>json;
                 } else {
