@@ -9,6 +9,7 @@
  */
 export interface IMindConnectConfiguration extends Configuration {
     response?: ClientIdentifier;
+    recovery?: ClientIdentifier[]; // backup keys for problems with key rotation
     dataSourceConfiguration?: DataSourceConfiguration;
     mappings?: Mapping[];
     urls?: Object;

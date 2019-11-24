@@ -153,6 +153,7 @@ export const retry = async (n: number, func: Function, timoutinMilliseconds: num
         try {
             if (logFunction) {
                 logFunction();
+                console.log(i);
             }
             if (i > 0) {
                 await sleep(i * timoutinMilliseconds);

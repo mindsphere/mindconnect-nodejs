@@ -15,6 +15,7 @@ import {
 } from "..";
 import { MindConnectBase, TokenRotation } from "./mindconnect-base";
 import { DefaultStorage, IsConfigurationStorage } from "./mindconnect-storage";
+import _ = require("lodash");
 const log = debug("mindconnect-agentauth");
 const rsaPemToJwk = require("rsa-pem-to-jwk");
 
@@ -112,6 +113,34 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
         }
     }
 
+    private PushKey() {
+        if (!this._configuration.response) throw new Error("This agent was not onboarded yet.");
+        this._configuration.recovery = this._configuration.recovery || [];
+
+        if (!_.some(this._configuration.recovery, this._configuration.response)) {
+            this._configuration.recovery.push(Object.assign({}, this._configuration.response));
+        }
+        this._configuration.recovery = _.takeRight(this._configuration.recovery, 5);
+    }
+
+    public async TryRecovery() {
+        this._configuration.recovery = this._configuration.recovery || [];
+        this.PushKey();
+
+        let i = 0;
+        for (const currentKey of this._configuration.recovery.reverse()) {
+            try {
+                this._configuration.response = currentKey;
+                console.log(`recovery with ${i}`);
+                await retry(3, () => this.RotateKey());
+                console.log("success");
+                break;
+            } catch (err) {
+                console.log(`recovery with ${i++} failed`);
+            }
+        }
+    }
+
     /**
      * This method rotates the client secret (reregisters the agent). It is called by RenewToken when the secret is expiring.
      *
@@ -121,6 +150,8 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
      */
     private async RotateKey(): Promise<boolean> {
         if (!this._configuration.response) throw new Error("This agent was not onboarded yet.");
+
+        this.PushKey();
 
         const headers = {
             ...this._apiHeaders,
@@ -280,6 +311,32 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
         }
     }
 
+    private async GetCertificate(): Promise<object> {
+        const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/oauth/token_key`;
+        const headers = this._headers;
+        log(`Validate Token Headers ${JSON.stringify(headers)} Url: ${url}`);
+        try {
+            const response = await fetch(url, { method: "GET", headers: headers, agent: this._proxyHttpAgent });
+
+            if (!response.ok) {
+                throw new Error(`${response.statusText} ${await response.text()}`);
+            }
+
+            if (response.status >= 200 && response.status <= 299) {
+                const json = await response.json();
+                log(`OauthPublicKeyResponse ${JSON.stringify(json)}`);
+                this._oauthPublicKey = <TokenKey>json;
+                return json;
+            } else {
+                throw new Error(`invalid response ${JSON.stringify(response)}`);
+            }
+            // process body
+        } catch (err) {
+            log(err);
+            throw new Error(`Network error occured ${err.message}`);
+        }
+    }
+
     /**
      * Validates /exchange token on the client. If the certificate is not available retrieves certificate from /oauth/token_key endpoint
      * acnd caches it in _oauthPublicKey property for the lifetime of the agent.
@@ -292,28 +349,11 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
         if (!this._accessToken) throw new Error("The token needs to be acquired first before validation.");
 
         if (!this._oauthPublicKey) {
-            const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/oauth/token_key`;
-            const headers = this._headers;
-            log(`Validate Token Headers ${JSON.stringify(headers)} Url: ${url}`);
-            try {
-                const response = await fetch(url, { method: "GET", headers: headers, agent: this._proxyHttpAgent });
+            await retry(5, () => this.GetCertificate());
+        }
 
-                if (!response.ok) {
-                    throw new Error(`${response.statusText} ${await response.text()}`);
-                }
-
-                if (response.status >= 200 && response.status <= 299) {
-                    const json = await response.json();
-                    log(`OauthPublicKeyResponse ${JSON.stringify(json)}`);
-                    this._oauthPublicKey = <TokenKey>json;
-                } else {
-                    throw new Error(`invalid response ${JSON.stringify(response)}`);
-                }
-                // process body
-            } catch (err) {
-                log(err);
-                throw new Error(`Network error occured ${err.message}`);
-            }
+        if (!this._oauthPublicKey) {
+            throw new Error("couldnt read client certificate!");
         }
 
         log(this._oauthPublicKey.value);
@@ -357,24 +397,25 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
 
         const now = Math.floor(Date.now() / 1000);
 
-        const secondsLeft = now - (this._configuration.response.client_secret_expires_at - 25 * 3600);
+        const secondsLeft = this._configuration.response.client_secret_expires_at - now;
         if (this._configuration.response.client_secret_expires_at - 25 * 3600 <= now) {
             log(`client secret will expire in ${secondsLeft} seconds - renewing`);
             try {
                 await this.secretLock.acquire("secretLock", async () => {
                     await retry(5, () => this.RotateKey());
+                    this._accessToken = undefined; // delete the token it will need to be regenerated with the new key
                 });
             } catch (err) {
                 console.warn(
-                    `There is a problem rotating the client secrets. The client secret will expire in ${secondsLeft}`
+                    `There is a problem rotating the client secrets. The client secret ${
+                        secondsLeft > 0 ? "will expire in" : "has expired since"
+                    } ${Math.abs(secondsLeft)} seconds. The error was ${err}`
                 );
             }
-
-            this._accessToken = undefined; // delete the token it will need to be regenerated with the new key
         }
 
         if (!this._accessToken) {
-            await this.AquireToken();
+            await retry(5, () => this.AquireToken());
             await this.ValidateToken();
             if (!this._accessToken) throw new Error("Error aquiering the new token!");
             log("New token acquired");

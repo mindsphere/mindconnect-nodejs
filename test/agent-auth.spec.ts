@@ -4,7 +4,7 @@ import * as debug from "debug";
 import { it } from "mocha";
 import * as nock from "nock";
 import "url-search-params-polyfill";
-import { IMindConnectConfiguration, MindConnectAgent, OnboardingStatus } from "../src";
+import { ClientIdentifier, IMindConnectConfiguration, MindConnectAgent, OnboardingStatus } from "../src";
 import { AgentManagementModels } from "../src/api/sdk";
 import { MindSphereSdk } from "../src/api/sdk/";
 import { decrypt, loadAuth, retry } from "../src/api/utils";
@@ -32,21 +32,22 @@ describe("Agent Auth Rotation", () => {
         );
         agentConfig = unitTestConfiguration.agentConfig as IMindConnectConfiguration;
     });
+
     after(async () => {
         await tearDownAgents(sdk, unitTestConfiguration);
     });
 
-    it.only("onboarding should be able to handle internet connection problems", async () => {
+    it("onboarding should be able to handle internet connection problems", async () => {
         let errors = 0;
         const scope = nock("https://southgate.eu1.mindsphere.io:443", { encodedQueryParams: true, allowUnmocked: true })
             .post("/api/agentmanagement/v3/register", {})
             .thrice()
             .reply(500, "Internal Server Error")
-            .log(err => console.log(err, ++errors));
+            .log((err: any) => console.log(err, ++errors));
 
         const agent = new MindConnectAgent(agentConfig);
         agent.should.not.be.undefined;
-        const result = await retry(5, async () => await agent.OnBoard());
+        const result = await retry(5, () => agent.OnBoard());
         errors.should.be.equal(3);
         result.should.be.equal(OnboardingStatus.StatusEnum.ONBOARDED);
         scope.done();
@@ -55,10 +56,8 @@ describe("Agent Auth Rotation", () => {
     it.only("should be able to recover from a problem with key rotation.", async () => {
         const agent = new MindConnectAgent(agentConfig);
         agent.should.not.be.undefined;
-
-        if (!agent.IsOnBoarded()) {
-            await retry(5, () => agent.OnBoard());
-        }
+        nock.cleanAll();
+        if (!agent.IsOnBoarded()) await retry(5, () => agent.OnBoard());
 
         const responseA = JSON.stringify((agent as any)._configuration.response);
         await (agent as any).RotateKey();
@@ -78,8 +77,96 @@ describe("Agent Auth Rotation", () => {
         errorShouldOccur.should.be.true;
 
         // fallback to old response for key rotation should always work
-        (agent as any)._configuration.response = JSON.parse(responseA);
+        // (agent as any)._configuration.response = JSON.parse(responseA);
+
+        await agent.TryRecovery();
+
         await (agent as any).RotateKey();
+
+        (agent as any)._configuration.response = { test: "XX" };
+
+        await agent.TryRecovery();
+        await agent.RenewToken();
+
         await (agent as any).SaveConfig();
+    });
+
+    it("should be able to store old keys", async () => {
+        const agent = new MindConnectAgent(agentConfig);
+        agent.should.not.be.undefined;
+        nock.cleanAll();
+        if (!agent.IsOnBoarded()) await retry(5, () => agent.OnBoard());
+
+        await (agent as any).RotateKey();
+
+        await (agent as any).RotateKey();
+
+        await (agent as any).RotateKey();
+
+        await (agent as any).RotateKey();
+
+        await (agent as any).RotateKey();
+
+        (agent as any)._configuration.recovery.length.should.be.equal(3);
+    });
+
+    it("should be able to handle errors in key rotation", async () => {
+        const agent = new MindConnectAgent(agentConfig);
+        agent.should.not.be.undefined;
+        nock.cleanAll();
+        if (!agent.IsOnBoarded()) await retry(5, () => agent.OnBoard());
+        await retry(3, () => agent.RenewToken());
+        let error = 0;
+        const scope = nock("https://southgate.eu1.mindsphere.io:443", { encodedQueryParams: true, allowUnmocked: true })
+            .put(`/api/agentmanagement/v3/register/${agent.ClientId()}`, {
+                client_id: `${agent.ClientId()}`
+            })
+            .times(12)
+            .reply(500, "Internal Server error")
+            .log(err => {
+                console.log(err, ++error);
+            });
+
+        const today = new Date();
+        const yesterday = new Date(today);
+
+        yesterday.setHours(today.getHours() + 1);
+
+        ((agent as any)._configuration.response as ClientIdentifier).client_secret_expires_at = Math.trunc(
+            yesterday.getTime() / 1000
+        );
+
+        await agent.RenewToken();
+        await agent.RenewToken();
+        await agent.RenewToken();
+        error.should.be.equal(12);
+
+        const token = await agent.GetAgentToken();
+        token.should.not.be.undefined;
+        token.should.not.be.null;
+        token.should.not.be.equal("");
+        scope.done();
+    });
+
+    it("should handle problems with certificate urls", async () => {
+        const agent = new MindConnectAgent(agentConfig);
+        agent.should.not.be.undefined;
+        nock.cleanAll();
+
+        if (!agent.IsOnBoarded()) await retry(5, () => agent.OnBoard());
+
+        let error = 0;
+        const scope = nock("https://southgate.eu1.mindsphere.io:443", { encodedQueryParams: true, allowUnmocked: true })
+            .get(`/api/agentmanagement/v3/oauth/token_key`)
+            .times(4)
+            .reply(500, "Internal Server error")
+            .log(msg => {
+                console.log(msg, ++error);
+            });
+
+        await retry(2, () => agent.RenewToken());
+        const token = await agent.GetAgentToken();
+        error.should.be.equal(4);
+        scope.done();
     });
 });
