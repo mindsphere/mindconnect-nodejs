@@ -80,8 +80,8 @@ describe("Credential Auth", () => {
         allowUnmocked: true
       }
     )
-      .persist()
       .get("/token_keys")
+      .twice()
       .reply(200, {
         keys: [
           {
