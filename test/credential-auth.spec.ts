@@ -24,7 +24,7 @@ describe("Credential Auth", () => {
     token.should.not.be.undefined;
   });
 
-  it.only("should validate token during key rotation", async () => {
+  it("should validate token during key rotation", async () => {
     const agentManagement = sdk.GetAgentManagementClient();
 
     nock.cleanAll();
@@ -69,7 +69,7 @@ describe("Credential Auth", () => {
     scope.done();
   });
 
-  it.only("should throw error if there is no key", async () => {
+  it("should throw error if there is no key", async () => {
     const assetManagement = sdk.GetAssetManagementClient();
 
     nock.cleanAll();
@@ -119,7 +119,7 @@ describe("Credential Auth", () => {
     scope.done();
   });
 
-  it.only("should just work", async () => {
+  it("should just work", async () => {
     nock.cleanAll();
     const agentManagement = sdk.GetAgentManagementClient();
 
