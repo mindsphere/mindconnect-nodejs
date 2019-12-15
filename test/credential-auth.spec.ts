@@ -28,13 +28,10 @@ describe("Credential Auth", () => {
     const agentManagement = sdk.GetAgentManagementClient();
 
     nock.cleanAll();
-    const scope = nock(
-      `https://${sdk.GetTenant()}.piam.eu1.mindsphere.io:443`,
-      {
-        encodedQueryParams: true,
-        allowUnmocked: true
-      }
-    )
+    nock(`https://${sdk.GetTenant()}.piam.eu1.mindsphere.io:443`, {
+      encodedQueryParams: true,
+      allowUnmocked: true
+    })
       .get("/token_keys")
       .once()
       .reply(200, {
@@ -66,20 +63,16 @@ describe("Credential Auth", () => {
 
     const token = await agentManagement.GetServiceToken();
     token.should.not.be.undefined;
-    scope.done();
   });
 
   it("should throw error if there is no key", async () => {
     const assetManagement = sdk.GetAssetManagementClient();
 
     nock.cleanAll();
-    const scope = nock(
-      `https://${sdk.GetTenant()}.piam.eu1.mindsphere.io:443`,
-      {
-        encodedQueryParams: true,
-        allowUnmocked: true
-      }
-    )
+    nock(`https://${sdk.GetTenant()}.piam.eu1.mindsphere.io:443`, {
+      encodedQueryParams: true,
+      allowUnmocked: true
+    })
       .get("/token_keys")
       .twice()
       .reply(200, {
@@ -116,7 +109,6 @@ describe("Credential Auth", () => {
       errorOccured = true;
     }
     errorOccured.should.be.true;
-    scope.done();
   });
 
   it("should just work", async () => {
