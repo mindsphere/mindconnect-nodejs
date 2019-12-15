@@ -1,11 +1,13 @@
 # Changelog
 
-## 3.7.0 - (Boysenberry Vienna) - October 2019
+## 3.7.0 - (Boysenberry Vienna) - December 2019
 
-## Bugfixes and Improvements 2019
+## Bugfixes and Improvements 3.7.0
 
+- CLI: mc agent-token and mc service-token command print out the full token (including header in signature) in --verbose mode
+- The agent will now try to recover from the sporadic errors which happen when there is internet connection problem during key rotation.
 - Bumped all dependencies
-- Upgraded https-proxy-agent to fix https://snyk.io/vuln/SNYK-JS-HTTPSPROXYAGENT-469131
+- Upgraded https-proxy-agent to fix [https://snyk.io/vuln/SNYK-JS-HTTPSPROXYAGENT-469131](https://snyk.io/vuln/SNYK-JS-HTTPSPROXYAGENT-469131)
 - Added stale issues bot watcher to github
 
 ## 3.6.1 - (Cobalt Blue Vienna) - September 2019

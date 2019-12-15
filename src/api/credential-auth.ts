@@ -43,6 +43,8 @@ export abstract class CredentialAuth extends MindConnectBase implements TokenRot
 
     private async ValidateToken(): Promise<boolean> {
         await this.AcquirePublicKey();
+
+        
         const publicKey = this._oauthResponse.keys[0].value;
         if (!this._accessToken.access_token) throw new Error("Invalid access token");
 
