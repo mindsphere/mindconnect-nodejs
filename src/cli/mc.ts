@@ -69,8 +69,15 @@ signalValidationCommand(program);
 starterTsCommand(program);
 starterJsCommand(program);
 
+program.on("command:*", function() {
+    console.error("Invalid command: %s\nSee --help for a list of available commands.", program.args.join(" "));
+    process.exit(1);
+});
+
 program.parse(process.argv);
 
-if (!program.args.length) program.help();
+if (process.argv.length < 3) {
+    program.outputHelp();
+}
 
 export default program;
