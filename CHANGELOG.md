@@ -4,6 +4,7 @@
 
 ## Bugfixes and Improvements 3.7.0
 
+- SDK: Token rotation for agent credentials (#99)
 - CLI: mc agent-token and mc service-token command print out the full token (including header in signature) in --verbose mode
 - The agent will now try to recover from the sporadic errors which happen when there is internet connection problem during key rotation.
 - Bumped all dependencies

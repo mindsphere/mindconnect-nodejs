@@ -46,7 +46,7 @@ describe("Agent Auth Rotation", () => {
     await tearDownAgents(sdk, unitTestConfiguration);
   });
 
-  it.only("onboarding should be able to handle internet connection problems", async () => {
+  it("onboarding should be able to handle internet connection problems", async () => {
     // respond 3 times with internal server error before returning the correct response
     let errors = 0;
     const scope = nock("https://southgate.eu1.mindsphere.io:443", {
@@ -68,7 +68,7 @@ describe("Agent Auth Rotation", () => {
     scope.done();
   });
 
-  it.only("should be able to recover from a problem with key rotation.", async () => {
+  it("should be able to recover from a problem with key rotation.", async () => {
     const agent = new MindConnectAgent(agentConfig);
     agent.should.not.be.undefined;
     nock.cleanAll();
@@ -104,7 +104,7 @@ describe("Agent Auth Rotation", () => {
     // await (agent as any).SaveConfig();
   });
 
-  it.only("should be able to store old keys", async () => {
+  it("should be able to store old keys", async () => {
     const agent = new MindConnectAgent(agentConfig);
     agent.should.not.be.undefined;
     nock.cleanAll();
@@ -127,7 +127,7 @@ describe("Agent Auth Rotation", () => {
     (agent as any)._configuration.recovery.length.should.be.equal(5);
   });
 
-  it.only("should be able to handle errors in key rotation", async () => {
+  it("should be able to handle errors in key rotation", async () => {
     const agent = new MindConnectAgent(agentConfig);
     agent.should.not.be.undefined;
     nock.cleanAll();
@@ -180,7 +180,7 @@ describe("Agent Auth Rotation", () => {
     scope.done();
   });
 
-  it.only("should handle problems with certificate urls", async () => {
+  it("should handle problems with certificate urls", async () => {
     const agent = new MindConnectAgent(agentConfig);
     agent.should.not.be.undefined;
     nock.cleanAll();
