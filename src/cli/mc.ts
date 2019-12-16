@@ -2,6 +2,7 @@
 // Copyright (C), Siemens AG 2017
 import * as program from "commander";
 import deleteAssetCommand from "./commands/delete-asset";
+import deleteFileCommand from "./commands/delete-file";
 import iotCheckBulkComand from "./commands/iot-bulk-check";
 import iotBulkRunCommand from "./commands/iot-bulk-run";
 import iotBulkDirCommand from "./commands/iot-prepare-bulk-dir";
@@ -61,6 +62,7 @@ listAssetsCommand(program);
 deleteAssetCommand(program);
 listFilesCommand(program);
 downloadFileCommand(program);
+deleteFileCommand(program);
 
 // * analytics command
 
