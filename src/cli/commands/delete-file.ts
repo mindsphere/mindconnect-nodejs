@@ -1,7 +1,6 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as path from "path";
-import * as util from "util";
 import { MindSphereSdk } from "../../api/sdk/";
 import { decrypt, loadAuth, retry } from "../../api/utils";
 import {
@@ -12,7 +11,6 @@ import {
   verboseLog
 } from "./command-utils";
 import ora = require("ora");
-const streamPipeline = util.promisify(require("stream").pipeline);
 
 const color = getColor("magenta");
 

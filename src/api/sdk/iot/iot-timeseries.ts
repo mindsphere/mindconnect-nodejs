@@ -95,8 +95,8 @@ export class TimeSeriesClient extends SdkClient {
       .get("link")
       // tslint:disable-next-line: quotemark
       ?.replace('; rel="next"', "")
-      .replace("<", "")
-      .replace(">", "")
+      .replace(/</g, "")
+      .replace(/>/g, "")
       .replace(this.GetGateway(), "");
     const values = (await response.json()) as Array<{ [key: string]: any }>;
 
