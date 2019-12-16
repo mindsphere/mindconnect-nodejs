@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Copyright (C), Siemens AG 2017
 import * as program from "commander";
+import deleteAssetCommand from "./commands/delete-asset";
 import iotCheckBulkComand from "./commands/iot-bulk-check";
 import iotBulkRunCommand from "./commands/iot-bulk-run";
 import iotBulkDirCommand from "./commands/iot-prepare-bulk-dir";
@@ -57,6 +58,7 @@ iotCheckBulkComand(program);
 
 // * assets and files handling commands
 listAssetsCommand(program);
+deleteAssetCommand(program);
 listFilesCommand(program);
 downloadFileCommand(program);
 
@@ -70,14 +72,17 @@ starterTsCommand(program);
 starterJsCommand(program);
 
 program.on("command:*", function() {
-    console.error("Invalid command: %s\nSee --help for a list of available commands.", program.args.join(" "));
-    process.exit(1);
+  console.error(
+    "Invalid command: %s\nSee --help for a list of available commands.",
+    program.args.join(" ")
+  );
+  process.exit(1);
 });
 
 program.parse(process.argv);
 
 if (process.argv.length < 3) {
-    program.outputHelp();
+  program.outputHelp();
 }
 
 export default program;

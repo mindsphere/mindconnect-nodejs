@@ -274,3 +274,19 @@ export function generateTestData(
   }
   return results;
 }
+
+export function buildFilter(options: any) {
+  const filter = (options.filter && JSON.parse(options.filter)) || {};
+  let pointer = filter;
+  if (options.assetname !== undefined && options.typeid !== undefined) {
+    filter.and = {};
+    pointer = filter.and;
+  }
+  if (options.assetname) {
+    pointer.name = { contains: `${options.assetname}` };
+  }
+  if (options.typeid) {
+    pointer.typeId = { contains: `${options.typeid}` };
+  }
+  return filter;
+}

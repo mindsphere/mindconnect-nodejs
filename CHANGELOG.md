@@ -4,8 +4,9 @@
 
 ## Bugfixes and Improvements 3.7.0
 
-- SDK: Token rotation for agent credentials (#99)
+- CLI: mc delete-asset command
 - CLI: mc agent-token and mc service-token command print out the full token (including header in signature) in --verbose mode
+- SDK: Token rotation for agent credentials (#99)
 - The agent will now try to recover from the sporadic errors which happen when there is internet connection problem during key rotation.
 - Bumped all dependencies
 - Upgraded https-proxy-agent to fix [https://snyk.io/vuln/SNYK-JS-HTTPSPROXYAGENT-469131](https://snyk.io/vuln/SNYK-JS-HTTPSPROXYAGENT-469131)
