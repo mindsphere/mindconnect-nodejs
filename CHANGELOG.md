@@ -4,6 +4,8 @@
 
 ## Bugfixes and Improvements 3.7.0
 
+- CLI: mc bulk-download command (download timeseries aspects from mindsphere)
+- CLI: mc delete-file command
 - CLI: mc delete-asset command
 - CLI: mc agent-token and mc service-token command print out the full token (including header in signature) in --verbose mode
 - SDK: Token rotation for agent credentials (#99)

@@ -21,7 +21,7 @@ export default (program: CommanderStatic) => {
     .option("-k, --passkey <passkey>", "passkey")
     .option("-y, --retry <number>", "retry attempts before giving up", 3)
     .option("-v, --verbose", "verbose output")
-    .description(color(`delete asset with id <assetid>`))
+    .description(color(`delete asset with id <assetid> from mindsphere *`))
     .action(options => {
       (async () => {
         try {

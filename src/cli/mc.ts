@@ -5,6 +5,7 @@ import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
 import iotCheckBulkComand from "./commands/iot-bulk-check";
 import iotBulkRunCommand from "./commands/iot-bulk-run";
+import iotDownloadBulkCommand from "./commands/iot-download-bulk";
 import iotBulkDirCommand from "./commands/iot-prepare-bulk-dir";
 import agentStatusCommand from "./commands/mc-agent-status";
 import agentTokenCommand from "./commands/mc-agent-token";
@@ -56,6 +57,7 @@ unregisterDiagnoticCommand(program);
 iotBulkDirCommand(program);
 iotBulkRunCommand(program);
 iotCheckBulkComand(program);
+iotDownloadBulkCommand(program);
 
 // * assets and files handling commands
 listAssetsCommand(program);
