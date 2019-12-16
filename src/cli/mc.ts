@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 // Copyright (C), Siemens AG 2017
 import * as program from "commander";
+import deleteAssetCommand from "./commands/delete-asset";
+import deleteFileCommand from "./commands/delete-file";
 import iotCheckBulkComand from "./commands/iot-bulk-check";
 import iotBulkRunCommand from "./commands/iot-bulk-run";
+import iotDownloadBulkCommand from "./commands/iot-download-bulk";
 import iotBulkDirCommand from "./commands/iot-prepare-bulk-dir";
 import agentStatusCommand from "./commands/mc-agent-status";
 import agentTokenCommand from "./commands/mc-agent-token";
@@ -54,11 +57,14 @@ unregisterDiagnoticCommand(program);
 iotBulkDirCommand(program);
 iotBulkRunCommand(program);
 iotCheckBulkComand(program);
+iotDownloadBulkCommand(program);
 
 // * assets and files handling commands
 listAssetsCommand(program);
+deleteAssetCommand(program);
 listFilesCommand(program);
 downloadFileCommand(program);
+deleteFileCommand(program);
 
 // * analytics command
 
@@ -69,8 +75,18 @@ signalValidationCommand(program);
 starterTsCommand(program);
 starterJsCommand(program);
 
+program.on("command:*", function() {
+  console.error(
+    "Invalid command: %s\nSee --help for a list of available commands.",
+    program.args.join(" ")
+  );
+  process.exit(1);
+});
+
 program.parse(process.argv);
 
-if (!program.args.length) program.help();
+if (process.argv.length < 3) {
+  program.outputHelp();
+}
 
 export default program;

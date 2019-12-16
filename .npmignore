@@ -31,7 +31,8 @@ report.xml
 .github
 .prettier*
 
-bulkupload
+bulkupload*
+bulkdownload*
 
 # nyc
 .nyc_output
