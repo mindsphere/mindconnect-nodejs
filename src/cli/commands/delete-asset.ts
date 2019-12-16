@@ -1,6 +1,5 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
-import { verboseLog } from "../../../dist/src/cli/commands/command-utils";
 import { MindSphereSdk } from "../../api/sdk";
 import { decrypt, loadAuth, retry } from "../../api/utils";
 import {
@@ -8,7 +7,8 @@ import {
   getColor,
   homeDirLog,
   proxyLog,
-  serviceCredentialLog
+  serviceCredentialLog,
+  verboseLog
 } from "./command-utils";
 
 const color = getColor("magenta");
