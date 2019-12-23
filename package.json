@@ -61,7 +61,7 @@
         "@types/jsonwebtoken": "^8.3.5",
         "@types/lodash": "^4.14.149",
         "@types/mocha": "^5.2.7",
-        "@types/node": "^12.12.17",
+        "@types/node": "^13.1.0",
         "@types/node-fetch": "^2.5.4",
         "@types/uuid": "^3.4.6",
         "chai": "^4.2.0",
