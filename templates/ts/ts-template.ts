@@ -15,8 +15,8 @@ export const tstemplate: string = `import { DataPointValue, MindConnectAgent, Mi
             log(\`Iteration : \${index}\`);
             // onboarding the agent
             if (!agent.IsOnBoarded()) {
-                // wrapping the call in the retry function makes the agent a bit more resilliant
-                // if you don't want to retry the operations you can always just call await agent.OnBoard(); instaead.
+                // wrapping the call in the retry function makes the agent a bit more resillient
+                // if you don't want to retry the operations you can always just call await agent.OnBoard(); instead.
                 await retry(RETRYTIMES, () => agent.OnBoard());
                 log("Agent onboarded");
             }
@@ -96,13 +96,13 @@ export const tstemplate: string = `import { DataPointValue, MindConnectAgent, Mi
 })();`;
 
 export const tsconfigjson = {
-    compilerOptions: {
-        target: "es2015",
-        module: "commonjs",
-        lib: ["es2015", "dom"],
-        allowJs: false,
-        declaration: true,
-        sourceMap: true,
-        strict: true
-    }
+  compilerOptions: {
+    target: "es2015",
+    module: "commonjs",
+    lib: ["es2015", "dom"],
+    allowJs: false,
+    declaration: true,
+    sourceMap: true,
+    strict: true
+  }
 };
