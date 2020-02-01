@@ -17,3 +17,5 @@ export * from "./iotfile/iot-file";
 export * from "./iotfile/iot-file-models";
 export * from "./signal-validation/signal-validation";
 export * from "./signal-validation/signal-validation-models";
+export * from "./trend/trend-prediction";
+export * from "./trend/trend-prediction-models";
