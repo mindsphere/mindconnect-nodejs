@@ -4,6 +4,7 @@
 
 ## Bugfixes and Improvements 3.7.0
 
+- CLI: mc trend-prediction command (perform linear and polynomial trend prediction on mindsphere aspects using command line)
 - CLI: mc bulk-download command (download timeseries aspects from mindsphere)
 - CLI: mc delete-file command
 - CLI: mc delete-asset command
