@@ -6,7 +6,6 @@ import * as path from "path";
 import { MindSphereSdk, TrendPredictionClient, TrendPredictionModels } from "../../api/sdk";
 import { decrypt, loadAuth, retry } from "../../api/utils";
 import { errorLog, getColor, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
-import ora = require("ora");
 
 const color = getColor("blue");
 
