@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { log } from "console";
-import { AssetManagementModels, SignalValidationModels } from "../../api/sdk";
+import { AssetManagementModels } from "../../api/sdk";
 import { getHomeDotMcDir } from "../../api/utils";
 
 const magenta = getColor("magenta");
@@ -257,19 +257,22 @@ export const humanFileSize = (size: number) => {
 
 export function generateTestData(
   size: number,
-  fn: (x: number) => number | undefined
+  fn: (x: number) => number | undefined,
+  variableName: string = "variable1"
 ) {
   const startDate = new Date();
-  const results: SignalValidationModels.Timeseries[] = [];
+  const results = [];
   for (let index = 0; index < size; index++) {
     const time = subtractSecond(startDate, size - index);
     const value = fn(index);
 
-    if (value) {
-      results.push({
-        _time: time.toISOString(),
-        variable1: value.toString()
-      });
+    if (value !== undefined) {
+      const item: any = {
+        _time: time.toISOString()
+      };
+
+      item[variableName] = value!.toString();
+      results.push(item);
     }
   }
   return results;

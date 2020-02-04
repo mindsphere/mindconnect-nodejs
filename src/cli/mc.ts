@@ -29,6 +29,7 @@ import uploadTimeSeriesCommand from "./commands/mc-upload-timeseries";
 import versionAndHelp from "./commands/mc-version-help";
 import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
+import trendPrediction from "./commands/trend-prediction";
 
 // * generic commands
 versionAndHelp(program);
@@ -70,23 +71,21 @@ deleteFileCommand(program);
 
 spectrumAnalysisCommand(program);
 signalValidationCommand(program);
+trendPrediction(program);
 
 // * cli for starter projects
 starterTsCommand(program);
 starterJsCommand(program);
 
 program.on("command:*", function() {
-  console.error(
-    "Invalid command: %s\nSee --help for a list of available commands.",
-    program.args.join(" ")
-  );
-  process.exit(1);
+    console.error("Invalid command: %s\nSee --help for a list of available commands.", program.args.join(" "));
+    process.exit(1);
 });
 
 program.parse(process.argv);
 
 if (process.argv.length < 3) {
-  program.outputHelp();
+    program.outputHelp();
 }
 
 export default program;
