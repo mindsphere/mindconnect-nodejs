@@ -194,12 +194,12 @@ describe("[SDK] KPICalculationClient", () => {
         ]
     };
 
-    it.only("SDK should not be undefined", async () => {
+    it("SDK should not be undefined", async () => {
         sdk.should.not.be.undefined;
         kpiCalculationClient.should.not.be.undefined;
     });
 
-    it.only("should calculate kpis", async () => {
+    it("should calculate kpis", async () => {
         sdk.should.not.be.undefined;
         kpiCalculationClient.should.not.be.undefined;
 
@@ -216,7 +216,7 @@ describe("[SDK] KPICalculationClient", () => {
         result.should.not.be.undefined;
     });
 
-    it.only("should calculate KPI states", async () => {
+    it("should calculate KPI states", async () => {
         sdk.should.not.be.undefined;
         kpiCalculationClient.should.not.be.undefined;
 
