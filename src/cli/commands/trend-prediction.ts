@@ -22,6 +22,7 @@ export default (program: CommanderStatic) => {
         .option("-i, --input <input>", `input variables (comma separated)`)
         .option("-e, --modelid <modelid>", `modelid of the stored model for prediction`)
         .option("-r, --predict <predict>", `regression parameters for prediction (comma separated)`)
+        .option("-c, --predictfile <predictfile>", `regression parameters for prediction as timeseries`)
         .option("-d, --degree [degree]", "degree for linear / polynomial regression ", 1)
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-p, --passkey <passkey>", `passkey`)
@@ -136,8 +137,10 @@ export default (program: CommanderStatic) => {
 function displayPrediction(options: any, prediction: TrendPredictionModels.PredictionDataArray) {
     console.log(`${color("(")}${options.input}${color(") =>")} ${options.output}`);
     const predictionValue = prediction[0].timeSeries![0][options.output];
-    console.log(`${color("(")}${options.predict}${color(") =>")} ${predictionValue}`);
-    verboseLog(JSON.stringify(prediction, null, 2), options.verbose);
+    options.predict && console.log(`${color("(")}${options.predict}${color(") =>")} ${predictionValue}`);
+    options.predictfile
+        ? console.log(JSON.stringify(prediction, null, 2))
+        : verboseLog(JSON.stringify(prediction, null, 2), options.verbose);
 }
 
 function getpredictors(options: any) {
@@ -149,12 +152,21 @@ function getpredictors(options: any) {
             }
         ]
     };
-    const variables = `${options.input}`.split(",").map((x: string) => x.trim());
-    const predictors = `${options.predict}`.split(",").map((x: string) => x.trim());
-    for (let i = 0; i < variables.length; i++) {
-        const element = variables[i];
-        (predictiondata.predictionData as any)[0].timeSeries[0][element] = predictors[i];
+
+    if (options.predictfile) {
+        const predictorsPath = path.resolve(options.predictfile);
+        const predictorData = fs.readFileSync(predictorsPath);
+        const timeseries = JSON.parse(predictorData.toString());
+        predictiondata.predictionData[0].timeSeries = timeseries;
+    } else {
+        const variables = `${options.input}`.split(",").map((x: string) => x.trim());
+        const predictors = `${options.predict}`.split(",").map((x: string) => x.trim());
+        for (let i = 0; i < variables.length; i++) {
+            const element = variables[i];
+            (predictiondata.predictionData as any)[0].timeSeries[0][element] = predictors[i];
+        }
     }
+
     return predictiondata;
 }
 
@@ -242,7 +254,11 @@ function checkParameters(options: any) {
     options.mode === "predict" &&
         !options.modelid &&
         errorLog("you have to specify the id of the model (--modelid)", true);
+
     (options.mode === "predict" || options.mode === "trainandpredict") &&
-        !options.predict &&
-        errorLog("you have to provide the values of input variables (--predict)", true);
+        !(options.predict ? !options.predictfile : options.predictfile) &&
+        errorLog(
+            "you have to provide the values of input variables (--predict) or (--predictfile) (but not both)",
+            true
+        );
 }
