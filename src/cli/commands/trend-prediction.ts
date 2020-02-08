@@ -135,7 +135,7 @@ export default (program: CommanderStatic) => {
 };
 
 function displayPrediction(options: any, prediction: TrendPredictionModels.PredictionDataArray) {
-    console.log(`${color("(")}${options.input}${color(") =>")} ${options.output}`);
+    options.predict && console.log(`${color("(")}${options.input}${color(") =>")} ${options.output}`);
     const predictionValue = prediction[0].timeSeries![0][options.output];
     options.predict && console.log(`${color("(")}${options.predict}${color(") =>")} ${predictionValue}`);
     options.predictfile
