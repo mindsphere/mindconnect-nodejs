@@ -1,4 +1,4 @@
-import { toQueryString } from "../../../../dist/src/api/utils";
+import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
 import { KPICalculationModels } from "./kpi-models";
 
