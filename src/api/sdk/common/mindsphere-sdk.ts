@@ -5,6 +5,7 @@ import { TimeSeriesClient } from "../iot/iot-timeseries";
 import { TimeSeriesAggregateClient } from "../iotaggregate/iot-timeseries-aggregate";
 import { TimeSeriesBulkClient } from "../iotbulk/iot-timeseries-bulk";
 import { IotFileClient } from "../iotfile/iot-file";
+import { KPICalculationClient } from "../kpi/kpi";
 import { SignalValidationClient } from "../signal-validation/signal-validation";
 import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
 import { TrendPredictionClient } from "../trend/trend-prediction";
@@ -19,220 +20,217 @@ import { isSdkConfiguration, SdkConfiguration } from "./sdk-client";
  * @class MindSphereSdk
  */
 export class MindSphereSdk {
-  private _assetManagementClient?: AssetManagementClient;
-  /**
-   * * Asset Management
-   *
-   * @returns {AssetManagementClient}
-   *
-   * @memberOf MindSphereSdk
-   */
-  public GetAssetManagementClient(): AssetManagementClient {
-    this._assetManagementClient =
-      this._assetManagementClient ||
-      new AssetManagementClient(this._gateway, this._basicAuth, this._tenant);
-    return this._assetManagementClient;
-  }
-
-  private _agentManagementClient?: AgentManagementClient;
-
-  /**
-   * * Agent Management
-   *
-   * @returns {AgentManagementClient}
-   *
-   * @memberOf MindSphereSdk
-   */
-  public GetAgentManagementClient(): AgentManagementClient {
-    this._agentManagementClient =
-      this._agentManagementClient ||
-      new AgentManagementClient(this._gateway, this._basicAuth, this._tenant);
-    return this._agentManagementClient;
-  }
-
-  private _iotFileClient?: IotFileClient;
-
-  /**
-   * * Iot File
-   *
-   * @returns {IotFileClient}
-   *
-   * @memberOf MindSphereSdk
-   */
-  public GetIoTFileClient(): IotFileClient {
-    this._iotFileClient =
-      this._iotFileClient ||
-      new IotFileClient(this._gateway, this._basicAuth, this._tenant);
-    return this._iotFileClient;
-  }
-
-  private _tsBulkClient?: TimeSeriesBulkClient;
-
-  /**
-   * * Time Series Bulk
-   *
-   * @returns {TimeSeriesBulkClient}
-   *
-   * @memberOf MindSphereSdk
-   */
-  public GetTimeSeriesBulkClient(): TimeSeriesBulkClient {
-    this._tsBulkClient =
-      this._tsBulkClient ||
-      new TimeSeriesBulkClient(this._gateway, this._basicAuth, this._tenant);
-    return this._tsBulkClient;
-  }
-
-  private _timeSeriesClient?: TimeSeriesClient;
-
-  /**
-   * * Time Series
-   *
-   * @returns {TimeSeriesClient}
-   *
-   * @memberOf MindSphereSdk
-   */
-  public GetTimeSeriesClient(): TimeSeriesClient {
-    this._timeSeriesClient =
-      this._timeSeriesClient ||
-      new TimeSeriesClient(this._gateway, this._basicAuth, this._tenant);
-    return this._timeSeriesClient;
-  }
-
-  private _timeSeriesAggregateClient?: TimeSeriesAggregateClient;
-
-  /**
-   * * Time Series Aggregates
-   *
-   * @returns {TimeSeriesAggregateClient}
-   *
-   * @memberOf MindSphereSdk
-   */
-  public GetTimeSeriesAggregateClient(): TimeSeriesAggregateClient {
-    this._timeSeriesAggregateClient =
-      this._timeSeriesAggregateClient ||
-      new TimeSeriesAggregateClient(
-        this._gateway,
-        this._basicAuth,
-        this._tenant
-      );
-    return this._timeSeriesAggregateClient;
-  }
-
-  private _eventManagementClient?: EventManagementClient;
-
-  /**
-   * * Event Management
-   *
-   * @returns {EventManagementClient}
-   *
-   * @memberOf MindSphereSdk
-   */
-  public GetEventManagementClient(): EventManagementClient {
-    this._eventManagementClient =
-      this._eventManagementClient ||
-      new EventManagementClient(this._gateway, this._basicAuth, this._tenant);
-    return this._eventManagementClient;
-  }
-
-  private _spectrumAnalysisClient?: SpectrumAnalysisClient;
-
-  /**
-   *  * Spectrum Analysis Client
-   *
-   * @returns {SpectrumAnalysisClient}
-   *
-   * @memberOf MindSphereSdk
-   */
-  public GetSpectrumAnalysisClient(): SpectrumAnalysisClient {
-    this._spectrumAnalysisClient =
-      this._spectrumAnalysisClient ||
-      new SpectrumAnalysisClient(this._gateway, this._basicAuth, this._tenant);
-
-    return this._spectrumAnalysisClient;
-  }
-
-  private _signalValidationClient?: SignalValidationClient;
-
-  /**
-   * * Signal Validation Client
-   *
-   * @returns {SignalValidationClient}
-   *
-   * @memberOf MindSphereSdk
-   */
-  public GetSignalValidationClient(): SignalValidationClient {
-    this._signalValidationClient =
-      this._signalValidationClient ||
-      new SignalValidationClient(this._gateway, this._basicAuth, this._tenant);
-
-    return this._signalValidationClient;
-  }
-
-  private _trendPredictionClient?: TrendPredictionClient;
-
-  /**
-   * * Trend Prediction Client
-   *
-   * @returns {TrendPredictionClient}
-   *
-   * @memberOf MindSphereSdk
-   */
-  public GetTrendPredictionClient(): TrendPredictionClient {
-    this._trendPredictionClient =
-      this._trendPredictionClient ||
-      new TrendPredictionClient(this._gateway, this._basicAuth, this._tenant);
-    return this._trendPredictionClient;
-  }
-
-  /**
-   * * Tenant
-   *
-   * @returns
-   *
-   * @memberOf MindSphereSdk
-   */
-  public GetTenant() {
-    return this._tenant;
-  }
-
-  /**
-   * * Gateway
-   *
-   * @returns
-   *
-   * @memberOf MindSphereSdk
-   */
-  public GetGateway() {
-    return this._gateway;
-  }
-  private _gateway: string;
-  private _basicAuth: string;
-  private _tenant: string;
-  constructor();
-  constructor(gateway: string, basicAuth: string, tenant: string);
-  constructor(sdkConfiguration: string | SdkConfiguration);
-  constructor(
-    gatewayOrOptions?: string | SdkConfiguration,
-    basicAuth?: string,
-    tenant?: string
-  ) {
-    if (gatewayOrOptions === undefined) {
-      throw new Error("not implemented yet!");
+    private _assetManagementClient?: AssetManagementClient;
+    /**
+     * * Asset Management
+     *
+     * @returns {AssetManagementClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetAssetManagementClient(): AssetManagementClient {
+        this._assetManagementClient =
+            this._assetManagementClient || new AssetManagementClient(this._gateway, this._basicAuth, this._tenant);
+        return this._assetManagementClient;
     }
-    if (isSdkConfiguration(gatewayOrOptions)) {
-      this._gateway = gatewayOrOptions.gateway;
-      this._basicAuth = gatewayOrOptions.basicAuth;
-      this._tenant = gatewayOrOptions.tenant;
-    } else if (
-      typeof gatewayOrOptions === "string" &&
-      typeof basicAuth === "string" &&
-      typeof tenant === "string"
-    ) {
-      this._gateway = gatewayOrOptions;
-      this._basicAuth = basicAuth;
-      this._tenant = tenant;
-    } else {
-      throw new Error("invalid constructor, see documentation");
+
+    private _agentManagementClient?: AgentManagementClient;
+
+    /**
+     * * Agent Management
+     *
+     * @returns {AgentManagementClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetAgentManagementClient(): AgentManagementClient {
+        this._agentManagementClient =
+            this._agentManagementClient || new AgentManagementClient(this._gateway, this._basicAuth, this._tenant);
+        return this._agentManagementClient;
     }
-  }
+
+    private _iotFileClient?: IotFileClient;
+
+    /**
+     * * Iot File
+     *
+     * @returns {IotFileClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetIoTFileClient(): IotFileClient {
+        this._iotFileClient = this._iotFileClient || new IotFileClient(this._gateway, this._basicAuth, this._tenant);
+        return this._iotFileClient;
+    }
+
+    private _tsBulkClient?: TimeSeriesBulkClient;
+
+    /**
+     * * Time Series Bulk
+     *
+     * @returns {TimeSeriesBulkClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetTimeSeriesBulkClient(): TimeSeriesBulkClient {
+        this._tsBulkClient =
+            this._tsBulkClient || new TimeSeriesBulkClient(this._gateway, this._basicAuth, this._tenant);
+        return this._tsBulkClient;
+    }
+
+    private _timeSeriesClient?: TimeSeriesClient;
+
+    /**
+     * * Time Series
+     *
+     * @returns {TimeSeriesClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetTimeSeriesClient(): TimeSeriesClient {
+        this._timeSeriesClient =
+            this._timeSeriesClient || new TimeSeriesClient(this._gateway, this._basicAuth, this._tenant);
+        return this._timeSeriesClient;
+    }
+
+    private _timeSeriesAggregateClient?: TimeSeriesAggregateClient;
+
+    /**
+     * * Time Series Aggregates
+     *
+     * @returns {TimeSeriesAggregateClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetTimeSeriesAggregateClient(): TimeSeriesAggregateClient {
+        this._timeSeriesAggregateClient =
+            this._timeSeriesAggregateClient ||
+            new TimeSeriesAggregateClient(this._gateway, this._basicAuth, this._tenant);
+        return this._timeSeriesAggregateClient;
+    }
+
+    private _eventManagementClient?: EventManagementClient;
+
+    /**
+     * * Event Management
+     *
+     * @returns {EventManagementClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetEventManagementClient(): EventManagementClient {
+        this._eventManagementClient =
+            this._eventManagementClient || new EventManagementClient(this._gateway, this._basicAuth, this._tenant);
+        return this._eventManagementClient;
+    }
+
+    private _spectrumAnalysisClient?: SpectrumAnalysisClient;
+
+    /**
+     *  * Spectrum Analysis Client
+     *
+     * @returns {SpectrumAnalysisClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetSpectrumAnalysisClient(): SpectrumAnalysisClient {
+        this._spectrumAnalysisClient =
+            this._spectrumAnalysisClient || new SpectrumAnalysisClient(this._gateway, this._basicAuth, this._tenant);
+
+        return this._spectrumAnalysisClient;
+    }
+
+    private _signalValidationClient?: SignalValidationClient;
+
+    /**
+     * * Signal Validation Client
+     *
+     * @returns {SignalValidationClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetSignalValidationClient(): SignalValidationClient {
+        this._signalValidationClient =
+            this._signalValidationClient || new SignalValidationClient(this._gateway, this._basicAuth, this._tenant);
+
+        return this._signalValidationClient;
+    }
+
+    private _trendPredictionClient?: TrendPredictionClient;
+
+    /**
+     * * Trend Prediction Client
+     *
+     * @returns {TrendPredictionClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetTrendPredictionClient(): TrendPredictionClient {
+        this._trendPredictionClient =
+            this._trendPredictionClient || new TrendPredictionClient(this._gateway, this._basicAuth, this._tenant);
+        return this._trendPredictionClient;
+    }
+
+    private _kpiCalculationClient?: KPICalculationClient;
+
+    /**
+     * * KPI Calculation Client
+     *
+     * @returns {KPICalculationClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetKPICalculationClient(): KPICalculationClient {
+        this._kpiCalculationClient =
+            this._kpiCalculationClient || new KPICalculationClient(this._gateway, this._basicAuth, this._tenant);
+        return this._kpiCalculationClient;
+    }
+
+    /**
+     * * Tenant
+     *
+     * @returns
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetTenant() {
+        return this._tenant;
+    }
+
+    /**
+     * * Gateway
+     *
+     * @returns
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetGateway() {
+        return this._gateway;
+    }
+    private _gateway: string;
+    private _basicAuth: string;
+    private _tenant: string;
+    constructor();
+    constructor(gateway: string, basicAuth: string, tenant: string);
+    constructor(sdkConfiguration: string | SdkConfiguration);
+    constructor(gatewayOrOptions?: string | SdkConfiguration, basicAuth?: string, tenant?: string) {
+        if (gatewayOrOptions === undefined) {
+            throw new Error("not implemented yet!");
+        }
+        if (isSdkConfiguration(gatewayOrOptions)) {
+            this._gateway = gatewayOrOptions.gateway;
+            this._basicAuth = gatewayOrOptions.basicAuth;
+            this._tenant = gatewayOrOptions.tenant;
+        } else if (
+            typeof gatewayOrOptions === "string" &&
+            typeof basicAuth === "string" &&
+            typeof tenant === "string"
+        ) {
+            this._gateway = gatewayOrOptions;
+            this._basicAuth = basicAuth;
+            this._tenant = tenant;
+        } else {
+            throw new Error("invalid constructor, see documentation");
+        }
+    }
 }

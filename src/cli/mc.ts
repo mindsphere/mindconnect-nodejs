@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// Copyright (C), Siemens AG 2017
 import * as program from "commander";
 import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
@@ -7,6 +6,7 @@ import iotCheckBulkComand from "./commands/iot-bulk-check";
 import iotBulkRunCommand from "./commands/iot-bulk-run";
 import iotDownloadBulkCommand from "./commands/iot-download-bulk";
 import iotBulkDirCommand from "./commands/iot-prepare-bulk-dir";
+import kpicalculation from "./commands/kpi-calculation";
 import agentStatusCommand from "./commands/mc-agent-status";
 import agentTokenCommand from "./commands/mc-agent-token";
 import createAgentCommand from "./commands/mc-create-agent";
@@ -72,6 +72,7 @@ deleteFileCommand(program);
 spectrumAnalysisCommand(program);
 signalValidationCommand(program);
 trendPrediction(program);
+kpicalculation(program);
 
 // * cli for starter projects
 starterTsCommand(program);

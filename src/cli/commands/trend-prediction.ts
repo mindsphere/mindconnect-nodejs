@@ -13,7 +13,7 @@ export default (program: CommanderStatic) => {
     program
         .command("trend-prediction")
         .alias("tp")
-        .option("-f, --file <timeseries>", `timeseries file`, `timeseries-sample.json in mindsphere format`)
+        .option("-f, --file <timeseries>", `timeseries file`, `timeseries-sample.json`)
         .option(
             "-m, --mode [train|predict|trainandpredict|list|read|delete]",
             `mode see ${color("@ Additional Documentation")}`
