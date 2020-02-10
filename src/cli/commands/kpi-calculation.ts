@@ -25,7 +25,7 @@ export default (program: CommanderStatic) => {
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-p, --passkey <passkey>", `passkey`)
         .option("-v, --verbose", "verbose output")
-        .description(`${color("calculate kpi states or compute kpis")}`)
+        .description(`${color("calculate kpi states or compute kpis @")}`)
         .action(options => {
             (async () => {
                 try {
