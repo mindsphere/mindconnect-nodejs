@@ -27,7 +27,7 @@ export class TrendPredictionClient extends SdkClient {
      * specifies which variables are the input variables (regressors), and which one is the output variable (regressand) of the regression model.
      * In order to specify time as one of the input variables, set propertyName equal to timestamp
      *
-     * * trainingtData
+     * * trainingData
      * contains the time series data that will be used for model training the regression model.
      * It should contain the values for all variables specified under metadataConfiguration.
      *
@@ -138,7 +138,8 @@ export class TrendPredictionClient extends SdkClient {
         optional: {
             entityId: string;
             sort?: "asc" | "desc";
-        } = { entityId: "*", sort: "asc" }
+            size?: number;
+        } = { entityId: "*", sort: "asc", size: 100 } // ! fixed on the client for the february version of the api
     ): Promise<TrendPredictionModels.ModelDto[]> {
         const qs = toQueryString(optional);
 
