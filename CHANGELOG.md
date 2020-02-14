@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.7.0 - (Boysenberry Vienna) - February 2019
+## 3.7.0 - (Boysenberry Vienna) - February 2020
 
 ## Bugfixes and Improvements 3.7.0
 
