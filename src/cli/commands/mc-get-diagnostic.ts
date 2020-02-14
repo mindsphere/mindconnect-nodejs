@@ -1,11 +1,11 @@
-import chalk from "chalk";
+import * as chalk from "chalk";
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { DiagnosticInformation, MindConnectSetup } from "../..";
-import { getColor, errorLog, homeDirLog, proxyLog, verboseLog, serviceCredentialLog } from "./command-utils";
 import { decrypt, loadAuth } from "../../api/utils";
+import { errorLog, getColor, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
 
 const color = getColor("magenta");
 
@@ -53,9 +53,7 @@ export default (program: CommanderStatic) => {
                                 log(element);
                             } else if (options.text) {
                                 log(
-                                    `${element.timestamp},${element.severity},${element.agentId},${
-                                        element.correlationId
-                                    },${element.state},${element.source},${element.message}`
+                                    `${element.timestamp},${element.severity},${element.agentId},${element.correlationId},${element.state},${element.source},${element.message}`
                                 );
                             } else {
                                 log(
