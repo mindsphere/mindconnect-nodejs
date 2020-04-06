@@ -23,6 +23,7 @@ export default (program: CommanderStatic) => {
         .command("offboard-agent")
         .alias("of")
         .option("-c, --config <agentconfig>", "config file for agent configuration")
+        .option("-i, --agentid <agentid>", "agent id")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
@@ -41,10 +42,14 @@ export default (program: CommanderStatic) => {
                         basicAuth: decrypt(auth, options.passkey)
                     });
 
-                    const configFile = path.resolve(options.config);
-                    const configuration = require(configFile) as IMindConnectConfiguration;
-                    const agentid = configuration.content.clientId;
-                    agentid || throwError("invalid configuration in the file");
+                    let agentid = options.agentid;
+
+                    if (options.config) {
+                        const configFile = path.resolve(options.config);
+                        const configuration = require(configFile) as IMindConnectConfiguration;
+                        agentid = configuration.content.clientId;
+                        agentid || throwError("invalid configuration in the file");
+                    }
 
                     const ag = sdk.GetAgentManagementClient();
 
@@ -78,18 +83,23 @@ export default (program: CommanderStatic) => {
             log(
                 `    mc offboard-agent --config agent.json --passkey passkey... \t offboard agent with agent.json configuration`
             );
+            log(
+                `    mc offboard-agent --agentid 12345..ef --passkey passkey... \t offboard agent with 12345..ef agentid`
+            );
             serviceCredentialLog();
         });
 };
 
 function checkRequiredParamaters(options: any) {
     !options.passkey &&
-        errorLog(
-            "you have to provide a passkey to get the service token (run mc of --help for full description)",
-            true
-        );
+        errorLog("you have to provide a passkey to offboard an agent (run mc of --help for full description)", true);
 
-    !options.config && errorLog("you have to provide a filename for the agent configuration", true);
+    !options.agentid &&
+        !options.config &&
+        errorLog("you have to provide a filename for the agent configuration or assetid of the agent", true);
 
-    !fs.existsSync(options.config) && throwError(`the config file ${color(options.config)} doesn't exist.`);
+    !options.agentid &&
+        options.config &&
+        !fs.existsSync(options.config) &&
+        throwError(`the config file ${color(options.config)} doesn't exist.`);
 }
