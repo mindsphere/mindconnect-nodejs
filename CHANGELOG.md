@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.8.0 - (Electric Blue Vienna) - May 2020
+
+- CLI: mc offboard-agent has now a command to offboard an agent with the id only  (mc offboard --assetid) (#130)
+
+
 ## 3.7.0 - (Boysenberry Vienna) - February 2020
 
 ## Bugfixes and Improvements 3.7.0
