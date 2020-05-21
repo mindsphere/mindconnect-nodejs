@@ -4,20 +4,20 @@ import * as fs from "fs";
 import * as jwt from "jsonwebtoken";
 import * as path from "path";
 import * as uuid from "uuid";
-import { verboseLog } from "../../../dist/src/cli/commands/command-utils";
-import { errorLog, getColor } from "./command-utils";
+import { MqttOpcUaAuth } from "../../api/mqtt-opcua-auth";
+import { errorLog, getColor, verboseLog } from "./command-utils";
 
 const color = getColor("green");
 
 const tokenHeader: any = {
     alg: "RS256",
     x5c: [],
-    typ: "JWT"
+    typ: "JWT",
 };
 
 const tokenBody: any = {
     aud: ["MQTTBroker"],
-    schemas: "urn:siemens:mindsphere:v1"
+    schemas: ["urn:siemens:mindsphere:v1"],
 };
 
 export default (program: CommanderStatic) => {
@@ -25,7 +25,7 @@ export default (program: CommanderStatic) => {
         .command("mqtt-createjwt")
         .alias("jw")
         .option("-i, --clientid <clientid>", "MQTT ClientId", uuid.v4())
-        .option("-e, --expiration <expiration>", "time until the token is valid in days", 365)
+        .option("-e, --expiration <expiration>", "time until the token is valid in seconds", 1 * 60 * 60)
         .option("-c, --rootca <rootca>", "path to CA root certificate", "CA-root.pem")
         .option("-d, --devicecrt <devicecrt>", "path to device certificate", "device.crt.pem")
         .option("-k, --devicekey <devicekey>", "path to device certificate key", "device.key.pem")
@@ -34,9 +34,11 @@ export default (program: CommanderStatic) => {
         .option("-t, --tenant [tenant]", "tenant name")
         .option("-v, --verbose", "verbose output")
         .description(color("creates a signed token for opcua pub sub authentication #"))
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
+                    checkParameters(options);
+
                     tokenBody.iss = options.clientid;
                     tokenBody.sub = options.clientid;
 
@@ -49,31 +51,21 @@ export default (program: CommanderStatic) => {
                         intermediate = fs.readFileSync(path.resolve(options.intermediate)).toString();
                     }
 
-                    tokenHeader.x5c.push(pruneCert(devicecrt));
-                    intermediate && tokenHeader.x5c.push(pruneCert(intermediate));
-                    tokenHeader.x5c.push(pruneCert(rootca));
+                    const mqttTokenRotation = new MqttOpcUaAuth(
+                        options.clientid,
+                        rootca,
+                        devicecrt,
+                        options.expiration,
+                        devicekey,
+                        intermediate,
+                        options.passphrase,
+                        options.tenant
+                    );
 
-                    const issuedTime = Math.round(new Date().getTime() / 1000);
-                    const expirationTime = issuedTime + options.expiration * 24 * 60 * 60;
-
-                    tokenBody.jti = uuid.v4().toString();
-                    tokenBody.iat = issuedTime;
-                    tokenBody.nbf = issuedTime;
-                    tokenBody.exp = expirationTime;
-                    tokenBody.tenant = `${options.tenant}`;
-
-                    const signOptions: any = {
-                        key: devicekey
-                    };
-
-                    if (options.passphrase) {
-                        signOptions.passphrase = `${options.passphrase}`;
-                    }
-
-                    const signedJwt = jwt.sign(tokenBody, signOptions, { header: tokenHeader, algorithm: "RS256" });
-                    console.log(signedJwt);
-                    verboseLog(JSON.stringify(tokenHeader, null, 2), options.verbose);
-                    verboseLog(JSON.stringify(tokenBody, null, 2), options.verbose);
+                    let token = mqttTokenRotation.GetMqttToken();
+                    token = mqttTokenRotation.GetMqttToken();
+                    console.log(token);
+                    verboseLog(JSON.stringify(jwt.decode(token, { complete: true }), null, 2), options.verbose);
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
@@ -83,7 +75,7 @@ export default (program: CommanderStatic) => {
             log("\n  Examples:\n");
             log(`    mc mqtt-createjwt --clientid "12345...ef" \\`);
             log(`    --rootca path/to/root.cer.pem \\`);
-            log(`    --devicecert path/to/device.cer.pem \\`);
+            log(`    --devicecrt path/to/device.cer.pem \\`);
             log(`    --devicekey path/to/devicekey.pem \\`);
             log(`    --passphrase "device key passphrase"  \\`);
             log(`    --tenant yourtenant`);
@@ -96,11 +88,25 @@ export default (program: CommanderStatic) => {
         });
 };
 
-function pruneCert(s: string): string {
-    return s
-        .split(/\r\n|\r|\n/)
-        .filter(x => {
-            return x.indexOf("CERTIFICATE") < 0;
-        })
-        .join("");
+function checkParameters(options: any) {
+    !options.rootca &&
+        errorLog(
+            "You have to specify the path to the root certificate. Run mc jw --help for full syntax and examples.",
+            options.verbose
+        );
+    !options.devicecrt &&
+        errorLog(
+            "You have to specify the path to the device certificate. Run mc jw --help for full syntax and examples.",
+            options.verbose
+        );
+    !options.devicekey &&
+        errorLog(
+            "You have to specify the path to the device key. Run mc jw --help for full syntax and examples.",
+            options.verbose
+        );
+    !options.tenant &&
+        errorLog(
+            "You have to specify the name of your tenant. Run mc jw --help for full syntax and examples.",
+            options.verbose
+        );
 }

@@ -3,6 +3,8 @@
 ## 3.8.0 - (Electric Blue Vienna) - May 2020
 
 - CLI: mc offboard-agent has now a command to offboard an agent with the id only  (mc offboard --assetid) (#130)
+- CLI: added mc mqtt-createjwt command which can create a key for MQTT OPC UA PubSub authentication
+- SDK: added utility class for MQTT OPC UA PubSub key rotation
 
 
 ## 3.7.0 - (Boysenberry Vienna) - February 2020
