@@ -6,7 +6,6 @@
 - CLI: added mc mqtt-createjwt command which can create a key for MQTT OPC UA PubSub authentication
 - SDK: added utility class for MQTT OPC UA PubSub key rotation
 
-
 ## 3.7.0 - (Boysenberry Vienna) - February 2020
 
 ## Bugfixes and Improvements 3.7.0

@@ -9,17 +9,6 @@ import { errorLog, getColor, verboseLog } from "./command-utils";
 
 const color = getColor("green");
 
-const tokenHeader: any = {
-    alg: "RS256",
-    x5c: [],
-    typ: "JWT",
-};
-
-const tokenBody: any = {
-    aud: ["MQTTBroker"],
-    schemas: ["urn:siemens:mindsphere:v1"],
-};
-
 export default (program: CommanderStatic) => {
     program
         .command("mqtt-createjwt")
@@ -38,9 +27,6 @@ export default (program: CommanderStatic) => {
             (async () => {
                 try {
                     checkParameters(options);
-
-                    tokenBody.iss = options.clientid;
-                    tokenBody.sub = options.clientid;
 
                     const rootca = fs.readFileSync(path.resolve(options.rootca)).toString();
                     const devicecrt = fs.readFileSync(path.resolve(options.devicecrt)).toString();
@@ -62,8 +48,7 @@ export default (program: CommanderStatic) => {
                         options.tenant
                     );
 
-                    let token = mqttTokenRotation.GetMqttToken();
-                    token = mqttTokenRotation.GetMqttToken();
+                    const token = mqttTokenRotation.GetMqttToken();
                     console.log(token);
                     verboseLog(JSON.stringify(jwt.decode(token, { complete: true }), null, 2), options.verbose);
                 } catch (err) {
