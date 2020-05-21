@@ -11,7 +11,7 @@ This project has started as a community effort at Siemens AG and is now availabl
 [![Build Status](https://jenkins.mindconnect.rocks/buildStatus/icon?job=mindconnect-nodejs/master)](https://jenkins.mindconnect.rocks/blue/organizations/jenkins/mindconnect-nodejs/activity/) [![The MIT License](https://img.shields.io/badge/license-MIT-009999.svg?style=flat)](./LICENSE.md)
 [![npm](https://img.shields.io/npm/v/@mindconnect/mindconnect-nodejs/latest.svg?style=flat)](https://www.npmjs.com/package/@mindconnect/mindconnect-nodejs) ![downloads](https://img.shields.io/npm/dw/@mindconnect/mindconnect-nodejs.svg?colorB=009999)
 [![Known Vulnerabilities](https://snyk.io/test/github/mindsphere/mindconnect-nodejs/badge.svg?targetFile=package.json)](https://snyk.io/test/github/mindsphere/mindconnect-nodejs?targetFile=package.json)
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/mindsphere/mindconnect-nodejs.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/mindsphere/mindconnect-nodejs/context:javascript)  [![Greenkeeper badge](https://badges.greenkeeper.io/mindsphere/mindconnect-nodejs.svg)](https://greenkeeper.io/)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/mindsphere/mindconnect-nodejs.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/mindsphere/mindconnect-nodejs/context:javascript) 
 [![Documentation](https://img.shields.io/badge/mindsphere-documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/index.html)
 [![Forum](https://img.shields.io/badge/mindsphere-community-%23009999.svg)](https://community.plm.automation.siemens.com/t5/Developer-Space/bd-p/MindSphere-platform-forum)
 
