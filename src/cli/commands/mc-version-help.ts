@@ -16,7 +16,7 @@ export default (program: CommanderStatic) => {
         log(`    the ${magenta("magenta colored commands *")} require service credentials.`);
         log(`    the ${cyan("cyan colored commands ")}require mindconnectlib (agent) credentials`);
         log(`    the ${blue("blue colored commands @")} use analytical functions of MindSphere`);
-        log(`    the ${green("green colored commands #")} are used to setup starter projects`);
+        log(`    the ${green("green colored commands #")} are used as setup and utility commands`);
         log(`    the service credentials should only be used in secure environments for setup tasks`);
         log(`    Full documentation: ${cyan("https://opensource.mindsphere.io")}\n`);
     });

@@ -6,7 +6,7 @@ import iotCheckBulkComand from "./commands/iot-bulk-check";
 import iotBulkRunCommand from "./commands/iot-bulk-run";
 import iotDownloadBulkCommand from "./commands/iot-download-bulk";
 import iotBulkDirCommand from "./commands/iot-prepare-bulk-dir";
-import kpicalculation from "./commands/kpi-calculation";
+import kpicalculationCommand from "./commands/kpi-calculation";
 import agentStatusCommand from "./commands/mc-agent-status";
 import agentTokenCommand from "./commands/mc-agent-token";
 import createAgentCommand from "./commands/mc-create-agent";
@@ -27,9 +27,10 @@ import unregisterDiagnoticCommand from "./commands/mc-unregister-diagnostic";
 import uploadFileCommand from "./commands/mc-upload-file";
 import uploadTimeSeriesCommand from "./commands/mc-upload-timeseries";
 import versionAndHelp from "./commands/mc-version-help";
+import mqttCreateCommand from "./commands/mqtt-create-jwt";
 import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
-import trendPrediction from "./commands/trend-prediction";
+import trendPredictionCommand from "./commands/trend-prediction";
 
 // * generic commands
 versionAndHelp(program);
@@ -71,8 +72,12 @@ deleteFileCommand(program);
 
 spectrumAnalysisCommand(program);
 signalValidationCommand(program);
-trendPrediction(program);
-kpicalculation(program);
+trendPredictionCommand(program);
+kpicalculationCommand(program);
+
+// * opcua pub sub commands
+
+mqttCreateCommand(program);
 
 // * cli for starter projects
 starterTsCommand(program);
