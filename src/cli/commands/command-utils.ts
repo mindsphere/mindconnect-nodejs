@@ -12,7 +12,7 @@ const cyan = getColor("cyan");
 export const serviceCredentialLog = (color: Function = magenta) => {
     log(`\n  Important: \n`);
     log(
-        `    you need to supply the ${color("service credentials")} or ${color(
+        `    you need to supply the ${color("service credentials (deprecated)")} or ${color(
             "application credentials"
         )} for this operation and provide the passkey \n`
     );
