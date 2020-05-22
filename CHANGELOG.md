@@ -2,9 +2,14 @@
 
 ## 3.8.0 - (Electric Blue Vienna) - May 2020
 
+- SDK: added utility class for MQTT OPC UA PubSub key rotation
+- SDK: added TokenManagerAuth to SDK
+- SDK: release of beta version
 - CLI: mc offboard-agent has now a command to offboard an agent with the id only  (mc offboard --assetid) (#130)
 - CLI: added mc mqtt-createjwt command which can create a key for MQTT OPC UA PubSub authentication
-- SDK: added utility class for MQTT OPC UA PubSub key rotation
+- CLI: mc service-credentials command is now accepting application credentials
+- CLI: mc service-credentials command has now http based configuration frontend
+- CLI: deprecated use of classical service credentials
 
 ## 3.7.0 - (Boysenberry Vienna) - February 2020
 

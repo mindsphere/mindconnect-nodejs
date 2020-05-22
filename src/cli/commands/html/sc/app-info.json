@@ -1,0 +1,14 @@
+{
+    "displayName": "mindconnect-nodejs CLI",
+    "appVersion": "3.8.0",
+    "appCopyright": "© Siemens 2019",
+    "links": {
+        "default": [
+            {
+                "type": "WWW",
+                "name": "https://opensource.mindsphere.io",
+                "value": "https://opensource.mindsphere.io"
+            }
+        ]
+    }
+}

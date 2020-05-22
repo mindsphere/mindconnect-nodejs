@@ -16,13 +16,16 @@ export default (program: CommanderStatic) => {
             "region string or full gateway url (e.g. eu1, eu2 or https://gateway.eu1.mindsphere.io)"
         )
         .option("-t, --tenant <tenant>", "your tenant name")
+        .option("-s, --usertenant <usertenant>", "your user tenant name")
+        .option("-a, --appname <appname>", "your application name (e.g. cli)")
+        .option("-p, --appversion <appversion>", "your application version (e.g. 1.0.0)")
         .option(
             "-k, --passkey <passkey>",
             "passkey (you will use this in the commands which require service credentials)"
         )
         .option("-v, --verbose", "verbose output")
         .description(color("provide login for commands which require technical user credentials *"))
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     if (!options.gateway || !options.user || !options.tenant || !options.passkey) {

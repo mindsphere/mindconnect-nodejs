@@ -28,7 +28,20 @@ export type authJson = {
     iv: string;
     gateway: string;
     tenant: string;
+    userTenant?: string;
+    appName?: string;
+    appVersion?: string;
+    selected?: boolean;
+    type?: "SERVICE" | "APP";
+    createdAt?: string;
 };
+
+export function upgradeOldConfiguration(obj: any) {
+    if (obj.auth && obj.iv && obj.gateway && obj.tenant) {
+        return { credentials: [{ ...obj, selected: true, type: "SERVICE", createdAt: new Date().toISOString() }] };
+    }
+    return obj;
+}
 
 export const isUrl = (url: string): boolean => {
     try {
