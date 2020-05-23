@@ -34,7 +34,7 @@
                     <div class="item__metaInfo">
                         <b>Gateway:</b> {{gateway}}<br />
 
-                        <b>Encoded Authentication:</b> {{auth}}<br /> <b>Encoded passkey:</b> {{iv}}
+                        {{appName}} {{appVersion}}
                     </div>
                 </div>
                 <div class="content__column has-default-width-20 xs-100 sm-33 md-20 lg-20 xl-20 has-alignment-right">
@@ -50,9 +50,25 @@
 </head>
 
 <body>
-    <div class="mdsp mdsp-defaults forceDefaultElements" id="_mdspcontent">
+    <div class="mdsp mdsp-defaults forceDefaultElements" id="_mdspcontent" style="overflow: auto !important">
+        <div class="notificationContainer">
+            <div class="notifications">
+        
+                <!-- single notification item START -->
+                <div class="notification is-info" hidden id="saveButtonMessage">
+                    <div class="notification__main">
+                        <h4 class="notification__title">
+                            Save your settings
+                        <a class="notification__close" href="#" title="Close dialog" onclick="$('#saveButtonMessage').hide()"></a>
+                        </h4>
+                        <div class="notification__content">
+                            Configuration changed. Click on Save Settings button below to save your settings.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="appWrapper">
-            <div class="appWrapper__regions has-appBar has-contextRegion appWrapper__regions--pushLayout">
+            <div class="appWrapper__regions has-appBar has-bgColor-forced-white" style="overflow: auto !important;">
                 <div class="container" style="margin:15px">
                     <div class="container__title">
                         <div class="title__content">
@@ -68,7 +84,7 @@
                         </div>
                     </div>
                     <div class="container__content">
-                        <p>You need to supply the service credentials or (deprecated) application credentials for
+                        <p>You need to supply the application credentials or (deprecated) service credentials for
                             the command line interface.
                             Press the add <span aria-hidden="true" class="iconMdsp add black"></span> button on the
                             right to add a new set of credentials.<br/>The credential set with green checkmark will be used for cli commands.
@@ -84,14 +100,6 @@
                         </div>
 
                         <div style="text-align: right">
-                            <div id="saveButtonMessage" class="messageWrapper" style="text-align: right" hidden>
-                                <div class="message is-info message--withIcon has-contentWidth">
-                                    <p>
-                                        Click on the Save Settings button to save the settings.
-                                    </p>
-                                </div>
-                            </div>
-
                             <button class="button--primary is-disabled" id="saveButton">
                                 <span aria-hidden="true">Save Settings</span>
                             </button>
@@ -115,21 +123,12 @@
                         <span class="item__title">MindSphere Proxy Settings</span>
                     </a>
                 </li>
-
             </ul>
-            <div class="appWrapper__mobileToggle">
-                <a class="leadingRegionToggle is-activated button button--secondary" href="#">
-                    <span aria-hidden="true" class="iconMdsp sidebar"></span>
-                </a>
-                <a class="contextRegionToggle is-activated button button--secondary" href="#">
-                    <span aria-hidden="true" class="iconMdsp sidebar"></span>
-                </a>
-            </div>
         </div>
 
 
 
-        <div class="dialog is-shown" id="addDialog">
+        <div class="dialog" id="addDialog">
             <div class="dialog__overlay"></div>
             <div class="dialog__container">
                 <div class="dialog__background">
@@ -141,10 +140,8 @@
                         <form id="settings">
                             <!-- Form elements, e.g. fieldsets, form-groups, etc., go here -->
                             <div class="inputGroup">
-
-
                                 <label class="inputGroup__label is-required" for="radio-button01">
-                                    Mode
+                                    <span aria-hidden="true" class="iconMdsp serviceCredential has-color-black"></span> Credentials
                                 </label>
 
                                 <div class="radioButtonWrapper">
@@ -252,7 +249,7 @@
 
         <script type="text/javascript">
             _msb.init({
-                title: "mindconnect-nodejs CLI",
+                title: "mindconnect-nodejs 3.8.0",
                 appId: "_mdspcontent",
                 appInfoPath: "/app-info.json",
                 polyfills: {

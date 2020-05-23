@@ -36,7 +36,7 @@ function select(index) {
         element.selected = i == index;
     }
     $("#saveButton").removeClass("is-disabled");
-    $("#saveButtonMessage").show();
+    showSaveButtonMessage();
     bindList();
 }
 
@@ -59,26 +59,37 @@ function validateInput(id) {
 function addNew() {
     let valid = true;
 
+    const appcredentials = $("#radio-button01").is(":checked");
+
     ["passkey", "username", "password", "gateway", "tenant"].forEach((x) => {
         valid = validateInput(`#text-${x}`) && valid;
     });
 
-    ["usertenant", "appname", "appversion"].forEach((x) => {
-        valid = validateInput(`#text-${x}`) && valid;
-    });
+    if (appcredentials) {
+        ["usertenant", "appname", "appversion"].forEach((x) => {
+            valid = validateInput(`#text-${x}`) && valid;
+        });
+    }
 
     const element = {
+        type: appcredentials ? "APP" : "SERVICE",
         passkey: "" + $("#text-passkey").val(),
         username: "" + $("#text-username").val(),
         password: "" + $("#text-password").val(),
         gateway: "" + $("#text-gateway").val(),
         tenant: "" + $("#text-tenant").val(),
-        usertenant: "" + $("#text-usertenant").val(),
-        appName: "" + $("#text-appname").val(),
-        appVersion: "" + $("#text-appversion").val(),
+        usertenant: "",
+        appName: "",
+        appVersion: "",
         createdAt: new Date().toISOString(),
         selected: true,
     };
+
+    if (appcredentials) {
+        element.usertenant = "" + $("#text-usertenant").val();
+        element.appName = "" + $("#text-appname").val();
+        element.appVersion = "" + $("#text-appversion").val();
+    }
 
     for (let i = 0; i < window.configuration.credentials.length; i++) {
         const element = window.configuration.credentials[i];
@@ -88,15 +99,24 @@ function addNew() {
     valid && window.configuration.credentials.push(element);
     valid && $("#addDialog").removeClass("is-shown");
     valid && $("#saveButton").removeClass("is-disabled");
-    valid && $("#saveButtonMessage").show();
-    // window.alert(JSON.stringify(element, null, 2));
+    valid && showSaveButtonMessage();
+    valid && bindList();
 }
 
 async function retrieveData() {
-    let response = await fetch("configuration.json");
+    let response = await fetch("/sc/config");
     window.configuration = await response.json();
-    $("#saveButtonMessage").hide();
+    hideSaveButtonMessage();
     $("#saveButton").addClass("is-disabled");
+}
+
+function hideSaveButtonMessage() {
+    $("#saveButtonMessage").hide();
+}
+
+function showSaveButtonMessage() {
+    $("#saveButtonMessage").show();
+    setTimeout(hideSaveButtonMessage, 3000);
 }
 
 function checkList() {

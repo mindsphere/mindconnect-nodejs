@@ -38,7 +38,19 @@ export type authJson = {
 
 export function upgradeOldConfiguration(obj: any) {
     if (obj.auth && obj.iv && obj.gateway && obj.tenant) {
-        return { credentials: [{ ...obj, selected: true, type: "SERVICE", createdAt: new Date().toISOString() }] };
+        return {
+            credentials: [
+                {
+                    ...obj,
+                    selected: true,
+                    type: "SERVICE",
+                    createdAt: new Date().toISOString(),
+                    appName: "",
+                    appVersion: "",
+                    userTenant: "",
+                },
+            ],
+        };
     }
     return obj;
 }
@@ -120,6 +132,22 @@ export const loadAuth = (): authJson => {
     const pathName = `${getHomeDotMcDir()}auth.json`;
     const buffer = fs.readFileSync(pathName);
     return <authJson>JSON.parse(buffer.toString());
+};
+
+export const getFullConfig = () => {
+    const pathName = `${getHomeDotMcDir()}auth.json`;
+    const buffer = fs.readFileSync(pathName);
+    let obj = JSON.parse(buffer.toString());
+
+    if (obj.auth && obj.iv && obj.gateway && obj.tenant) {
+        const upgraded = upgradeOldConfiguration(obj);
+        fs.writeFileSync(pathName, JSON.stringify(upgraded));
+        obj = upgraded;
+        console.log("upgraded configuration to the new format");
+    }
+
+    console.log(obj);
+    return obj;
 };
 
 export const getConfigProfile = (config: IMindConnectConfiguration): string => {
