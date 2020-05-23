@@ -1,0 +1,58 @@
+{
+    "credentials": [
+        {
+            "auth": "test1",
+            "gateway": "test",
+            "iv": "test",
+            "tenant": "test",
+            "selected": true,
+            "type": "SERVICE",
+            "createdAt": "2020-05-22T23:56:06.227Z"
+        },
+        {
+            "auth": "test2",
+            "gateway": "test",
+            "iv": "test",
+            "tenant": "test",
+            "selected": false,
+            "type": "APP",
+            "createdAt": "2020-05-22T23:56:06.227Z"
+        },
+        {
+            "auth": "test3",
+            "gateway": "test",
+            "iv": "test",
+            "tenant": "test",
+            "selected": false,
+            "type": "SERVICE",
+            "createdAt": "2020-05-22T23:56:06.227Z"
+        },
+        {
+            "auth": "test4",
+            "gateway": "test",
+            "iv": "test",
+            "tenant": "test",
+            "selected": false,
+            "type": "SERVICE",
+            "createdAt": "2020-05-22T23:56:06.227Z"
+        },
+        {
+            "auth": "test5",
+            "gateway": "test",
+            "iv": "test",
+            "tenant": "test",
+            "selected": false,
+            "type": "SERVICE",
+            "createdAt": "2020-05-22T23:56:06.227Z"
+        },
+        {
+            "auth": "test6",
+            "gateway": "test",
+            "iv": "test",
+            "tenant": "test",
+            "selected": false,
+            "type": "SERVICE",
+            "createdAt": "2020-05-22T23:56:06.227Z"
+        }
+    ]
+}
