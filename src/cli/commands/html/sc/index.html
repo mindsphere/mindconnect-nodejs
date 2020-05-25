@@ -41,7 +41,7 @@
 
                     <button class="button--ghost has-icon-only">
                         <span aria-hidden="true" class="iconMdsp delete" onclick="remove('{{index}}')"
-                            title="delete"></span>
+                            title="delete these credentials"></span>
                     </button>
                 </div>
             </div>
@@ -65,6 +65,18 @@
                             Configuration changed. Click on Save Settings button below to save your settings.</div>
                     </div>
                 </div>
+
+                <div class="notification is-error" hidden id="errorMessage">
+                    <div class="notification__main">
+                        <h4 class="notification__title">
+                            Communication Error 
+                        <a class="notification__close" href="#" title="Close dialog" onclick="$('#errorMessage').hide()"></a>
+                        </h4>
+                        <div id="errorMessageText" class="notification__content">
+                            
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="appWrapper">
@@ -76,9 +88,9 @@
                         </div>
                         <div class="title__actions">
                             <button class="button--ghost has-icon-only" onclick="showDialog()">
-                                <span aria-hidden="true" class="iconMdsp add"></span>
+                                <span aria-hidden="true" class="iconMdsp add" title="Add credentials"></span>
                             </button>
-                            <button class="button--ghost has-icon-only" id="refreshButton">
+                            <button class="button--ghost has-icon-only" id="refreshButton" title="Refresh data">
                                 <span aria-hidden="true" class="iconMdsp update"></span>
                             </button>
                         </div>
@@ -100,10 +112,11 @@
                         </div>
 
                         <div style="text-align: right">
-                            <button class="button--primary is-disabled" id="saveButton">
+                            <button class="button--primary is-disabled" id="saveButton" title="Save credential data">
                                 <span aria-hidden="true">Save Settings</span>
                             </button>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -169,11 +182,11 @@
                                     retrieve it.
                                 </div>
 
-                                <label class="inputGroup__label is-required" for="text-username">
+                                <label class="inputGroup__label is-required" for="text-user">
                                     User
                                 </label>
-                                <input class="inputGroup__textInput" type="text" placeholder="credentials: username"
-                                    id="text-username" onblur="validateInput('#text-username')"/>
+                                <input class="inputGroup__textInput" type="text" placeholder="credentials: user"
+                                    id="text-user" onblur="validateInput('#text-user')"/>
                                 <div class="inputGroup__description">
                                     Username for application or service credentials.
                                 </div>
@@ -238,7 +251,7 @@
                     </section>
                     <footer class="dialog__footer">
                         <a class="button button--secondary" onclick="cancelDialog()" href="#">Cancel</a>
-                        <a class="button button--primary" onclick="addNew()" href="#">Save</a>
+                        <a class="button button--primary" onclick="addNew()" href="#" title="Add item to credential list">Add</a>
                     </footer>
                 </div>
             </div>
@@ -259,7 +272,7 @@
 
             window.onload = init;
         </script>
+        
     </div>
 </body>
-
 </html>

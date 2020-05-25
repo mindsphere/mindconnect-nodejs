@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as http from "http";
 import * as path from "path";
 import * as url from "url";
-import { getFullConfig } from "../../api/utils";
+import { addAndStoreConfiguration, getFullConfig } from "../../api/utils";
 import { errorLog, getColor, serviceCredentialLog } from "./command-utils";
 const mime = require("mime-types");
 
@@ -68,22 +68,39 @@ async function serve() {
     const server = http.createServer();
     const port = process.env.PORT || 4994;
 
-    server.on("request", (req, res) => {
+    server.on("request", async (req, res) => {
         const uri = url.parse(req.url);
 
         try {
-            console.log(uri.path);
+            // console.log(uri.path);
 
             const filePath = uri.path === "/" ? "index.html" : uri.path;
-
             const fullName = path.resolve(`${__dirname}/html/sc/${filePath}`);
 
             if (uri.path?.startsWith("/sc/config") && req.method === "GET") {
                 res.writeHead(200, { "Content-Type": "application/json" });
                 res.end(JSON.stringify(getFullConfig()));
+                console.log(`${color(new Date().toISOString())} Acquired the CLI settings`);
+            } else if (uri.path?.startsWith("/sc/save") && req.method === "POST") {
+                const data: string[] = [];
+
+                req.on("data", (chunk: any) => {
+                    data.push(chunk);
+                });
+                req.on("end", () => {
+                    const configuration = JSON.parse(data.join());
+                    addAndStoreConfiguration(configuration);
+
+                    res.writeHead(200, { "Content-Type": "application/json" });
+                    res.end(JSON.stringify(getFullConfig()));
+                    console.log(
+                        `${color(new Date().toISOString())} Stored the configuration. Press ${color(
+                            "CTRL + C"
+                        )} to exit`
+                    );
+                });
             } else if (fs.existsSync(fullName)) {
                 res.writeHead(200, { "Content-Type": mime.lookup(filePath) });
-
                 const stream = fs.createReadStream(fullName);
                 stream.pipe(res);
             } else {
@@ -92,17 +109,8 @@ async function serve() {
             }
         } catch (error) {
             res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ error: error }, null, 2));
+            res.end(JSON.stringify({ error: error.message }, null, 2));
         }
-
-        // if (uri.path === "/" || uri.path === "index.html") {
-        //     res.writeHead(200, { "Content-Type": "application/html" });
-        //     const stream = fs.createReadStream();
-        //     stream.pipe(res);
-        // }
-
-        // res.writeHead(200, { "Content-Type": "application/json" });
-        // res.end(JSON.stringify({}));
     });
 
     server.listen(port);
@@ -110,33 +118,3 @@ async function serve() {
     console.log(`navigate to ${color("http://localhost:" + port)} to configure the CLI`);
     console.log(`press ${color("CTRL + C")} to exit`);
 }
-
-// /** @format */
-
-// var http = require("http");
-// var url = require("url");
-// var querystring = require("querystring");
-// var server = http.createServer();
-// var port = process.env.PORT || 3000;
-
-// server.on("request", function (request, response) {
-//     var uri = url.parse(request.url);
-//     var qs = uri.query ? querystring.parse(uri.query) : {};
-
-//     var status = qs.status || 200;
-//     var contentType = qs.contentType || "application/json";
-//     const timestamp = new Date().toISOString();
-//     var body = qs.body || JSON.stringify({ timestamp: timestamp, api: "serverTimeCustomApi" });
-
-//     var queryData = url.parse(request.url, true).query;
-
-//     response.writeHead(status, {
-//         "Content-Type": contentType,
-//     });
-
-//     if (queryData.token) {
-//         response.end(JSON.stringify(request.headers, null, 2));
-//     } else {
-//         response.end(body);
-//     }
-// });

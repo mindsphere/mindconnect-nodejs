@@ -28,12 +28,12 @@ export type authJson = {
     iv: string;
     gateway: string;
     tenant: string;
-    userTenant?: string;
-    appName?: string;
-    appVersion?: string;
-    selected?: boolean;
-    type?: "SERVICE" | "APP";
-    createdAt?: string;
+    usertenant: string;
+    appName: string;
+    appVersion: string;
+    selected: boolean;
+    type: "SERVICE" | "APP";
+    createdAt: string;
 };
 
 export function upgradeOldConfiguration(obj: any) {
@@ -73,8 +73,20 @@ const normalizePasskey = (passkey: string): string => {
     return passkey.length < 32 ? passkey + new Array(33 - passkey.length).join("$") : passkey.substr(0, 32);
 };
 
-export const encrypt = (user: string, password: string, passkey: string, gateway: string, tenant: string): authJson => {
-    const base64encoded = new Buffer(`${user}:${password}`).toString("base64");
+export const encrypt = ({
+    user,
+    password,
+    passkey,
+    gateway,
+    tenant,
+    type,
+    usertenant,
+    appName,
+    appVersion,
+    createdAt,
+    selected,
+}: credentialEntry): authJson => {
+    const base64encoded = Buffer.from(`${user}:${password}`).toString("base64");
     const iv = crypto.randomBytes(16);
 
     const cipher = crypto.createCipheriv("aes-256-ctr", Buffer.from(normalizePasskey(passkey)), iv);
@@ -85,9 +97,29 @@ export const encrypt = (user: string, password: string, passkey: string, gateway
         iv: iv.toString("base64"),
         gateway: gateway,
         tenant: tenant,
+        type: type,
+        usertenant: usertenant,
+        appName: appName,
+        appVersion: appVersion,
+        createdAt: createdAt,
+        selected: selected,
     };
-    console.log(encryptedAuth);
+    // console.log(encryptedAuth);
     return encryptedAuth;
+};
+
+export type credentialEntry = {
+    user: string;
+    password: string;
+    passkey: string;
+    gateway: string;
+    tenant: string;
+    type: "SERVICE" | "APP";
+    usertenant: string;
+    appName: string;
+    appVersion: string;
+    createdAt: string;
+    selected: boolean;
 };
 
 export const decrypt = (encryptedAuth: authJson, passkey: string): string => {
@@ -118,24 +150,41 @@ export const getHomeDotMcDir = () => {
     return `${os.homedir()}/.mc/`;
 };
 
-export const storeAuth = (encryptedAuth: authJson) => {
+export const storeAuth = (auth: { credentials: authJson[] }) => {
     const homeDir = getHomeDotMcDir();
     if (!fs.existsSync(homeDir)) {
         fs.mkdirSync(homeDir);
     }
 
     const pathName = `${getHomeDotMcDir()}auth.json`;
-    fs.writeFileSync(pathName, JSON.stringify(encryptedAuth));
+    fs.writeFileSync(pathName, JSON.stringify(auth));
 };
 
 export const loadAuth = (): authJson => {
-    const pathName = `${getHomeDotMcDir()}auth.json`;
-    const buffer = fs.readFileSync(pathName);
-    return <authJson>JSON.parse(buffer.toString());
+    const fullConfig = getFullConfig();
+
+    let result: authJson | undefined = undefined;
+
+    for (let index = 0; index < fullConfig.credentials.length; index++) {
+        const element = fullConfig.credentials[index];
+
+        if (element.selected) {
+            result = element;
+            break;
+        }
+    }
+
+    !result &&
+        throwError(
+            "please configure the authentication: https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/setting-up-the-cli.html "
+        );
+
+    return result!;
 };
 
-export const getFullConfig = () => {
+export function getFullConfig(): { credentials: authJson[] } {
     const pathName = `${getHomeDotMcDir()}auth.json`;
+
     const buffer = fs.readFileSync(pathName);
     let obj = JSON.parse(buffer.toString());
 
@@ -145,10 +194,8 @@ export const getFullConfig = () => {
         obj = upgraded;
         console.log("upgraded configuration to the new format");
     }
-
-    console.log(obj);
     return obj;
-};
+}
 
 export const getConfigProfile = (config: IMindConnectConfiguration): string => {
     try {
@@ -255,4 +302,34 @@ export function pruneCert(s: string): string {
             return x.indexOf("CERTIFICATE") < 0;
         })
         .join("");
+}
+
+export function addAndStoreConfiguration(configuration: any) {
+    const newConfiguration: {
+        credentials: authJson[];
+    } = {
+        credentials: [],
+    };
+    (!configuration || !configuration.credentials) && throwError("invalid configuration!");
+    configuration.credentials.forEach((element: credentialEntry) => {
+        element.gateway = isUrl(element.gateway) ? element.gateway : `https://gateway.${element.gateway}.mindsphere.io`;
+        newConfiguration.credentials.push(element.passkey ? encrypt(element) : ((element as unknown) as authJson));
+    });
+    checkList(newConfiguration.credentials);
+    storeAuth(newConfiguration);
+}
+
+export function checkList(list: any[]) {
+    let count = 0;
+    for (let i = 0; i < list.length; i++) {
+        const element = list[i];
+        element.selected && count++;
+    }
+
+    if (count !== 1) {
+        for (let i = 0; i < list.length; i++) {
+            const element = list[i];
+            element.selected = i === 0;
+        }
+    }
 }

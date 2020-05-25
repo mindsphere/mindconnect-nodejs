@@ -61,7 +61,7 @@ function addNew() {
 
     const appcredentials = $("#radio-button01").is(":checked");
 
-    ["passkey", "username", "password", "gateway", "tenant"].forEach((x) => {
+    ["passkey", "user", "password", "gateway", "tenant"].forEach((x) => {
         valid = validateInput(`#text-${x}`) && valid;
     });
 
@@ -74,7 +74,7 @@ function addNew() {
     const element = {
         type: appcredentials ? "APP" : "SERVICE",
         passkey: "" + $("#text-passkey").val(),
-        username: "" + $("#text-username").val(),
+        user: "" + $("#text-user").val(),
         password: "" + $("#text-password").val(),
         gateway: "" + $("#text-gateway").val(),
         tenant: "" + $("#text-tenant").val(),
@@ -103,8 +103,32 @@ function addNew() {
     valid && bindList();
 }
 
+async function saveData() {
+    const cred = window.configuration.credentials || [];
+
+    const body = {
+        credentials: [],
+    };
+    cred.forEach((credential) => {
+        x = { ...credential };
+        delete x.index;
+        delete x.color;
+        body.credentials.push(x);
+    });
+
+    let response = await fetch("/sc/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+    });
+    return response;
+}
+
 async function retrieveData() {
     let response = await fetch("/sc/config");
+    if (!response.ok) {
+        throw new Error(`Communication.error ${await response.text()}`);
+    }
     window.configuration = await response.json();
     hideSaveButtonMessage();
     $("#saveButton").addClass("is-disabled");
@@ -117,6 +141,15 @@ function hideSaveButtonMessage() {
 function showSaveButtonMessage() {
     $("#saveButtonMessage").show();
     setTimeout(hideSaveButtonMessage, 3000);
+}
+
+function hideErrorMessage() {
+    $("#errorMessage").hide();
+}
+
+function showErrorMessage(error) {
+    $("#errorMessageText").html(`${error.message}`);
+    $("#errorMessage").show();
 }
 
 function checkList() {
@@ -138,11 +171,31 @@ async function init(e) {
     $("mdsp-logout").hide();
     $("mdsp-platform-dropdown").hide();
     $("._mdsp-operatorType__innerWrap").html(" &nbsp;&nbsp;CLI&nbsp;&nbsp;&nbsp;&nbsp; ");
-    await retrieveData();
-    bindList();
+    window.configuration = [];
+
+    try {
+        await retrieveData();
+        bindList();
+    } catch (err) {
+        showErrorMessage(err);
+    }
 
     $("#refreshButton").on("click", async () => {
-        await retrieveData();
-        bindList(window.configuration);
+        try {
+            await retrieveData();
+            bindList(window.configuration);
+        } catch (err) {
+            showErrorMessage(err);
+        }
+    });
+
+    $("#saveButton").on("click", async () => {
+        try {
+            await saveData();
+            await retrieveData();
+            bindList(window.configuration);
+        } catch (err) {
+            showErrorMessage(err);
+        }
     });
 }
