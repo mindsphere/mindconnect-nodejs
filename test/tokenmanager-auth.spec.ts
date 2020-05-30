@@ -1,6 +1,6 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
-import { authJson, loadAuth, upgradeOldConfiguration } from "../src/api/utils";
+import { loadAuth, upgradeOldConfiguration } from "../src/api/utils";
 
 chai.should();
 
@@ -8,7 +8,7 @@ describe("TokenManager Auth", () => {
     const auth = loadAuth();
 
     it.only("should update old service credentials configuration", () => {
-        const oldConfig: authJson = {
+        const oldConfig = {
             auth: "test",
             gateway: "test",
             iv: "test",
