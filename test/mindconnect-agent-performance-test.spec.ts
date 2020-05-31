@@ -11,7 +11,7 @@ import {
     IMindConnectConfiguration,
     Mapping,
     MindConnectAgent,
-    retry
+    retry,
 } from "../src";
 import { AgentManagementModels, MindSphereSdk } from "../src/api/sdk";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
@@ -23,9 +23,8 @@ chai.should();
 describe("MindConnectApi RSA_3072 Agent performance test", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
-        gateway: auth.gateway,
+        ...auth,
         basicAuth: decrypt(auth, "passkey.4.unit.test"),
-        tenant: auth.tenant
     });
 
     let rsaConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;
@@ -74,27 +73,27 @@ describe("MindConnectApi RSA_3072 Agent performance test", () => {
                             name: "Temperature",
                             description: "Temperature",
                             type: DataPoint.TypeEnum.DOUBLE,
-                            unit: "°C"
+                            unit: "°C",
                         },
                         {
                             id: "DP-Humidity",
                             name: "Humidity",
                             description: "Humidity",
                             type: DataPoint.TypeEnum.INT,
-                            unit: "%"
+                            unit: "%",
                         },
                         {
                             id: "DP-Pressure",
                             name: "Pressure",
                             description: "Pressure",
                             type: DataPoint.TypeEnum.DOUBLE,
-                            unit: "kPa"
-                        }
+                            unit: "kPa",
+                        },
                     ],
                     customData: {
                         ostype: os.type(),
-                        osHostname: os.hostname()
-                    }
+                        osHostname: os.hostname(),
+                    },
                 },
                 {
                     name: "VibrationData",
@@ -105,36 +104,36 @@ describe("MindConnectApi RSA_3072 Agent performance test", () => {
                             name: "Displacement",
                             description: "Displacement",
                             type: DataPoint.TypeEnum.DOUBLE,
-                            unit: "mm"
+                            unit: "mm",
                         },
                         {
                             id: "DP-Velocity",
                             name: "Velocity",
                             description: "Velocity",
                             type: DataPoint.TypeEnum.DOUBLE,
-                            unit: "mm/s"
+                            unit: "mm/s",
                         },
                         {
                             id: "DP-Acceleration",
                             name: "Acceleration",
                             description: "Acceleration",
                             type: DataPoint.TypeEnum.DOUBLE,
-                            unit: "mm/s^2"
+                            unit: "mm/s^2",
                         },
                         {
                             id: "DP-Frequency",
                             name: "Frequency",
                             description: "Frequency",
                             type: DataPoint.TypeEnum.DOUBLE,
-                            unit: "Hz"
-                        }
+                            unit: "Hz",
+                        },
                     ],
                     customData: {
                         ostype: os.type(),
-                        osHostname: os.hostname()
-                    }
-                }
-            ]
+                        osHostname: os.hostname(),
+                    },
+                },
+            ],
         };
 
         if (!agent.HasDataSourceConfiguration()) {
@@ -185,7 +184,7 @@ describe("MindConnectApi RSA_3072 Agent performance test", () => {
                     entityId: targetAssetId,
                     propertyName: datapoint.name.replace("DP-", ""),
                     propertySetName: dataSource.name,
-                    keepMapping: true
+                    keepMapping: true,
                 });
             }
         }
@@ -233,18 +232,18 @@ describe("MindConnectApi RSA_3072 Agent performance test", () => {
                 {
                     dataPointId: "DP-Temperature",
                     qualityCode: "0",
-                    value: (Math.sin(index) * (20 + (index % 2)) + 25).toString()
+                    value: (Math.sin(index) * (20 + (index % 2)) + 25).toString(),
                 },
                 {
                     dataPointId: "DP-Pressure",
                     qualityCode: "0",
-                    value: (Math.cos(index) * (20 + (index % 25)) + 25).toString()
+                    value: (Math.cos(index) * (20 + (index % 25)) + 25).toString(),
                 },
                 { dataPointId: "DP-Humidity", qualityCode: "0", value: ((index + 30) % 100).toString() },
                 { dataPointId: "DP-Acceleration", qualityCode: "0", value: (1000.0 + index).toString() },
                 { dataPointId: "DP-Frequency", qualityCode: "0", value: (60.0 + index * 0.1).toString() },
                 { dataPointId: "DP-Displacement", qualityCode: "0", value: (index % 10).toString() },
-                { dataPointId: "DP-Velocity", qualityCode: "0", value: (50.0 + index).toString() }
+                { dataPointId: "DP-Velocity", qualityCode: "0", value: (50.0 + index).toString() },
             ];
 
             if (Date.now() % 3 === 0) {

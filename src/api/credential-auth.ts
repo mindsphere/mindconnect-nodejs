@@ -6,7 +6,7 @@ import { getPiamUrl } from "./utils";
 
 const log = debug("mindconnect-credentialauth");
 
-export abstract class CredentialAuth extends AuthBase implements TokenRotation {
+export class CredentialAuth extends AuthBase implements TokenRotation {
     protected async AcquireToken(): Promise<boolean> {
         const headers = {
             ...this._urlEncodedHeaders,
@@ -48,7 +48,7 @@ export abstract class CredentialAuth extends AuthBase implements TokenRotation {
      *
      * @memberOf AgentAuth
      */
-    public async GetServiceToken(): Promise<string> {
+    public async GetToken(): Promise<string> {
         await this.RenewToken();
         if (!this._accessToken || !this._accessToken.access_token) throw new Error("Error getting the new token!");
         return this._accessToken.access_token;

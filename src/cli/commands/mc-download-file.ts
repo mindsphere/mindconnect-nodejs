@@ -22,17 +22,13 @@ export default (program: CommanderStatic) => {
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
         .description(`${color("download the file from mindsphere file service *")}`)
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     checkParameters(options);
 
                     const auth = loadAuth();
-                    const sdk = new MindSphereSdk({
-                        gateway: auth.gateway,
-                        basicAuth: decrypt(auth, options.passkey),
-                        tenant: auth.tenant
-                    });
+                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
                     const iotFileClient = sdk.GetIoTFileClient();
                     let fullpath = options.filepath ? `${options.filepath}/${options.file}` : `${options.file}`;
                     fullpath = fullpath.replace("//", "/");
@@ -41,7 +37,7 @@ export default (program: CommanderStatic) => {
                     if (path.dirname(fullpath) !== ".") filter += ` and path eq ${path.dirname(fullpath)}/`;
 
                     const fileInfo = await iotFileClient.GetFiles(options.assetid, {
-                        filter: filter
+                        filter: filter,
                     });
 
                     fileInfo.length !== 1 &&

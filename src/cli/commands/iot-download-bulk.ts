@@ -24,17 +24,13 @@ export default (program: CommanderStatic) => {
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
         .description(`${color("download the timeseries from mindsphere")}`)
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     checkParameters(options);
 
                     const auth = loadAuth();
-                    const sdk = new MindSphereSdk({
-                        gateway: auth.gateway,
-                        basicAuth: decrypt(auth, options.passkey),
-                        tenant: auth.tenant
-                    });
+                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     fs.mkdirSync(path.resolve(options.dir));
 
@@ -49,7 +45,7 @@ export default (program: CommanderStatic) => {
                             (iotTs.GetTimeSeriesBulkStyle(options.assetid, options.aspectname, {
                                 from: new Date(options.from),
                                 to: new Date(options.to),
-                                limit: options.size
+                                limit: options.size,
                             }) as unknown) as TimeSeriesModels.BulkTimeseries
                     );
 

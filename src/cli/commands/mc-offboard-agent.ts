@@ -13,7 +13,7 @@ import {
     homeDirLog,
     proxyLog,
     retrylog,
-    serviceCredentialLog
+    serviceCredentialLog,
 } from "./command-utils";
 
 const color = getColor("magenta");
@@ -28,7 +28,7 @@ export default (program: CommanderStatic) => {
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
         .description(color("offboards the agent in the mindsphere *"))
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     homeDirLog(options.verbose, color);
@@ -36,11 +36,7 @@ export default (program: CommanderStatic) => {
                     checkRequiredParamaters(options);
 
                     const auth = loadAuth();
-                    const sdk = new MindSphereSdk({
-                        tenant: auth.tenant,
-                        gateway: auth.gateway,
-                        basicAuth: decrypt(auth, options.passkey)
-                    });
+                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     let agentid = options.agentid;
 
@@ -71,7 +67,7 @@ export default (program: CommanderStatic) => {
                         host: "gateway",
                         tenant: sdk.GetTenant(),
                         agentid,
-                        color
+                        color,
                     });
                 } catch (err) {
                     errorLog(err, options.verbose);

@@ -64,7 +64,7 @@ export class TokenManagerAuth extends AuthBase implements TokenRotation {
      *
      * @memberOf AgentAuth
      */
-    public async GetTokenManagerToken(): Promise<string> {
+    public async GetToken(): Promise<string> {
         await this.RenewToken();
         if (!this._accessToken || !this._accessToken.access_token) throw new Error("Error getting the new token!");
         return this._accessToken.access_token;

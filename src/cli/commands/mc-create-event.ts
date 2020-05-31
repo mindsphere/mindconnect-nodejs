@@ -37,7 +37,7 @@ export default (program: CommanderStatic) => {
         )
         .option("-v, --verbose", "verbose output")
         .description(`${color("create an event in the mindsphere")} ${adminColor("(optional: passkey) *")}`)
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     color = options.passkey !== undefined ? adminColor : color;
@@ -73,7 +73,7 @@ export default (program: CommanderStatic) => {
                         source: options.source,
                         severity: parseInt(options.severity), // 0-99 : 20:error, 30:warning, 40: information
                         timestamp: options.timestamp,
-                        description: options.desc
+                        description: options.desc,
                     };
 
                     verboseLog(`creating event : ${JSON.stringify(event)}`, options.verbose, spinner);
@@ -104,11 +104,7 @@ export default (program: CommanderStatic) => {
 
 function getEventManager(options: any) {
     const auth = loadAuth();
-    const sdk = new MindSphereSdk({
-        tenant: auth.tenant,
-        basicAuth: decrypt(auth, options.passkey),
-        gateway: auth.gateway
-    });
+    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
     const uploader = sdk.GetEventManagementClient();
     return uploader;
 }

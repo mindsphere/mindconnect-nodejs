@@ -3,7 +3,8 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
-import { DiagnosticInformation, MindConnectSetup } from "../..";
+import { DiagnosticInformation } from "../..";
+import { MindSphereSdk } from "../../api/sdk";
 import { decrypt, loadAuth } from "../../api/utils";
 import { errorLog, getColor, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
 
@@ -20,7 +21,7 @@ export default (program: CommanderStatic) => {
         .option("-t, --text", "text (raw) output")
         .option("-v, --verbose", "verbose output")
         .description(color("get diagnostic information *"))
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     if (!options.passkey) {
@@ -30,7 +31,8 @@ export default (program: CommanderStatic) => {
                     proxyLog(options.verbose, color);
 
                     const auth = loadAuth();
-                    const setup = new MindConnectSetup(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
+                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
+                    const mcApiclient = sdk.GetMindConnectApiClient();
                     const configFile = path.resolve(options.config);
                     if (!fs.existsSync(configFile)) {
                         throw new Error(`Can't find file ${configFile}`);
@@ -41,7 +43,7 @@ export default (program: CommanderStatic) => {
                         options.verbose
                     );
 
-                    const activations = await setup.GetDiagnosticActivations();
+                    const activations = await mcApiclient.GetDiagnosticActivations();
                     log(`There are ${color(activations.content.length + " agent(s)")} registered for diagnostic`);
                     verboseLog(JSON.stringify(activations.content), options.verbose);
 
@@ -64,12 +66,13 @@ export default (program: CommanderStatic) => {
                             }
                         }
                     }
-                    const information = await setup.GetDiagnosticInformation(
+                    const information = await mcApiclient.GetAllDiagnosticInformation(
                         configuration.content.clientId,
                         printDiagnosticInformation,
                         options,
                         !options.all
                     );
+                    log(`There are ${color(information.totalElements + " ")}total log entries`);
                     log(`There are ${color(information.totalElements + " ")}total log entries`);
                 } catch (err) {
                     verboseLog(color("This operation requires additionaly the service credentials."), options.verbose);

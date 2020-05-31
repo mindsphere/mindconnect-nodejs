@@ -37,7 +37,7 @@ export default (program: CommanderStatic) => {
         .description(
             `${color("upload the file to the mindsphere file service")} ${adminColor("(optional: passkey) *")}`
         )
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     color = options.passkey ? adminColor : color;
@@ -107,7 +107,7 @@ export default (program: CommanderStatic) => {
                                 },
                                 verboseFunction: (p: string) => {
                                     verboseLog(p, options.verbose, spinner);
-                                }
+                                },
                             },
                             300,
                             retrylog("retrying")
@@ -138,11 +138,7 @@ export default (program: CommanderStatic) => {
 };
 function getIotFileUploader(options: any) {
     const auth = loadAuth();
-    const sdk = new MindSphereSdk({
-        tenant: auth.tenant,
-        basicAuth: decrypt(auth, options.passkey),
-        gateway: auth.gateway
-    });
+    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
     const uploader = sdk.GetIoTFileClient();
     return uploader;
 }

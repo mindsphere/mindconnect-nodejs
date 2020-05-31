@@ -30,11 +30,7 @@ export default (program: CommanderStatic) => {
 
           checkRequiredParameters(options);
           const auth = loadAuth();
-          const sdk = new MindSphereSdk({
-            gateway: auth.gateway,
-            basicAuth: decrypt(auth, options.passkey),
-            tenant: auth.tenant
-          });
+          const sdk = new MindSphereSdk({...auth, basicAuth: decrypt(auth, options.passkey)});
 
           const assetMgmt = sdk.GetAssetManagementClient();
           const asset = await retry(options.retry, () =>

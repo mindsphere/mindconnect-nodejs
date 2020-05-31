@@ -10,9 +10,8 @@ const timeOffset = new Date().getTime();
 describe("[SDK] AssetManagementClient.Files", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
+        ...auth,
         basicAuth: decrypt(auth, "passkey.4.unit.test"),
-        tenant: auth.tenant,
-        gateway: auth.gateway
     });
     const am = sdk.GetAssetManagementClient();
 
@@ -38,7 +37,7 @@ describe("[SDK] AssetManagementClient.Files", () => {
             () =>
                 am.PostFile(Buffer.from("xyz"), `${timeOffset}xyz.text`, {
                     mimeType: "text/plain",
-                    description: "Blubb2"
+                    description: "Blubb2",
                 }),
             1000
         );
@@ -54,7 +53,7 @@ describe("[SDK] AssetManagementClient.Files", () => {
         }
         const result = await am.PostFile(Buffer.from("xyz"), `${timeOffset}xyz.text`, {
             mimeType: "text/plain",
-            description: "Blubb2"
+            description: "Blubb2",
         });
         // ! the behavior here is asynchronous...
         const file = (await retry(5, () => am.DownloadFile(`${result.id}`), 1000)) as Response;
@@ -67,7 +66,7 @@ describe("[SDK] AssetManagementClient.Files", () => {
     it("should be able to DELETE file", async () => {
         const result = await am.PostFile(Buffer.from("abc"), `${timeOffset}abc.text`, {
             mimeType: "text/plain",
-            description: "Blubb2"
+            description: "Blubb2",
         });
         await am.DeleteFile(`${result.id}`, { ifMatch: `${result.etag}` });
     });
@@ -75,13 +74,13 @@ describe("[SDK] AssetManagementClient.Files", () => {
     it("should be able to PUT file", async () => {
         const result = await am.PostFile(Buffer.from("abc"), `${timeOffset}test2.text`, {
             mimeType: "text/plain",
-            description: "Blubb2"
+            description: "Blubb2",
         });
 
         const updatedFile = await am.PutFile(`${result.id}`, Buffer.from("abcabc"), `${timeOffset}test2.text`, {
             scope: AssetManagementModels.FileMetadataResource.ScopeEnum.PRIVATE,
             description: result.description,
-            ifMatch: `${result.etag}`
+            ifMatch: `${result.etag}`,
         });
 
         await am.DeleteFile(`${result.id}`, { ifMatch: `${updatedFile.etag}` });
@@ -98,13 +97,13 @@ async function deleteFiles(am: AssetManagementClient) {
         filter: JSON.stringify({
             and: {
                 name: {
-                    endsWith: ".text"
-                }
-            }
+                    endsWith: ".text",
+                },
+            },
         }),
         sort: "DESC",
         page: 0,
-        size: 0
+        size: 0,
     })) as any;
     for (const x of files._embedded.files) {
         await am.DeleteFile(x.id, { ifMatch: x.etag });

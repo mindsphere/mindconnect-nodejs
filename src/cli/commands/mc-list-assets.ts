@@ -22,7 +22,7 @@ export default (program: CommanderStatic) => {
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
         .description(color(`list assets in the tenant *`))
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     homeDirLog(options.verbose, color);
@@ -30,11 +30,7 @@ export default (program: CommanderStatic) => {
 
                     checkRequiredParameters(options);
                     const auth = loadAuth();
-                    const sdk = new MindSphereSdk({
-                        gateway: auth.gateway,
-                        basicAuth: decrypt(auth, options.passkey),
-                        tenant: auth.tenant
-                    });
+                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     const assetMgmt = sdk.GetAssetManagementClient();
 
@@ -55,7 +51,7 @@ export default (program: CommanderStatic) => {
                                 page: page,
                                 size: 100,
                                 filter: Object.keys(filter).length === 0 ? undefined : JSON.stringify(filter),
-                                sort: "name,asc"
+                                sort: "name,asc",
                             })
                         )) as AssetManagementModels.AssetListResource;
 
