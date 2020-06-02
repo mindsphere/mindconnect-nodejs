@@ -1,7 +1,7 @@
 import { TimeSeriesBulkClient } from "../src/api/sdk";
 import { decrypt, loadAuth } from "../src/api/utils";
 
-describe("IotTsBulkUpload", () => {
+describe("[SDK] IotTsBulkUpload", () => {
     const auth = loadAuth();
 
     it("should instantiate", async () => {

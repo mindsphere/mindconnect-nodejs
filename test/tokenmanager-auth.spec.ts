@@ -4,7 +4,7 @@ import { loadAuth, upgradeOldConfiguration } from "../src/api/utils";
 
 chai.should();
 
-describe("TokenManager Auth", () => {
+describe("[SDK] TokenManager Auth", () => {
     const auth = loadAuth();
 
     it("should update old service credentials configuration", () => {

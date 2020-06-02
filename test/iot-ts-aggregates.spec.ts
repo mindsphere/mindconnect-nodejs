@@ -2,7 +2,7 @@ import { MindSphereSdk, TimeSeriesAggregateModels } from "../src/api/sdk";
 import { checkAssetId, decrypt, loadAuth } from "../src/api/utils";
 import { setupStructure } from "./test-agent-setup-utils";
 
-describe("IotTsAggregateClient", () => {
+describe("[SDK] IotTsAggregateClient", () => {
     const auth = loadAuth();
 
     const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, "passkey.4.unit.test") });

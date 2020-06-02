@@ -10,7 +10,7 @@ import { decrypt, loadAuth } from "../src/api/utils";
 const log = debug("mindconnect-agent-auth");
 chai.should();
 
-describe("Credential Auth", () => {
+describe("[SDK] Credential Auth", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
