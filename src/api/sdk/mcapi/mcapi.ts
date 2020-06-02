@@ -135,6 +135,8 @@ export class MindConnectApiClient extends SdkClient {
     }
 
     /**
+     * *diagnostic
+     *
      * Get messages
      *
      * @param {string} id
@@ -158,6 +160,8 @@ export class MindConnectApiClient extends SdkClient {
     }
 
     /**
+     * * diagnostic
+     *
      * @deprecated please use GetDiagnosticActivationMessages
      *
      * Get list of diagnostic informations
@@ -190,7 +194,7 @@ export class MindConnectApiClient extends SdkClient {
 
     /**
      *
-     * * Delete all diagnostic activations
+     * * diagnostic
      *
      * Deletes all diagnostic activations
      *
