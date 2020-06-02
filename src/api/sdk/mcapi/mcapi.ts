@@ -241,4 +241,101 @@ export class MindConnectApiClient extends SdkClient {
         } while (!pagedInformation.last);
         return pagedInformation;
     }
+
+    /**
+     * * mappings
+     *
+     * Create single mapping
+     *
+     * @param {MindConnectApiModels.Mapping} mapping
+     * @returns
+     *
+     * @memberOf MindConnectApiClient
+     */
+    public async PostDataPointMapping(mapping: MindConnectApiModels.Mapping) {
+        const body = mapping;
+
+        return await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/dataPointMappings`,
+            body: body,
+            message: "PostDataPointMapping",
+            noResponse: true,
+        });
+    }
+
+    /**
+     *
+     * * mappings
+     *
+     * Get mappings
+     *
+     * @param {{
+     *         filter?: string;
+     *         size?: number;
+     *         page?: number;
+     *         sort?: string;
+     *     }} [optional]
+     * @returns {Promise<MindConnectApiModels.PagedMapping>}
+     *
+     * @memberOf MindConnectApiClient
+     */
+    public async GetDataPointMappings(optional?: {
+        filter?: string;
+        size?: number;
+        page?: number;
+        sort?: string;
+    }): Promise<MindConnectApiModels.PagedMapping> {
+        const qs = toQueryString(optional);
+        return (await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/dataPointMappings?${qs}`,
+            message: "GetDataPointMappings",
+            noResponse: true,
+        })) as MindConnectApiModels.PagedMapping;
+    }
+
+    /**
+     * * mappings
+     *
+     * Get a mapping by id
+     *
+     * @param {string} id
+     * @returns {Promise<MindConnectApiModels.Mapping>}
+     *
+     * @memberOf MindConnectApiClient
+     */
+    public async GetDataPointMapping(id: string): Promise<MindConnectApiModels.Mapping> {
+        return (await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/dataPointMappings/${id}`,
+            message: "GetDataPointMapping",
+        })) as MindConnectApiModels.Mapping;
+    }
+
+    /**
+     *
+     * Delete a mapping
+     *
+     * @param {string} id
+     * @returns
+     *
+     * @memberOf MindConnectApiClient
+     */
+    public async DeleteDataMapping(id: string) {
+        return await this.HttpAction({
+            verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/dataPointMappings/${id}`,
+            message: "DeleteDataMapping",
+            noResponse: true,
+        });
+    }
 }
