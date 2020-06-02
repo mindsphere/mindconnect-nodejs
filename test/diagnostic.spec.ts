@@ -9,7 +9,7 @@ import {} from "./test-utils";
 const log = debug("mindconnect-setup-test");
 chai.should();
 
-describe("MindConnect Setup", () => {
+describe("Diagnostic API tests", () => {
     const auth = loadAuth();
 
     const sdk = new MindSphereSdk({
