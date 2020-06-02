@@ -2,9 +2,26 @@ import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
 import { MindConnectApiModels } from "./mcapi-models";
 
+/**
+ * MindConnect API Client
+ *
+ * @export
+ * @class MindConnectApiClient
+ * @extends {SdkClient}
+ */
 export class MindConnectApiClient extends SdkClient {
     private _baseUrl: string = "/api/mindconnect/v3";
 
+    /**
+     * * diagnostic
+     *
+     * * Register agent for diagnostic activation
+     *
+     * @param {string} agentId
+     * @returns {Promise<MindConnectApiModels.DiagnosticActivation>}
+     *
+     * @memberOf MindConnectApiClient
+     */
     public async PostDiagnosticActivation(agentId: string): Promise<MindConnectApiModels.DiagnosticActivation> {
         const body = { agentId: agentId };
 
@@ -18,6 +35,20 @@ export class MindConnectApiClient extends SdkClient {
         })) as MindConnectApiModels.DiagnosticActivation;
     }
 
+    /**
+     * * diagnostic
+     *
+     * Get the list of diagnostic activations
+     *
+     * @param {{
+     *         size?: number;
+     *         page?: number;
+     *         sort?: string;
+     *     }} [optional]
+     * @returns {Promise<MindConnectApiModels.PagedDiagnosticActivation>}
+     *
+     * @memberOf MindConnectApiClient
+     */
     public async GetDiagnosticActivations(optional?: {
         size?: number;
         page?: number;
@@ -34,6 +65,18 @@ export class MindConnectApiClient extends SdkClient {
         })) as MindConnectApiModels.PagedDiagnosticActivation;
     }
 
+    /**
+     *
+     * *diagnostic
+     *
+     * Put diagnostic api client
+     *
+     * @param {string} id
+     * @param {MindConnectApiModels.DiagnosticActivationStatus} diagnosticStatus
+     * @returns {Promise<MindConnectApiModels.DiagnosticActivation>}
+     *
+     * @memberOf MindConnectApiClient
+     */
     public async PutDiagnosticActivation(
         id: string,
         diagnosticStatus: MindConnectApiModels.DiagnosticActivationStatus
@@ -50,6 +93,16 @@ export class MindConnectApiClient extends SdkClient {
         })) as MindConnectApiModels.DiagnosticActivation;
     }
 
+    /**
+     * * diagnostic
+     *
+     * Get current diagnostic activation
+     *
+     * @param {string} id
+     * @returns {Promise<MindConnectApiModels.DiagnosticActivation>}
+     *
+     * @memberOf MindConnectApiClient
+     */
     public async GetDiagnosticActivation(id: string): Promise<MindConnectApiModels.DiagnosticActivation> {
         return (await this.HttpAction({
             verb: "GET",
@@ -60,6 +113,16 @@ export class MindConnectApiClient extends SdkClient {
         })) as MindConnectApiModels.DiagnosticActivation;
     }
 
+    /**
+     * *diagnnostic
+     *
+     * Delete diagnostic activation.
+     *
+     * @param {string} id
+     * @returns
+     *
+     * @memberOf MindConnectApiClient
+     */
     public async DeleteDiagnosticActivation(id: string) {
         return await this.HttpAction({
             verb: "DELETE",
@@ -71,6 +134,15 @@ export class MindConnectApiClient extends SdkClient {
         });
     }
 
+    /**
+     * Get messages
+     *
+     * @param {string} id
+     * @param {{ filter?: string; size?: number; page?: number; sort?: string }} [optional]
+     * @returns {Promise<MindConnectApiModels.PagedDiagnosticInformationMessages>}
+     *
+     * @memberOf MindConnectApiClient
+     */
     public async GetDiagnosticActivationMessages(
         id: string,
         optional?: { filter?: string; size?: number; page?: number; sort?: string }
@@ -85,6 +157,21 @@ export class MindConnectApiClient extends SdkClient {
         })) as MindConnectApiModels.PagedDiagnosticInformationMessages;
     }
 
+    /**
+     * @deprecated please use GetDiagnosticActivationMessages
+     *
+     * Get list of diagnostic informations
+     *
+     * @param {{
+     *         filter?: string;
+     *         size?: number;
+     *         page?: number;
+     *         sort?: string;
+     *     }} [optional]
+     * @returns {Promise<MindConnectApiModels.PagedDiagnosticInformationMessages>}
+     *
+     * @memberOf MindConnectApiClient
+     */
     public async GetDiagnosticInformation(optional?: {
         filter?: string;
         size?: number;
@@ -101,6 +188,15 @@ export class MindConnectApiClient extends SdkClient {
         })) as MindConnectApiModels.PagedDiagnosticInformationMessages;
     }
 
+    /**
+     *
+     * * Delete all diagnostic activations
+     *
+     * Deletes all diagnostic activations
+     *
+     *
+     * @memberOf MindConnectApiClient
+     */
     public async DeleteAllDiagnosticActivations() {
         const activations = await this.GetDiagnosticActivations();
         for (const activation of activations.content) {
@@ -108,6 +204,19 @@ export class MindConnectApiClient extends SdkClient {
         }
     }
 
+    /**
+     * * diagnostic
+     *
+     * Get all diagnostic information paged (for the CLI)
+     *
+     * @param {string} agentId
+     * @param {(x: MindConnectApiModels.DiagnosticInformation[], ...args: any[]) => any} [callback]
+     * @param {*} [callbackOptions]
+     * @param {boolean} [skipToLast=true]
+     * @returns
+     *
+     * @memberOf MindConnectApiClient
+     */
     public async GetAllDiagnosticInformation(
         agentId: string,
         callback?: (x: MindConnectApiModels.DiagnosticInformation[], ...args: any[]) => any,
