@@ -110,7 +110,7 @@ async function saveData() {
         credentials: [],
     };
     cred.forEach((credential) => {
-        x = { ...credential };
+        let x = { ...credential };
         delete x.index;
         delete x.color;
         body.credentials.push(x);
@@ -183,7 +183,7 @@ async function init(e) {
     $("#refreshButton").on("click", async () => {
         try {
             await retrieveData();
-            bindList(window.configuration);
+            bindList();
         } catch (err) {
             showErrorMessage(err);
         }
@@ -193,7 +193,7 @@ async function init(e) {
         try {
             await saveData();
             await retrieveData();
-            bindList(window.configuration);
+            bindList();
         } catch (err) {
             showErrorMessage(err);
         }

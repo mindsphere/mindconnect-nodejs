@@ -194,7 +194,7 @@ function addEntry(options: any) {
 
 function checkRequiredParamaters(options: any) {
     !(["config", "list", "select", "add"].indexOf(options.mode) >= 0) &&
-        throwError("invalid mode ${options.mode} (must be config, list, select or add)");
+        throwError(`invalid mode ${options.mode} (must be config, list, select or add)`);
 
     options.mode === "select" && !options.index && throwError("you have to specify a configuration index to select");
     options.mode === "add" &&
