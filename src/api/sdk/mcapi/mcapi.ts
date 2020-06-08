@@ -114,7 +114,7 @@ export class MindConnectApiClient extends SdkClient {
     }
 
     /**
-     * *diagnnostic
+     * *diagnostic
      *
      * Delete diagnostic activation.
      *
