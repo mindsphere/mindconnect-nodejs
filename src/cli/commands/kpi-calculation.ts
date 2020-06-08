@@ -26,7 +26,7 @@ export default (program: CommanderStatic) => {
         .option("-p, --passkey <passkey>", `passkey`)
         .option("-v, --verbose", "verbose output")
         .description(`${color("calculate kpi states or compute kpis @")}`)
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     checkParameters(options);
@@ -34,11 +34,7 @@ export default (program: CommanderStatic) => {
                     proxyLog(options.verbose, color);
 
                     const auth = loadAuth();
-                    const sdk = new MindSphereSdk({
-                        tenant: auth.tenant,
-                        gateway: auth.gateway,
-                        basicAuth: decrypt(auth, options.passkey)
-                    });
+                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     const kpiClient = sdk.GetKPICalculationClient();
                     const timeSeries = readDataFromFile(options.file, options.verbose);
@@ -64,7 +60,7 @@ export default (program: CommanderStatic) => {
                                         {
                                             calendar: calendar,
                                             timeseries: timeSeries,
-                                            controlSystemEvents: events
+                                            controlSystemEvents: events,
                                         },
                                         {
                                             from: from,
@@ -73,13 +69,13 @@ export default (program: CommanderStatic) => {
                                             initialState: options.initialstate,
                                             defaultState: options.defaultstate,
                                             threshold: options.threshold,
-                                            shutdownCorrelationThreshold: options.shutdown
+                                            shutdownCorrelationThreshold: options.shutdown,
                                         }
                                     )
                                 );
 
                                 // create timeseries from kpi state indications
-                                const ts = _.map(results.indications, item => {
+                                const ts = _.map(results.indications, (item) => {
                                     return { _time: item.timestamp, state: item.state, source: item.source };
                                 });
 
@@ -94,7 +90,7 @@ export default (program: CommanderStatic) => {
                                         from: from,
                                         to: to,
                                         variableName: options.target,
-                                        initialState: options.initialstate
+                                        initialState: options.initialstate,
                                     })
                                 );
 

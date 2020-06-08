@@ -8,16 +8,15 @@ chai.should();
 describe("[SDK] TrendPredictionClient", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
+        ...auth,
         basicAuth: decrypt(auth, "passkey.4.unit.test"),
-        tenant: auth.tenant,
-        gateway: auth.gateway
     });
 
     const trendPredictionClient = sdk.GetTrendPredictionClient();
 
     const data = generateTestData(
         50,
-        x => {
+        (x) => {
             return x * 1.0;
         },
         "Temperature"
@@ -34,7 +33,7 @@ describe("[SDK] TrendPredictionClient", () => {
 
     const powerOutputSensor = generateTestData(
         50,
-        x => {
+        (x) => {
             return Math.pow(x, 2) - 15 * x + 7; // f(x) = x^2 -15x + 7; https://www.wolframalpha.com/input/?i=x%5E2-15x%2B7
         },
         "powerOutputSensor"
@@ -42,38 +41,38 @@ describe("[SDK] TrendPredictionClient", () => {
 
     const trainingData: TrendPredictionModels.TrainBody = {
         modelConfiguration: {
-            polynomialDegree: 2
+            polynomialDegree: 2,
         },
         metadataConfiguration: {
             outputVariable: {
                 entityId: "UnitTestTurbine1",
                 propertySetName: "monitoringModule",
-                propertyName: "powerOutputSensor"
+                propertyName: "powerOutputSensor",
             },
             inputVariables: [
                 {
                     entityId: "UnitTestTurbine1",
                     propertySetName: "combustionSubpart1",
-                    propertyName: "Temperature"
-                }
-            ]
+                    propertyName: "Temperature",
+                },
+            ],
         },
         trainingData: [
             {
                 variable: {
                     entityId: "UnitTestTurbine1",
-                    propertySetName: "monitoringModule"
+                    propertySetName: "monitoringModule",
                 },
-                timeSeries: powerOutputSensor
+                timeSeries: powerOutputSensor,
             },
             {
                 variable: {
                     entityId: "UnitTestTurbine1",
-                    propertySetName: "combustionSubpart1"
+                    propertySetName: "combustionSubpart1",
                 },
-                timeSeries: data
-            }
-        ]
+                timeSeries: data,
+            },
+        ],
     };
 
     it("SDK should not be undefined", async () => {
@@ -95,25 +94,25 @@ describe("[SDK] TrendPredictionClient", () => {
                 {
                     variable: {
                         entityId: "UnitTestTurbine1",
-                        propertySetName: "combustionSubpart1"
+                        propertySetName: "combustionSubpart1",
                     },
 
                     timeSeries: [
                         {
                             _time: new Date().toISOString(),
-                            Temperature: "4.0"
+                            Temperature: "4.0",
                         },
                         {
                             _time: new Date().toISOString(),
-                            Temperature: "14.0"
+                            Temperature: "14.0",
                         },
                         {
                             _time: new Date().toISOString(),
-                            Temperature: "-4.0"
-                        }
-                    ]
-                }
-            ]
+                            Temperature: "-4.0",
+                        },
+                    ],
+                },
+            ],
         };
 
         const predictionResult = await trendPredictionClient.Predict(prediction);
@@ -133,30 +132,30 @@ describe("[SDK] TrendPredictionClient", () => {
                 {
                     variable: {
                         entityId: "UnitTestTurbine1",
-                        propertySetName: "combustionSubpart1"
+                        propertySetName: "combustionSubpart1",
                     },
 
                     timeSeries: [
                         {
                             _time: new Date().toISOString(),
-                            Temperature: "4.0"
+                            Temperature: "4.0",
                         },
                         {
                             _time: new Date().toISOString(),
-                            Temperature: "14.0"
+                            Temperature: "14.0",
                         },
                         {
                             _time: new Date().toISOString(),
-                            Temperature: "-4.0"
-                        }
-                    ]
-                }
-            ]
+                            Temperature: "-4.0",
+                        },
+                    ],
+                },
+            ],
         };
 
         const predictionResult = await trendPredictionClient.TrainAndPredict({
             ...trainingData,
-            ...prediction
+            ...prediction,
         } as TrendPredictionModels.TrainPredictBody);
         Math.round(predictionResult[0].timeSeries![0]!["powerOutputSensor"]).should.be.equal(-37); // f(x)=x*x -15x + 7 ;// https://www.wolframalpha.com/input/?i=x%5E2-15x%2B7%3B+x+%3D+4
 
@@ -168,7 +167,7 @@ describe("[SDK] TrendPredictionClient", () => {
     before(async () => {
         try {
             const models = await trendPredictionClient.GetModels({
-                entityId: "UnitTestTurbine1"
+                entityId: "UnitTestTurbine1",
             });
             // console.log(`Deleting ${models.length} model(s)`);
             models.should.not.be.undefined;

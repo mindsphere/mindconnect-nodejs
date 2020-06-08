@@ -15,6 +15,11 @@ const log = debug("mindconnect-agent");
 /**
  * MindConnect Agent implements the V3 of the Mindsphere API.
  *
+ *  * The synchronous methods (IsOnBoarded, HasConfiguration, HasDataMapping...) are operating on agent state storage only.
+ *  * The asynchronous methods (GetDataSourceConfiguration, BulkPostData...)  are calling MindSphere APIs.
+ *
+ * @see https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
+ *
  * @export
  * @class MindConnectAgent
  */
@@ -24,7 +29,12 @@ export class MindConnectAgent extends AgentAuth {
     }
 
     /**
-     *Checkis if the agent is onboarded.
+     *
+     * Check in the local storage if the agent is onboarded.
+     *
+     * * This is a local agent state storage setting only. MindSphere API is not called.
+     *
+     * @see https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
      *
      * @returns {boolean}
      * @memberof MindConnectAgent
@@ -34,7 +44,12 @@ export class MindConnectAgent extends AgentAuth {
     }
 
     /**
-     * Checks if the agent has a data source configuration
+     * Checks in the local storage if the agent has a data source configuration.
+     *
+     * * This is a local agent state storage setting only. MindSphere API is not called.
+     * * Call await GetDataSourceConfiguration() if you want to check if there is configuration in the mindsphere.
+     *
+     * @see https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
      *
      * @returns {boolean}
      * @memberof MindConnectAgent
@@ -50,7 +65,12 @@ export class MindConnectAgent extends AgentAuth {
     }
 
     /**
-     * Checks if the agent has mappings
+     * Checks in the local storage if the agent has configured mappings.
+     *
+     * * This is a local agent state storage setting only. MindSphere API is not called.
+     * * Call await GetDataMappings() to check if the agent has configured mappings in the MindSphere.
+     *
+     * @see https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
      *
      * @returns {boolean}
      * @memberof MindConnectAgent
@@ -96,11 +116,9 @@ export class MindConnectAgent extends AgentAuth {
         const headers = {
             ...this._apiHeaders,
             Authorization: `Bearer ${this._accessToken.access_token}`,
-            "If-Match": eTag.toString()
+            "If-Match": eTag.toString(),
         };
-        const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/agents/${
-            this._configuration.content.clientId
-        }/dataSourceConfiguration`;
+        const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/agents/${this._configuration.content.clientId}/dataSourceConfiguration`;
 
         log(`PutDataSourceConfiguration Headers ${JSON.stringify(headers)} Url ${url} eTag ${eTag}`);
 
@@ -109,7 +127,7 @@ export class MindConnectAgent extends AgentAuth {
                 method: "PUT",
                 body: JSON.stringify(dataSourceConfiguration),
                 headers: headers,
-                agent: this._proxyHttpAgent
+                agent: this._proxyHttpAgent,
             });
             const json = await response.json();
             if (!response.ok) {
@@ -129,15 +147,22 @@ export class MindConnectAgent extends AgentAuth {
         }
     }
 
+    /**
+     * Acquire DataSource Configuration and store it in the Agent Storage.
+     *
+     * @see https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
+     *
+     * @returns {Promise<DataSourceConfiguration>}
+     *
+     * @memberOf MindConnectAgent
+     */
     public async GetDataSourceConfiguration(): Promise<DataSourceConfiguration> {
         await this.RenewToken();
         if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
         if (!this._configuration.content.clientId) throw new Error("No client id in the configuration of the agent.");
 
         const headers = { ...this._headers, Authorization: `Bearer ${this._accessToken.access_token}` };
-        const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/agents/${
-            this._configuration.content.clientId
-        }/dataSourceConfiguration`;
+        const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/agents/${this._configuration.content.clientId}/dataSourceConfiguration`;
 
         log(`GetDataSourceConfiguration Headers ${JSON.stringify(headers)} Url ${url}`);
 
@@ -162,6 +187,15 @@ export class MindConnectAgent extends AgentAuth {
         }
     }
 
+    /**
+     * Acquire the data mappings from the MindSphere and store them in the agent state storage.
+     *
+     * @see https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
+     *
+     * @returns {Promise<Array<Mapping>>}
+     *
+     * @memberOf MindConnectAgent
+     */
     public async GetDataMappings(): Promise<Array<Mapping>> {
         await this.RenewToken();
         if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
@@ -169,9 +203,7 @@ export class MindConnectAgent extends AgentAuth {
 
         const headers = { ...this._headers, Authorization: `Bearer ${this._accessToken.access_token}` };
         const agentFilter = encodeURIComponent(JSON.stringify({ agentId: `${this._configuration.content.clientId}` }));
-        const url = `${
-            this._configuration.content.baseUrl
-        }/api/mindconnect/v3/dataPointMappings?filter=${agentFilter}&size=2000`;
+        const url = `${this._configuration.content.baseUrl}/api/mindconnect/v3/dataPointMappings?filter=${agentFilter}&size=2000`;
 
         log(`GetDataSourceConfiguration Headers ${JSON.stringify(headers)} Url ${url}`);
         try {
@@ -194,6 +226,16 @@ export class MindConnectAgent extends AgentAuth {
         }
     }
 
+    /**
+     * Store data mappings in the mindsphere and also in the local agent state storage.
+     *
+     * @see https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
+     *
+     * @param {Mapping[]} mappings
+     * @returns {Promise<boolean>}
+     *
+     * @memberOf MindConnectAgent
+     */
     public async PutDataMappings(mappings: Mapping[]): Promise<boolean> {
         await this.RenewToken();
         if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
@@ -210,7 +252,7 @@ export class MindConnectAgent extends AgentAuth {
                 method: "POST",
                 body: JSON.stringify(mapping),
                 headers: headers,
-                agent: this._proxyHttpAgent
+                agent: this._proxyHttpAgent,
             });
             const json = await response.json();
             try {
@@ -273,7 +315,6 @@ export class MindConnectAgent extends AgentAuth {
     /**
      * Post Data Point Values to the Exchange Endpoint
      *
-     *
      * @see: https://developer.mindsphere.io/howto/howto-upload-agent-data/index.html
      *
      * @param {DataPointValue[]} dataPoints
@@ -319,6 +360,15 @@ export class MindConnectAgent extends AgentAuth {
         return <boolean>result;
     }
 
+    /**
+     * Post Bulk Data Point Values to the Exchange Endpoint.
+     *
+     * @param {TimeStampedDataPoint[]} timeStampedDataPoints
+     * @param {boolean} [validateModel=true]
+     * @returns {Promise<boolean>}
+     *
+     * @memberOf MindConnectAgent
+     */
     public async BulkPostData(
         timeStampedDataPoints: TimeStampedDataPoint[],
         validateModel: boolean = true
@@ -439,7 +489,7 @@ export class MindConnectAgent extends AgentAuth {
             description: description,
             chunk: chunk,
             chunkSize: chunkSize,
-            parallelUploads: maxSockets
+            parallelUploads: maxSockets,
         });
     }
 
@@ -454,7 +504,7 @@ export class MindConnectAgent extends AgentAuth {
                 method: method,
                 body: dataMessage,
                 headers: headers,
-                agent: this._proxyHttpAgent
+                agent: this._proxyHttpAgent,
             });
             if (!response.ok) {
                 log({ method: method, body: dataMessage, headers: headers, agent: this._proxyHttpAgent });
@@ -477,6 +527,14 @@ export class MindConnectAgent extends AgentAuth {
         }
     }
 
+    /**
+     * Ajv Validator (@see https://github.com/ajv-validator/ajv) for the data points. Validates if the data points array is only
+     * containing dataPointIds which are configured in the agent configuration.
+     *
+     * @returns {ajv.ValidateFunction}
+     *
+     * @memberOf MindConnectAgent
+     */
     public GetValidator(): ajv.ValidateFunction {
         const model = this._configuration.dataSourceConfiguration;
         if (!model) {
@@ -486,6 +544,15 @@ export class MindConnectAgent extends AgentAuth {
     }
 
     private _eventValidator?: ajv.ValidateFunction;
+
+    /**
+     *
+     * Ajv Validator (@see https://github.com/ajv-validator/ajv) for the events. Validates the syntax of the mindsphere events.
+     *
+     * @returns {ajv.ValidateFunction}
+     *
+     * @memberOf MindConnectAgent
+     */
     public GetEventValidator(): ajv.ValidateFunction {
         if (!this._eventValidator) {
             this._eventValidator = eventValidator();
@@ -493,6 +560,17 @@ export class MindConnectAgent extends AgentAuth {
         return this._eventValidator;
     }
 
+    /**
+     * Get local configuration from the agent state storage.
+     *
+     * * This is a local agent state storage setting only. MindSphere API is not called.
+     *
+     * @see https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
+     *
+     * @returns {IMindConnectConfiguration}
+     *
+     * @memberOf MindConnectAgent
+     */
     public GetMindConnectConfiguration(): IMindConnectConfiguration {
         return this._configuration;
     }

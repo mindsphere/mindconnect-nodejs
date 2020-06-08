@@ -10,7 +10,7 @@ import {
     homeDirLog,
     proxyLog,
     serviceCredentialLog,
-    verboseLog
+    verboseLog,
 } from "./command-utils";
 
 const color = getColor("blue");
@@ -37,7 +37,7 @@ export default (program: CommanderStatic) => {
         .option("-p, --passkey <passkey>", `passkey`)
         .option("-v, --verbose", "verbose output")
         .description(`${color("perform signal validation @")}`)
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     checkParameters(options);
@@ -45,11 +45,7 @@ export default (program: CommanderStatic) => {
                     proxyLog(options.verbose, color);
 
                     const auth = loadAuth();
-                    const sdk = new MindSphereSdk({
-                        tenant: auth.tenant,
-                        gateway: auth.gateway,
-                        basicAuth: decrypt(auth, options.passkey)
-                    });
+                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     const signalvalidation = sdk.GetSignalValidationClient();
 
@@ -68,21 +64,21 @@ export default (program: CommanderStatic) => {
                             signalvalidation.DetectRangeViolations(timeseries, {
                                 variableName: options.variablename,
                                 lowerLimit: options.lowerlimit,
-                                upperLimit: options.upperlimit
+                                upperLimit: options.upperlimit,
                             })
                         );
                     } else if (options.mode === "spike") {
                         result = await retry(options.retry, () =>
                             signalvalidation.DetectSpikes(timeseries, {
                                 variableName: options.variablename,
-                                windowSize: options.windowsize
+                                windowSize: options.windowsize,
                             })
                         );
                     } else if (options.mode === "jumps") {
                         result = await retry(options.retry, () =>
                             signalvalidation.DetectJumps(timeseries, {
                                 variableName: options.variablename,
-                                windowSize: options.windowsize
+                                windowSize: options.windowsize,
                             })
                         );
                     } else if (options.mode === "noise") {
@@ -90,21 +86,21 @@ export default (program: CommanderStatic) => {
                             signalvalidation.DetectNoise(timeseries, {
                                 variableName: options.variablename,
                                 windowRadius: options.windowradius,
-                                threshold: options.threshold
+                                threshold: options.threshold,
                             })
                         );
                     } else if (options.mode === "gaps") {
                         result = await retry(options.retry, () =>
                             signalvalidation.DetectGaps(timeseries, {
                                 variableName: options.variablename,
-                                threshold: options.threshold
+                                threshold: options.threshold,
                             })
                         );
                     } else if (options.mode === "interpolate") {
                         result = await retry(options.retry, () =>
                             signalvalidation.DetectGapsAndInterpolate(timeseries, {
                                 variableName: options.variablename,
-                                threshold: options.threshold
+                                threshold: options.threshold,
                             })
                         );
                     } else if (options.mode === "bias") {
@@ -113,7 +109,7 @@ export default (program: CommanderStatic) => {
                                 variableName: options.variablename,
                                 windowSize: options.windowsize,
                                 threshold: options.threshold,
-                                step: options.step
+                                step: options.step,
                             })
                         );
                     } else {
@@ -154,7 +150,7 @@ export default (program: CommanderStatic) => {
 
 function createFile(options: any) {
     fs.existsSync(options.file) && throwError(`The file ${options.file} already exists.`);
-    const data = generateTestData(options.size, x => {
+    const data = generateTestData(options.size, (x) => {
         let result: number | undefined = Math.sin(x);
         if (x === 40 || x === 41) result = Math.sin(x) + 18; // create spike
         if (x >= 20 && x <= 30) result = Math.sin(x) * Math.random() * 5 + Math.random(); // create noise

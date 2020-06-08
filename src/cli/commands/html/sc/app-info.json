@@ -1,0 +1,17 @@
+{
+    "displayName": "mindconnect-nodejs",
+    "links": {
+        "default": [
+            {
+                "type": "WWW",
+                "name": "https://opensource.mindsphere.io",
+                "value": "https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html"
+            },
+            {
+                "type": "WWW",
+                "name": "License (MIT)",
+                "value": "https://opensource.mindsphere.io/docs/mindconnect-nodejs/LICENSE.html"
+            }
+        ]
+    }
+}

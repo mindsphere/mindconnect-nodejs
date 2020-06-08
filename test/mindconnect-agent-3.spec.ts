@@ -15,7 +15,7 @@ import {
     Mapping,
     MindConnectAgent,
     retry,
-    TimeStampedDataPoint
+    TimeStampedDataPoint,
 } from "../src";
 import { AgentManagementModels } from "../src/api/sdk";
 import { MindSphereSdk } from "../src/api/sdk/";
@@ -28,9 +28,8 @@ chai.should();
 describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
-        gateway: auth.gateway,
+        ...auth,
         basicAuth: decrypt(auth, "passkey.4.unit.test"),
-        tenant: auth.tenant
     });
 
     let agentConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;
@@ -235,27 +234,27 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
                             name: "Temperature",
                             description: "Temperature",
                             type: DataPoint.TypeEnum.DOUBLE,
-                            unit: "°C"
+                            unit: "°C",
                         },
                         {
                             id: "DP-Humidity",
                             name: "Humidity",
                             description: "Humidity",
                             type: DataPoint.TypeEnum.INT,
-                            unit: "%"
+                            unit: "%",
                         },
                         {
                             id: "DP-Pressure",
                             name: "Pressure",
                             description: "Pressure",
                             type: DataPoint.TypeEnum.DOUBLE,
-                            unit: "kPa"
-                        }
+                            unit: "kPa",
+                        },
                     ],
                     customData: {
                         ostype: os.type(),
-                        osHostname: os.hostname()
-                    }
+                        osHostname: os.hostname(),
+                    },
                 },
                 {
                     name: "VibrationData",
@@ -266,36 +265,36 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
                             name: "Displacement",
                             description: "Displacement",
                             type: DataPoint.TypeEnum.DOUBLE,
-                            unit: "mm"
+                            unit: "mm",
                         },
                         {
                             id: "DP-Velocity",
                             name: "Velocity",
                             description: "Velocity",
                             type: DataPoint.TypeEnum.DOUBLE,
-                            unit: "mm/s"
+                            unit: "mm/s",
                         },
                         {
                             id: "DP-Acceleration",
                             name: "Acceleration",
                             description: "Acceleration",
                             type: DataPoint.TypeEnum.DOUBLE,
-                            unit: "mm/s^2"
+                            unit: "mm/s^2",
                         },
                         {
                             id: "DP-Frequency",
                             name: "Frequency",
                             description: "Frequency",
                             type: DataPoint.TypeEnum.DOUBLE,
-                            unit: "Hz"
-                        }
+                            unit: "Hz",
+                        },
                     ],
                     customData: {
                         ostype: os.type(),
-                        osHostname: os.hostname()
-                    }
-                }
-            ]
+                        osHostname: os.hostname(),
+                    },
+                },
+            ],
         };
 
         if (!agent.HasDataSourceConfiguration()) {
@@ -343,7 +342,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
                     entityId: targetAssetId,
                     propertyName: datapoint.name.replace("DP-", ""),
                     propertySetName: dataSource.name,
-                    keepMapping: true
+                    keepMapping: true,
                 });
             }
         }
@@ -375,7 +374,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             { dataPointId: "DP-Temperature", qualityCode: "0", value: "123.1" },
             { dataPointId: "DP-Pressure", qualityCode: "0", value: "144" },
             { dataPointId: "DP-Humidity", qualityCode: "0", value: "166.45" },
-            { dataPointId: "DP-NONEXISTANT", qualityCode: "0", value: "166.45" }
+            { dataPointId: "DP-NONEXISTANT", qualityCode: "0", value: "166.45" },
         ];
 
         try {
@@ -401,18 +400,18 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
                 {
                     dataPointId: "DP-Temperature",
                     qualityCode: "0",
-                    value: (Math.sin(index) * (20 + (index % 2)) + 25).toString()
+                    value: (Math.sin(index) * (20 + (index % 2)) + 25).toString(),
                 },
                 {
                     dataPointId: "DP-Pressure",
                     qualityCode: "0",
-                    value: (Math.cos(index) * (20 + (index % 25)) + 25).toString()
+                    value: (Math.cos(index) * (20 + (index % 25)) + 25).toString(),
                 },
                 { dataPointId: "DP-Humidity", qualityCode: "0", value: ((index + 30) % 100).toString() },
                 { dataPointId: "DP-Acceleration", qualityCode: "0", value: (1000.0 + index).toString() },
                 { dataPointId: "DP-Frequency", qualityCode: "0", value: (60.0 + index * 0.1).toString() },
                 { dataPointId: "DP-Displacement", qualityCode: "0", value: (index % 10).toString() },
-                { dataPointId: "DP-Velocity", qualityCode: "0", value: (50.0 + index).toString() }
+                { dataPointId: "DP-Velocity", qualityCode: "0", value: (50.0 + index).toString() },
             ];
 
             const validator = agent.GetValidator();
@@ -443,18 +442,18 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
                 {
                     dataPointId: "DP-Temperature",
                     qualityCode: "0",
-                    value: (Math.sin(index) * (20 + (index % 2)) + 25).toString()
+                    value: (Math.sin(index) * (20 + (index % 2)) + 25).toString(),
                 },
                 {
                     dataPointId: "DP-Pressure",
                     qualityCode: "0",
-                    value: (Math.cos(index) * (20 + (index % 25)) + 25).toString()
+                    value: (Math.cos(index) * (20 + (index % 25)) + 25).toString(),
                 },
                 { dataPointId: "DP-Humidity", qualityCode: "0", value: ((index + 30) % 100).toString() },
                 { dataPointId: "DP-Acceleration", qualityCode: "0", value: (1000.0 + index).toString() },
                 { dataPointId: "DP-Frequency", qualityCode: "0", value: (60.0 + index * 0.1).toString() },
                 { dataPointId: "DP-Displacement", qualityCode: "0", value: (index % 10).toString() },
-                { dataPointId: "DP-Velocity", qualityCode: "0", value: (50.0 + index).toString() }
+                { dataPointId: "DP-Velocity", qualityCode: "0", value: (50.0 + index).toString() },
             ];
 
             const result = await retry(5, () => agent.PostData(values));
@@ -473,7 +472,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
 
         const values: DataPointValue[] = [
             { dataPointId: "DP-Temperature", qualityCode: "0", value: "10" },
-            { dataPointId: "DP-Pressure", qualityCode: "0", value: "10" }
+            { dataPointId: "DP-Pressure", qualityCode: "0", value: "10" },
         ];
 
         const now = new Date();
@@ -484,12 +483,12 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         const bulk: TimeStampedDataPoint[] = [
             {
                 timestamp: hourBefore.toISOString(),
-                values: values
+                values: values,
             },
             {
                 timestamp: now.toISOString(),
-                values: values
-            }
+                values: values,
+            },
         ];
 
         await retry(5, () => agent.BulkPostData(bulk));
@@ -512,7 +511,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             sourceId: "application",
             source: "Meowz",
             severity: 20,
-            description: `MC.rocks ${Math.floor(new Date().getTime() / 1000) % 100}`
+            description: `MC.rocks ${Math.floor(new Date().getTime() / 1000) % 100}`,
         };
 
         await agent.PostEvent(events);
@@ -532,7 +531,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             source: "Meowz",
             severity: 20,
             timestamp: new Date().toISOString(),
-            description: "Test"
+            description: "Test",
         }).should.be.true;
 
         await validator({
@@ -542,7 +541,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             sourceId: "application",
             source: "Meowz",
             severity: 20,
-            description: ""
+            description: "",
         }).should.be.true;
 
         await validator({
@@ -552,12 +551,12 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             sourceId: "application",
             source: "Meowz",
             severity: 20,
-            description: ""
+            description: "",
         }).should.be.false;
 
         log(validator.errors);
         const error: any = (<any>validator).errors[0].message;
-        error.should.be.equal("should match pattern \"^[A-Fa-f0-9]*$\"");
+        error.should.be.equal('should match pattern "^[A-Fa-f0-9]*$"');
 
         await validator({
             entityId: "aaac5ae889a44717b02fa8282a30d1b4",
@@ -568,8 +567,8 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             severity: 20,
             description: "",
             additionalData: {
-                "foo:": "bar"
-            }
+                "foo:": "bar",
+            },
         }).should.be.true;
     });
 
@@ -603,9 +602,14 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         }
         let logCount = 0;
         try {
-            await retry(5, () => agent.Upload("LICENSE.md", "text/plain", "blubb", true), 300, () => {
-                logCount++;
-            });
+            await retry(
+                5,
+                () => agent.Upload("LICENSE.md", "text/plain", "blubb", true),
+                300,
+                () => {
+                    logCount++;
+                }
+            );
         } catch (err) {
             err.message.should.contain("ECONNREFUSED");
         }
@@ -618,10 +622,15 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             await agent.OnBoard();
         }
         let logCount = 0;
-        await retry(5, () => agent.Upload("LICENSE.md", "text/plain", "blubb", true), 300, () => {
-            logCount++;
-            if (logCount < 3) throw new Error("not yet");
-        });
+        await retry(
+            5,
+            () => agent.Upload("LICENSE.md", "text/plain", "blubb", true),
+            300,
+            () => {
+                logCount++;
+                if (logCount < 3) throw new Error("not yet");
+            }
+        );
 
         logCount.should.be.gte(3);
     });
@@ -671,7 +680,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             Buffer.alloc(16.25 * 1024 * 1024),
             {
                 chunk: true,
-                retry: 5
+                retry: 5,
             }
         );
 
@@ -693,7 +702,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             Buffer.alloc(8 * 1024 * 1024 + 1),
             {
                 chunk: true,
-                retry: 5
+                retry: 5,
             }
         );
 
@@ -707,7 +716,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         }
 
         const checksum = await agent.UploadFile(agent.ClientId(), `test/1_byte.bin`, Buffer.alloc(1), {
-            chunk: true
+            chunk: true,
         });
 
         checksum.should.be.equal("93b885adfe0da089cdf634904fd59f71");
@@ -720,7 +729,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         }
 
         const checksum = await agent.UploadFile(agent.ClientId(), `test/0_byte.bin`, Buffer.alloc(0), {
-            chunk: true
+            chunk: true,
         });
 
         checksum.should.be.equal("d41d8cd98f00b204e9800998ecf8427e");

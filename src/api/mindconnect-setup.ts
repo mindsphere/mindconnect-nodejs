@@ -5,13 +5,11 @@ import { CredentialAuth } from "./credential-auth";
 import { OnboardingStatus } from "./mindconnect-models";
 import { checkAssetId } from "./utils";
 const log = debug("mindconnect-setup");
-// Copyright (C), Siemens AG 2017
 
 /**
- * This class can be used to perform some setup tasks
- * which can't be performed with the mindconnect agent itself.
+ * @deprecated replaced with MindSphereSDK
  *
- * It is mostly used by the CLI to offboard the agents, clean up etc.
+ * This class is deprecated. please use MinSphereSDK for this
  *
  * @export
  * @class MindConnectSetup
@@ -43,7 +41,7 @@ export class MindConnectSetup extends CredentialAuth {
                 method: "POST",
                 body: JSON.stringify(body),
                 headers: headers,
-                agent: this._proxyHttpAgent
+                agent: this._proxyHttpAgent,
             });
             if (!response.ok) {
                 throw new Error(`${response.statusText} ${await response.text()}`);
@@ -62,7 +60,7 @@ export class MindConnectSetup extends CredentialAuth {
     }
 
     /**
-     * Unregister the agent from the diagnostics.
+     * @deprecated replaced with MindSphereSDK
      *
      * @param {string} agentId
      * @param {boolean} [ignoreError=false]
@@ -117,6 +115,8 @@ export class MindConnectSetup extends CredentialAuth {
     }
 
     /**
+     * @deprecated replaced with MindSphereSDK
+     *
      * Delete all diagnostic activations. As there are only 5 global diagnostic activations this can have unintended consequences.
      * Use with care.
      *
@@ -131,6 +131,8 @@ export class MindConnectSetup extends CredentialAuth {
     }
 
     /**
+     * @deprecated replaced with MindSphereSDK
+     *
      * Gets all registered agents for diagnostic.
      *
      * @returns {Promise<PagedDiagnosticActivation>}
@@ -165,6 +167,8 @@ export class MindConnectSetup extends CredentialAuth {
     }
 
     /**
+     * @deprecated replaced with MindSphereSDK
+     *
      * Gets the diagnostic information for the registered agent(s)
      *
      * @param {string} [agentId] - Optional: If passed, only logs for this agent will be retrieved.
@@ -287,4 +291,3 @@ export class MindConnectSetup extends CredentialAuth {
         }
     }
 }
-

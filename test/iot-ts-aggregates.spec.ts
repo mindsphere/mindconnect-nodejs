@@ -2,13 +2,10 @@ import { MindSphereSdk, TimeSeriesAggregateModels } from "../src/api/sdk";
 import { checkAssetId, decrypt, loadAuth } from "../src/api/utils";
 import { setupStructure } from "./test-agent-setup-utils";
 
-describe("IotTsAggregateClient", () => {
+describe("[SDK] IotTsAggregateClient", () => {
     const auth = loadAuth();
-    const gateway = process.env.GATEWAY || auth.gateway;
-    const tenant = process.env.TENANT || auth.tenant;
-    const basicAuth = process.env.BASICAUTH || decrypt(auth, "passkey.4.unit.test");
 
-    const sdk = new MindSphereSdk({ gateway, tenant, basicAuth });
+    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, "passkey.4.unit.test") });
 
     let assetid = "";
 
@@ -48,7 +45,7 @@ describe("IotTsAggregateClient", () => {
             from: fromLastMonth,
             to: toNow,
             intervalUnit: "hour",
-            intervalValue: 1
+            intervalValue: 1,
         });
 
         aggregates.should.not.be.undefined;

@@ -11,11 +11,17 @@ const cyan = getColor("cyan");
 
 export const serviceCredentialLog = (color: Function = magenta) => {
     log(`\n  Important: \n`);
-    log(`    you need to supply the ${color("service credentials")} for this operation and provide the passkey \n`);
+    log(
+        `    you need to supply the ${color("service credentials (deprecated)")} or ${color(
+            "application credentials"
+        )} for this operation and provide the passkey \n`
+    );
     log(`    how to get service credentials: `);
     log(
         color(`    https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials`)
     );
+    log(`    how to get application credentials: `);
+    log(color(`    https://documentation.mindsphere.io/resources/html/developer-cockpit/en-US/124342231819.html`));
 
     log(`\n  More Information: \n`);
     log(`    ${color("https://opensource.mindsphere.io")}\n`);
@@ -76,7 +82,7 @@ export const displayCsvHelp = (color: (chalk: string) => string) => {
 export const directoryReadyLog = ({
     path,
     runCommand,
-    jobCommand
+    jobCommand,
 }: {
     path: string;
     runCommand: string;
@@ -124,7 +130,7 @@ export function agentConfigLog({
     host,
     tenant,
     agentid,
-    color
+    color,
 }: {
     gateway: string;
     host: string;
@@ -172,7 +178,7 @@ export const homeDirLog = (verbose: any, color: Function) => {
     verboseLog(`Using configuration stored in ${c(getHomeDotMcDir())}`, verbose);
 };
 
-export const retrylog = function(operation: string, c: Function = cyan) {
+export const retrylog = function (operation: string, c: Function = cyan) {
     let x = 0;
     return () => {
         if (x > 0) {
@@ -202,7 +208,7 @@ export function generateTestData(
 
         if (value !== undefined) {
             const item: any = {
-                _time: time.toISOString()
+                _time: time.toISOString(),
             };
 
             item[variableName] = value!.toString();

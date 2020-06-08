@@ -33,7 +33,7 @@ export default (program: CommanderStatic) => {
         .option("-p, --passkey <passkey>", `passkey`)
         .option("-v, --verbose", "verbose output")
         .description(`${color("perform spectrum analysis on a sound file @")}`)
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     checkParameters(options);
@@ -56,11 +56,7 @@ export default (program: CommanderStatic) => {
                     verboseLog(`OutputFileName: ${outputfilename}`, options.verbose, spinner);
 
                     const auth = loadAuth();
-                    const sdk = new MindSphereSdk({
-                        tenant: auth.tenant,
-                        gateway: auth.gateway,
-                        basicAuth: decrypt(auth, options.passkey)
-                    });
+                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     const mimeType = mime.lookup(uploadFile);
 
@@ -82,12 +78,10 @@ export default (program: CommanderStatic) => {
                         const result = (await retry(options.retry, () =>
                             spectrumAnalysis.CalculateFrequencies(
                                 buffer,
-                                (`${
-                                    options.windowtype
-                                }` as unknown) as SpectrumAnalysisModels.WindowType.WindowTypeEnum,
+                                (`${options.windowtype}` as unknown) as SpectrumAnalysisModels.WindowType.WindowTypeEnum,
                                 {
                                     filename: path.basename(uploadFile),
-                                    mimetype: mimeType
+                                    mimetype: mimeType,
                                 }
                             )
                         )) as SpectrumAnalysisModels.FFTOutput;
@@ -101,7 +95,7 @@ export default (program: CommanderStatic) => {
                                         minFrequency: 100,
                                         maxFrequency: 200,
                                         lowerThreshold: -40.25,
-                                        upperThreshold: -30
+                                        upperThreshold: -30,
                                     },
                                     null,
                                     2
@@ -118,7 +112,7 @@ export default (program: CommanderStatic) => {
                         const result = (await retry(options.retry, () =>
                             spectrumAnalysis.DetectThresholdViolations({
                                 data: fft.data,
-                                spectrumFilter: JSON.parse(thresholds)
+                                spectrumFilter: JSON.parse(thresholds),
                             } as SpectrumAnalysisModels.ThresholdViolationInput)
                         )) as SpectrumAnalysisModels.ThresholdViolationOutput;
 

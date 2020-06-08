@@ -25,7 +25,7 @@ export default (program: CommanderStatic) => {
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
         .description(color(`displays the agent status and agent onboarding status *`))
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     homeDirLog(options.verbose, color);
@@ -58,7 +58,7 @@ export default (program: CommanderStatic) => {
                     }
 
                     const auth = loadAuth();
-                    const sdk = new MindSphereSdk(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
+                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
                     const agentMgmt = sdk.GetAgentManagementClient();
 
                     const onlinestatus = await retry(

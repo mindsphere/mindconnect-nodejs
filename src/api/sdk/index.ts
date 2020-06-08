@@ -15,6 +15,8 @@ export * from "./iotbulk/iot-timeseries-bulk";
 export * from "./iotbulk/iot-timeseries-bulk-models";
 export * from "./iotfile/iot-file";
 export * from "./iotfile/iot-file-models";
+export * from "./mcapi/mcapi";
+export * from "./mcapi/mcapi-models";
 export * from "./signal-validation/signal-validation";
 export * from "./signal-validation/signal-validation-models";
 export * from "./trend/trend-prediction";

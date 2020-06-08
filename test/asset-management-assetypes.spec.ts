@@ -10,9 +10,8 @@ const timeOffset = new Date().getTime();
 describe("[SDK] AssetManagementClient.AssetTypes", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
+        ...auth,
         basicAuth: decrypt(auth, "passkey.4.unit.test"),
-        tenant: auth.tenant,
-        gateway: auth.gateway
     });
     const am = sdk.GetAssetManagementClient();
     const tenant = sdk.GetTenant();
@@ -31,10 +30,10 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
                 unit: "C/F",
                 searchable: true,
                 length: 5,
-                defaultValue: "25/77"
-            }
+                defaultValue: "25/77",
+            },
         ],
-        fileAssignments: []
+        fileAssignments: [],
     };
 
     before(async () => {
@@ -57,7 +56,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
         am.should.not.be.undefined;
         am.GetGateway().should.be.equal(auth.gateway);
         (await am.GetToken()).length.should.be.greaterThan(200);
-        (await am.GetServiceToken()).length.should.be.greaterThan(200);
+        (await am.GetToken()).length.should.be.greaterThan(200);
     });
 
     it("should GET asset types", async () => {
@@ -75,9 +74,9 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
         const assetTypes = await am.GetAssetTypes({
             filter: JSON.stringify({
                 id: {
-                    startsWith: `${tenant}`
-                }
-            })
+                    startsWith: `${tenant}`,
+                },
+            }),
         });
         assetTypes.should.not.be.undefined;
         assetTypes.should.not.be.null;
@@ -91,16 +90,16 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
             filter: JSON.stringify({
                 and: {
                     id: {
-                        startsWith: `${tenant}`
+                        startsWith: `${tenant}`,
                     },
                     name: {
-                        startsWith: `SpaceShipType_${timeOffset}`
-                    }
-                }
+                        startsWith: `SpaceShipType_${timeOffset}`,
+                    },
+                },
             }),
             sort: "DESC",
             page: 0,
-            size: 0
+            size: 0,
         });
         assetTypes.should.not.be.undefined;
         assetTypes.should.not.be.null;
@@ -115,14 +114,14 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
             filter: JSON.stringify({
                 and: {
                     id: {
-                        startsWith: `${tenant}`
+                        startsWith: `${tenant}`,
                     },
                     name: {
-                        startsWith: `SpaceShipType_${timeOffset}`
-                    }
-                }
+                        startsWith: `SpaceShipType_${timeOffset}`,
+                    },
+                },
             }),
-            exploded: true
+            exploded: true,
         });
         assetTypes.should.not.be.undefined;
         assetTypes.should.not.be.null;
@@ -161,11 +160,11 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
 
         assetType.variables.push({
             dataType: AssetManagementModels.VariableDefinition.DataTypeEnum.BOOLEAN,
-            name: "test"
+            name: "test",
         });
 
         const patchedAssetType = await am.PatchAssetType(`${tenant}.SpaceShipType_${timeOffset}_D`, assetType, {
-            ifMatch: `${assetType.etag}`
+            ifMatch: `${assetType.etag}`,
         });
 
         patchedAssetType.should.not.be.null;
@@ -190,7 +189,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
                 `${assetType.id}`,
                 "Keyword",
                 {
-                    fileId: "abcd"
+                    fileId: "abcd",
                 },
                 { ifMatch: `${assetType.etag}` }
             );
@@ -217,16 +216,16 @@ async function deleteAssetTypes(am: AssetManagementClient, tenant: string) {
         filter: JSON.stringify({
             and: {
                 id: {
-                    startsWith: `${tenant}`
+                    startsWith: `${tenant}`,
                 },
                 name: {
-                    startsWith: `SpaceShipType_${timeOffset}`
-                }
-            }
+                    startsWith: `SpaceShipType_${timeOffset}`,
+                },
+            },
         }),
         sort: "DESC",
         page: 0,
-        size: 0
+        size: 0,
     })) as any;
     for (const x of assetTypes._embedded.assetTypes) {
         await am.DeleteAssetType(x.id, { ifMatch: x.etag });

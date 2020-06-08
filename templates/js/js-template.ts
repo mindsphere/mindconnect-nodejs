@@ -14,6 +14,8 @@ export const jstemplate: string = `const { MindConnectAgent, retry } = require (
 
             log(\`Iteration : \${index}\`);
             // onboarding the agent
+            // Check in the local agent state storage if agent is onboarded.
+            // https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
             if (!agent.IsOnBoarded()) {
                 // wrapping the call in the retry function makes the agent a bit more resillient
                 // if you don't want to retry the operations you can always just call await agent.OnBoard(); instead.
@@ -21,6 +23,7 @@ export const jstemplate: string = `const { MindConnectAgent, retry } = require (
                 log("Agent onboarded");
             }
 
+            // Check in the local agent state storage if agent has data source configuration.
             if (!agent.HasDataSourceConfiguration()) {
                 await retry(RETRYTIMES, () => agent.GetDataSourceConfiguration());
                 log("Configuration aquired");

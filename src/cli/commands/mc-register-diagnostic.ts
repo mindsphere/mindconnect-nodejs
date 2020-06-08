@@ -2,7 +2,7 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
-import { MindConnectSetup } from "../..";
+import { MindSphereSdk } from "../../api/sdk";
 import { decrypt, loadAuth } from "../../api/utils";
 import { errorLog, getColor, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
 
@@ -16,7 +16,7 @@ export default (program: CommanderStatic) => {
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
         .description(color("register agent for diagnostic *"))
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     if (!options.passkey) {
@@ -26,7 +26,8 @@ export default (program: CommanderStatic) => {
                     proxyLog(options.verbose, color);
 
                     const auth = loadAuth();
-                    const setup = new MindConnectSetup(auth.gateway, decrypt(auth, options.passkey), auth.tenant);
+                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
+                    const mcApiClient = sdk.GetMindConnectApiClient();
                     const configFile = path.resolve(options.config);
                     if (!fs.existsSync(configFile)) {
                         throw new Error(`Can't find file ${configFile}`);
@@ -36,7 +37,7 @@ export default (program: CommanderStatic) => {
                         `registering for diagnostic with agent id ${color(configuration.content.clientId)}`,
                         options.verbose
                     );
-                    await setup.RegisterForDiagnostic(configuration.content.clientId);
+                    await mcApiClient.PostDiagnosticActivation(configuration.content.clientId);
                     verboseLog(
                         `successfully registered the agent with agent id ${color(
                             configuration.content.clientId

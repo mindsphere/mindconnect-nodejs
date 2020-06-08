@@ -9,9 +9,8 @@ const timeOffset = new Date().getTime();
 describe("[SDK] AssetManagementClient.AspectTypes", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
+        ...auth,
         basicAuth: decrypt(auth, "passkey.4.unit.test"),
-        tenant: auth.tenant,
-        gateway: auth.gateway
     });
     const am = sdk.GetAssetManagementClient();
     const tenant = sdk.GetTenant();
@@ -29,9 +28,9 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
                 searchable: true,
                 length: 5,
                 defaultValue: "25/77",
-                qualityCode: true
-            }
-        ]
+                qualityCode: true,
+            },
+        ],
     };
 
     before(async () => {
@@ -57,7 +56,7 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         am.should.not.be.undefined;
         am.GetGateway().should.be.equal(auth.gateway);
         (await am.GetToken()).length.should.be.greaterThan(200);
-        (await am.GetServiceToken()).length.should.be.greaterThan(200);
+        (await am.GetToken()).length.should.be.greaterThan(200);
     });
 
     it("should GET aspecttypes", async () => {
@@ -75,9 +74,9 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         const aspectTypes = await am.GetAspectTypes({
             filter: JSON.stringify({
                 id: {
-                    startsWith: `${tenant}`
-                }
-            })
+                    startsWith: `${tenant}`,
+                },
+            }),
         });
 
         aspectTypes.should.not.be.undefined;
@@ -92,16 +91,16 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
             filter: JSON.stringify({
                 and: {
                     id: {
-                        startsWith: `${tenant}`
+                        startsWith: `${tenant}`,
                     },
                     name: {
-                        startsWith: `UnitTestEngine_${timeOffset}`
-                    }
-                }
+                        startsWith: `UnitTestEngine_${timeOffset}`,
+                    },
+                },
             }),
             sort: "DESC",
             page: 0,
-            size: 0
+            size: 0,
         });
 
         aspectTypes.should.not.be.undefined;
@@ -132,11 +131,11 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         const aspectType = await am.PutAspectType(`${tenant}.UnitTestEngine_${timeOffset}_D`, testAspectType);
         aspectType.variables.push({
             dataType: AssetManagementModels.VariableDefinition.DataTypeEnum.BOOLEAN,
-            name: "test"
+            name: "test",
         });
 
         const patchedAspectType = await am.PatchAspectType(`${tenant}.UnitTestEngine_${timeOffset}_D`, aspectType, {
-            ifMatch: `${aspectType.etag}`
+            ifMatch: `${aspectType.etag}`,
         });
         patchedAspectType.should.not.be.null;
         patchedAspectType.variables.length.should.be.equal(2);
@@ -155,16 +154,16 @@ async function deleteAspectTypes(am: AssetManagementClient, tenant: string) {
         filter: JSON.stringify({
             and: {
                 id: {
-                    startsWith: `${tenant}`
+                    startsWith: `${tenant}`,
                 },
                 name: {
-                    startsWith: `UnitTestEngine_${timeOffset}`
-                }
-            }
+                    startsWith: `UnitTestEngine_${timeOffset}`,
+                },
+            },
         }),
         sort: "DESC",
         page: 0,
-        size: 0
+        size: 0,
     })) as any;
     for (const x of aspectTypes._embedded.aspectTypes) {
         await am.DeleteAspectType(x.id, { ifMatch: x.etag });

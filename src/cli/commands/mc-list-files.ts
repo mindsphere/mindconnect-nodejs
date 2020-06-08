@@ -2,7 +2,15 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import { IotFileModels, MindSphereSdk } from "../../api/sdk";
 import { decrypt, loadAuth, retry } from "../../api/utils";
-import { errorLog, getColor, homeDirLog, humanFileSize, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
+import {
+    errorLog,
+    getColor,
+    homeDirLog,
+    humanFileSize,
+    proxyLog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
 
 const color = getColor("magenta");
 
@@ -21,7 +29,7 @@ export default (program: CommanderStatic) => {
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
         .description(color(`list files stored with the asset *`))
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     homeDirLog(options.verbose, color);
@@ -29,11 +37,7 @@ export default (program: CommanderStatic) => {
 
                     checkRequiredParameters(options);
                     const auth = loadAuth();
-                    const sdk = new MindSphereSdk({
-                        gateway: auth.gateway,
-                        basicAuth: decrypt(auth, options.passkey),
-                        tenant: auth.tenant
-                    });
+                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     const iotFile = sdk.GetIoTFileClient();
 
@@ -48,7 +52,7 @@ export default (program: CommanderStatic) => {
                                 offset: offset,
                                 limit: 500,
                                 count: true,
-                                filter: options.filter
+                                filter: options.filter,
                             })
                         )) as IotFileModels.File[];
                         for (const file of files) {

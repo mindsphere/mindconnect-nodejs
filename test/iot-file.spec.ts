@@ -10,9 +10,8 @@ const timeOffset = new Date().getTime();
 describe("[SDK] IotFileClient", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
+        ...auth,
         basicAuth: decrypt(auth, "passkey.4.unit.test"),
-        tenant: auth.tenant,
-        gateway: auth.gateway
     });
     const iotFile = sdk.GetIoTFileClient();
     let rootId = "";
@@ -36,7 +35,7 @@ describe("[SDK] IotFileClient", () => {
         await retry(5, () =>
             iotFile.PutFile(rootId, `unit/test/xyz${timeOffset}.txt`, Buffer.from("xyz"), {
                 description: "blubb",
-                type: "text/plain"
+                type: "text/plain",
             })
         );
         const file = await retry(5, () => iotFile.GetFile(rootId, `unit/test/xyz${timeOffset}.txt`));
@@ -51,7 +50,7 @@ describe("[SDK] IotFileClient", () => {
             Buffer.alloc(8 * 1024 * 1024 + 1),
             {
                 chunk: true,
-                retry: 5
+                retry: 5,
             }
         );
 
@@ -67,7 +66,7 @@ describe("[SDK] IotFileClient", () => {
             Buffer.alloc(16.25 * 1024 * 1024),
             {
                 chunk: true,
-                retry: 5
+                retry: 5,
             }
         );
 
@@ -77,7 +76,7 @@ describe("[SDK] IotFileClient", () => {
     it("should be able to upload 1 byte large file", async () => {
         const checksum = await iotFile.UploadFile(rootId, `unit/test/xyz${timeOffset}_1by.txt`, Buffer.alloc(1), {
             chunk: true,
-            retry: 5
+            retry: 5,
         });
 
         checksum.should.be.equal("93b885adfe0da089cdf634904fd59f71");
@@ -86,7 +85,7 @@ describe("[SDK] IotFileClient", () => {
     it("should be able to upload 0 byte large file", async () => {
         const checksum = await iotFile.UploadFile(rootId, `unit/test/xyz${timeOffset}_0by.txt`, Buffer.alloc(0), {
             chunk: true,
-            retry: 5
+            retry: 5,
         });
 
         checksum.should.be.equal("d41d8cd98f00b204e9800998ecf8427e");
@@ -95,7 +94,7 @@ describe("[SDK] IotFileClient", () => {
     async function deleteFiles() {
         await sleep(2000);
         const files = await iotFile.GetFiles(rootId, {
-            filter: `name eq xyz${timeOffset}*.txt and path eq unit/test/`
+            filter: `name eq xyz${timeOffset}*.txt and path eq unit/test/`,
         });
 
         for (const file of files) {

@@ -10,9 +10,8 @@ const timeOffset = new Date().getTime();
 describe("[SDK] AssetManagementClient.Assets", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
+        ...auth,
         basicAuth: decrypt(auth, "passkey.4.unit.test"),
-        tenant: auth.tenant,
-        gateway: auth.gateway
     });
     const am = sdk.GetAssetManagementClient();
     const tenant = sdk.GetTenant();
@@ -29,7 +28,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
             streetAddress: "Industriestraße 21 A/II",
             postalCode: "6020",
             longitude: 53.5125546,
-            latitude: 9.9763411
+            latitude: 9.9763411,
         },
         variables: [],
         aspects: [],
@@ -37,7 +36,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         typeId: `core.basicsite`,
 
         timezone: "Europe/Berlin",
-        twinType: AssetManagementModels.TwinType.Performance
+        twinType: AssetManagementModels.TwinType.Performance,
     };
 
     before(async () => {
@@ -63,7 +62,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         am.should.not.be.undefined;
         am.GetGateway().should.be.equal(auth.gateway);
         (await am.GetToken()).length.should.be.greaterThan(200);
-        (await am.GetServiceToken()).length.should.be.greaterThan(200);
+        (await am.GetToken()).length.should.be.greaterThan(200);
     });
 
     it("should GET asset(s)", async () => {
@@ -81,9 +80,9 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         const assets = await am.GetAssets({
             filter: JSON.stringify({
                 typeId: {
-                    startsWith: `${tenant}`
-                }
-            })
+                    startsWith: `${tenant}`,
+                },
+            }),
         });
         assets.should.not.be.undefined;
         assets.should.not.be.null;
@@ -98,13 +97,13 @@ describe("[SDK] AssetManagementClient.Assets", () => {
                 and: {
                     deleted: null,
                     name: {
-                        startsWith: `Falcon_${timeOffset}`
-                    }
-                }
+                        startsWith: `Falcon_${timeOffset}`,
+                    },
+                },
             }),
             sort: "ASC",
             page: 0,
-            size: 0
+            size: 0,
         });
         assets.should.not.be.undefined;
         assets.should.not.be.null;
@@ -136,7 +135,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
 
         asset.externalId = "12354";
         const patchedAssetType = await am.PatchAsset(`${asset.assetId}`, asset, {
-            ifMatch: `${asset.etag}`
+            ifMatch: `${asset.etag}`,
         });
         patchedAssetType.should.not.be.null;
         (patchedAssetType as any).externalId.should.be.equal("12354");
@@ -160,7 +159,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
                 `${asset.assetId}`,
                 "Keyword",
                 {
-                    fileId: "abcd"
+                    fileId: "abcd",
                 },
                 { ifMatch: `${asset.etag}` }
             );
@@ -221,13 +220,13 @@ async function deleteAssets(am: AssetManagementClient) {
             and: {
                 deleted: null,
                 name: {
-                    startsWith: `Falcon_${timeOffset}`
-                }
-            }
+                    startsWith: `Falcon_${timeOffset}`,
+                },
+            },
         }),
         sort: "DESC",
         page: 0,
-        size: 0
+        size: 0,
     })) as any;
     await sleep(2000);
     for (const x of assets._embedded.assets) {

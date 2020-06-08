@@ -217,7 +217,7 @@ export class MultipartUploader extends MindConnectBase {
         ifMatch,
         description,
         fileType,
-        timeStamp
+        timeStamp,
     }: {
         mode: "start" | "complete" | "abort";
         entityId: string;
@@ -232,7 +232,7 @@ export class MultipartUploader extends MindConnectBase {
 
         const headers = {
             description: description,
-            type: fileType
+            type: fileType,
         };
 
         timeStamp && ((headers as any).timeStamp = timeStamp.toISOString());
@@ -248,7 +248,7 @@ export class MultipartUploader extends MindConnectBase {
             additionalHeaders: headers,
             noResponse: true,
             returnHeaders: true,
-            body: Buffer.alloc(0)
+            body: Buffer.alloc(0),
         });
         return result;
     }
@@ -262,14 +262,14 @@ export class MultipartUploader extends MindConnectBase {
         uploadPath,
         entityId,
         buffer,
-        ifMatch
+        ifMatch,
     }: uploadChunkParameters): Promise<boolean> {
         if (buffer.length <= 0) return false;
 
         const headers = {
             description: description,
             type: fileType,
-            timestamp: timeStamp.toISOString()
+            timestamp: timeStamp.toISOString(),
         };
 
         ifMatch !== undefined && ((headers as any)["If-Match"] = ifMatch);
@@ -295,7 +295,7 @@ export class MultipartUploader extends MindConnectBase {
             octetStream: true,
             additionalHeaders: headers,
             noResponse: true,
-            returnHeaders: true
+            returnHeaders: true,
         })) as Headers;
 
         const result = resultHeaders.get("ETag") || true;
@@ -359,9 +359,7 @@ export class MultipartUploader extends MindConnectBase {
         storedError &&
             aborted &&
             throwError(
-                `Error occurred uploading the file. (Multipart upload was automatically aborted).\n Previous error: ${
-                    storedError.message
-                } `
+                `Error occurred uploading the file. (Multipart upload was automatically aborted).\n Previous error: ${storedError.message} `
             );
         storedError && !aborted && throwError(storedError.message);
 
@@ -392,7 +390,7 @@ export class MultipartUploader extends MindConnectBase {
             uploadPath: filepath,
             totalChunks: totalChunks,
             entityId: entityId,
-            ifMatch: optional.ifMatch
+            ifMatch: optional.ifMatch,
         };
 
         const RETRIES = optional.retry || 1;
@@ -426,7 +424,7 @@ export class MultipartUploader extends MindConnectBase {
                     () =>
                         this.MultipartOperation({
                             mode: "start",
-                            ...fileInfo
+                            ...fileInfo,
                         }),
                     300,
                     multipartLog
@@ -435,7 +433,7 @@ export class MultipartUploader extends MindConnectBase {
 
         return new Promise((resolve, reject) => {
             mystream
-                .on("error", err => reject(err))
+                .on("error", (err) => reject(err))
                 .on("data", async (data: Buffer) => {
                     if (current.byteLength + data.byteLength <= chunkSize) {
                         current = this.addDataToBuffer(current, data);
@@ -463,7 +461,7 @@ export class MultipartUploader extends MindConnectBase {
                                         this.UploadChunk({
                                             ...fileInfo,
                                             chunks: currentChunk,
-                                            buffer: currentBuffer
+                                            buffer: currentBuffer,
                                         }),
                                     300,
                                     uploadLog
@@ -489,7 +487,7 @@ export class MultipartUploader extends MindConnectBase {
                                 this.UploadChunk({
                                     ...fileInfo,
                                     chunks: currentChunk,
-                                    buffer: currentBuffer
+                                    buffer: currentBuffer,
                                 }),
                             300,
                             uploadLog
@@ -516,7 +514,7 @@ export class MultipartUploader extends MindConnectBase {
                         if (verboseFunction) verboseFunction(`max parallel uploads ${maxParalellUploads}`);
                         for (const partPromises of splitedPromises) {
                             const uploadParts: any = [];
-                            partPromises.forEach(async f => {
+                            partPromises.forEach(async (f) => {
                                 uploadParts.push(f());
                             });
 
@@ -549,7 +547,7 @@ export class MultipartUploader extends MindConnectBase {
         }
 
         if (this.sdkClient) {
-            return await this.sdkClient.GetServiceToken();
+            return await this.sdkClient.GetToken();
         }
         return "";
     }

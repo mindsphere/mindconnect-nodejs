@@ -6,10 +6,11 @@ import { TimeSeriesAggregateClient } from "../iotaggregate/iot-timeseries-aggreg
 import { TimeSeriesBulkClient } from "../iotbulk/iot-timeseries-bulk";
 import { IotFileClient } from "../iotfile/iot-file";
 import { KPICalculationClient } from "../kpi/kpi";
+import { MindConnectApiClient } from "../mcapi/mcapi";
 import { SignalValidationClient } from "../signal-validation/signal-validation";
 import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
 import { TrendPredictionClient } from "../trend/trend-prediction";
-import { isSdkConfiguration, SdkConfiguration } from "./sdk-client";
+import { SdkClient } from "./sdk-client";
 /**
  * * Pre-Alpha SDK for the mindsphere APIs
  *
@@ -19,7 +20,7 @@ import { isSdkConfiguration, SdkConfiguration } from "./sdk-client";
  * @export
  * @class MindSphereSdk
  */
-export class MindSphereSdk {
+export class MindSphereSdk extends SdkClient {
     private _assetManagementClient?: AssetManagementClient;
     /**
      * * Asset Management
@@ -29,8 +30,7 @@ export class MindSphereSdk {
      * @memberOf MindSphereSdk
      */
     public GetAssetManagementClient(): AssetManagementClient {
-        this._assetManagementClient =
-            this._assetManagementClient || new AssetManagementClient(this._gateway, this._basicAuth, this._tenant);
+        this._assetManagementClient = this._assetManagementClient || new AssetManagementClient(this._credentials);
         return this._assetManagementClient;
     }
 
@@ -44,8 +44,7 @@ export class MindSphereSdk {
      * @memberOf MindSphereSdk
      */
     public GetAgentManagementClient(): AgentManagementClient {
-        this._agentManagementClient =
-            this._agentManagementClient || new AgentManagementClient(this._gateway, this._basicAuth, this._tenant);
+        this._agentManagementClient = this._agentManagementClient || new AgentManagementClient(this._credentials);
         return this._agentManagementClient;
     }
 
@@ -59,7 +58,7 @@ export class MindSphereSdk {
      * @memberOf MindSphereSdk
      */
     public GetIoTFileClient(): IotFileClient {
-        this._iotFileClient = this._iotFileClient || new IotFileClient(this._gateway, this._basicAuth, this._tenant);
+        this._iotFileClient = this._iotFileClient || new IotFileClient(this._credentials);
         return this._iotFileClient;
     }
 
@@ -73,8 +72,7 @@ export class MindSphereSdk {
      * @memberOf MindSphereSdk
      */
     public GetTimeSeriesBulkClient(): TimeSeriesBulkClient {
-        this._tsBulkClient =
-            this._tsBulkClient || new TimeSeriesBulkClient(this._gateway, this._basicAuth, this._tenant);
+        this._tsBulkClient = this._tsBulkClient || new TimeSeriesBulkClient(this._credentials);
         return this._tsBulkClient;
     }
 
@@ -88,8 +86,7 @@ export class MindSphereSdk {
      * @memberOf MindSphereSdk
      */
     public GetTimeSeriesClient(): TimeSeriesClient {
-        this._timeSeriesClient =
-            this._timeSeriesClient || new TimeSeriesClient(this._gateway, this._basicAuth, this._tenant);
+        this._timeSeriesClient = this._timeSeriesClient || new TimeSeriesClient(this._credentials);
         return this._timeSeriesClient;
     }
 
@@ -104,8 +101,7 @@ export class MindSphereSdk {
      */
     public GetTimeSeriesAggregateClient(): TimeSeriesAggregateClient {
         this._timeSeriesAggregateClient =
-            this._timeSeriesAggregateClient ||
-            new TimeSeriesAggregateClient(this._gateway, this._basicAuth, this._tenant);
+            this._timeSeriesAggregateClient || new TimeSeriesAggregateClient(this._credentials);
         return this._timeSeriesAggregateClient;
     }
 
@@ -119,8 +115,7 @@ export class MindSphereSdk {
      * @memberOf MindSphereSdk
      */
     public GetEventManagementClient(): EventManagementClient {
-        this._eventManagementClient =
-            this._eventManagementClient || new EventManagementClient(this._gateway, this._basicAuth, this._tenant);
+        this._eventManagementClient = this._eventManagementClient || new EventManagementClient(this._credentials);
         return this._eventManagementClient;
     }
 
@@ -134,8 +129,7 @@ export class MindSphereSdk {
      * @memberOf MindSphereSdk
      */
     public GetSpectrumAnalysisClient(): SpectrumAnalysisClient {
-        this._spectrumAnalysisClient =
-            this._spectrumAnalysisClient || new SpectrumAnalysisClient(this._gateway, this._basicAuth, this._tenant);
+        this._spectrumAnalysisClient = this._spectrumAnalysisClient || new SpectrumAnalysisClient(this._credentials);
 
         return this._spectrumAnalysisClient;
     }
@@ -150,8 +144,7 @@ export class MindSphereSdk {
      * @memberOf MindSphereSdk
      */
     public GetSignalValidationClient(): SignalValidationClient {
-        this._signalValidationClient =
-            this._signalValidationClient || new SignalValidationClient(this._gateway, this._basicAuth, this._tenant);
+        this._signalValidationClient = this._signalValidationClient || new SignalValidationClient(this._credentials);
 
         return this._signalValidationClient;
     }
@@ -166,8 +159,7 @@ export class MindSphereSdk {
      * @memberOf MindSphereSdk
      */
     public GetTrendPredictionClient(): TrendPredictionClient {
-        this._trendPredictionClient =
-            this._trendPredictionClient || new TrendPredictionClient(this._gateway, this._basicAuth, this._tenant);
+        this._trendPredictionClient = this._trendPredictionClient || new TrendPredictionClient(this._credentials);
         return this._trendPredictionClient;
     }
 
@@ -181,56 +173,21 @@ export class MindSphereSdk {
      * @memberOf MindSphereSdk
      */
     public GetKPICalculationClient(): KPICalculationClient {
-        this._kpiCalculationClient =
-            this._kpiCalculationClient || new KPICalculationClient(this._gateway, this._basicAuth, this._tenant);
+        this._kpiCalculationClient = this._kpiCalculationClient || new KPICalculationClient(this._credentials);
         return this._kpiCalculationClient;
     }
 
-    /**
-     * * Tenant
-     *
-     * @returns
-     *
-     * @memberOf MindSphereSdk
-     */
-    public GetTenant() {
-        return this._tenant;
-    }
+    private _mindConnectApiClient?: MindConnectApiClient;
 
     /**
-     * * Gateway
+     * * MindConnectApiClient
      *
-     * @returns
+     * @returns {MindConnectApiClient}
      *
      * @memberOf MindSphereSdk
      */
-    public GetGateway() {
-        return this._gateway;
-    }
-    private _gateway: string;
-    private _basicAuth: string;
-    private _tenant: string;
-    constructor();
-    constructor(gateway: string, basicAuth: string, tenant: string);
-    constructor(sdkConfiguration: string | SdkConfiguration);
-    constructor(gatewayOrOptions?: string | SdkConfiguration, basicAuth?: string, tenant?: string) {
-        if (gatewayOrOptions === undefined) {
-            throw new Error("not implemented yet!");
-        }
-        if (isSdkConfiguration(gatewayOrOptions)) {
-            this._gateway = gatewayOrOptions.gateway;
-            this._basicAuth = gatewayOrOptions.basicAuth;
-            this._tenant = gatewayOrOptions.tenant;
-        } else if (
-            typeof gatewayOrOptions === "string" &&
-            typeof basicAuth === "string" &&
-            typeof tenant === "string"
-        ) {
-            this._gateway = gatewayOrOptions;
-            this._basicAuth = basicAuth;
-            this._tenant = tenant;
-        } else {
-            throw new Error("invalid constructor, see documentation");
-        }
+    public GetMindConnectApiClient(): MindConnectApiClient {
+        this._mindConnectApiClient = this._mindConnectApiClient || new MindConnectApiClient(this._credentials);
+        return this._mindConnectApiClient;
     }
 }

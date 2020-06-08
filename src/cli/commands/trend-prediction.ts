@@ -28,7 +28,7 @@ export default (program: CommanderStatic) => {
         .option("-p, --passkey <passkey>", `passkey`)
         .option("-v, --verbose", "verbose output")
         .description(`${color("perform trend prediction (linear/polynomial) @")}`)
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     checkParameters(options);
@@ -36,11 +36,7 @@ export default (program: CommanderStatic) => {
                     proxyLog(options.verbose, color);
 
                     const auth = loadAuth();
-                    const sdk = new MindSphereSdk({
-                        tenant: auth.tenant,
-                        gateway: auth.gateway,
-                        basicAuth: decrypt(auth, options.passkey)
-                    });
+                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     const trendPrediction = sdk.GetTrendPredictionClient();
 
@@ -75,7 +71,7 @@ export default (program: CommanderStatic) => {
                                 const prediction = (await retry(options.retry, () =>
                                     trendPrediction.Predict({
                                         modelConfiguration: { modelId: options.modelid },
-                                        ...predictionData
+                                        ...predictionData,
                                     })
                                 )) as TrendPredictionModels.PredictionDataArray;
 
@@ -90,7 +86,7 @@ export default (program: CommanderStatic) => {
                                 const prediction = (await retry(options.retry, () =>
                                     trendPrediction.TrainAndPredict({
                                         ...trainBody,
-                                        ...predictionData
+                                        ...predictionData,
                                     })
                                 )) as TrendPredictionModels.PredictionDataArray;
                                 displayPrediction(options, prediction);
@@ -148,9 +144,9 @@ function getpredictors(options: any) {
         predictionData: [
             {
                 variable: { entityId: "cli-trend-prediction", propertySetName: "cli-trend-prediction" },
-                timeSeries: [{ _time: new Date().toISOString() }]
-            }
-        ]
+                timeSeries: [{ _time: new Date().toISOString() }],
+            },
+        ],
     };
 
     if (options.predictfile) {
@@ -177,29 +173,29 @@ function getTrainBody(options: any) {
     const data = JSON.parse(buffer.toString());
     const variables = `${options.input}`.split(",").map((x: string) => x.trim());
     const allvariables = [...variables, options.output, "_time"];
-    const result = _.map(data, item => _.pick(item, allvariables));
+    const result = _.map(data, (item) => _.pick(item, allvariables));
     const params: TrendPredictionModels.TrainBody = {
         modelConfiguration: { polynomialDegree: options.degree },
         metadataConfiguration: {
             outputVariable: {
                 entityId: "cli-trend-prediction",
                 propertySetName: "cli-trend-prediction",
-                propertyName: options.output
+                propertyName: options.output,
             },
-            inputVariables: []
+            inputVariables: [],
         },
         trainingData: [
             {
                 variable: { entityId: "cli-trend-prediction", propertySetName: "cli-trend-prediction" },
-                timeSeries: result
-            }
-        ]
+                timeSeries: result,
+            },
+        ],
     };
     variables.forEach((item: string) => {
         params.metadataConfiguration!.inputVariables!.push({
             entityId: "cli-trend-prediction",
             propertySetName: "cli-trend-prediction",
-            propertyName: item
+            propertyName: item,
         });
     });
     return params;
@@ -209,10 +205,10 @@ async function listModels(trendPrediction: TrendPredictionClient, options: any) 
     const result = (await retry(options.retry, () => trendPrediction.GetModels())) as TrendPredictionModels.ModelDto[];
 
     console.log(`${color("id")} function creation date`);
-    result.forEach(element => {
+    result.forEach((element) => {
         console.log(
             `${color(element.id)} ${color("(")}${element.metadataConfiguration?.inputVariables
-                ?.map(x => x.propertyName)
+                ?.map((x) => x.propertyName)
                 .join(",")}${color(") =>")} ${element.metadataConfiguration?.outputVariable?.propertyName} ${
                 element.creationDate
             }`

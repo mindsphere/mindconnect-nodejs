@@ -3,13 +3,17 @@ import { log } from "console";
 import * as fs from "fs";
 import { sleep } from "../../../test/test-utils";
 import { AgentManagementModels, AssetManagementModels, MindSphereSdk } from "../../api/sdk";
+import { decrypt, loadAuth, retry, throwError } from "../../api/utils";
 import {
-    decrypt,
-    retry,
-    throwError,
-    loadAuth
-} from "../../api/utils";
-import { agentConfigLog, getColor, serviceCredentialLog, homeDirLog, proxyLog, verboseLog, retrylog, errorLog } from "./command-utils";
+    agentConfigLog,
+    errorLog,
+    getColor,
+    homeDirLog,
+    proxyLog,
+    retrylog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
 
 const color = getColor("magenta");
 
@@ -29,7 +33,7 @@ export default (program: CommanderStatic) => {
         .option("-y, --retry <number>", "retry attempts before giving up", 3)
         .option("-v, --verbose", "verbose output")
         .description(color("create an agent in the mindsphere *"))
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     homeDirLog(options.verbose, color);
@@ -37,11 +41,7 @@ export default (program: CommanderStatic) => {
                     checkRequiredParamaters(options);
 
                     const auth = loadAuth();
-                    const sdk = new MindSphereSdk({
-                        tenant: auth.tenant,
-                        gateway: auth.gateway,
-                        basicAuth: decrypt(auth, options.passkey)
-                    });
+                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     const am = sdk.GetAssetManagementClient();
                     const ag = sdk.GetAgentManagementClient();
@@ -50,7 +50,7 @@ export default (program: CommanderStatic) => {
                         name: options.name,
                         parentId: parent.assetId,
                         description: "Agent created via mindconnect CLI",
-                        typeId: "core.mclib"
+                        typeId: "core.mclib",
                     };
 
                     verboseLog("creating asset:", options.verbose);
@@ -68,7 +68,7 @@ export default (program: CommanderStatic) => {
                             ag.PostAgent({
                                 name: createdAsset.name,
                                 entityId: `${createdAsset.assetId}`,
-                                securityProfile: options.profile
+                                securityProfile: options.profile,
                             }),
                         500,
                         retrylog("PostAgent", color)
@@ -97,7 +97,7 @@ export default (program: CommanderStatic) => {
                         host: "gateway",
                         tenant: sdk.GetTenant(),
                         agentid: `${createdAgent.id}`,
-                        color
+                        color,
                     });
                 } catch (err) {
                     errorLog(err, options.verbose);
