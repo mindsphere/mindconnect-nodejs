@@ -47,7 +47,7 @@ export function upgradeOldConfiguration(obj: any) {
                     createdAt: new Date().toISOString(),
                     appName: "",
                     appVersion: "",
-                    userTenant: "",
+                    usertenant: "",
                 },
             ],
         };
@@ -183,10 +183,23 @@ export const loadAuth = (): authJson => {
 };
 
 export function getFullConfig(): { credentials: authJson[] } {
+    const homeDir = getHomeDotMcDir();
+    if (!fs.existsSync(homeDir)) {
+        fs.mkdirSync(homeDir);
+        console.log(`creating ${homeDir} folder`);
+    }
+
+    // create empty auth.json
     const pathName = `${getHomeDotMcDir()}auth.json`;
+    if (!fs.existsSync(pathName)) {
+        fs.writeFileSync(pathName, JSON.stringify({ credentials: [] }));
+        console.log(`initializing ${pathName} with empty configuration`);
+    }
 
     const buffer = fs.readFileSync(pathName);
     let obj = JSON.parse(buffer.toString());
+
+    // console.log(obj);
 
     if (obj.auth && obj.iv && obj.gateway && obj.tenant) {
         const upgraded = upgradeOldConfiguration(obj);

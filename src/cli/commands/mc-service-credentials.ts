@@ -181,9 +181,9 @@ function addEntry(options: any) {
         gateway: options.gateway,
         tenant: `${options.tenant}`,
         type: options.type,
-        usertenant: `${options.usertenant}`,
-        appName: `${options.appName}`,
-        appVersion: `${options.appVersion}`,
+        usertenant: `${options.usertenant || ""}`,
+        appName: `${options.appName || ""}`,
+        appVersion: `${options.appVersion || ""}`,
         createdAt: new Date().toISOString(),
         selected: true,
     };
