@@ -22,7 +22,7 @@ export default (program: CommanderStatic) => {
             "-r, --cert [privatekey]",
             "required for agents with RSA_3072 profile. create with: openssl genrsa -out private.key 3072"
         )
-        .option("-y, --retry <number>", "retry attempts before giving up", 3)
+        .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
         .description(color(`displays the agent status and agent onboarding status *`))
         .action((options) => {

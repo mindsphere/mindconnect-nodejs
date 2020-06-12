@@ -23,7 +23,7 @@ export default (program: CommanderStatic) => {
         .alias("rn")
         .option("-c, --config <agentconfig>", "config file for agent configuration")
         .option("-k, --passkey <passkey>", "passkey")
-        .option("-y, --retry <number>", "retry attempts before giving up", 3)
+        .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
         .description(color("renews the agent secrets  *"))
         .action((options) => {

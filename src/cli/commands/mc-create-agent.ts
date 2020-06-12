@@ -30,7 +30,7 @@ export default (program: CommanderStatic) => {
         .option("-p, --parentid <name>", "parent asset id")
         .option("-f, --profile <profile>", "security profile [SHARED_SECRET|RSA_3072]", "SHARED_SECRET")
         .option("-k, --passkey <passkey>", "passkey")
-        .option("-y, --retry <number>", "retry attempts before giving up", 3)
+        .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
         .description(color("create an agent in the mindsphere *"))
         .action((options) => {

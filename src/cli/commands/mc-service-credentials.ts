@@ -24,7 +24,7 @@ export default (program: CommanderStatic) => {
         .option("-m, --mode [config|list|select|add]", "config | list | select | add", "config")
         .option("-i, --index <index>", "select credentials with specified index")
         .option("-y, --type <type>", "type (APP | SERVICE)", "APP")
-        .option("-o, --port <port>", "port for config web server", 4994)
+        .option("-o, --port <port>", "port for config web server", "4994")
         .option("-u, --user <user>", "credentials: username")
         .option("-p, --password <password>", "credendials: password")
         .option(

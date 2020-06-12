@@ -27,10 +27,10 @@ export default (program: CommanderStatic) => {
         .option("-y, --sourceType <sourceType>", "Source Type", "MindConnect-Agent")
         .option("-S, --sourceId <sourceId>", "Source Id", os.hostname() || "")
         .option("-O, --source <source>", "Source", "MindConnect-NodeJs CLI")
-        .option("-V, --severity <severity>", "Severity (20:Error, 30:Warning , 40:information)", 20)
+        .option("-V, --severity <severity>", "Severity (20:Error, 30:Warning , 40:information)", "20")
         .option("-d, --desc <description>", "Event description", "CLI created event")
         .option("-t, --timestamp <timestamp>", "Timestamp", new Date().toISOString())
-        .option("-y, --retry <number>", "retry attempts before giving up", 3)
+        .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option(
             "-p, --passkey <passkey>",
             `passkey (optional, event creation uses ${adminColor("service credentials *")})`

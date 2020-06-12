@@ -12,7 +12,7 @@ export default (program: CommanderStatic) => {
         .command("service-token")
         .alias("stk")
         .option("-k, --passkey <passkey>", "passkey")
-        .option("-y, --retry <number>", "retry attempts before giving up", 3)
+        .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
         .description(color(`displays the service token for use in other tools (e.g. postman) *`))
         .action((options) => {

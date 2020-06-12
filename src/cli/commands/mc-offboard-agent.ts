@@ -25,7 +25,7 @@ export default (program: CommanderStatic) => {
         .option("-c, --config <agentconfig>", "config file for agent configuration")
         .option("-i, --agentid <agentid>", "agent id")
         .option("-k, --passkey <passkey>", "passkey")
-        .option("-y, --retry <number>", "retry attempts before giving up", 3)
+        .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
         .description(color("offboards the agent in the mindsphere *"))
         .action((options) => {

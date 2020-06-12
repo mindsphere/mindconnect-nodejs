@@ -26,7 +26,7 @@ export default (program: CommanderStatic) => {
     program
         .command("dev-proxy")
         .alias("px")
-        .option("-o, --port <port>", "port for web server", 7707)
+        .option("-o, --port <port>", "port for web server", "7707")
         .option("-c, --nocors", "don't provide cors headers")
         .option("-r, --norewrite", "don't rewrite hal+json urls")
         .option("-w, --nowarn", "don't warn for missing headers")

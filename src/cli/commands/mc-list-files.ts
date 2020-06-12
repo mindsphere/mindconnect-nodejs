@@ -26,7 +26,7 @@ export default (program: CommanderStatic) => {
             )}) `
         )
         .option("-k, --passkey <passkey>", "passkey")
-        .option("-y, --retry <number>", "retry attempts before giving up", 3)
+        .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
         .description(color(`list files stored with the asset *`))
         .action((options) => {

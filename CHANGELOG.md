@@ -12,6 +12,7 @@
 - CLI: mc dev-proxy added simple api proxy for mindsphere local app development
 - CLI: deprecated use of classical service credentials
 - Improved documentation for GetDataSourceConfiguration and GetDataMappings methods (#149, #150)
+- bumped all dependencies
 
 ## 3.7.0 - (Boysenberry Vienna) - February 2020
 
