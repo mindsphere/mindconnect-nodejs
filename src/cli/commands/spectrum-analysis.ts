@@ -29,7 +29,7 @@ export default (program: CommanderStatic) => {
             `output file (fft: ${color("fft.spectrum.json")}, threshold: ${color("violations.spectrum.json")})`
         )
         .option("-w, --windowtype [flattop|hamming|hanning|blackman]", "window type for the FFT", "flattop")
-        .option("-y, --retry <number>", "retry attempts before giving up", 3)
+        .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-p, --passkey <passkey>", `passkey`)
         .option("-v, --verbose", "verbose output")
         .description(`${color("perform spectrum analysis on a sound file @")}`)

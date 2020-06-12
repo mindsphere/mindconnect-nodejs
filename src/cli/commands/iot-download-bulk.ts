@@ -19,9 +19,9 @@ export default (program: CommanderStatic) => {
         .option("-a, --aspectname <aspectname>", "aspectname")
         .option("-f, --from <from>", "from date")
         .option("-t, --to <to>", "to date")
-        .option("-s, --size <size>", "max entries per file ", 200)
+        .option("-s, --size <size>", "max entries per file ", "200")
         .option("-p, --passkey <passkey>", `passkey`)
-        .option("-y, --retry <number>", "retry attempts before giving up", 3)
+        .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
         .description(`${color("download the timeseries from mindsphere")}`)
         .action((options) => {

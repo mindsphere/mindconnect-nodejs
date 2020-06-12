@@ -23,12 +23,12 @@ export default (program: CommanderStatic) => {
         )
         .option("-f, --file <fileToUpload>", "file to upload to the file service")
         .option("-h, --filepath <filepath>", "file path in the mindsphere")
-        .option("-l, --parallel <number>", "parallel chunk uploads", 3)
+        .option("-l, --parallel <number>", "parallel chunk uploads", "3")
         .option("-i, --assetid [assetid]", "asset id from the mindsphere  (default: upload to the agent)")
         .option("-m, --mime [mime-type]", "mime type of the file (default: automatic recognition)")
         .option("-d, --desc [description]", "description")
         .option("-k, --chunked", "Use chunked upload")
-        .option("-y, --retry <number>", "retry attempts before giving up", 3)
+        .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option(
             "-p, --passkey <passkey>",
             `passkey (optional, file upload uses ${adminColor("service credentials *")})`

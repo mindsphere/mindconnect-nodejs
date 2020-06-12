@@ -14,7 +14,7 @@ export default (program: CommanderStatic) => {
         .command("mqtt-createjwt")
         .alias("jw")
         .option("-i, --clientid <clientid>", "MQTT ClientId", uuid.v4())
-        .option("-e, --expiration <expiration>", "time until the token is valid in seconds", 1 * 60 * 60)
+        .option("-e, --expiration <expiration>", "time until the token is valid in seconds", `${1 * 60 * 60}`)
         .option("-c, --rootca <rootca>", "path to CA root certificate", "CA-root.pem")
         .option("-d, --devicecrt <devicecrt>", "path to device certificate", "device.crt.pem")
         .option("-k, --devicekey <devicekey>", "path to device certificate key", "device.key.pem")

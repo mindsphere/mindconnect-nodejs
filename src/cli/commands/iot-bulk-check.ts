@@ -18,7 +18,7 @@ export default (program: CommanderStatic) => {
         .command("check-bulk")
         .alias("cb")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
-        .option("-y, --retry <number>", "retry attempts before giving up", 3)
+        .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-i, --timeseries", `use ${yellow("(deprecated)")} standard timeseries upload`)
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")

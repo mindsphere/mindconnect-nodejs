@@ -19,7 +19,7 @@ export default (program: CommanderStatic) => {
         .option("-h, --filepath [filepath]", "file path in the mindsphere", "")
         .option("-i, --assetid <assetid>", "asset id from the mindsphere")
         .option("-p, --passkey <passkey>", `passkey`)
-        .option("-y, --retry <number>", "retry attempts before giving up", 3)
+        .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
         .description(`${color("download the file from mindsphere file service *")}`)
         .action((options) => {
