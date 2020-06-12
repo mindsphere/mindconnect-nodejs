@@ -517,6 +517,49 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         await agent.PostEvent(events);
     });
 
+    it("should be able to post a minimal event", async () => {
+        const agent = new MindConnectAgent(agentConfig);
+
+        if (!agent.IsOnBoarded()) {
+            await agent.OnBoard();
+        }
+
+        await agent.PostEvent({ entityId: agentConfig!.content!.clientId!, timestamp: new Date().toISOString() });
+    });
+
+    it("should be able to post a MindsphereStandardEvent", async () => {
+        const agent = new MindConnectAgent(agentConfig);
+
+        if (!agent.IsOnBoarded()) {
+            await agent.OnBoard();
+        }
+
+        await agent.PostEvent({
+            entityId: agentConfig!.content!.clientId!,
+            timestamp: new Date().toISOString(),
+            description: "x",
+            severity: 20,
+            code: "123",
+            source: "blubb",
+            acknowledged: false,
+        });
+    });
+
+    it("should be able to post a typed event", async () => {
+        const agent = new MindConnectAgent(agentConfig);
+
+        if (!agent.IsOnBoarded()) {
+            await agent.OnBoard();
+        }
+
+        await agent.PostEvent({
+            entityId: agentConfig!.content!.clientId!,
+            timestamp: new Date().toISOString(),
+            typeId: "d29e4385-25c5-46b0-b2b1-82eeeadf19fb",
+            temperature: 23.7,
+        });
+    });
+
     it("should be able to validate event data", async () => {
         const agent = new MindConnectAgent(agentConfig);
 
@@ -524,7 +567,24 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
 
         if (!agentConfig.content.clientId) throw new Error("Invalid configuration");
 
-        await validator({
+        validator({}).should.be.false;
+        validator({ entityId: "123" }).should.be.false;
+        validator({ entityId: agentConfig.content.clientId, timestamp: new Date().toISOString() }).should.be.true;
+        validator({
+            entityId: agentConfig.content.clientId,
+            timestamp: new Date().toISOString(),
+            blubb: "123",
+            acknowledged: true,
+        }).should.be.true;
+
+        validator({
+            entityId: agentConfig.content.clientId,
+            timestamp: new Date().toISOString(),
+            blubb: "123",
+            acknowledged: "xx",
+        }).should.be.false;
+
+        validator({
             entityId: agentConfig.content.clientId,
             sourceType: "Event",
             sourceId: "application",
@@ -534,7 +594,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             description: "Test",
         }).should.be.true;
 
-        await validator({
+        validator({
             entityId: "33ac5ae889a44717b02fa8282a30d1b4",
             timestamp: "2018-06-16T18:38:07.293Z",
             sourceType: "Event",
@@ -544,7 +604,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             description: "",
         }).should.be.true;
 
-        await validator({
+        validator({
             entityId: "XXac5ae889a44717b02fa8282a30d1b4",
             timestamp: "2018-06-16T18:38:07.293Z",
             sourceType: "Event",
@@ -556,9 +616,10 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
 
         log(validator.errors);
         const error: any = (<any>validator).errors[0].message;
+        // tslint:disable-next-line: quotemark
         error.should.be.equal('should match pattern "^[A-Fa-f0-9]*$"');
 
-        await validator({
+        validator({
             entityId: "aaac5ae889a44717b02fa8282a30d1b4",
             timestamp: "2018-06-16T18:38:07.293+02:00",
             sourceType: "Event",
