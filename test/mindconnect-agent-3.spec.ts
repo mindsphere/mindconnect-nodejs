@@ -517,12 +517,72 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         await agent.PostEvent(events);
     });
 
+    it("should be able to post a minimal event", async () => {
+        const agent = new MindConnectAgent(agentConfig);
+
+        if (!agent.IsOnBoarded()) {
+            await agent.OnBoard();
+        }
+
+        await agent.PostEvent({ entityId: agentConfig!.content!.clientId!, timestamp: new Date().toISOString() });
+    });
+
+    it("should be able to post a MindsphereStandardEvent", async () => {
+        const agent = new MindConnectAgent(agentConfig);
+
+        if (!agent.IsOnBoarded()) {
+            await agent.OnBoard();
+        }
+
+        await agent.PostEvent({
+            entityId: agentConfig!.content!.clientId!,
+            timestamp: new Date().toISOString(),
+            description: "x",
+            severity: 20,
+            code: "123",
+            source: "blubb",
+            acknowledged: false,
+        });
+    });
+
+    it("should be able to post a typed event", async () => {
+        const agent = new MindConnectAgent(agentConfig);
+
+        if (!agent.IsOnBoarded()) {
+            await agent.OnBoard();
+        }
+
+        await agent.PostEvent({
+            entityId: agentConfig!.content!.clientId!,
+            timestamp: new Date().toISOString(),
+            typeId: "d29e4385-25c5-46b0-b2b1-82eeeadf19fb",
+            temperature: 23.7,
+        });
+    });
+
     it("should be able to validate event data", async () => {
         const agent = new MindConnectAgent(agentConfig);
 
         const validator = agent.GetEventValidator();
 
         if (!agentConfig.content.clientId) throw new Error("Invalid configuration");
+
+        validator({}).should.be.false;
+        validator({ entityId: "123" }).should.be.false;
+        validator({ entityId: agentConfig.content.clientId, timestamp: new Date().toISOString() }).should.be.true;
+        validator({
+            entityId: agentConfig.content.clientId,
+            timestamp: new Date().toISOString(),
+            blubb: "123",
+            acknowledged: true,
+        }).should.be.true;
+
+        validator({
+            entityId: agentConfig.content.clientId,
+            timestamp: new Date().toISOString(),
+            blubb: "123",
+            acknowledged: "xx",
+        }).should.be.false;
 
         await validator({
             entityId: agentConfig.content.clientId,
