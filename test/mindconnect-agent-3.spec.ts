@@ -584,7 +584,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             acknowledged: "xx",
         }).should.be.false;
 
-        await validator({
+        validator({
             entityId: agentConfig.content.clientId,
             sourceType: "Event",
             sourceId: "application",
@@ -594,7 +594,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             description: "Test",
         }).should.be.true;
 
-        await validator({
+        validator({
             entityId: "33ac5ae889a44717b02fa8282a30d1b4",
             timestamp: "2018-06-16T18:38:07.293Z",
             sourceType: "Event",
@@ -604,7 +604,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             description: "",
         }).should.be.true;
 
-        await validator({
+        validator({
             entityId: "XXac5ae889a44717b02fa8282a30d1b4",
             timestamp: "2018-06-16T18:38:07.293Z",
             sourceType: "Event",
@@ -616,9 +616,10 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
 
         log(validator.errors);
         const error: any = (<any>validator).errors[0].message;
+        // tslint:disable-next-line: quotemark
         error.should.be.equal('should match pattern "^[A-Fa-f0-9]*$"');
 
-        await validator({
+        validator({
             entityId: "aaac5ae889a44717b02fa8282a30d1b4",
             timestamp: "2018-06-16T18:38:07.293+02:00",
             sourceType: "Event",
