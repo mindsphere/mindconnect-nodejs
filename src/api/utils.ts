@@ -199,7 +199,7 @@ export function getFullConfig(): { credentials: authJson[] } {
     const buffer = fs.readFileSync(pathName);
     let obj = JSON.parse(buffer.toString());
 
-    console.log(obj);
+    // console.log(obj);
 
     if (obj.auth && obj.iv && obj.gateway && obj.tenant) {
         const upgraded = upgradeOldConfiguration(obj);
