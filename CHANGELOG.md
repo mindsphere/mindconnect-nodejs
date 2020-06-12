@@ -9,6 +9,7 @@
 - CLI: added mc mqtt-createjwt command which can create a key for MQTT OPC UA PubSub authentication
 - CLI: mc service-credentials command is now accepting application credentials
 - CLI: mc service-credentials command has now http based configuration frontend
+- CLI: mc dev-proxy added simple api proxy for mindsphere local app development
 - CLI: deprecated use of classical service credentials
 - Improved documentation for GetDataSourceConfiguration and GetDataMappings methods (#149, #150)
 

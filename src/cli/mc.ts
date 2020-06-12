@@ -17,6 +17,7 @@ import listAssetsCommand from "./commands/mc-list-assets";
 import listFilesCommand from "./commands/mc-list-files";
 import offboardCommand from "./commands/mc-offboard-agent";
 import onboardCommand from "./commands/mc-onboard";
+import devProxyCommand from "./commands/mc-proxy";
 import registerDiagnosticCommand from "./commands/mc-register-diagnostic";
 import renewAgentCommand from "./commands/mc-renew-agent";
 import serviceCredentialsCommand from "./commands/mc-service-credentials";
@@ -31,7 +32,6 @@ import mqttCreateCommand from "./commands/mqtt-create-jwt";
 import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
 import trendPredictionCommand from "./commands/trend-prediction";
-
 // * generic commands
 versionAndHelp(program);
 
@@ -68,6 +68,10 @@ listFilesCommand(program);
 downloadFileCommand(program);
 deleteFileCommand(program);
 
+// * development proxy
+
+devProxyCommand(program);
+
 // * analytics command
 
 spectrumAnalysisCommand(program);
@@ -83,7 +87,7 @@ mqttCreateCommand(program);
 starterTsCommand(program);
 starterJsCommand(program);
 
-program.on("command:*", function() {
+program.on("command:*", function () {
     console.error("Invalid command: %s\nSee --help for a list of available commands.", program.args.join(" "));
     process.exit(1);
 });
