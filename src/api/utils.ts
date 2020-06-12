@@ -193,7 +193,7 @@ export function getFullConfig(): { credentials: authJson[] } {
     const pathName = `${getHomeDotMcDir()}auth.json`;
     if (!fs.existsSync(pathName)) {
         fs.writeFileSync(pathName, JSON.stringify({ credentials: [] }));
-        console.log(`initiializing ${pathName} with empty configuration`);
+        console.log(`initializing ${pathName} with empty configuration`);
     }
 
     const buffer = fs.readFileSync(pathName);
