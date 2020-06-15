@@ -17,7 +17,6 @@ const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "*",
     "Access-Control-Max-Age": 2592000, // 30 days
-    "transfer-encoding": "",
     "cache-control": "no-cache",
     "x-proxied-by": "mindsphere development proxy",
 };
@@ -138,7 +137,7 @@ async function serve({
                     if (!options.norewrite) {
                         const regex = new RegExp(`https://${requestOptions.hostname}`, "g");
                         replaced = body.replace(regex, `http://localhost:${port}`);
-                        allHeaders["content-length"] = `${replaced.length}`;
+                        // allHeaders["content-length"] = `${replaced.length}`;
                     }
 
                     res.writeHead(proxyres.statusCode || 500, allHeaders);
@@ -166,7 +165,11 @@ async function serve({
 
     server.listen(port);
 
-    console.log(`proxy available at ${color("http://localhost:" + port)}`);
+    console.log(`proxy is available at ${color("http://localhost:" + port)}`);
+    console.log(
+        `example api call (list of assets): ${color("http://localhost:" + port + "/api/assetmanagement/v3/assets")}`
+    );
+    console.log(`API documentation: ${color("https://developer.mindsphere.io/apis/index.html")}`);
     console.log(`press ${color("CTRL + C")} to exit`);
 }
 

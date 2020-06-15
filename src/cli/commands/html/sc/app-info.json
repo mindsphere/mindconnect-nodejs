@@ -9,6 +9,11 @@
             },
             {
                 "type": "WWW",
+                "name": "Source Code (GitHub)",
+                "value": "https://github.com/mindsphere/mindconnect-nodejs/"
+            },
+            {
+                "type": "WWW",
                 "name": "License (MIT)",
                 "value": "https://opensource.mindsphere.io/docs/mindconnect-nodejs/LICENSE.html"
             }
