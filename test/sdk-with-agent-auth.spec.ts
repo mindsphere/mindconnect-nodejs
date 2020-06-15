@@ -6,8 +6,7 @@ import "url-search-params-polyfill";
 import { IMindConnectConfiguration, MindConnectAgent } from "../src";
 import { CredentialAuth } from "../src/api/credential-auth";
 import { isTokenRotation } from "../src/api/mindconnect-base";
-import { AgentManagementModels } from "../src/api/sdk";
-import { MindSphereSdk } from "../src/api/sdk/";
+import { AgentManagementModels, MindSphereSdk } from "../src/api/sdk";
 import { TokenManagerAuth } from "../src/api/tokenmanager-auth";
 import { decrypt, loadAuth } from "../src/api/utils";
 import { AgentUnitTestConfiguration, tearDownAgents, unitTestSetup } from "./test-agent-setup-utils";
@@ -45,7 +44,7 @@ describe("[SDK] using agent authorization", () => {
         (<any>agent)._storage.should.not.be.null;
     });
 
-    it.only("should be able to run the SDK with agent authorization", async () => {
+    it("should be able to run the SDK with agent authorization", async () => {
         const agent = new MindConnectAgent(agentConfig);
         if (!agent.IsOnBoarded()) {
             await agent.OnBoard();
@@ -61,7 +60,7 @@ describe("[SDK] using agent authorization", () => {
         (await assetManagement.GetAssets())._embedded?.assets?.length.should.be.greaterThan(0);
     });
 
-    it.only("should determine if something implements TokenRotation", async () => {
+    it("should determine if something implements TokenRotation", async () => {
         const agent = new MindConnectAgent(agentConfig);
         const credentialAuth = new CredentialAuth("https://opensource.mindsphere.io", "Basic: test", "test");
         const tokenManagerAuth = new TokenManagerAuth(
