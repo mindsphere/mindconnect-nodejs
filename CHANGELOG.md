@@ -2,6 +2,7 @@
 
 ## 3.8.0 - (Electric Blue Vienna) - June 2020
 
+- Agent: added support for creating automatic data source configuration and automatic mappings
 - Agent: added support for typed events
 - SDK: added utility class for MQTT OPC UA PubSub key rotation
 - SDK: added TokenManagerAuth to SDK

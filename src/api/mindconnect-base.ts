@@ -19,6 +19,28 @@ export interface TokenRotation {
      * @memberOf TokenRotation
      */
     RenewToken(): Promise<boolean>;
+
+    GetToken(): Promise<string>;
+
+    GetGateway(): string;
+
+    GetTenant(): string;
+}
+
+export function isTokenRotation(obj: any): boolean {
+    const tr = obj as TokenRotation;
+
+    return (
+        tr.GetGateway !== undefined &&
+        tr.GetTenant !== undefined &&
+        tr.GetToken !== undefined &&
+        tr.RenewToken !== undefined &&
+        tr instanceof Object &&
+        typeof tr.GetGateway === "function" &&
+        typeof tr.GetTenant === "function" &&
+        typeof tr.GetToken === "function" &&
+        typeof tr.RenewToken === "function"
+    );
 }
 
 /**
@@ -41,7 +63,7 @@ export abstract class MindConnectBase {
     protected _headers = {
         Accept: "*/*",
         "X-Powered-By": "meowz",
-        "User-Agent": "mindconnect-nodejs (3.8.0)"
+        "User-Agent": "mindconnect-nodejs (3.8.0)",
     };
 
     /**
@@ -52,12 +74,12 @@ export abstract class MindConnectBase {
      */
     protected _multipartHeaders = {
         ...this._headers,
-        "Content-Type": "multipart/mixed; boundary=mindspheremessage"
+        "Content-Type": "multipart/mixed; boundary=mindspheremessage",
     };
 
     protected _multipartFormData = {
         ...this._headers,
-        "Content-Type": "multipart/form-data; boundary=--mindsphere"
+        "Content-Type": "multipart/form-data; boundary=--mindsphere",
     };
 
     /**
@@ -68,12 +90,12 @@ export abstract class MindConnectBase {
      */
     protected _apiHeaders = {
         ...this._headers,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     };
 
     protected _octetStreamHeaders = {
         ...this._headers,
-        "Content-Type": "application/octet-stream"
+        "Content-Type": "application/octet-stream",
     };
 
     /**
@@ -84,10 +106,10 @@ export abstract class MindConnectBase {
      */
     protected _urlEncodedHeaders = {
         ...this._headers,
-        "Content-Type": "application/x-www-form-urlencoded"
+        "Content-Type": "application/x-www-form-urlencoded",
     };
 
-    protected async HttpAction({
+    public async HttpAction({
         verb,
         gateway,
         baseUrl,
@@ -99,7 +121,7 @@ export abstract class MindConnectBase {
         additionalHeaders,
         noResponse,
         rawResponse,
-        returnHeaders
+        returnHeaders,
     }: {
         verb: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
         gateway: string;
@@ -120,7 +142,7 @@ export abstract class MindConnectBase {
 
         let headers: any = {
             ...apiheaders,
-            Authorization: `Bearer ${authorization}`
+            Authorization: `Bearer ${authorization}`,
         };
 
         if (verb === "GET" || verb === "DELETE") {

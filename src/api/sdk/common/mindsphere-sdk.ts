@@ -30,7 +30,7 @@ export class MindSphereSdk extends SdkClient {
      * @memberOf MindSphereSdk
      */
     public GetAssetManagementClient(): AssetManagementClient {
-        this._assetManagementClient = this._assetManagementClient || new AssetManagementClient(this._credentials);
+        this._assetManagementClient = this._assetManagementClient || new AssetManagementClient(this._authenticator);
         return this._assetManagementClient;
     }
 
@@ -44,7 +44,7 @@ export class MindSphereSdk extends SdkClient {
      * @memberOf MindSphereSdk
      */
     public GetAgentManagementClient(): AgentManagementClient {
-        this._agentManagementClient = this._agentManagementClient || new AgentManagementClient(this._credentials);
+        this._agentManagementClient = this._agentManagementClient || new AgentManagementClient(this._authenticator);
         return this._agentManagementClient;
     }
 
@@ -58,7 +58,7 @@ export class MindSphereSdk extends SdkClient {
      * @memberOf MindSphereSdk
      */
     public GetIoTFileClient(): IotFileClient {
-        this._iotFileClient = this._iotFileClient || new IotFileClient(this._credentials);
+        this._iotFileClient = this._iotFileClient || new IotFileClient(this._authenticator);
         return this._iotFileClient;
     }
 
@@ -72,7 +72,7 @@ export class MindSphereSdk extends SdkClient {
      * @memberOf MindSphereSdk
      */
     public GetTimeSeriesBulkClient(): TimeSeriesBulkClient {
-        this._tsBulkClient = this._tsBulkClient || new TimeSeriesBulkClient(this._credentials);
+        this._tsBulkClient = this._tsBulkClient || new TimeSeriesBulkClient(this._authenticator);
         return this._tsBulkClient;
     }
 
@@ -86,7 +86,7 @@ export class MindSphereSdk extends SdkClient {
      * @memberOf MindSphereSdk
      */
     public GetTimeSeriesClient(): TimeSeriesClient {
-        this._timeSeriesClient = this._timeSeriesClient || new TimeSeriesClient(this._credentials);
+        this._timeSeriesClient = this._timeSeriesClient || new TimeSeriesClient(this._authenticator);
         return this._timeSeriesClient;
     }
 
@@ -101,7 +101,7 @@ export class MindSphereSdk extends SdkClient {
      */
     public GetTimeSeriesAggregateClient(): TimeSeriesAggregateClient {
         this._timeSeriesAggregateClient =
-            this._timeSeriesAggregateClient || new TimeSeriesAggregateClient(this._credentials);
+            this._timeSeriesAggregateClient || new TimeSeriesAggregateClient(this._authenticator);
         return this._timeSeriesAggregateClient;
     }
 
@@ -115,7 +115,7 @@ export class MindSphereSdk extends SdkClient {
      * @memberOf MindSphereSdk
      */
     public GetEventManagementClient(): EventManagementClient {
-        this._eventManagementClient = this._eventManagementClient || new EventManagementClient(this._credentials);
+        this._eventManagementClient = this._eventManagementClient || new EventManagementClient(this._authenticator);
         return this._eventManagementClient;
     }
 
@@ -129,7 +129,7 @@ export class MindSphereSdk extends SdkClient {
      * @memberOf MindSphereSdk
      */
     public GetSpectrumAnalysisClient(): SpectrumAnalysisClient {
-        this._spectrumAnalysisClient = this._spectrumAnalysisClient || new SpectrumAnalysisClient(this._credentials);
+        this._spectrumAnalysisClient = this._spectrumAnalysisClient || new SpectrumAnalysisClient(this._authenticator);
 
         return this._spectrumAnalysisClient;
     }
@@ -144,7 +144,7 @@ export class MindSphereSdk extends SdkClient {
      * @memberOf MindSphereSdk
      */
     public GetSignalValidationClient(): SignalValidationClient {
-        this._signalValidationClient = this._signalValidationClient || new SignalValidationClient(this._credentials);
+        this._signalValidationClient = this._signalValidationClient || new SignalValidationClient(this._authenticator);
 
         return this._signalValidationClient;
     }
@@ -159,7 +159,7 @@ export class MindSphereSdk extends SdkClient {
      * @memberOf MindSphereSdk
      */
     public GetTrendPredictionClient(): TrendPredictionClient {
-        this._trendPredictionClient = this._trendPredictionClient || new TrendPredictionClient(this._credentials);
+        this._trendPredictionClient = this._trendPredictionClient || new TrendPredictionClient(this._authenticator);
         return this._trendPredictionClient;
     }
 
@@ -173,7 +173,7 @@ export class MindSphereSdk extends SdkClient {
      * @memberOf MindSphereSdk
      */
     public GetKPICalculationClient(): KPICalculationClient {
-        this._kpiCalculationClient = this._kpiCalculationClient || new KPICalculationClient(this._credentials);
+        this._kpiCalculationClient = this._kpiCalculationClient || new KPICalculationClient(this._authenticator);
         return this._kpiCalculationClient;
     }
 
@@ -187,7 +187,7 @@ export class MindSphereSdk extends SdkClient {
      * @memberOf MindSphereSdk
      */
     public GetMindConnectApiClient(): MindConnectApiClient {
-        this._mindConnectApiClient = this._mindConnectApiClient || new MindConnectApiClient(this._credentials);
+        this._mindConnectApiClient = this._mindConnectApiClient || new MindConnectApiClient(this._authenticator);
         return this._mindConnectApiClient;
     }
 }

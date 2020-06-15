@@ -41,7 +41,7 @@ export class CredentialAuth extends AuthBase implements TokenRotation {
     }
 
     /**
-     * Returns the current agent token.
+     * Returns the current token.
      * This token can be used in e.g. in Postman to call mindspher APIs.
      *
      * @returns {(Promise<string>)}

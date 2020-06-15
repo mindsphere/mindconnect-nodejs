@@ -1,10 +1,11 @@
 import { CredentialAuth } from "../../credential-auth";
-import { MindConnectBase } from "../../mindconnect-base";
+import { MindConnectBase, TokenRotation, isTokenRotation } from "../../mindconnect-base";
 import { TokenManagerAuth } from "../../tokenmanager-auth";
 import {
     AppCredentials,
     isCredentialAuth,
     isTokenManagerAuth,
+    MindSphereCredentials,
     TenantCredentials,
     UserCredentials,
 } from "./credentials";
@@ -19,20 +20,22 @@ export abstract class SdkClient extends MindConnectBase {
     }
 
     public GetGateway() {
-        return this._credentials.gateway;
+        return this._authenticator.GetGateway();
     }
 
     public GetTenant() {
-        return this._credentials.tenant;
+        return this._authenticator.GetTenant();
     }
 
-    protected _authenticator: CredentialAuth | TokenManagerAuth;
+    protected _authenticator: TokenRotation;
 
-    constructor(protected _credentials: UserCredentials | TenantCredentials | AppCredentials) {
+    constructor(credentialsOrAuthorizer: UserCredentials | TenantCredentials | AppCredentials | TokenRotation) {
         super();
 
-        if (isTokenManagerAuth(_credentials)) {
-            const appCredentials = _credentials as AppCredentials;
+        if (isTokenRotation(credentialsOrAuthorizer)) {
+            this._authenticator = credentialsOrAuthorizer as TokenRotation;
+        } else if (isTokenManagerAuth(credentialsOrAuthorizer)) {
+            const appCredentials = credentialsOrAuthorizer as AppCredentials;
 
             this._authenticator = new TokenManagerAuth(
                 appCredentials.gateway,
@@ -42,8 +45,13 @@ export abstract class SdkClient extends MindConnectBase {
                 appCredentials.appName,
                 appCredentials.appVersion
             );
-        } else if (isCredentialAuth(_credentials)) {
-            this._authenticator = new CredentialAuth(_credentials.gateway, _credentials.basicAuth, _credentials.tenant);
+        } else if (isCredentialAuth(credentialsOrAuthorizer)) {
+            const credentialsAuth = credentialsOrAuthorizer as MindSphereCredentials;
+            this._authenticator = new CredentialAuth(
+                credentialsAuth.gateway,
+                credentialsAuth.basicAuth,
+                credentialsAuth.tenant
+            );
         } else {
             throw new Error("invalid constructor");
         }
