@@ -3,6 +3,7 @@ export * from "./agent/agent-management";
 export * from "./agent/agent-models";
 export * from "./asset/asset-management";
 export * from "./asset/asset-models";
+export * from "./common/credentials";
 export * from "./common/mindsphere-sdk";
 export * from "./common/sdk-client";
 export * from "./event/event-management";
