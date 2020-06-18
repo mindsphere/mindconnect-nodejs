@@ -1,5 +1,4 @@
 import * as jwt from "jsonwebtoken";
-import { TokenRotation } from "./mindconnect-base";
 import { pruneCert } from "./utils";
 import uuid = require("uuid");
 
