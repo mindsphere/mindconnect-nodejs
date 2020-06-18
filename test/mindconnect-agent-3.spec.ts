@@ -796,27 +796,6 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         checksum.should.be.equal("d41d8cd98f00b204e9800998ecf8427e");
     });
 
-    it("should be able to automatically create and map data source configuration to asset", async () => {
-        const agent = new MindConnectAgent(agentConfig);
-
-        if (!agent.IsOnBoarded()) {
-            await agent.OnBoard();
-        }
-
-        const targetAssetId = unitTestConfiguration.targetAsset.assetId || throwError("invalid asset");
-        await agent.ConfigureAgentForAssetId(targetAssetId);
-
-        for (let index = 0; index < 15; index++) {
-            const values: DataPointValue[] = [
-                { dataPointId: "DP-Temperature", qualityCode: "0", value: "223.1" },
-                { dataPointId: "DP-Pressure", qualityCode: "0", value: "244" },
-                { dataPointId: "DP-Humidity", qualityCode: "0", value: "366" },
-            ];
-
-            await agent.PostData(values);
-        }
-    });
-
     it("should be able to use SDK with agent credentials", async () => {
         const agent = new MindConnectAgent(agentConfig);
 
