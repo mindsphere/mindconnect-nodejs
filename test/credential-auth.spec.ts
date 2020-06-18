@@ -104,6 +104,7 @@ describe("[SDK] Credential Auth", () => {
         let errorOccured = false;
         try {
             await assetManagement.GetToken();
+            console.log(JSON.stringify((assetManagement as any)._authenticator!._oauthResponse!));
         } catch (err) {
             errorOccured = true;
             console.log(JSON.stringify((assetManagement as any)._authenticator!._oauthResponse!));
