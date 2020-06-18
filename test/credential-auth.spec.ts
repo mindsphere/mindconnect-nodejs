@@ -66,7 +66,7 @@ describe("[SDK] Credential Auth", () => {
 
     it("should throw error if there is no key", async () => {
         const assetManagement = sdk.GetAssetManagementClient();
-
+        console.log("testing");
         nock.cleanAll();
         nock(`https://${sdk.GetTenant()}.piam.eu1.mindsphere.io:443`, {
             encodedQueryParams: true,
