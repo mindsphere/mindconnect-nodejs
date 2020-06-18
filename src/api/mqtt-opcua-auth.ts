@@ -1,5 +1,4 @@
 import * as jwt from "jsonwebtoken";
-import { TokenRotation } from "./mindconnect-base";
 import { pruneCert } from "./utils";
 import uuid = require("uuid");
 
@@ -10,7 +9,7 @@ import uuid = require("uuid");
  * @class MqttOpcUaAuth
  * @implements {TokenRotation}
  */
-export class MqttOpcUaAuth implements TokenRotation {
+export class MqttOpcUaAuth {
     /**
      * Creates an instance of MqttOpcUaAuth.
      * @param {string} _clientid

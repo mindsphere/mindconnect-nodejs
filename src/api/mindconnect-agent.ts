@@ -6,10 +6,19 @@ import * as path from "path";
 import "url-search-params-polyfill";
 import { DataSourceConfiguration, Mapping, retry } from "..";
 import { AgentAuth } from "./agent-auth";
-import { BaseEvent, DataPointValue, IMindConnectConfiguration, TimeStampedDataPoint } from "./mindconnect-models";
+import {
+    BaseEvent,
+    DataPoint,
+    DataPointValue,
+    DataSource,
+    IMindConnectConfiguration,
+    TimeStampedDataPoint,
+} from "./mindconnect-models";
 import { bulkDataTemplate, dataTemplate } from "./mindconnect-template";
 import { dataValidator, eventValidator } from "./mindconnect-validators";
+import { AssetManagementModels, MindSphereSdk } from "./sdk";
 import { fileUploadOptionalParameters, MultipartUploader } from "./sdk/common/multipart-uploader";
+import { throwError } from "./utils";
 import _ = require("lodash");
 const log = debug("mindconnect-agent");
 /**
@@ -525,6 +534,166 @@ export class MindConnectAgent extends AgentAuth {
             log(err);
             throw new Error(`Network error occured ${err.message}`);
         }
+    }
+
+    /**
+     * Generates a Data Source Configuration for specified Asset Type
+     *
+     * you still have to generate the mappings (or use ConfigureAgentForAssetId method)
+     *
+     * @example
+     * config = await agent.GenerateDataSourceConfiguration("castidev.Engine");
+     *
+     * @param {string} assetTypeId
+     * @param {("NUMERICAL" | "DESCRIPTIVE")} [mode="DESCRIPTIVE"]
+     * @returns {Promise<DataSourceConfiguration>}
+     *
+     * @memberOf MindConnectAgent
+     */
+    public async GenerateDataSourceConfiguration(
+        assetTypeId: string,
+        mode: "NUMERICAL" | "DESCRIPTIVE" = "DESCRIPTIVE"
+    ): Promise<DataSourceConfiguration> {
+        const assetType = await this.Sdk().GetAssetManagementClient().GetAssetType(assetTypeId, { exploded: true });
+
+        const dataSourceConfiguration: DataSourceConfiguration = {
+            configurationId: mode === "NUMERICAL" ? "CF0001" : `CF-${assetType!.id!.toString().substr(0, 34)}`,
+            dataSources: [],
+        };
+
+        const dynamicAspects =
+            assetType.aspects?.filter(
+                (x) => x.aspectType!.category === AssetManagementModels.AspectType.CategoryEnum.Dynamic
+            ) || [];
+
+        let ds = 0,
+            dp = 0;
+
+        dynamicAspects!.forEach((aspect) => {
+            const aspectType = (aspect.aspectType as unknown) as AssetManagementModels.AspectTypeResource;
+
+            const dataSource: DataSource = {
+                name:
+                    mode === "NUMERICAL"
+                        ? `DS${(++ds).toString().padStart(5, "0")}`
+                        : `DS-${aspect.name!.substr(0, 61)}`,
+                dataPoints: [],
+                customData: {
+                    aspect: aspect.name!,
+                },
+            };
+
+            aspectType.variables.forEach((variable) => {
+                dataSource.dataPoints.push({
+                    id:
+                        mode === "NUMERICAL"
+                            ? `DP${(++dp).toString().padStart(5, "0")}`
+                            : `DP-${variable.name.substr(0, 33)}`,
+                    name: variable.name.substr(0, 64),
+                    type: (variable.dataType as unknown) as DataPoint.TypeEnum,
+                    unit: `${variable.unit}`,
+                    customData: {
+                        variable: `${variable.name}`,
+                    },
+                });
+            });
+            dataSourceConfiguration.dataSources.push(dataSource);
+        });
+
+        return dataSourceConfiguration;
+    }
+
+    /**
+     * Generate automatically the mappings for the specified target assetid
+     *
+     * !Important! this only works if you have created the data source coniguration automatically
+     *
+     * @example
+     * config = await agent.GenerateDataSourceConfiguration("castidev.Engine");
+     * await agent.PutDataSourceConfiguration(config);
+     * const mappings = await agent.GenerateMappings(targetassetId);
+     * await agent.PutDataMappings (mappings);
+     *
+     * @param {string} targetAssetId
+     * @returns {Mapping[]}
+     *
+     * @memberOf MindConnectAgent
+     */
+    public GenerateMappings(targetAssetId: string): Mapping[] {
+        const mappings = [];
+
+        !this._configuration.dataSourceConfiguration &&
+            throwError(
+                "no data source configuration! (have you forgotten to create / generate the data source configuration first?"
+            );
+
+        for (const dataSource of this._configuration.dataSourceConfiguration!.dataSources) {
+            (!dataSource.customData || !dataSource.customData!.aspect!) &&
+                throwError(
+                    "GenerateMappings works only on configurations created with GenerateDataSourceConfiguration method!"
+                );
+            for (const datapoint of dataSource.dataPoints) {
+                (!datapoint.customData || !datapoint.customData!.variable) &&
+                    throwError(
+                        "GenerateMappings works only on configurations created with GenerateDataSourceConfiguration method!"
+                    );
+
+                mappings.push({
+                    agentId: this.ClientId(),
+                    dataPointId: datapoint.id,
+                    entityId: targetAssetId,
+                    propertyName: datapoint.customData!.variable,
+                    propertySetName: dataSource.customData!.aspect,
+                    keepMapping: true,
+                });
+            }
+        }
+        return mappings;
+    }
+
+    /**
+     * This method can automatically create all necessary configurations and mappings for selected target asset id.
+     *
+     * * This method will automatically create all necessary configurations and mappings to start sending the data
+     * * to an asset with selected assetid in Mindsphere
+     *
+     * @param {string} targetAssetId
+     * @param {("NUMERICAL" | "DESCRIPTIVE")} mode
+     *
+     * * NUMERICAL MODE will use names like CF0001 for configurationId , DS0001,DS0002,DS0003... for data source ids and DP0001, DP0002... for dataPointIds
+     * * DESCRIPTIVE MODE will use names like CF-assetName for configurationId , DS-aspectName... for data source ids and DP-variableName for data PointIds (default)
+     * @memberOf MindConnectAgent
+     */
+    public async ConfigureAgentForAssetId(targetAssetId: string, mode: "NUMERICAL" | "DESCRIPTIVE" = "DESCRIPTIVE") {
+        const asset = await this.Sdk().GetAssetManagementClient().GetAsset(targetAssetId);
+        const configuration = await this.GenerateDataSourceConfiguration((asset.typeId as unknown) as string, mode);
+        await this.PutDataSourceConfiguration(configuration);
+        const mappings = this.GenerateMappings(targetAssetId);
+        await this.PutDataMappings(mappings);
+    }
+
+    private _sdk?: MindSphereSdk = undefined;
+
+    /**
+     * MindSphere SDK using agent authentication
+     *
+     * ! important: not all APIs can be called with agent credentials, however MindSphere is currently working on making this possible.
+     *
+     *  * Here is a list of some APIs which you can use:
+     *
+     *  * AssetManagementClient (Read Methods)
+     *  * MindConnectApiClient
+     *
+     * @returns {MindSphereSdk}
+     *
+     * @memberOf MindConnectAgent
+     */
+    public Sdk(): MindSphereSdk {
+        if (!this._sdk) {
+            this._sdk = new MindSphereSdk(this);
+        }
+
+        return this._sdk;
     }
 
     /**

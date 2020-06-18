@@ -526,4 +526,19 @@ describe("MindConnectApi Version 3 Agent (RSA_3072)", () => {
 
         await agent.BulkPostData(bulk);
     });
+
+    it("should be able to use SDK with agent credentials", async () => {
+        const agent = new MindConnectAgent(rsaConfig);
+        agent.SetupAgentCertificate(fs.readFileSync("private.key"));
+
+        if (!agent.IsOnBoarded()) {
+            await agent.OnBoard();
+        }
+
+        const agentSdk = agent.Sdk();
+        const billboard = await retry(5, () => agentSdk.GetAssetManagementClient().GetBillboard());
+        billboard.should.not.be.undefined;
+        const assetTypes = await retry(5, () => agentSdk.GetAssetManagementClient().GetAspectTypes());
+        assetTypes.should.not.be.undefined;
+    });
 });

@@ -9,6 +9,7 @@ import iotBulkDirCommand from "./commands/iot-prepare-bulk-dir";
 import kpicalculationCommand from "./commands/kpi-calculation";
 import agentStatusCommand from "./commands/mc-agent-status";
 import agentTokenCommand from "./commands/mc-agent-token";
+import agentAutoConfigCommand from "./commands/mc-automap";
 import createAgentCommand from "./commands/mc-create-agent";
 import createEventCommand from "./commands/mc-create-event";
 import downloadFileCommand from "./commands/mc-download-file";
@@ -37,6 +38,7 @@ versionAndHelp(program);
 
 // * agent commands
 onboardCommand(program);
+agentAutoConfigCommand(program);
 agentTokenCommand(program);
 uploadTimeSeriesCommand(program);
 

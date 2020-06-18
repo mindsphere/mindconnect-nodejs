@@ -795,4 +795,18 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
 
         checksum.should.be.equal("d41d8cd98f00b204e9800998ecf8427e");
     });
+
+    it("should be able to use SDK with agent credentials", async () => {
+        const agent = new MindConnectAgent(agentConfig);
+
+        if (!agent.IsOnBoarded()) {
+            await agent.OnBoard();
+        }
+
+        const agentSdk = agent.Sdk();
+        const billboard = await retry(5, () => agentSdk.GetAssetManagementClient().GetBillboard());
+        billboard.should.not.be.undefined;
+        const assetTypes = await retry(5, () => agentSdk.GetAssetManagementClient().GetAspectTypes());
+        assetTypes.should.not.be.undefined;
+    });
 });

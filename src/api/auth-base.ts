@@ -107,6 +107,8 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
         return true;
     }
 
+    public abstract GetToken(): Promise<string>;
+
     /**
      * Creates an instance of CredentialAuth.
      * @param {string} _gateway
@@ -130,5 +132,11 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
         if (!_tenant) {
             throw new Error("You have to provide a tenant");
         }
+    }
+    GetTenant(): string {
+        return this._tenant;
+    }
+    GetGateway(): string {
+        return this._gateway;
     }
 }
