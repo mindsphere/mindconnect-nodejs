@@ -4,9 +4,11 @@
 
 - Agent: added support for creating automatic data source configuration and automatic mappings
 - Agent: added support for typed events
+- Agent: exposed Sdk() property on the Agent for future use (at the moment only some APIs of mindsphere can be called with Agent Credentials)
 - SDK: added utility class for MQTT OPC UA PubSub key rotation
 - SDK: added TokenManagerAuth to SDK
 - SDK: release of beta version
+- CLI: mc configure-agent can now automatically create the data source configuration and the mappings for selected assetid
 - CLI: mc offboard-agent has now a command to offboard an agent with the id only  (mc offboard --assetid) (#130)
 - CLI: added mc mqtt-createjwt command which can create a key for MQTT OPC UA PubSub authentication
 - CLI: mc service-credentials command is now accepting application credentials

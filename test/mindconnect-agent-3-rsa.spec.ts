@@ -526,4 +526,48 @@ describe("MindConnectApi Version 3 Agent (RSA_3072)", () => {
 
         await agent.BulkPostData(bulk);
     });
+
+    it("should be able to automatically create and map data source configuration to asset", async () => {
+        const agent = new MindConnectAgent(rsaConfig);
+        agent.SetupAgentCertificate(fs.readFileSync("private.key"));
+
+        if (!agent.IsOnBoarded()) {
+            await agent.OnBoard();
+        }
+
+        const dataSourceConfig = await agent.GenerateDataSourceConfiguration(
+            `${agent.GetTenant()}.UnitTestEngine`,
+            "DESCRIPTIVE"
+        );
+        // console.log(JSON.stringify(dataSourceConfig));
+        await agent.PutDataSourceConfiguration(dataSourceConfig, true);
+        const targetAssetId = unitTestConfiguration.targetAsset.assetId || throwError("invalid asset");
+        const mappings = agent.GenerateMappings(targetAssetId);
+        await agent.PutDataMappings(mappings);
+
+        for (let index = 0; index < 15; index++) {
+            const values: DataPointValue[] = [
+                { dataPointId: "DP-Temperature", qualityCode: "0", value: "123.1" },
+                { dataPointId: "DP-Pressure", qualityCode: "0", value: "144" },
+                { dataPointId: "DP-Humidity", qualityCode: "0", value: "166" },
+            ];
+
+            await agent.PostData(values);
+        }
+    });
+
+    it("should be able to use SDK with agent credentials", async () => {
+        const agent = new MindConnectAgent(rsaConfig);
+        agent.SetupAgentCertificate(fs.readFileSync("private.key"));
+
+        if (!agent.IsOnBoarded()) {
+            await agent.OnBoard();
+        }
+
+        const agentSdk = agent.Sdk();
+        const billboard = await retry(5, () => agentSdk.GetAssetManagementClient().GetBillboard());
+        billboard.should.not.be.undefined;
+        const assetTypes = await retry(5, () => agentSdk.GetAssetManagementClient().GetAspectTypes());
+        assetTypes.should.not.be.undefined;
+    });
 });

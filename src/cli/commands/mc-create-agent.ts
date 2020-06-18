@@ -1,8 +1,8 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
+import { AgentManagementModels, AssetManagementModels, MindSphereSdk } from "../..";
 import { sleep } from "../../../test/test-utils";
-import { AgentManagementModels, AssetManagementModels, MindSphereSdk } from "../../api/sdk";
 import { decrypt, loadAuth, retry, throwError } from "../../api/utils";
 import {
     agentConfigLog,
@@ -26,8 +26,8 @@ export default (program: CommanderStatic) => {
             "-r, --cert [privatekey]",
             "required for agents with RSA_3072 profile. create with: openssl genrsa -out private.key 3072"
         )
-        .option("-n, --name <name>", "agent name", `Agent${Date.now()}`)
-        .option("-p, --parentid <name>", "parent asset id")
+        .option("-n, --agentname <agentname>", "agent name", `Agent${Date.now()}`)
+        .option("-p, --parentid <parentid>", "parent asset id")
         .option("-f, --profile <profile>", "security profile [SHARED_SECRET|RSA_3072]", "SHARED_SECRET")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
@@ -47,7 +47,7 @@ export default (program: CommanderStatic) => {
                     const ag = sdk.GetAgentManagementClient();
                     const parent = options.parentid ? await am.GetAsset(options.parentid) : await am.GetRootAsset();
                     const asset: AssetManagementModels.Asset = {
-                        name: options.name,
+                        name: options.agentname,
                         parentId: parent.assetId,
                         description: "Agent created via mindconnect CLI",
                         typeId: "core.mclib",
