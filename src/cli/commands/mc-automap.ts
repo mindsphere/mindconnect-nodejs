@@ -62,11 +62,7 @@ export default (program: CommanderStatic) => {
                         !options.assetid &&
                             throwError("you have to specifiy the assetid for the automatic configuration");
 
-                        agent.HasDataSourceConfiguration() &&
-                            throwError("The agent is already configured. (it has data source configuration)");
-                        agent.HasDataMappings() && throwError("The agent is already configured. (it has mappings)");
-
-                        await agent.ConfigureAgentForAssetId(options.assetid);
+                        await agent.ConfigureAgentForAssetId(options.assetid, "DESCRIPTIVE", true);
 
                         verboseLog(JSON.stringify(await agent.GetDataSourceConfiguration(), null, 2), options.verbose);
                         verboseLog(JSON.stringify(await agent.GetDataMappings(), null, 2), options.verbose);

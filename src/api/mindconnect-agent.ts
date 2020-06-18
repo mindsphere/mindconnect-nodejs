@@ -659,15 +659,30 @@ export class MindConnectAgent extends AgentAuth {
      *
      * @param {string} targetAssetId
      * @param {("NUMERICAL" | "DESCRIPTIVE")} mode
+     * @param {boolean} [ignoreEtag=false] ignore eTag will overwrite mappings and data source configuration
      *
      * * NUMERICAL MODE will use names like CF0001 for configurationId , DS0001,DS0002,DS0003... for data source ids and DP0001, DP0002... for dataPointIds
      * * DESCRIPTIVE MODE will use names like CF-assetName for configurationId , DS-aspectName... for data source ids and DP-variableName for data PointIds (default)
      * @memberOf MindConnectAgent
      */
-    public async ConfigureAgentForAssetId(targetAssetId: string, mode: "NUMERICAL" | "DESCRIPTIVE" = "DESCRIPTIVE") {
+    public async ConfigureAgentForAssetId(
+        targetAssetId: string,
+        mode: "NUMERICAL" | "DESCRIPTIVE" = "DESCRIPTIVE",
+        ignoreEtag: boolean = false
+    ) {
         const asset = await this.Sdk().GetAssetManagementClient().GetAsset(targetAssetId);
         const configuration = await this.GenerateDataSourceConfiguration((asset.typeId as unknown) as string, mode);
-        await this.PutDataSourceConfiguration(configuration);
+        if (ignoreEtag) {
+            await this.GetDataSourceConfiguration();
+        }
+        await this.PutDataSourceConfiguration(configuration, ignoreEtag);
+        if (ignoreEtag) {
+            const toDeleteMappings = await this.GetDataMappings();
+
+            for await (const iterator of toDeleteMappings) {
+                await this.Sdk().GetMindConnectApiClient().DeleteDataMapping(iterator.id!);
+            }
+        }
         const mappings = this.GenerateMappings(targetAssetId);
         await this.PutDataMappings(mappings);
     }
