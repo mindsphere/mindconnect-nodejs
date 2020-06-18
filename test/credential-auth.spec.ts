@@ -64,7 +64,7 @@ describe("[SDK] Credential Auth", () => {
         token.should.not.be.undefined;
     });
 
-    it.only("should throw error if there is no key", async () => {
+    it("should throw error if there is no key", async () => {
         const assetManagement = sdk.GetAssetManagementClient();
 
         nock.cleanAll();
