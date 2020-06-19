@@ -103,7 +103,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
         }
     });
 
-    it("should be able to delete mappings", async () => {
+    it("should delete all mappings", async () => {
         const agent = new MindConnectAgent(agentConfig);
 
         if (!agent.IsOnBoarded()) {
@@ -112,13 +112,15 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
 
         const targetAssetId = unitTestConfiguration.targetAsset.assetId || throwError("invalid asset");
         await agent.ConfigureAgentForAssetId(targetAssetId, "DESCRIPTIVE", true);
+
+        agent.HasDataSourceConfiguration().should.be.true;
         agent.HasDataMappings().should.be.true;
 
         await agent.DeleteAllMappings();
         agent.HasDataMappings().should.be.false;
 
-        const mappings = await agent.GetDataMappings();
-        mappings.length.should.equal(0);
+        const mappings2 = await agent.GetDataMappings();
+        mappings2.length.should.be.equal(0);
         agent.HasDataMappings().should.be.false;
     });
 
@@ -128,10 +130,9 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
         if (!agent.IsOnBoarded()) {
             await agent.OnBoard();
         }
+
         const targetAssetId = unitTestConfiguration.targetAsset.assetId || throwError("invalid asset");
-        if (!agent.HasDataSourceConfiguration()) {
-            await agent.ConfigureAgentForAssetId(targetAssetId, "DESCRIPTIVE", true);
-        }
+        await agent.ConfigureAgentForAssetId(targetAssetId, "DESCRIPTIVE", true);
 
         agent.HasDataSourceConfiguration().should.be.true;
         agent.HasDataMappings().should.be.true;
@@ -155,6 +156,8 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
         if (!agent.IsOnBoarded()) {
             await agent.OnBoard();
         }
+
+        await agent.DeleteAllMappings();
 
         if (!agent.HasDataSourceConfiguration()) {
             const generatedConfig = await agent.GenerateDataSourceConfiguration(`${agent.GetTenant()}.UnitTestEngine`);

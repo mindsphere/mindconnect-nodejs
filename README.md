@@ -91,7 +91,7 @@ Mindsphere V3 IoT model requires that you create an asset type and aspect types 
 
 ![assetype](images/types.png)
 
-More information about [MindSphere Data Model](http://bit.ly/2IgVB9T).
+More information about [MindSphere Data Model](https://siemens.mindsphere.io/en/docs/tutorials/asset-manager).
 
 ### Step 1: Create an asset
 

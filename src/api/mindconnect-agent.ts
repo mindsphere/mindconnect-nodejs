@@ -254,10 +254,13 @@ export class MindConnectAgent extends AgentAuth {
         const toDeleteMappings = await this.GetDataMappings();
 
         const mcapi = this.Sdk().GetMindConnectApiClient();
-        for await (const iterator of toDeleteMappings) {
-            await mcapi.DeleteDataMapping(iterator.id!, { ignoreCodes: [404] });
+
+        for (let index = 0; index < toDeleteMappings.length; index++) {
+            const element = toDeleteMappings[index];
+            await mcapi.DeleteDataMapping(element.id!, { ignoreCodes: [404] });
         }
-        this._configuration.mappings = undefined;
+
+        this._configuration.mappings = [];
         await retry(5, () => this.SaveConfig());
     }
 
