@@ -2,9 +2,8 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
-import { MindConnectAgent } from "../../api/mindconnect-agent";
-import { MindSphereSdk } from "../../api/sdk";
-import { decrypt, getAgentDir, loadAuth, throwError } from "../../api/utils";
+import { DataPointValue, MindConnectAgent, MindSphereSdk } from "../..";
+import { decrypt, getAgentDir, loadAuth, retry, throwError } from "../../api/utils";
 import { agentConfigLog, errorLog, getColor, homeDirLog, proxyLog, verboseLog } from "./command-utils";
 import ora = require("ora");
 
@@ -16,7 +15,7 @@ export default (program: CommanderStatic) => {
         .command("configure-agent")
         .alias("co")
         .option("-c, --config <agentconfig>", "config file with agent configuration", "agentconfig.json")
-        .option("-m, --mode [config | map | print | delete]", "command mode", "config")
+        .option("-m, --mode [config | map | print | delete | test]", "command mode", "config")
         .option("-a, --agentid <agentid>", "agentid")
         .option("-i, --assetid <assetid>", "target assetid for mapping")
         .option("-t, --typeid <typeid>", "asset type for configuration")
@@ -35,6 +34,7 @@ export default (program: CommanderStatic) => {
 
                     const auth = loadAuth();
                     let agentid = options.agentid;
+                    let agent: MindConnectAgent;
 
                     const sdk = options.passkey
                         ? new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) })
@@ -47,7 +47,7 @@ export default (program: CommanderStatic) => {
                               verboseLog(`Using .mc folder for agent: ${color(agentFolder)}`, options.verbose);
 
                               const configuration = require(configFile);
-                              const agent = new MindConnectAgent(configuration, undefined, agentFolder);
+                              agent = new MindConnectAgent(configuration, undefined, agentFolder);
                               agentid = agent.ClientId();
 
                               return new MindSphereSdk(agent);
@@ -57,8 +57,9 @@ export default (program: CommanderStatic) => {
                     options.mode === "config" && (await config(sdk, agentid, color, options));
                     options.mode === "delete" && (await deleteMappings(sdk, agentid, color, options));
                     options.mode === "map" && (await map(sdk, agentid, color, options));
+                    options.mode === "test" && (await inject(agent!, color, options));
 
-                    await print(sdk, agentid, color, options);
+                    options.mode !== "test" && (await print(sdk, agentid, color, options));
 
                     agentConfigLog({
                         gateway: sdk.GetGateway(),
@@ -175,9 +176,12 @@ async function config(sdk: MindSphereSdk, agentid: any, color: any, options: any
 }
 
 function checkParameters(options: any) {
-    ["map", "config", "print", "delete"].indexOf(options.mode) < 0 &&
-        throwError("The mode must be map | configure | print | delete");
+    ["map", "config", "print", "delete", "test"].indexOf(options.mode) < 0 &&
+        throwError("The mode must be map | configure | print | delete | test");
 
+    options.passkey &&
+        options.mode === "test" &&
+        throwError("test only works with agent configuration not with passkey");
     options.passkey && !options.agentid && throwError("you have to specify agentid when using passkey mode");
     options.mode === "config" &&
         !((options.assetid && !options.typeid) || (!options.assetid && options.typeid)) &&
@@ -186,4 +190,28 @@ function checkParameters(options: any) {
     ["map"].indexOf(options.mode) >= 0 &&
         !options.assetid &&
         throwError(`you have to specify assetid for ${options.mode}`);
+}
+
+async function inject(agent: MindConnectAgent, color: any, options: any) {
+    const configuration = await agent.GetDataSourceConfiguration();
+
+    const data: DataPointValue[] = [];
+    configuration.dataSources.forEach((datasource) => {
+        datasource.dataPoints.forEach((dp) => {
+            data.push({ dataPointId: dp.id, qualityCode: "0", value: generateValue(dp.type.toString()) });
+        });
+    });
+
+    verboseLog(JSON.stringify(data), options.verbose);
+
+    await retry(options.retry, () => agent.PostData(data));
+    console.log(`Injected ${color(data.length)} datapoints`);
+}
+
+function generateValue(type: string) {
+    let result = Math.floor(100 * Math.sin(new Date().getTime())).toString();
+    if (type === "TIMESTAMP") {
+        result = new Date().toISOString();
+    }
+    return result;
 }
