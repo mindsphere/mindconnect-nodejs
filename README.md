@@ -415,7 +415,7 @@ press CTRL + C to exit
 
 ```
 
-![CLI](images/service-credentials.png)
+![CLI](images/servicecredentials.png)
 
 You can get the application credentials from your developer or operator cockpit in MindSphere. (if you don't habe any application you can register a dummy one just for CLI)
 
