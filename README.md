@@ -11,7 +11,7 @@ This project has started as a community effort at Siemens AG and is now availabl
 [![Build Status](https://jenkins.mindconnect.rocks/buildStatus/icon?job=mindconnect-nodejs/master)](https://jenkins.mindconnect.rocks/blue/organizations/jenkins/mindconnect-nodejs/activity/) [![The MIT License](https://img.shields.io/badge/license-MIT-009999.svg?style=flat)](./LICENSE.md)
 [![npm](https://img.shields.io/npm/v/@mindconnect/mindconnect-nodejs/latest.svg?style=flat)](https://www.npmjs.com/package/@mindconnect/mindconnect-nodejs) ![downloads](https://img.shields.io/npm/dw/@mindconnect/mindconnect-nodejs.svg?colorB=009999)
 [![Known Vulnerabilities](https://snyk.io/test/github/mindsphere/mindconnect-nodejs/badge.svg?targetFile=package.json)](https://snyk.io/test/github/mindsphere/mindconnect-nodejs?targetFile=package.json)
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/mindsphere/mindconnect-nodejs.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/mindsphere/mindconnect-nodejs/context:javascript) 
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/mindsphere/mindconnect-nodejs.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/mindsphere/mindconnect-nodejs/context:javascript)
 [![Documentation](https://img.shields.io/badge/mindsphere-documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/index.html)
 [![Forum](https://img.shields.io/badge/mindsphere-community-%23009999.svg)](https://community.plm.automation.siemens.com/t5/Developer-Space/bd-p/MindSphere-platform-forum)
 
@@ -46,27 +46,18 @@ npm install mindconnect-...tgz --save
 
 ## Installing the Command Line Interface
 
+[![Documentation](https://img.shields.io/badge/cli-documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html)
+
 The library comes with a command line interface which can also be installed globally. You can use the command line mode to upload timeseries, files and create events in the mindsphere.
+
+Navigate to [http://localhost:4994](http://localhost:4994) to configure the CLI.
+
+The image below shows the dialog for adding new credentials (press on the + sign in the upper left corner)
 
 ```bash
 # install the library globaly if you want to use its command line interface.
  npm install -g @mindconnect/mindconnect-nodejs
 ```
-
-## Using CLI
-
-The CLI can be used to create starter projects, upload timeseries, events and files, read agent diagnostics etc.
-
-```bash
-# run mc --help to see the full help inforamtion
-mc --help
-```
-
-Here are some examples how to use the CLI:
-
-![image](images/full.gif)
-
-<!-- <img src="images/full.gif"> -->
 
 ## Using CLI to generate starter projects
 
@@ -158,23 +149,45 @@ if (!agent.IsOnBoarded()) {
 }
 ```
 
-### Step 5: Configure the data model and data mappings to asset variables. (via UI)
+### Step 5: Configure the data model and data mappings to asset variables. (via code)
 
-In the mindsphere  version 3 you can configure the data model and mappings to aspect variables in the UI of the asset manager as well. Just go to configuration of mindconnectlib and configure the data sources like this.
+**Important**: From the version 3.8.0 it is possible to create the data source configuration and data mappings fully automatic via code
+
+First you need to create a data source configuration
+
+```typescript
+// create data source configuration for an asset type castidev.Engine
+const generatedConfig = await agent.GenerateDataSourceConfiguration(`${agent.ClientId()}.Engine`);
+await agent.PutDataSourceConfiguration(generatedConfig);
+```
+
+and then the data mappings:
+
+```typescript
+const mappings = await agent.GenerateMappings(targetAssetId);
+await agent.PutDataMappings(mappings);
+```
+
+The agents have now access to MindSphere TypeScript SDK (in beta)
+
+```typescript
+agent.Sdk();
+// the sdk gives you access to e.g. asset management client with which you can get asset types or assets from mindsphere
+// which can be used for automatic data source configuration and automatic mappings
+
+const assetMgmt = agent.Sdk().GetAssetManagementClient();
+await assetMgmt.GetAssets(...);
+await assetMgmt.GetAspectTypes(...);
+
+```
+
+If you take a look at the mindsphere configuration of your agent now it should look like this:
 
 ![datasources](images/datasources.png)
 
-![datasources](images/mappings.png)
+And the data mappings should be in place
 
-(it might be a bit tedious to click through all mappings).
-
-After that you can pull the configuration from mindsphere.
-
-```typescript
-if (!agent.HasDataSourceConfiguration()) {
-    await agent.GetDataSourceConfiguration();
-}
-```
+![mappings](images/mappings.png)
 
 ### Step 6 After this you can send the data in the code
 
@@ -310,14 +323,7 @@ await retry(5, () => agent.BulkPostData(bulk));
 
 ```
 
-## Generating the documentation
-
-You can always generate the current HTML documentation by running the command below.
-
-```bash
-#this generates a docs/ folder the with full documentation of the library.
-npm run doc
-```
+The data in the mindsphere can be observed in the fleet manager.
 
 ## Proxy support
 
@@ -329,20 +335,96 @@ Set the http_proxy or HTTP_PROXY environment variable if you need to connect via
 export HTTP_PROXY=http://localhost:8888
 ```
 
-## Data in the mindsphere
+## MindSphere TypeScript SDK (beta)
 
-Environment data:
+The library comes with the typescript SDK which can be used to access MindSphere APIs
 
-![Environment Data](images/environmentdata.PNG)
+[![SDK](https://img.shields.io/badge/SDK-full%20documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/sdk/index.html)
 
-Vibration data:
+It implements support for
 
-![Vibration Data](images/vibrationdata.PNG)
+- UserCredentials
+- AppCredentials
+- ServiceCredentials
+- MindSphere Agents
+
+and Clients for following APIs
+
+- AgentManagementClient
+- AssetManagementClient
+- EventManagementClient
+- IotFileClient
+- KPICalculationClient
+- MindConnectAPIClient
+- SignalValidationClient
+- SpectumAnalysisClient
+- TimeSeriesAggregateClient
+- TimeSeriesBulkClient
+- TimeSeriesClient
+- TrendPredictionClient
+
+``` typescript
+// example Get Assets from MindSphere with custom AssetTypes
+
+const sdk = new MindSphereSdk (...); // use UserCredentials, AppCredentials, ServiceCredentials or MindSphere agent in constructor
+const am = sdk.GetAssetManagementClient();
+
+const assets = await am.GetAssets({
+        filter: JSON.stringify({
+            typeId: {
+                startsWith: `${tenant}`,
+            },
+        }),
+    });
+
+// you will get fully typed assets in response
+```
+
+**Important** [Call for help - How to Contribute to SDK](./CONTRIBUTING.md)
+
+If an API is missing and you would like to contribute take a look at [CONTRIBUTING.md](./CONTRIBUTING.md). With your help we will have a full set of MindSphere APIs.
 
 ## Command Line Interface
 
-The CLI commands should only be used **in secure enviroments!** (e.g on your working station, not on the agents). In the next major version the CLI will be
-moved to a separate package to reduce the size of the library.
+The full docmumentation for the command line interface can be found at
+
+[![Documentation](https://img.shields.io/badge/cli-full%20documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html)
+
+The library comes with a command line interface which can also be installed globally. You can use the command line mode to upload timeseries, files and create events in the mindsphere.
+
+```bash
+# install the library globaly if you want to use its command line interface.
+ npm install -g @mindconnect/mindconnect-nodejs
+```
+
+### Configuring CLI
+
+First step is to configure the CLI. For this you will need either service credentials (which have been deprecated) or application credentials from your developer cockpit.
+
+- how to get [application credentials](https://documentation.mindsphere.io/resources/html/developer-cockpit/en-US/124342231819.html)
+- how to get [service credentials (deprecated)](https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials)
+
+```bash
+# run mc service-credentials --help for full information
+# this will start a web server on your local computer where you can enter the credentials
+$ mc service-credentials
+navigate to http://localhost:4994 to configure the CLI
+press CTRL + C to exit
+
+```
+
+![CLI](images/service-credentials.png)
+
+You can get the application credentials from your developer or operator cockpit in MindSphere. (if you don't habe any application you can register a dummy one just for CLI)
+
+![CLI](images/cockpit.png)
+
+Once configred you can press CTRL + C to stop the configuration server and start using the CLI. Remember the passkey you have created as you will be using it with almost all CLI commands.
+
+### Using CLI
+
+The CLI can be used to create starter projects, upload timeseries, events and files, read agent diagnostics etc.
+The CLI commands should only be used **in secure enviroments!** (e.g on your working station, not on the agents).
 
 Here is an overview of CLI commands:
 
@@ -353,22 +435,29 @@ mc --help
 
 ![CLI](images/cli.png)
 
-### Setup and diagnostic
+### Notable Command Development Proxy
 
-The diagnostic endpoint gives informations about the possible problems which an agent might have on the cloud side. However, these operations require service credentials which should only be used for setup and diagnostic tasks in secure environments.
+The CLI comes with a development proxy which can be used to kickstart your MindSphere development. It provides an endpoint
+at your local machine at
 
-![setup](images/setup.gif)
+[http://localhost:7707](http://localhost:7707)
 
-### Bulk Import and Standard Import of the historical data
+which will authenticate all requests with the configured app credentials or service credentials.
 
-The CLI provides the commands to import historical data to the MindSphere IoT services.
-The commands use bulk import API for simulation assets and standard time series for performance assets.
+This endpoint can be used to simplify development of your MindSphere applications in your development environment or when using REST tools like postman etc.
 
-If you use the standard import to the IoT services, the calls to the API will be **throttled** to match your throttling limits.
-The number of the records per message will be reduced to max 200 per message. Using this feature has direct impact on mindsphere resource consumption.
-You might get a notice that you will need to upgrade your account's data ingest rate.
+```text
+mc dev-proxy --passkey yourpasskey
 
-The feature will be deprecated once bulk upload also works for performance assets.
+CORS support on
+Rewrite hal+json support https://gateway.eu1.mindsphere.io -> http://localhost:7707 on
+warn on missing x-xsrf-token on
+
+proxy is available at http://localhost:7707
+example api call (list of assets): http://localhost:7707/api/assetmanagement/v3/assets
+API documentation: https://developer.mindsphere.io/apis/index.html
+press CTRL + C to exit
+````
 
 ## Legal
 

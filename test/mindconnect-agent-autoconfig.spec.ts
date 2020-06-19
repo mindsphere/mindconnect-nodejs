@@ -147,6 +147,39 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
         mappings.length.should.equal(7);
     });
 
+    it.only("should store data", async () => {
+        const agent = new MindConnectAgent(agentConfig);
+
+        const targetAssetId = unitTestConfiguration.targetAsset.assetId || throwError("invalid asset");
+
+        if (!agent.IsOnBoarded()) {
+            await agent.OnBoard();
+        }
+
+        if (!agent.HasDataSourceConfiguration()) {
+            const generatedConfig = await agent.GenerateDataSourceConfiguration(`${agent.ClientId()}.UnitTestEngine`);
+            await agent.PutDataSourceConfiguration(generatedConfig);
+        }
+
+        if (!agent.HasDataMappings()) {
+            const mappings = await agent.GenerateMappings(targetAssetId);
+            await agent.PutDataMappings(mappings);
+        }
+
+        agent.HasDataSourceConfiguration().should.be.true;
+        agent.HasDataMappings().should.be.true;
+
+        const config = agent.GetMindConnectConfiguration();
+
+        config.dataSourceConfiguration?.configurationId.should.eq(`CF-${agent.GetTenant()}.UnitTestEngine`);
+        config.dataSourceConfiguration?.dataSources[0].dataPoints.length.should.equal(3);
+        config.dataSourceConfiguration?.dataSources[1].dataPoints.length.should.equal(4);
+        agent.GetMindConnectConfiguration().mappings?.length.should.equal(7);
+
+        const mappings = await agent.GetDataMappings();
+        mappings.length.should.equal(7);
+    });
+
     it("should be able to use SDK with agent credentials", async () => {
         const agent = new MindConnectAgent(agentConfig);
 
