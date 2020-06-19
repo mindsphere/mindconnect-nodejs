@@ -9,51 +9,53 @@ export const jstemplate: string = `const { MindConnectAgent, retry } = require (
     const log = (text) => { console.log(\`[\${new Date().toISOString()}] \${text.toString()}\`); };
     const RETRYTIMES = 5; // retry the operation before giving up and throwing exception
 
+    // onboarding the agent
+    // Check in the local agent state storage if agent is onboarded.
+    // https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
+    if (!agent.IsOnBoarded()) {
+        // wrapping the call in the retry function makes the agent a bit more resillient
+        // if you don't want to retry the operations you can always just call await agent.OnBoard(); instead.
+        await retry(RETRYTIMES, () => agent.OnBoard());
+        log("Agent onboarded");
+    }
+
+    // you can use agent.Sdk().GetAssetManagementClient() to get the asset id and asset type from mindsphere
+    // or just copy them from Asset Manager
+    const targetAssetId = "1234567....";
+    const targetAssetType = "<tenant>.Engine";
+
+    // create data sourceconfiguration and mappings
+    // this generates a data source configuration from an asset type
+    const config = await agent.GenerateDataSourceConfiguration(targetAssetType);
+
+    // create/overwrite the data source configuration
+    await agent.PutDataSourceConfiguration(config);
+
+    // create mappings for asset id
+    const mappings = await agent.GenerateMappings(targetAssetId);
+    // store mappings in mindsphere
+    await agent.PutDataMappings(mappings);
+
+    // instead of creating the data source configuration and mappings separately
+    // you can also just use the method below which takes care of everything
+    // this is only used for 1:1 asset -> agent mappings
+    // the method above can also map the data source configuration to multiple assets
+    // just call GenerateMappings with different asset ids
+
+    await agent.ConfigureAgentForAssetId(targetAssetId);
+
+    // Check in the local agent state storage if agent has data source configuration.
+    if (!agent.HasDataSourceConfiguration()) {
+        await retry(RETRYTIMES, () => agent.GetDataSourceConfiguration());
+        log("Configuration aquired");
+    }
+
     for (let index = 0; index < 5; index++) {
         try {
 
+            // if you have configred the data points in the mindsphere UI you will have to use the long integer values instead of descriptive dataPointIds.
+
             log(\`Iteration : \${index}\`);
-            // onboarding the agent
-            // Check in the local agent state storage if agent is onboarded.
-            // https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
-            if (!agent.IsOnBoarded()) {
-                // wrapping the call in the retry function makes the agent a bit more resillient
-                // if you don't want to retry the operations you can always just call await agent.OnBoard(); instead.
-                await retry(RETRYTIMES, () => agent.OnBoard());
-                log("Agent onboarded");
-            }
-
-            // you can use agent.Sdk().GetAssetManagementClient() to get the asset id and asset type from mindsphere
-            // or just copy them from Asset Manager
-            const targetAssetId = "1234567....";
-            const targetAssetType = "<tenant>.Engine";
-
-            // create data sourceconfiguration and mappings
-            // this generates a data source configuration from an asset type
-            const config = await agent.GenerateDataSourceConfiguration(targetAssetType);
-
-            // create/overwrite the data source configuration
-            await agent.PutDataSourceConfiguration(config);
-
-            // create mappings for asset id
-            const mappings = await agent.GenerateMappings(targetAssetId);
-            // store mappings in mindsphere
-            await agent.PutDataMappings(mappings);
-
-            // instead of creating the data source configuration and mappings separately
-            // you can also just use the method below which takes care of everything
-            // this is only used for 1:1 asset -> agent mappings
-            // the method above can also map the data source configuration to multiple assets
-            // just call GenerateMappings with different asset ids
-
-            await agent.ConfigureAgentForAssetId(targetAssetId);
-
-            // Check in the local agent state storage if agent has data source configuration.
-            if (!agent.HasDataSourceConfiguration()) {
-                await retry(RETRYTIMES, () => agent.GetDataSourceConfiguration());
-                log("Configuration aquired");
-            }
-
             const values = [
                 { "dataPointId": "DP-Temperature", "qualityCode": "0", "value": (Math.sin(index) * (20 + index % 2) + 25).toString() },
                 { "dataPointId": "DP-Pressure", "qualityCode": "0", "value": (Math.cos(index) * (20 + index % 25) + 25).toString() },
