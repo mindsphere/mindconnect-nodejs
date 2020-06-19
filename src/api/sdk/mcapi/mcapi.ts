@@ -1,4 +1,6 @@
-import { toQueryString } from "../../utils";
+import { DataPoint, DataSource, DataSourceConfiguration, Mapping } from "../../..";
+import { throwError, toQueryString } from "../../utils";
+import { AssetManagementModels } from "../asset/asset-models";
 import { SdkClient } from "../common/sdk-client";
 import { MindConnectApiModels } from "./mcapi-models";
 
@@ -256,9 +258,8 @@ export class MindConnectApiClient extends SdkClient {
      *
      * @memberOf MindConnectApiClient
      */
-    public async PostDataPointMapping(mapping: MindConnectApiModels.Mapping) {
+    public async PostDataPointMapping(mapping: MindConnectApiModels.Mapping, optional?: { ignoreCodes: number[] }) {
         const body = mapping;
-
         return await this.HttpAction({
             verb: "POST",
             gateway: this.GetGateway(),
@@ -267,6 +268,7 @@ export class MindConnectApiClient extends SdkClient {
             body: body,
             message: "PostDataPointMapping",
             noResponse: true,
+            ignoreCodes: optional?.ignoreCodes,
         });
     }
 
@@ -299,7 +301,6 @@ export class MindConnectApiClient extends SdkClient {
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/dataPointMappings?${qs}`,
             message: "GetDataPointMappings",
-            noResponse: true,
         })) as MindConnectApiModels.PagedMapping;
     }
 
@@ -332,7 +333,7 @@ export class MindConnectApiClient extends SdkClient {
      *
      * @memberOf MindConnectApiClient
      */
-    public async DeleteDataMapping(id: string) {
+    public async DeleteDataMapping(id: string, optional?: { ignoreCodes: number[] }) {
         return await this.HttpAction({
             verb: "DELETE",
             gateway: this.GetGateway(),
@@ -340,6 +341,117 @@ export class MindConnectApiClient extends SdkClient {
             baseUrl: `${this._baseUrl}/dataPointMappings/${id}`,
             message: "DeleteDataMapping",
             noResponse: true,
+            ignoreCodes: optional?.ignoreCodes,
         });
+    }
+
+    /**
+     * Generates a Data Source Configuration for specified Asset Type
+     *
+     * you still have to generate the mappings (or use ConfigureAgentForAssetId method)
+     *
+     *
+     * @param {AssetManagementModels.AssetTypeResource} assetType
+     * @param {("NUMERICAL" | "DESCRIPTIVE")} [mode="DESCRIPTIVE"]
+     * @returns {Promise<DataSourceConfiguration>}
+     *
+     * @memberOf MindconnectApiClient
+     */
+    public GenerateDataSourceConfiguration(
+        assetType: AssetManagementModels.AssetTypeResource,
+        mode: "NUMERICAL" | "DESCRIPTIVE" = "DESCRIPTIVE"
+    ): DataSourceConfiguration {
+        const dataSourceConfiguration: DataSourceConfiguration = {
+            configurationId: mode === "NUMERICAL" ? "CF0001" : `CF-${assetType!.id!.toString().substr(0, 34)}`,
+            dataSources: [],
+        };
+
+        const dynamicAspects =
+            assetType.aspects?.filter(
+                (x) => x.aspectType!.category === AssetManagementModels.AspectType.CategoryEnum.Dynamic
+            ) || [];
+
+        let ds = 0,
+            dp = 0;
+
+        dynamicAspects!.forEach((aspect) => {
+            const aspectType = (aspect.aspectType as unknown) as AssetManagementModels.AspectTypeResource;
+
+            const dataSource: DataSource = {
+                name:
+                    mode === "NUMERICAL"
+                        ? `DS${(++ds).toString().padStart(5, "0")}`
+                        : `DS-${aspect.name!.substr(0, 61)}`,
+                dataPoints: [],
+                customData: {
+                    aspect: aspect.name!,
+                },
+            };
+
+            aspectType.variables.forEach((variable) => {
+                dataSource.dataPoints.push({
+                    id:
+                        mode === "NUMERICAL"
+                            ? `DP${(++dp).toString().padStart(5, "0")}`
+                            : `DP-${variable.name.substr(0, 33)}`,
+                    name: variable.name.substr(0, 64),
+                    type: (variable.dataType as unknown) as DataPoint.TypeEnum,
+                    unit: `${variable.unit}`,
+                    customData: {
+                        variable: `${variable.name}`,
+                    },
+                });
+            });
+            dataSourceConfiguration.dataSources.push(dataSource);
+        });
+        return dataSourceConfiguration;
+    }
+
+    /**
+     *  * Generate automatically the mappings for the specified target assetid
+     *
+     * !Important! this only works if you have created the data source coniguration automatically
+     *
+     * @param {DataSourceConfiguration} dataSourceConfiguration
+     * @param {string} agentId
+     * @param {string} targetAssetId
+     * @returns {Mapping[]}
+     *
+     * @memberOf MindConnectApiClient
+     */
+    public GenerateMappings(
+        dataSourceConfiguration: DataSourceConfiguration,
+        agentId: string,
+        targetAssetId: string
+    ): Mapping[] {
+        const mappings = [];
+
+        !dataSourceConfiguration &&
+            throwError(
+                "no data source configuration! (have you forgotten to create / generate the data source configuration first?"
+            );
+
+        for (const dataSource of dataSourceConfiguration!.dataSources) {
+            (!dataSource.customData || !dataSource.customData!.aspect!) &&
+                throwError(
+                    "GenerateMappings works only on configurations created with GenerateDataSourceConfiguration method!"
+                );
+            for (const datapoint of dataSource.dataPoints) {
+                (!datapoint.customData || !datapoint.customData!.variable) &&
+                    throwError(
+                        "GenerateMappings works only on configurations created with GenerateDataSourceConfiguration method!"
+                    );
+
+                mappings.push({
+                    agentId: agentId,
+                    dataPointId: datapoint.id,
+                    entityId: targetAssetId,
+                    propertyName: datapoint.customData!.variable,
+                    propertySetName: dataSource.customData!.aspect,
+                    keepMapping: true,
+                });
+            }
+        }
+        return mappings;
     }
 }

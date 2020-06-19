@@ -32,7 +32,7 @@ export class AgentManagementClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/agents`,
-            body: agent
+            body: agent,
         });
 
         return result as AgentManagementModels.Agent;
@@ -65,7 +65,7 @@ export class AgentManagementClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/agents?${toQueryString({ page, size, sort, filter })}`
+            baseUrl: `${this._baseUrl}/agents?${toQueryString({ page, size, sort, filter })}`,
         });
 
         return result as AgentManagementModels.PagedAgent;
@@ -86,7 +86,7 @@ export class AgentManagementClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/agents/${id}`
+            baseUrl: `${this._baseUrl}/agents/${id}`,
         });
 
         return result as AgentManagementModels.Agent;
@@ -117,7 +117,7 @@ export class AgentManagementClient extends SdkClient {
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/agents/${id}`,
             body: agent,
-            additionalHeaders: { "If-Match": ifMatch }
+            additionalHeaders: { "If-Match": ifMatch },
         });
 
         return result as AgentManagementModels.Agent;
@@ -143,7 +143,7 @@ export class AgentManagementClient extends SdkClient {
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/agents/${id}`,
             additionalHeaders: { "If-Match": ifMatch },
-            noResponse: true
+            noResponse: true,
         });
 
         return result as AgentManagementModels.Agent;
@@ -164,7 +164,7 @@ export class AgentManagementClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/agents/${id}/status`
+            baseUrl: `${this._baseUrl}/agents/${id}/status`,
         });
 
         return result as AgentManagementModels.OnlineStatus;
@@ -185,7 +185,7 @@ export class AgentManagementClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/agents/${id}/dataSourceConfiguration`
+            baseUrl: `${this._baseUrl}/agents/${id}/dataSourceConfiguration`,
         });
 
         return result as AgentManagementModels.DataSourceConfiguration;
@@ -214,9 +214,9 @@ export class AgentManagementClient extends SdkClient {
             verb: "PUT",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/agents/${id}`,
+            baseUrl: `${this._baseUrl}/agents/${id}/dataSourceConfiguration`,
             body: dataSourceConfiguration,
-            additionalHeaders: { "If-Match": ifMatch }
+            additionalHeaders: { "If-Match": ifMatch },
         });
 
         return result as AgentManagementModels.DataSourceConfiguration;
@@ -247,7 +247,7 @@ export class AgentManagementClient extends SdkClient {
                 verb: "GET",
                 gateway: this.GetGateway(),
                 authorization: await this.GetToken(),
-                baseUrl: `${this._baseUrl}/agents/${id}/boarding/configuration`
+                baseUrl: `${this._baseUrl}/agents/${id}/boarding/configuration`,
             })) as AgentManagementModels.Configuration;
 
             if (!result.content) {
@@ -276,7 +276,7 @@ export class AgentManagementClient extends SdkClient {
             verb: "POST",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/agents/${id}/boarding/offboard`
+            baseUrl: `${this._baseUrl}/agents/${id}/boarding/offboard`,
         });
 
         return result as AgentManagementModels.OnboardingStatus;
@@ -297,7 +297,7 @@ export class AgentManagementClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/agents/${id}/boarding/status`
+            baseUrl: `${this._baseUrl}/agents/${id}/boarding/status`,
         });
 
         return result as AgentManagementModels.OnboardingStatus;

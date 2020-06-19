@@ -2,12 +2,26 @@
 
 ## 3.8.0 - (Electric Blue Vienna) - June 2020
 
+- SDK: typescript sdk released to beta status
+- SDK: AgentManagementClient released to beta
+- SDK: AssetManagementClient released to beta
+- SDK: EventManagementClient released to beta
+- SDK: IotFileClient released to beta
+- SDK: KPICalculationClient released to beta
+- SDK: MindConnectAPIClient released to beta
+- SDK: SignalValidationClient released to beta
+- SDK: SpectumAnalysisClient released to beta
+- SDK: TimeSeriesAggregateClient released to beta
+- SDK: TimeSeriesBulkClient released to beta
+- SDK: TimeSeriesClient released to beta
+- SDK: TrendPredictionClient released to beta
+- SDK: added utility class for MQTT OPC UA PubSub key rotation
+- SDK: added TokenManagerAuth to SDK
 - Agent: added support for creating automatic data source configuration and automatic mappings
 - Agent: added support for typed events
 - Agent: exposed Sdk() property on the Agent for future use (at the moment only some APIs of mindsphere can be called with Agent Credentials)
 - SDK: added utility class for MQTT OPC UA PubSub key rotation
 - SDK: added TokenManagerAuth to SDK
-- SDK: release of beta version
 - CLI: mc configure-agent can now automatically create the data source configuration and the mappings for selected assetid
 - CLI: mc offboard-agent has now a command to offboard an agent with the id only  (mc offboard --assetid) (#130)
 - CLI: added mc mqtt-createjwt command which can create a key for MQTT OPC UA PubSub authentication

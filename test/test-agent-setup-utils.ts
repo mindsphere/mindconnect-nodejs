@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { retry } from "../src";
-import { AgentManagementModels, AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
+import { AgentManagementModels, AssetManagementClient, AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
 import { sleep } from "./test-utils";
 
 export async function unitTestSetup(
@@ -18,18 +18,18 @@ export async function unitTestSetup(
     const agentAsset = await assetMgmt.PostAsset({
         name: `Agent${new Date().getTime()}`,
         parentId: folderid,
-        typeId: "core.mclib"
+        typeId: "core.mclib",
     });
 
     const agent = await agentMgmt.PostAgent({
         entityId: `${agentAsset.assetId}`,
         name: `${agentAsset.assetId}`,
-        securityProfile: profile
+        securityProfile: profile,
     });
 
     const agentConfig = await agentMgmt.GetBoardingConfiguration(agent.entityId, { retry: 5 });
 
-    return { targetAsset, agentAsset, agent, agentConfig };
+    return { targetAsset, agentAsset, agent, agentConfig, folderid };
 }
 
 export async function setupStructure(sdk: MindSphereSdk) {
@@ -41,16 +41,16 @@ export async function setupStructure(sdk: MindSphereSdk) {
         await assetMgmt.GetAssets({
             filter: JSON.stringify({
                 name: {
-                    eq: "UnitTestFolder"
-                }
-            })
+                    eq: "UnitTestFolder",
+                },
+            }),
         })
     );
     if (folders.length === 0) {
         const folder = await assetMgmt.PostAsset({
             name: "UnitTestFolder",
             typeId: "core.basicarea",
-            parentId: rootassetid
+            parentId: rootassetid,
         });
         folders.push(folder);
     }
@@ -62,10 +62,10 @@ export async function setupStructure(sdk: MindSphereSdk) {
             filter: JSON.stringify({
                 id: {
                     in: {
-                        value: [`${tenant}.UnitTestEnvironment`, `${tenant}.UnitTestVibration`]
-                    }
-                }
-            })
+                        value: [`${tenant}.UnitTestEnvironment`, `${tenant}.UnitTestVibration`],
+                    },
+                },
+            }),
         })
     );
     if (aspectTypes.length === 0) {
@@ -78,21 +78,21 @@ export async function setupStructure(sdk: MindSphereSdk) {
                     name: "Humidity",
                     dataType: AssetManagementModels.VariableDefinition.DataTypeEnum.INT,
                     qualityCode: true,
-                    unit: "%"
+                    unit: "%",
                 },
                 {
                     name: "Pressure",
                     dataType: AssetManagementModels.VariableDefinition.DataTypeEnum.DOUBLE,
                     qualityCode: true,
-                    unit: "kPa"
+                    unit: "kPa",
                 },
                 {
                     name: "Temperature",
                     dataType: AssetManagementModels.VariableDefinition.DataTypeEnum.DOUBLE,
                     qualityCode: true,
-                    unit: "°C"
-                }
-            ]
+                    unit: "°C",
+                },
+            ],
         });
         await assetMgmt.PutAspectType(`${tenant}.UnitTestVibration`, {
             name: "UnitTestVibration",
@@ -103,32 +103,32 @@ export async function setupStructure(sdk: MindSphereSdk) {
                     name: "Acceleration",
                     dataType: AssetManagementModels.VariableDefinition.DataTypeEnum.DOUBLE,
                     qualityCode: true,
-                    unit: "mm/s^2"
+                    unit: "mm/s^2",
                 },
                 {
                     name: "Displacement",
                     dataType: AssetManagementModels.VariableDefinition.DataTypeEnum.DOUBLE,
                     qualityCode: true,
-                    unit: "mm"
+                    unit: "mm",
                 },
                 {
                     name: "Frequency",
                     dataType: AssetManagementModels.VariableDefinition.DataTypeEnum.DOUBLE,
                     qualityCode: true,
-                    unit: "Hz"
+                    unit: "Hz",
                 },
                 {
                     name: "Velocity",
                     dataType: AssetManagementModels.VariableDefinition.DataTypeEnum.DOUBLE,
                     qualityCode: true,
-                    unit: "mm/s"
-                }
-            ]
+                    unit: "mm/s",
+                },
+            ],
         });
     }
     const assetType = unroll(
         await assetMgmt.GetAssetTypes({
-            filter: JSON.stringify({ name: { eq: `UnitTestEngine` } })
+            filter: JSON.stringify({ name: { eq: `UnitTestEngine` } }),
         })
     );
     if (assetType.length === 0) {
@@ -137,40 +137,13 @@ export async function setupStructure(sdk: MindSphereSdk) {
             parentTypeId: "core.BasicAsset",
             aspects: [
                 { name: "EnvironmentData", aspectTypeId: `${tenant}.UnitTestEnvironment` },
-                { name: "VibrationData", aspectTypeId: `${tenant}.UnitTestVibration` }
-            ]
+                { name: "VibrationData", aspectTypeId: `${tenant}.UnitTestVibration` },
+            ],
         });
     }
-    const asset = unroll(
-        await assetMgmt.GetAssets({
-            filter: JSON.stringify({
-                and: {
-                    name: {
-                        eq: "UnitTestEngineInstance"
-                    },
-                    parentId: {
-                        eq: folderid
-                    }
-                }
-            })
-        })
-    );
-    if (asset.length === 0) {
-        await assetMgmt.PostAsset({
-            name: "UnitTestEngineInstance",
-            typeId: `${tenant}.UnitTestEngine`,
-            parentId: folderid
-        });
-    }
-    const targetAsset = unroll<AssetManagementModels.AssetResource>(
-        await assetMgmt.GetAssets({
-            filter: JSON.stringify({
-                name: {
-                    eq: "UnitTestEngineInstance"
-                }
-            })
-        })
-    )[0];
+
+    const name = "UnitTestEngineInstance";
+    const targetAsset = await createUnitTestAsset({ assetMgmt, folderid, tenant, name });
     return { targetAsset, folderid };
 }
 
@@ -181,6 +154,52 @@ function unroll<T>(obj: { _embedded?: any }) {
     if (keys.length === 0) return [];
     if (keys.length === 1) return embedded[keys[0]] as T[];
     throw new Error("cant unroll object");
+}
+
+export async function createUnitTestAsset({
+    assetMgmt,
+    folderid,
+    tenant,
+    name,
+}: {
+    assetMgmt: AssetManagementClient;
+    folderid: string;
+    tenant: string;
+    name: string;
+}) {
+    const asset = unroll(
+        await assetMgmt.GetAssets({
+            filter: JSON.stringify({
+                and: {
+                    name: {
+                        eq: name,
+                    },
+                    parentId: {
+                        eq: folderid,
+                    },
+                },
+            }),
+        })
+    );
+    if (asset.length === 0) {
+        await assetMgmt.PostAsset({
+            name: name,
+            typeId: `${tenant}.UnitTestEngine`,
+            parentId: folderid,
+        });
+    }
+
+    const targetAsset = unroll<AssetManagementModels.AssetResource>(
+        await assetMgmt.GetAssets({
+            filter: JSON.stringify({
+                name: {
+                    eq: name,
+                },
+            }),
+        })
+    )[0];
+
+    return targetAsset;
 }
 
 export async function tearDownAgents(sdk: MindSphereSdk, config: AgentUnitTestConfiguration) {
@@ -207,4 +226,5 @@ export interface AgentUnitTestConfiguration {
     agentAsset: AssetManagementModels.AssetResourceWithHierarchyPath;
     agent: AgentManagementModels.Agent;
     agentConfig: AgentManagementModels.Configuration;
+    folderid: string;
 }

@@ -6,17 +6,10 @@ import * as path from "path";
 import "url-search-params-polyfill";
 import { DataSourceConfiguration, Mapping, retry } from "..";
 import { AgentAuth } from "./agent-auth";
-import {
-    BaseEvent,
-    DataPoint,
-    DataPointValue,
-    DataSource,
-    IMindConnectConfiguration,
-    TimeStampedDataPoint,
-} from "./mindconnect-models";
+import { BaseEvent, DataPointValue, IMindConnectConfiguration, TimeStampedDataPoint } from "./mindconnect-models";
 import { bulkDataTemplate, dataTemplate } from "./mindconnect-template";
 import { dataValidator, eventValidator } from "./mindconnect-validators";
-import { AssetManagementModels, MindSphereSdk } from "./sdk";
+import { MindSphereSdk } from "./sdk";
 import { fileUploadOptionalParameters, MultipartUploader } from "./sdk/common/multipart-uploader";
 import { throwError } from "./utils";
 import _ = require("lodash");
@@ -85,7 +78,7 @@ export class MindConnectAgent extends AgentAuth {
      * @memberof MindConnectAgent
      */
     public HasDataMappings(): boolean {
-        return this._configuration.mappings ? true : false;
+        return (this._configuration.mappings || []).length > 0;
     }
 
     /**
@@ -106,9 +99,29 @@ export class MindConnectAgent extends AgentAuth {
         ignoreEtag: boolean = true
     ): Promise<DataSourceConfiguration> {
         await this.RenewToken();
-        if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
-        if (!this._configuration.content.clientId) throw new Error("No client id in the configuration of the agent.");
+        this.checkConfiguration();
+        const eTag: number = this.calculateEtag(ignoreEtag, dataSourceConfiguration);
 
+        const agentManangement = this.Sdk().GetAgentManagementClient();
+
+        try {
+            const storedConfig = await agentManangement.PutDataSourceConfiguration(
+                this.ClientId(),
+                dataSourceConfiguration,
+                {
+                    ifMatch: eTag.toString(),
+                }
+            );
+            this._configuration.dataSourceConfiguration = storedConfig;
+            await retry(5, () => this.SaveConfig());
+            return storedConfig;
+        } catch (err) {
+            log(err);
+            throw new Error(`Network error occured ${err.message}`);
+        }
+    }
+
+    private calculateEtag(ignoreEtag: boolean, dataSourceConfiguration: DataSourceConfiguration) {
         let eTag: number = 0;
 
         if (this._configuration.dataSourceConfiguration && this._configuration.dataSourceConfiguration.eTag) {
@@ -121,39 +134,7 @@ export class MindConnectAgent extends AgentAuth {
             eTag = parseInt(dataSourceConfiguration.eTag);
             if (isNaN(eTag)) throw new Error("Invalid eTag in provided configuration!");
         }
-
-        const headers = {
-            ...this._apiHeaders,
-            Authorization: `Bearer ${this._accessToken.access_token}`,
-            "If-Match": eTag.toString(),
-        };
-        const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/agents/${this._configuration.content.clientId}/dataSourceConfiguration`;
-
-        log(`PutDataSourceConfiguration Headers ${JSON.stringify(headers)} Url ${url} eTag ${eTag}`);
-
-        try {
-            const response = await fetch(url, {
-                method: "PUT",
-                body: JSON.stringify(dataSourceConfiguration),
-                headers: headers,
-                agent: this._proxyHttpAgent,
-            });
-            const json = await response.json();
-            if (!response.ok) {
-                throw new Error(`${response.statusText} ${JSON.stringify(json)}`);
-            }
-
-            if (response.status >= 200 && response.status <= 299) {
-                this._configuration.dataSourceConfiguration = json;
-                await retry(5, () => this.SaveConfig());
-                return json;
-            } else {
-                throw new Error(`invalid response ${JSON.stringify(response)}`);
-            }
-        } catch (err) {
-            log(err);
-            throw new Error(`Network error occured ${err.message}`);
-        }
+        return eTag;
     }
 
     /**
@@ -170,26 +151,13 @@ export class MindConnectAgent extends AgentAuth {
         if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
         if (!this._configuration.content.clientId) throw new Error("No client id in the configuration of the agent.");
 
-        const headers = { ...this._headers, Authorization: `Bearer ${this._accessToken.access_token}` };
-        const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/agents/${this._configuration.content.clientId}/dataSourceConfiguration`;
-
-        log(`GetDataSourceConfiguration Headers ${JSON.stringify(headers)} Url ${url}`);
+        const agentManagment = this.Sdk().GetAgentManagementClient();
 
         try {
-            const response = await fetch(url, { method: "GET", headers: headers, agent: this._proxyHttpAgent });
-            if (!response.ok) {
-                throw new Error(`${response.statusText}`);
-            }
-
-            const json = await response.json();
-
-            if (response.status >= 200 && response.status <= 299) {
-                this._configuration.dataSourceConfiguration = json;
-                await retry(5, () => this.SaveConfig());
-                return json;
-            } else {
-                throw new Error(`invalid response ${JSON.stringify(response)}`);
-            }
+            const result = await agentManagment.GetDataSourceConfiguration(this.ClientId());
+            this._configuration.dataSourceConfiguration = result;
+            await retry(5, () => this.SaveConfig());
+            return result;
         } catch (err) {
             log(err);
             throw new Error(`Network error occured ${err.message}`);
@@ -207,32 +175,28 @@ export class MindConnectAgent extends AgentAuth {
      */
     public async GetDataMappings(): Promise<Array<Mapping>> {
         await this.RenewToken();
-        if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
-        if (!this._configuration.content.clientId) throw new Error("No client id in the configuration of the agent.");
+        this.checkConfiguration();
 
-        const headers = { ...this._headers, Authorization: `Bearer ${this._accessToken.access_token}` };
-        const agentFilter = encodeURIComponent(JSON.stringify({ agentId: `${this._configuration.content.clientId}` }));
-        const url = `${this._configuration.content.baseUrl}/api/mindconnect/v3/dataPointMappings?filter=${agentFilter}&size=2000`;
+        const mcapi = this.Sdk().GetMindConnectApiClient();
+        const agentFilter = JSON.stringify({ agentId: `${this._configuration.content.clientId}` });
 
-        log(`GetDataSourceConfiguration Headers ${JSON.stringify(headers)} Url ${url}`);
         try {
-            const response = await fetch(url, { method: "GET", headers: headers, agent: this._proxyHttpAgent });
-            const json = await response.json();
-            if (!response.ok) {
-                throw new Error(`${response.statusText} ${JSON.stringify(json)}`);
-            }
-
-            if (response.status >= 200 && response.status <= 299) {
-                this._configuration.mappings = json;
-                await retry(5, () => this.SaveConfig());
-                return json.content;
-            } else {
-                throw new Error(`invalid response ${JSON.stringify(response)}`);
-            }
+            const result = await mcapi.GetDataPointMappings({
+                size: 2000,
+                filter: agentFilter,
+            });
+            this._configuration.mappings = result.content;
+            await retry(5, () => this.SaveConfig());
+            return result.content;
         } catch (err) {
             log(err);
             throw new Error(`Network error occured ${err.message}`);
         }
+    }
+
+    private checkConfiguration() {
+        !this._accessToken && throwError("The agent doesn't have a valid access token.");
+        !this._configuration.content.clientId && throwError("No client id in the configuration of the agent.");
     }
 
     /**
@@ -247,38 +211,57 @@ export class MindConnectAgent extends AgentAuth {
      */
     public async PutDataMappings(mappings: Mapping[]): Promise<boolean> {
         await this.RenewToken();
-        if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
-        if (!this._configuration.content.clientId) throw new Error("No client id in the configuration of the agent.");
+        this.checkConfiguration();
 
-        const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
-        const url = `${this._configuration.content.baseUrl}/api/mindconnect/v3/dataPointMappings`;
-
-        log(`GetDataSourceConfiguration Headers ${JSON.stringify(headers)} Url ${url}`);
+        const mcapi = this.Sdk().GetMindConnectApiClient();
 
         for (const mapping of mappings) {
             log(`Storing mapping ${mapping}`);
-            const response = await fetch(url, {
-                method: "POST",
-                body: JSON.stringify(mapping),
-                headers: headers,
-                agent: this._proxyHttpAgent,
-            });
-            const json = await response.json();
             try {
-                if (!response.ok) {
-                    throw new Error(`${response.statusText} ${JSON.stringify(json)}`);
-                }
-                if (!(response.status >= 200 && response.status <= 299)) {
-                    throw new Error(`invalid response ${JSON.stringify(response)}`);
-                }
+                // we are ignoring the 409 so that method becomes retryable
+                await mcapi.PostDataPointMapping(mapping, { ignoreCodes: [409] });
             } catch (err) {
                 log(err);
                 throw new Error(`Network error occured ${err.message}`);
             }
 
-            this._configuration.mappings = mappings;
+            let oldmappings = this._configuration.mappings || [];
+            // there was a deprecation of old mappings in mindsphere, this isn't an array anymore.
+            if ((oldmappings as any).content) {
+                oldmappings = [];
+            }
+            this._configuration.mappings = _.uniqWith([...oldmappings, ...mappings], (a, b) => {
+                return (
+                    a.agentId === b.agentId &&
+                    a.dataPointId === b.dataPointId &&
+                    a.entityId === b.entityId &&
+                    a.propertyName === b.propertyName &&
+                    a.propertySetName === b.propertySetName
+                );
+            });
+
+            await retry(5, () => this.SaveConfig());
         }
         return true;
+    }
+
+    /**
+     * Deletes all mappings from the agent
+     *
+     * @memberOf MindConnectAgent
+     */
+    public async DeleteAllMappings() {
+        const toDeleteMappings = await this.GetDataMappings();
+
+        const mcapi = this.Sdk().GetMindConnectApiClient();
+
+        for (let index = 0; index < toDeleteMappings.length; index++) {
+            const element = toDeleteMappings[index];
+            await mcapi.DeleteDataMapping(element.id!, { ignoreCodes: [404] });
+        }
+
+        this._configuration.mappings = [];
+        await retry(5, () => this.SaveConfig());
     }
 
     /**
@@ -293,20 +276,22 @@ export class MindConnectAgent extends AgentAuth {
      * @memberof MindConnectAgent
      */
     public async PostEvent(
-        event: BaseEvent,
+        event: BaseEvent | CustomEvent,
         timeStamp: Date = new Date(),
         validateModel: boolean = true
     ): Promise<boolean> {
         await this.RenewToken();
         if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
 
+        const eventManagement = this.Sdk().GetEventManagementClient();
+
         const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
         // const url = `${this._configuration.content.baseUrl}/api/mindconnect/v3/exchange`;
         const url = `${this._configuration.content.baseUrl}/api/eventmanagement/v3/events`;
         log(`GetDataSourceConfiguration Headers ${JSON.stringify(headers)} Url ${url}`);
 
-        if (!event.timestamp) {
-            event.timestamp = timeStamp.toISOString();
+        if (!(event as any).timestamp) {
+            (event as any).timestamp = timeStamp.toISOString();
         }
 
         if (validateModel) {
@@ -317,8 +302,8 @@ export class MindConnectAgent extends AgentAuth {
             }
         }
 
-        const result = await this.SendMessage("POST", url, JSON.stringify(event), headers);
-        return <boolean>result;
+        await eventManagement.PostEvent(event as any);
+        return true;
     }
 
     /**
@@ -556,49 +541,9 @@ export class MindConnectAgent extends AgentAuth {
     ): Promise<DataSourceConfiguration> {
         const assetType = await this.Sdk().GetAssetManagementClient().GetAssetType(assetTypeId, { exploded: true });
 
-        const dataSourceConfiguration: DataSourceConfiguration = {
-            configurationId: mode === "NUMERICAL" ? "CF0001" : `CF-${assetType!.id!.toString().substr(0, 34)}`,
-            dataSources: [],
-        };
-
-        const dynamicAspects =
-            assetType.aspects?.filter(
-                (x) => x.aspectType!.category === AssetManagementModels.AspectType.CategoryEnum.Dynamic
-            ) || [];
-
-        let ds = 0,
-            dp = 0;
-
-        dynamicAspects!.forEach((aspect) => {
-            const aspectType = (aspect.aspectType as unknown) as AssetManagementModels.AspectTypeResource;
-
-            const dataSource: DataSource = {
-                name:
-                    mode === "NUMERICAL"
-                        ? `DS${(++ds).toString().padStart(5, "0")}`
-                        : `DS-${aspect.name!.substr(0, 61)}`,
-                dataPoints: [],
-                customData: {
-                    aspect: aspect.name!,
-                },
-            };
-
-            aspectType.variables.forEach((variable) => {
-                dataSource.dataPoints.push({
-                    id:
-                        mode === "NUMERICAL"
-                            ? `DP${(++dp).toString().padStart(5, "0")}`
-                            : `DP-${variable.name.substr(0, 33)}`,
-                    name: variable.name.substr(0, 64),
-                    type: (variable.dataType as unknown) as DataPoint.TypeEnum,
-                    unit: `${variable.unit}`,
-                    customData: {
-                        variable: `${variable.name}`,
-                    },
-                });
-            });
-            dataSourceConfiguration.dataSources.push(dataSource);
-        });
+        const dataSourceConfiguration = this.Sdk()
+            .GetMindConnectApiClient()
+            .GenerateDataSourceConfiguration(assetType, mode);
 
         return dataSourceConfiguration;
     }
@@ -620,34 +565,19 @@ export class MindConnectAgent extends AgentAuth {
      * @memberOf MindConnectAgent
      */
     public GenerateMappings(targetAssetId: string): Mapping[] {
-        const mappings = [];
+        const mcapi = this.Sdk().GetMindConnectApiClient();
 
         !this._configuration.dataSourceConfiguration &&
             throwError(
                 "no data source configuration! (have you forgotten to create / generate the data source configuration first?"
             );
 
-        for (const dataSource of this._configuration.dataSourceConfiguration!.dataSources) {
-            (!dataSource.customData || !dataSource.customData!.aspect!) &&
-                throwError(
-                    "GenerateMappings works only on configurations created with GenerateDataSourceConfiguration method!"
-                );
-            for (const datapoint of dataSource.dataPoints) {
-                (!datapoint.customData || !datapoint.customData!.variable) &&
-                    throwError(
-                        "GenerateMappings works only on configurations created with GenerateDataSourceConfiguration method!"
-                    );
+        const mappings = mcapi.GenerateMappings(
+            this._configuration.dataSourceConfiguration!,
+            this.ClientId(),
+            targetAssetId
+        );
 
-                mappings.push({
-                    agentId: this.ClientId(),
-                    dataPointId: datapoint.id,
-                    entityId: targetAssetId,
-                    propertyName: datapoint.customData!.variable,
-                    propertySetName: dataSource.customData!.aspect,
-                    keepMapping: true,
-                });
-            }
-        }
         return mappings;
     }
 
@@ -659,15 +589,26 @@ export class MindConnectAgent extends AgentAuth {
      *
      * @param {string} targetAssetId
      * @param {("NUMERICAL" | "DESCRIPTIVE")} mode
+     * @param {boolean} [overwrite=true] ignore eTag will overwrite mappings and data source configuration
      *
      * * NUMERICAL MODE will use names like CF0001 for configurationId , DS0001,DS0002,DS0003... for data source ids and DP0001, DP0002... for dataPointIds
      * * DESCRIPTIVE MODE will use names like CF-assetName for configurationId , DS-aspectName... for data source ids and DP-variableName for data PointIds (default)
      * @memberOf MindConnectAgent
      */
-    public async ConfigureAgentForAssetId(targetAssetId: string, mode: "NUMERICAL" | "DESCRIPTIVE" = "DESCRIPTIVE") {
+    public async ConfigureAgentForAssetId(
+        targetAssetId: string,
+        mode: "NUMERICAL" | "DESCRIPTIVE" = "DESCRIPTIVE",
+        overwrite: boolean = true
+    ) {
         const asset = await this.Sdk().GetAssetManagementClient().GetAsset(targetAssetId);
         const configuration = await this.GenerateDataSourceConfiguration((asset.typeId as unknown) as string, mode);
-        await this.PutDataSourceConfiguration(configuration);
+        if (overwrite) {
+            await this.GetDataSourceConfiguration();
+        }
+        await this.PutDataSourceConfiguration(configuration, overwrite);
+        if (overwrite) {
+            await this.DeleteAllMappings();
+        }
         const mappings = this.GenerateMappings(targetAssetId);
         await this.PutDataMappings(mappings);
     }

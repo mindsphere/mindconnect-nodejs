@@ -1,4 +1,14 @@
-// Copyright (C), Siemens AG 2017
+/**
+ * used for Generate Configuration method
+ *
+ * @export
+ * @enum {number}
+ */
+export enum ConfigurationStyle {
+    Numeric = "NUMERIC",
+    Descriptive = "DESCRIPTIVE",
+}
+
 /**
  * The agent extends the configuration to store the state of the agent.
  * This type was created manually for the agent.
@@ -120,7 +130,7 @@ export namespace Agent {
      */
     export enum SecurityProfileEnum {
         SHAREDSECRET = <any>"SHARED_SECRET",
-        RSA3072 = <any>"RSA_3072"
+        RSA3072 = <any>"RSA_3072",
     }
 }
 
@@ -155,7 +165,7 @@ export namespace AgentUpdate {
      */
     export enum SecurityProfileEnum {
         SHAREDSECRET = <any>"SHARED_SECRET",
-        RSA3072 = <any>"RSA_3072"
+        RSA3072 = <any>"RSA_3072",
     }
 }
 
@@ -273,7 +283,7 @@ export namespace ClientIdentifier {
      */
     export enum GrantTypesEnum {
         SHAREDSECRET = <any>"SHARED_SECRET",
-        RSA3072 = <any>"RSA_3072"
+        RSA3072 = <any>"RSA_3072",
     }
     /**
      * @export
@@ -281,7 +291,7 @@ export namespace ClientIdentifier {
      */
     export enum TokenEndpointAuthMethodEnum {
         ClientSecretJwt = <any>"client_secret_jwt",
-        PrivateKeyJwt = <any>"private_key_jwt"
+        PrivateKeyJwt = <any>"private_key_jwt",
     }
 }
 
@@ -383,7 +393,7 @@ export namespace DataPoint {
         LONG = <any>"LONG",
         DOUBLE = <any>"DOUBLE",
         BOOLEAN = <any>"BOOLEAN",
-        STRING = <any>"STRING"
+        STRING = <any>"STRING",
     }
 }
 
@@ -642,7 +652,7 @@ export namespace OnboardingStatus {
     export enum StatusEnum {
         NOTONBOARDED = <any>"NOT_ONBOARDED",
         ONBOARDING = <any>"ONBOARDING",
-        ONBOARDED = <any>"ONBOARDED"
+        ONBOARDED = <any>"ONBOARDED",
     }
 }
 
@@ -701,7 +711,7 @@ export namespace Order {
      */
     export enum DirectionEnum {
         ASC = <any>"ASC",
-        DESC = <any>"DESC"
+        DESC = <any>"DESC",
     }
     /**
      * @export
@@ -710,7 +720,7 @@ export namespace Order {
     export enum NullHandlingEnum {
         NATIVE = <any>"NATIVE",
         NULLSFIRST = <any>"NULLS_FIRST",
-        NULLSLAST = <any>"NULLS_LAST"
+        NULLSLAST = <any>"NULLS_LAST",
     }
 }
 
@@ -911,7 +921,7 @@ export const COLLECTION_FORMATS = {
     csv: ",",
     ssv: " ",
     tsv: "\t",
-    pipes: "|"
+    pipes: "|",
 };
 
 /**
@@ -1120,7 +1130,7 @@ export namespace Mapping {
         BOOLEAN = <any>"BOOLEAN",
         STRING = <any>"STRING",
         BIGSTRING = <any>"BIG_STRING",
-        TIMESTAMP = <any>"TIMESTAMP"
+        TIMESTAMP = <any>"TIMESTAMP",
     }
     /**
      * @export
@@ -1133,7 +1143,7 @@ export namespace Mapping {
         BOOLEAN = <any>"BOOLEAN",
         STRING = <any>"STRING",
         BIGSTRING = <any>"BIG_STRING",
-        TIMESTAMP = <any>"TIMESTAMP"
+        TIMESTAMP = <any>"TIMESTAMP",
     }
 }
 
@@ -1168,7 +1178,7 @@ export namespace Validity {
      */
     export enum StatusEnum {
         VALID = <any>"VALID",
-        INVALID = <any>"INVALID"
+        INVALID = <any>"INVALID",
     }
     /**
      * @export
@@ -1178,7 +1188,7 @@ export namespace Validity {
         MISSINGDATAPOINT = <any>"MISSING_DATAPOINT",
         MISSINGPROPERTY = <any>"MISSING_PROPERTY",
         INVALIDTYPE = <any>"INVALID_TYPE",
-        INVALIDUNIT = <any>"INVALID_UNIT"
+        INVALIDUNIT = <any>"INVALID_UNIT",
     }
 }
 
@@ -1531,7 +1541,7 @@ export namespace DiagnosticInformation {
     export enum SeverityEnum {
         INFO = <any>"INFO",
         WARN = <any>"WARN",
-        ERROR = <any>"ERROR"
+        ERROR = <any>"ERROR",
     }
 }
 
@@ -1689,6 +1699,6 @@ export namespace OnlineStatus {
      */
     export enum StatusEnum {
         ONLINE = <any>"ONLINE",
-        OFFLINE = <any>"OFFLINE"
+        OFFLINE = <any>"OFFLINE",
     }
 }
