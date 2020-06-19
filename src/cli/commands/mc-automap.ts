@@ -76,11 +76,22 @@ export default (program: CommanderStatic) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc configure-agent --config agent.json --assetid 1234567...89 \tconfigures agent automatically to send the data to specified assetid`
+                `    mc configure-agent --config agent.json -assetid 1234567...89 \t\tconfigures agent automatically for specified assetid`
             );
             log(
-                `    mc configure-agent --config agent.json --mode print \t\tprints data source configuration and mappings`
+                `    mc configure-agent --config agent.json --mode print \t\t\tprints data source configuration and mappings`
             );
+            log(
+                `    mc configure-agent --agentid 12345..ef --typeid <tenant>.Engine  \t\tcreates the data source configuration`
+            );
+            log(
+                `    mc configure-agent --mode map --agentid 12345..ef --assetid 1234567 \tcreates the mappings for assetid`
+            );
+
+            log(
+                `    mc configure-agent --mode delete --agentid 12345..ef --assetid 1234567 \tdeletes the mappings for assetid`
+            );
+            log(`    mc configure-agent --config agent.json --mode test \t\t\t\tsends test data to mindsphere`);
         });
 };
 
