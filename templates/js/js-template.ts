@@ -23,6 +23,31 @@ export const jstemplate: string = `const { MindConnectAgent, retry } = require (
                 log("Agent onboarded");
             }
 
+            // you can use agent.Sdk().GetAssetManagementClient() to get the asset id and asset type from mindsphere
+            // or just copy them from Asset Manager
+            const targetAssetId = "1234567....";
+            const targetAssetType = "<tenant>.Engine";
+
+            // create data sourceconfiguration and mappings
+            // this generates a data source configuration from an asset type
+            const config = await agent.GenerateDataSourceConfiguration(targetAssetType);
+
+            // create/overwrite the data source configuration
+            await agent.PutDataSourceConfiguration(config);
+
+            // create mappings for asset id
+            const mappings = await agent.GenerateMappings(targetAssetId);
+            // store mappings in mindsphere
+            await agent.PutDataMappings(mappings);
+
+            // instead of creating the data source configuration and mappings separately
+            // you can also just use the method below which takes care of everything
+            // this is only used for 1:1 asset -> agent mappings
+            // the method above can also map the data source configuration to multiple assets
+            // just call GenerateMappings with different asset ids
+
+            await agent.ConfigureAgentForAssetId(targetAssetId);
+
             // Check in the local agent state storage if agent has data source configuration.
             if (!agent.HasDataSourceConfiguration()) {
                 await retry(RETRYTIMES, () => agent.GetDataSourceConfiguration());
