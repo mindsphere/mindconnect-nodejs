@@ -46,22 +46,11 @@ npm pack
 npm install mindconnect-...tgz --save
 ```
 
-## Installing the Command Line Interface
+## Using CLI to generate starter projects
 
 [![Documentation](https://img.shields.io/badge/cli-documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html)
 
-The library comes with a command line interface which can also be installed globally. You can use the command line mode to upload timeseries, files and create events in the mindsphere.
-
-Navigate to [http://localhost:4994](http://localhost:4994) to configure the CLI.
-
-The image below shows the dialog for adding new credentials (press on the + sign in the upper left corner)
-
-```bash
-# install the library globaly if you want to use its command line interface.
- npm install -g @mindconnect/mindconnect-nodejs
-```
-
-## Using CLI to generate starter projects
+The easiest way to start is to use CLI to create a starter project:
 
 ```bash
 # install the library globaly if you want to use its command line interface.
@@ -415,6 +404,10 @@ press CTRL + C to exit
 
 ```
 
+Navigate to [http://localhost:4994](http://localhost:4994) to configure the CLI.
+
+The image below shows the dialog for adding new credentials (press on the + sign in the upper left corner)
+
 ![CLI](images/servicecredentials.png)
 
 You can get the application credentials from your developer or operator cockpit in MindSphere. (if you don't have any application you can register a dummy one just for CLI)
@@ -437,7 +430,7 @@ mc --help
 
 ![CLI](images/cli.png)
 
-### Notable Command Development Proxy
+### Important Command: Development Proxy
 
 The CLI comes with a development proxy which can be used to kickstart your MindSphere development. It provides an endpoint
 at your local machine at
