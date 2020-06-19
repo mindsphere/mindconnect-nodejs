@@ -20,10 +20,31 @@ export interface TokenRotation {
      */
     RenewToken(): Promise<boolean>;
 
+    /**
+     * Returns the current token
+     *
+     * @returns {Promise<string>}
+     *
+     * @memberOf TokenRotation
+     */
     GetToken(): Promise<string>;
 
+    /**
+     * returns the currently used MindSphere gateway
+     *
+     * @returns {string}
+     *
+     * @memberOf TokenRotation
+     */
     GetGateway(): string;
 
+    /**
+     * returns the currently used mindsphere tenant
+     *
+     * @returns {string}
+     *
+     * @memberOf TokenRotation
+     */
     GetTenant(): string;
 }
 
@@ -109,6 +130,42 @@ export abstract class MindConnectBase {
         "Content-Type": "application/x-www-form-urlencoded",
     };
 
+    /**
+     * perform http action
+     *
+     * @param {({
+     *         verb: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
+     *         gateway: string;
+     *         baseUrl: string;
+     *         authorization: string;
+     *         body?: Object;
+     *         message?: string;
+     *         octetStream?: boolean;
+     *         multiPartFormData?: boolean;
+     *         additionalHeaders?: Object;
+     *         noResponse?: boolean;
+     *         rawResponse?: boolean;
+     *         returnHeaders?: boolean;
+     *         ignoreCodes?: number[];
+     *     })} {
+     *         verb,
+     *         gateway,
+     *         baseUrl,
+     *         authorization,
+     *         body,
+     *         message,
+     *         octetStream,
+     *         multiPartFormData,
+     *         additionalHeaders,
+     *         noResponse,
+     *         rawResponse,
+     *         returnHeaders,
+     *         ignoreCodes,
+     *     }
+     * @returns {Promise<Object>}
+     *
+     * @memberOf MindConnectBase
+     */
     public async HttpAction({
         verb,
         gateway,
@@ -122,6 +179,7 @@ export abstract class MindConnectBase {
         noResponse,
         rawResponse,
         returnHeaders,
+        ignoreCodes,
     }: {
         verb: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
         gateway: string;
@@ -135,11 +193,12 @@ export abstract class MindConnectBase {
         noResponse?: boolean;
         rawResponse?: boolean;
         returnHeaders?: boolean;
+        ignoreCodes?: number[];
     }): Promise<Object> {
         additionalHeaders = additionalHeaders || {};
         let apiheaders = octetStream ? this._octetStreamHeaders : this._apiHeaders;
         apiheaders = multiPartFormData ? this._multipartFormData : apiheaders;
-
+        ignoreCodes = ignoreCodes || [];
         let headers: any = {
             ...apiheaders,
             Authorization: `Bearer ${authorization}`,
@@ -162,6 +221,7 @@ export abstract class MindConnectBase {
 
             !response.ok && throwError(`${response.statusText} ${await response.text()}`);
             (response.status < 200 || response.status > 299) &&
+                ignoreCodes.indexOf(response.status) < 0 &&
                 throwError(`invalid response ${JSON.stringify(response)}`);
 
             if (rawResponse) return response;
