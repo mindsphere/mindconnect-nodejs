@@ -194,7 +194,7 @@ export abstract class MindConnectBase {
         rawResponse?: boolean;
         returnHeaders?: boolean;
         ignoreCodes?: number[];
-    }): Promise<Object> {
+    }): Promise<Object | undefined> {
         additionalHeaders = additionalHeaders || {};
         let apiheaders = octetStream ? this._octetStreamHeaders : this._apiHeaders;
         apiheaders = multiPartFormData ? this._multipartFormData : apiheaders;
@@ -219,10 +219,15 @@ export abstract class MindConnectBase {
             }
             const response = await fetch(url, request);
 
-            !response.ok && throwError(`${response.statusText} ${await response.text()}`);
-            (response.status < 200 || response.status > 299) &&
-                ignoreCodes.indexOf(response.status) < 0 &&
+            const codeIgnored = ignoreCodes.indexOf(response.status) >= 0;
+
+            !codeIgnored && !response.ok && throwError(`${response.statusText} ${await response.text()}`);
+
+            !codeIgnored &&
+                (response.status < 200 || response.status > 299) &&
                 throwError(`invalid response ${JSON.stringify(response)}`);
+
+            if (codeIgnored) return undefined;
 
             if (rawResponse) return response;
 

@@ -258,9 +258,8 @@ export class MindConnectApiClient extends SdkClient {
      *
      * @memberOf MindConnectApiClient
      */
-    public async PostDataPointMapping(mapping: MindConnectApiModels.Mapping) {
+    public async PostDataPointMapping(mapping: MindConnectApiModels.Mapping, optional?: { ignoreCodes: number[] }) {
         const body = mapping;
-
         return await this.HttpAction({
             verb: "POST",
             gateway: this.GetGateway(),
@@ -269,6 +268,7 @@ export class MindConnectApiClient extends SdkClient {
             body: body,
             message: "PostDataPointMapping",
             noResponse: true,
+            ignoreCodes: optional?.ignoreCodes,
         });
     }
 
@@ -333,7 +333,7 @@ export class MindConnectApiClient extends SdkClient {
      *
      * @memberOf MindConnectApiClient
      */
-    public async DeleteDataMapping(id: string) {
+    public async DeleteDataMapping(id: string, optional?: { ignoreCodes: number[] }) {
         return await this.HttpAction({
             verb: "DELETE",
             gateway: this.GetGateway(),
@@ -341,6 +341,7 @@ export class MindConnectApiClient extends SdkClient {
             baseUrl: `${this._baseUrl}/dataPointMappings/${id}`,
             message: "DeleteDataMapping",
             noResponse: true,
+            ignoreCodes: optional?.ignoreCodes,
         });
     }
 
@@ -349,8 +350,6 @@ export class MindConnectApiClient extends SdkClient {
      *
      * you still have to generate the mappings (or use ConfigureAgentForAssetId method)
      *
-     * @example
-     * config = await agent.GenerateDataSourceConfiguration("castidev.Engine");
      *
      * @param {AssetManagementModels.AssetTypeResource} assetType
      * @param {("NUMERICAL" | "DESCRIPTIVE")} [mode="DESCRIPTIVE"]

@@ -75,28 +75,6 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
         }
     });
 
-    it("should be able to automatically create and overwrite data source configuration", async () => {
-        const agent = new MindConnectAgent(agentConfig);
-
-        if (!agent.IsOnBoarded()) {
-            await agent.OnBoard();
-        }
-
-        const targetAssetId = unitTestConfiguration.targetAsset.assetId || throwError("invalid asset");
-        await agent.ConfigureAgentForAssetId(targetAssetId, "DESCRIPTIVE", true);
-        await agent.ConfigureAgentForAssetId(targetAssetId, "DESCRIPTIVE", true);
-
-        for (let index = 0; index < 15; index++) {
-            const values: DataPointValue[] = [
-                { dataPointId: "DP-Temperature", qualityCode: "0", value: "223.1" },
-                { dataPointId: "DP-Pressure", qualityCode: "0", value: "244" },
-                { dataPointId: "DP-Humidity", qualityCode: "0", value: "366" },
-            ];
-
-            await agent.PostData(values);
-        }
-    });
-
     it("should be able to create mappings to multiple assets", async () => {
         const agent = new MindConnectAgent(agentConfig);
 
@@ -108,8 +86,11 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
         await agent.ConfigureAgentForAssetId(targetAssetId, "DESCRIPTIVE", true);
 
         const mappings = agent.GenerateMappings(secondAsset.assetId!);
-
         await agent.PutDataMappings(mappings);
+
+        agent.GetMindConnectConfiguration().mappings?.length.should.be.equal(14);
+        const retrievedMappings = agent.GetDataMappings();
+        (await retrievedMappings).length.should.be.equal(14);
 
         for (let index = 0; index < 15; index++) {
             const values: DataPointValue[] = [
@@ -122,7 +103,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
         }
     });
 
-    it("should be able to automatically create and overwrite data source configuration", async () => {
+    it("should be able to delete mappings", async () => {
         const agent = new MindConnectAgent(agentConfig);
 
         if (!agent.IsOnBoarded()) {
@@ -131,17 +112,14 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
 
         const targetAssetId = unitTestConfiguration.targetAsset.assetId || throwError("invalid asset");
         await agent.ConfigureAgentForAssetId(targetAssetId, "DESCRIPTIVE", true);
-        await agent.ConfigureAgentForAssetId(targetAssetId, "DESCRIPTIVE", true);
+        agent.HasDataMappings().should.be.true;
 
-        for (let index = 0; index < 15; index++) {
-            const values: DataPointValue[] = [
-                { dataPointId: "DP-Temperature", qualityCode: "0", value: "223.1" },
-                { dataPointId: "DP-Pressure", qualityCode: "0", value: "244" },
-                { dataPointId: "DP-Humidity", qualityCode: "0", value: "366" },
-            ];
+        await agent.DeleteAllMappings();
+        agent.HasDataMappings().should.be.false;
 
-            await agent.PostData(values);
-        }
+        const mappings = await agent.GetDataMappings();
+        mappings.length.should.equal(0);
+        agent.HasDataMappings().should.be.false;
     });
 
     it("should use local storage properly", async () => {
