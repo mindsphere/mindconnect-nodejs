@@ -147,7 +147,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
         mappings.length.should.equal(7);
     });
 
-    it.only("should store data", async () => {
+    it("should store data", async () => {
         const agent = new MindConnectAgent(agentConfig);
 
         const targetAssetId = unitTestConfiguration.targetAsset.assetId || throwError("invalid asset");
@@ -157,7 +157,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
         }
 
         if (!agent.HasDataSourceConfiguration()) {
-            const generatedConfig = await agent.GenerateDataSourceConfiguration(`${agent.ClientId()}.UnitTestEngine`);
+            const generatedConfig = await agent.GenerateDataSourceConfiguration(`${agent.GetTenant()}.UnitTestEngine`);
             await agent.PutDataSourceConfiguration(generatedConfig);
         }
 

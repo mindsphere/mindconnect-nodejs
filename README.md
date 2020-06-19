@@ -159,7 +159,7 @@ First you need to create a data source configuration
 
 ```typescript
 // create data source configuration for an asset type castidev.Engine
-const generatedConfig = await agent.GenerateDataSourceConfiguration(`${agent.ClientId()}.Engine`);
+const generatedConfig = await agent.GenerateDataSourceConfiguration(`${agent.GetTenant()}.Engine`);
 await agent.PutDataSourceConfiguration(generatedConfig);
 ```
 
@@ -417,7 +417,7 @@ press CTRL + C to exit
 
 ![CLI](images/servicecredentials.png)
 
-You can get the application credentials from your developer or operator cockpit in MindSphere. (if you don't habe any application you can register a dummy one just for CLI)
+You can get the application credentials from your developer or operator cockpit in MindSphere. (if you don't have any application you can register a dummy one just for CLI)
 
 ![CLI](images/cockpit.png)
 
