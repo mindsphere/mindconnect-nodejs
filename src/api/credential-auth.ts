@@ -1,5 +1,5 @@
 import * as debug from "debug";
-import fetch from "node-fetch";
+import fetch from "cross-fetch";
 import { AuthBase } from "./auth-base";
 import { TokenRotation } from "./mindconnect-base";
 import { getPiamUrl } from "./utils";
@@ -22,7 +22,7 @@ export class CredentialAuth extends AuthBase implements TokenRotation {
                 body: body,
                 headers: headers,
                 agent: this._proxyHttpAgent,
-            });
+            } as RequestInit);
             if (!response.ok) {
                 throw new Error(`${response.statusText} ${await response.text()}`);
             }

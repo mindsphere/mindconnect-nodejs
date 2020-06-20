@@ -1,5 +1,5 @@
+import fetch from "cross-fetch";
 import * as debug from "debug";
-import fetch from "node-fetch";
 import { DiagnosticInformation, OnlineStatus, PagedDiagnosticActivation, PagedDiagnosticInformation } from "..";
 import { CredentialAuth } from "./credential-auth";
 import { OnboardingStatus } from "./mindconnect-models";
@@ -42,7 +42,7 @@ export class MindConnectSetup extends CredentialAuth {
                 body: JSON.stringify(body),
                 headers: headers,
                 agent: this._proxyHttpAgent,
-            });
+            } as RequestInit);
             if (!response.ok) {
                 throw new Error(`${response.statusText} ${await response.text()}`);
             }
@@ -99,7 +99,11 @@ export class MindConnectSetup extends CredentialAuth {
         log(`DeleteDiagnostic Headers ${JSON.stringify(headers)} Url ${url}`);
 
         try {
-            const response = await fetch(url, { method: "DELETE", headers: headers, agent: this._proxyHttpAgent });
+            const response = await fetch(url, {
+                method: "DELETE",
+                headers: headers,
+                agent: this._proxyHttpAgent,
+            } as RequestInit);
             if (!response.ok) {
                 throw new Error(`${response.statusText} ${await response.text()}`);
             }
@@ -149,7 +153,11 @@ export class MindConnectSetup extends CredentialAuth {
         log(`GetDiagnosticActivations Headers ${JSON.stringify(headers)} Url ${url}`);
 
         try {
-            const response = await fetch(url, { method: "GET", headers: headers, agent: this._proxyHttpAgent });
+            const response = await fetch(url, {
+                method: "GET",
+                headers: headers,
+                agent: this._proxyHttpAgent,
+            } as RequestInit);
             if (!response.ok) {
                 throw new Error(`${response.statusText} ${await response.text()}`);
             }
@@ -218,7 +226,11 @@ export class MindConnectSetup extends CredentialAuth {
         log(`GetDiagnosticInformation Headers ${JSON.stringify(headers)} Url ${url}`);
 
         try {
-            const response = await fetch(url, { method: "GET", headers: headers, agent: this._proxyHttpAgent });
+            const response = await fetch(url, {
+                method: "GET",
+                headers: headers,
+                agent: this._proxyHttpAgent,
+            } as RequestInit);
             if (!response.ok) {
                 throw new Error(`${response.statusText} ${await response.text()}`);
             }
@@ -246,7 +258,11 @@ export class MindConnectSetup extends CredentialAuth {
         log(`GetAgentStatus Headers ${JSON.stringify(headers)} Url ${url}`);
 
         try {
-            const response = await fetch(url, { method: "GET", headers: headers, agent: this._proxyHttpAgent });
+            const response = await fetch(url, {
+                method: "GET",
+                headers: headers,
+                agent: this._proxyHttpAgent,
+            } as RequestInit);
             if (!response.ok) {
                 throw new Error(`${response.statusText} ${await response.text()}`);
             }
@@ -274,7 +290,11 @@ export class MindConnectSetup extends CredentialAuth {
         log(`GetAgentStatus Headers ${JSON.stringify(headers)} Url ${url}`);
 
         try {
-            const response = await fetch(url, { method: "GET", headers: headers, agent: this._proxyHttpAgent });
+            const response = await fetch(url, {
+                method: "GET",
+                headers: headers,
+                agent: this._proxyHttpAgent,
+            } as RequestInit);
             if (!response.ok) {
                 throw new Error(`${response.statusText} ${await response.text()}`);
             }

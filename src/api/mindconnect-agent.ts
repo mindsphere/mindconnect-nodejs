@@ -1,7 +1,7 @@
 // Copyright (C), Siemens AG 2017
 import * as ajv from "ajv";
 import * as debug from "debug";
-import fetch from "node-fetch";
+import fetch from "cross-fetch";
 import * as path from "path";
 import "url-search-params-polyfill";
 import { DataSourceConfiguration, Mapping, retry } from "..";
@@ -499,7 +499,7 @@ export class MindConnectAgent extends AgentAuth {
                 body: dataMessage,
                 headers: headers,
                 agent: this._proxyHttpAgent,
-            });
+            } as RequestInit);
             if (!response.ok) {
                 log({ method: method, body: dataMessage, headers: headers, agent: this._proxyHttpAgent });
                 log(response);

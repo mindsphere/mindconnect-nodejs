@@ -1,6 +1,6 @@
 import * as debug from "debug";
 import * as jwt from "jsonwebtoken";
-import fetch from "node-fetch";
+import fetch from "cross-fetch";
 import { MindConnectBase, TokenRotation } from "./mindconnect-base";
 import { getPiamUrl, isUrl, retry } from "./utils";
 
@@ -64,7 +64,7 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
                     method: "GET",
                     headers: headers,
                     agent: this._proxyHttpAgent,
-                });
+                } as RequestInit);
                 if (!response.ok) {
                     throw new Error(`${response.statusText} ${await response.text()}`);
                 }
