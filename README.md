@@ -2,7 +2,11 @@
 
 ## nodejs library for the MindConnect API (V3)
 
-![mindconnect-nodejs](images/mindconnect-nodejs-new-logo.svg)
+<!-- markdownlint-disable MD033 -->
+<p align="center">
+<img src="images/mindconnect-nodejs-new-logo.svg" alt="mindconnect-nodejs" width="260px"/>
+</p>                                                                                                      
+<!-- markdownlint-enableMD033 -->
 
 The mindconnect-nodejs library enables the user to upload time series data, files and events to Siemens MindSphere Platform.
 
