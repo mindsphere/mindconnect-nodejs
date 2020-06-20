@@ -651,8 +651,8 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             await agent.OnBoard();
         }
 
-        const result = await agent.Upload("./images/full.gif", "", "desc");
-        result.should.be.equal("3b005ae235287f0d1e67c11f89857ad0");
+        const result = await agent.Upload("./images/environmentdata.PNG", "", "desc");
+        result.should.be.equal("59d9c81f4082c55cbc744fa41cc722be");
     });
 
     it("should be able to retry an operation before throwing an error", async () => {
