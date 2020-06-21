@@ -30,6 +30,9 @@ export default (program: CommanderStatic) => {
         .option("-r, --norewrite", "don't rewrite hal+json urls")
         .option("-w, --nowarn", "don't warn for missing headers")
         .option("-v, --verbose", "verbose output")
+        .option("-s, --session <session>", "User Session")
+        .option("-x, --xsrftoken <xsrftoken>", "XSRF-Token")
+        .option("-h, --host <host>", "host")
         .option("-k, --passkey <passkey>", "passkey")
         .description(color("starts mindsphere development proxy *"))
         .action((options) => {
@@ -97,8 +100,11 @@ async function serve({
 
     server.on("request", async (req, res: http.ServerResponse) => {
         try {
+            console.log((req as Request).headers);
+            const hostname = options.host || url.parse(auth.gateway).host;
+
             const requestOptions = {
-                hostname: url.parse(auth.gateway).host,
+                hostname: hostname,
                 port: 443,
                 path: req.url,
                 method: req.method,
@@ -108,9 +114,16 @@ async function serve({
 
             !options.nowarn && addWarning(req);
 
-            requestOptions.headers.host = url.parse(auth.gateway).host;
-            (requestOptions.headers as any)["Authorization"] = `Bearer ${await sdk.GetToken()}`;
-
+            requestOptions.headers.host = hostname;
+            if (!options.xsrftoken) {
+                (requestOptions.headers as any)["Authorization"] = `Bearer ${await sdk.GetToken()}`;
+            } else {
+                delete requestOptions.headers["sec-fetch-mode"];
+                delete requestOptions.headers["sec-fetch-dest"];
+                delete requestOptions.headers["sec-fetch-site"];
+                (requestOptions.headers as any)["Cookie"] = `SESSION=${options.session}`;
+                (requestOptions.headers as any)["x-xsrf-token"] = options.xsrftoken;
+            }
             const proxy = https.request(requestOptions, function (proxyres) {
                 const allHeaders = { ...headers, ...proxyres.headers };
                 const logColor = res.statusCode >= 200 && res.statusCode < 400 ? color : red;
@@ -153,8 +166,23 @@ async function serve({
                         delete responseHeaders["content-length"];
                     }
 
-                    res.writeHead(proxyres.statusCode || 500, responseHeaders);
+                    // if (responseHeaders["set-cookie"]) {
+                    //     ((responseHeaders["set-cookie"] as string[]) || []).forEach((x) => {
+                    //         x = x.replace("Secure;", "");
+                    //         x = x.replace("Secure", "");
+                    //         x = x.replace("HttpOnly", "");
+                    //         x = x.trim();
+                    //     });
+                    // }
 
+                    if (options.xsrftoken) {
+                        responseHeaders["set-cookie"] = [
+                            `SESSION=${options.session}; Path=/;`,
+                            `XSRF-TOKEN=${options.xsrftoken}; Path=/`,
+                        ];
+                    }
+
+                    res.writeHead(proxyres.statusCode || 500, responseHeaders);
                     res.statusCode = proxyres.statusCode || 500;
                     res.end(replaced);
 
