@@ -12,10 +12,10 @@ import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
 import { TrendPredictionClient } from "../trend/trend-prediction";
 import { SdkClient } from "./sdk-client";
 /**
- * * Pre-Alpha SDK for the mindsphere APIs
  *
- * ! You can experiment with this but please note that these interfaces will
- * ! will change in the next major version. See also CHANGELOG.md
+ * MindSphere typescript SDK - BETA
+ *
+ * Runs in Browser and in Node using User Credentials, App Credentials and ServiceCredentials.
  *
  * @export
  * @class MindSphereSdk

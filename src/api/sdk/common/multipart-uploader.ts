@@ -6,7 +6,7 @@ import * as path from "path";
 import * as stream from "stream";
 import { URL } from "url";
 import { MindConnectAgent } from "../../..";
-import { MindConnectBase } from "../../mindconnect-base";
+import { MindConnectBase, TokenRotation } from "../../mindconnect-base";
 import { retry, throwError } from "../../utils";
 import { SdkClient } from "./sdk-client";
 import _ = require("lodash");
@@ -112,7 +112,7 @@ type uploadChunkParameters = {
  * @class MultipartUploader
  * @extends {MindConnectBase}
  */
-export class MultipartUploader extends MindConnectBase {
+export class MultipartUploader {
     private getTotalChunks(fileLength: number, chunkSize: number, optional: fileUploadOptionalParameters) {
         let totalChunks = Math.ceil(fileLength / chunkSize);
 
@@ -239,7 +239,7 @@ export class MultipartUploader extends MindConnectBase {
         ifMatch !== undefined && ((headers as any)["If-Match"] = ifMatch);
         this.setIfMatch(`${this.GetGateway()}${url}`, headers);
 
-        const result = await this.HttpAction({
+        const result = await this.GetAuthorizer().HttpAction({
             verb: "PUT",
             authorization: token,
             gateway: this.GetGateway(),
@@ -286,7 +286,7 @@ export class MultipartUploader extends MindConnectBase {
 
         const gateway = this.GetGateway();
 
-        const resultHeaders = (await this.HttpAction({
+        const resultHeaders = (await this.GetAuthorizer().HttpAction({
             verb: "PUT",
             baseUrl: url,
             gateway: gateway,
@@ -571,8 +571,11 @@ export class MultipartUploader extends MindConnectBase {
         }
     }
 
+    private GetAuthorizer() {
+        return (this.agent || this.sdkClient) as TokenRotation;
+    }
+
     constructor(private agent?: MindConnectAgent, private sdkClient?: SdkClient) {
-        super();
         !agent && !sdkClient && throwError("you have to specify either agent or sdkclient");
     }
 }

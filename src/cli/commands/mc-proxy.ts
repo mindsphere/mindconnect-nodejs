@@ -16,6 +16,7 @@ const green = getColor("green");
 const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "*",
+    "Access-Control-Allow-Headers": "*",
     "Access-Control-Max-Age": 2592000, // 30 days
     "cache-control": "no-cache",
     "x-proxied-by": "mindsphere development proxy",
@@ -26,7 +27,6 @@ export default (program: CommanderStatic) => {
         .command("dev-proxy")
         .alias("px")
         .option("-o, --port <port>", "port for web server", "7707")
-        .option("-c, --nocors", "don't provide cors headers")
         .option("-r, --norewrite", "don't rewrite hal+json urls")
         .option("-w, --nowarn", "don't warn for missing headers")
         .option("-v, --verbose", "verbose output")
@@ -43,7 +43,7 @@ export default (program: CommanderStatic) => {
                     const auth = loadAuth();
                     const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
-                    console.log(`\nCORS support ${options.nocors ? red("off") : green("on")}`);
+                    console.log(`\nCORS support ${green("on")}`);
                     console.log(
                         `Rewrite hal+json support ${auth.gateway} -> ${"http://localhost:" + options.port} ${
                             options.norewrite ? red("off") : green("on")
@@ -112,9 +112,16 @@ async function serve({
             (requestOptions.headers as any)["Authorization"] = `Bearer ${await sdk.GetToken()}`;
 
             const proxy = https.request(requestOptions, function (proxyres) {
-                const allHeaders = options.nocors ? proxyres.headers : { ...headers, ...proxyres.headers };
-                if (!options.nocors && req.method === "OPTIONS") {
-                    res.writeHead(204, headers);
+                const allHeaders = { ...headers, ...proxyres.headers };
+                const logColor = res.statusCode >= 200 && res.statusCode < 400 ? color : red;
+
+                if (req.method === "OPTIONS") {
+                    res.writeHead(204, allHeaders);
+                    console.log(
+                        `[${logColor(new Date().toISOString())}] ${logColor(res.statusCode)} ${requestOptions.method} ${
+                            requestOptions.path
+                        }`
+                    );
                     res.end();
                     return;
                 }
@@ -134,13 +141,15 @@ async function serve({
 
                     let replaced = body;
 
+                    const responseHeaders = { ...proxyres.headers, ...headers };
+
                     if (!options.norewrite) {
                         const regex = new RegExp(`https://${requestOptions.hostname}`, "g");
                         replaced = body.replace(regex, `http://localhost:${port}`);
-                        // allHeaders["content-length"] = `${replaced.length}`;
+                        responseHeaders["content-length"] = `${replaced.length}`;
                     }
 
-                    res.writeHead(proxyres.statusCode || 500, allHeaders);
+                    res.writeHead(proxyres.statusCode || 500, responseHeaders);
                     res.statusCode = proxyres.statusCode || 500;
                     res.end(replaced);
 
