@@ -1,4 +1,3 @@
-import fetch from "cross-fetch";
 import { TokenRotation } from "./mindconnect-base";
 import { removeUndefined, throwError } from "./utils";
 
@@ -151,7 +150,7 @@ export class BrowserAuth implements TokenRotation {
             if (verb !== "GET" && verb !== "DELETE") {
                 request.body = octetStream || multiPartFormData ? body : JSON.stringify(body);
             }
-            const response = await fetch(url, request);
+            const response = await window.fetch(url, request);
             const codeIgnored = ignoreCodes.indexOf(response.status) >= 0;
 
             !codeIgnored && !response.ok && throwError(`${response.statusText} ${await response.text()}`);

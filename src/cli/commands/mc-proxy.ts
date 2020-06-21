@@ -149,7 +149,12 @@ async function serve({
                         responseHeaders["content-length"] = `${replaced.length}`;
                     }
 
+                    if (responseHeaders["transfer-encoding"] === "chunked") {
+                        delete responseHeaders["content-length"];
+                    }
+
                     res.writeHead(proxyres.statusCode || 500, responseHeaders);
+
                     res.statusCode = proxyres.statusCode || 500;
                     res.end(replaced);
 
