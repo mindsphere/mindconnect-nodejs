@@ -1,21 +1,15 @@
 import * as AsyncLock from "async-lock";
+import fetch from "cross-fetch";
 import * as debug from "debug";
 import * as jwt from "jsonwebtoken";
-import fetch from "cross-fetch";
 import "url-search-params-polyfill";
 import * as uuid from "uuid";
-import {
-    AccessToken,
-    IConfigurationStorage,
-    IMindConnectConfiguration,
-    OnboardingStatus,
-    retry,
-    SelfSignedClientAssertion,
-    TokenKey,
-} from "..";
 import { MindConnectBase, TokenRotation } from "./mindconnect-base";
-import { DefaultStorage, IsConfigurationStorage } from "./mindconnect-storage";
+import { DefaultStorage, IsConfigurationStorage, IConfigurationStorage } from "./mindconnect-storage";
+
 import _ = require("lodash");
+import { AccessToken, OnboardingStatus, TokenKey, SelfSignedClientAssertion, IMindConnectConfiguration } from "./mindconnect-models";
+import { retry } from "./utils";
 const log = debug("mindconnect-agentauth");
 const rsaPemToJwk = require("rsa-pem-to-jwk");
 
