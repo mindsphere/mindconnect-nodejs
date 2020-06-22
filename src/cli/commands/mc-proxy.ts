@@ -26,13 +26,18 @@ export default (program: CommanderStatic) => {
     program
         .command("dev-proxy")
         .alias("px")
+        .option(
+            "-m, --mode [credentials|session]",
+            "service/app credentials authentication of session authentication",
+            "session"
+        )
         .option("-o, --port <port>", "port for web server", "7707")
         .option("-r, --norewrite", "don't rewrite hal+json urls")
         .option("-w, --nowarn", "don't warn for missing headers")
         .option("-v, --verbose", "verbose output")
-        .option("-s, --session <session>", "User Session")
-        .option("-x, --xsrftoken <xsrftoken>", "XSRF-Token")
-        .option("-h, --host <host>", "host")
+        .option("-s, --session <session>", "borrowed SESSION cookie from brower")
+        .option("-x, --xsrftoken <xsrftoken>", "borrowed XSRF-TOKEN cookie from browser")
+        .option("-h, --host <host>", "the address where SESSION and XSRF-TOKEN have been borrowed from")
         .option("-k, --passkey <passkey>", "passkey")
         .description(color("starts mindsphere development proxy *"))
         .action((options) => {
@@ -43,18 +48,16 @@ export default (program: CommanderStatic) => {
 
                     checkRequiredParamaters(options);
 
-                    const auth = loadAuth();
-                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
-
-                    console.log(`\nCORS support ${green("on")}`);
+                    console.log(`\nMode ${color(options.mode)}`);
+                    console.log(`\CORS support ${green("on")}`);
                     console.log(
-                        `Rewrite hal+json support ${auth.gateway} -> ${"http://localhost:" + options.port} ${
-                            options.norewrite ? red("off") : green("on")
-                        }`
+                        `Rewrite hal+json support ${options.host || loadAuth().gateway} -> ${
+                            "http://localhost:" + options.port
+                        } ${options.norewrite ? red("off") : green("on")}`
                     );
 
                     console.log(`warn on missing x-xsrf-token ${options.nowarn ? red("off") : green("on")}\n`);
-                    await serve({ auth, configPort: options.port, sdk, options });
+                    await serve({ configPort: options.port, options: options });
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
@@ -77,32 +80,29 @@ export default (program: CommanderStatic) => {
         });
 };
 
-async function serve({
-    auth,
-    configPort,
-    sdk,
-    options,
-}: {
-    auth: authJson;
-    configPort?: number;
-    sdk: MindSphereSdk;
-    options: any;
-}) {
+async function serve({ configPort, options }: { configPort?: number; options: any }) {
     const proxy = process.env.http_proxy || process.env.HTTP_PROXY;
     const proxyHttpAgent = proxy ? new HttpsProxyAgent(proxy) : undefined;
 
     const server = http.createServer();
     const port = configPort || 7707;
 
+    let sdk: MindSphereSdk;
+    let auth: authJson;
+    if (options.mode === "credentials") {
+        auth = loadAuth();
+        sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
+    }
+
     server.on("error", (err) => {
         console.log(`[${red(new Date().toISOString())}] ${red(err)}`);
     });
 
+    let region: string | undefined;
+
     server.on("request", async (req, res: http.ServerResponse) => {
         try {
-            console.log((req as Request).headers);
-            const hostname = options.host || url.parse(auth.gateway).host;
-
+            const hostname = options.host ? options.host : url.parse(auth.gateway).host;
             const requestOptions = {
                 hostname: hostname,
                 port: 443,
@@ -113,17 +113,37 @@ async function serve({
             };
 
             !options.nowarn && addWarning(req);
-
             requestOptions.headers.host = hostname;
-            if (!options.xsrftoken) {
-                (requestOptions.headers as any)["Authorization"] = `Bearer ${await sdk.GetToken()}`;
-            } else {
+            if (requestOptions.headers.origin) {
+                requestOptions.headers["X-DevProxy-For"] = requestOptions.headers.origin;
+            }
+
+            if (req.method === "GET") {
                 delete requestOptions.headers["sec-fetch-mode"];
                 delete requestOptions.headers["sec-fetch-dest"];
                 delete requestOptions.headers["sec-fetch-site"];
-                (requestOptions.headers as any)["Cookie"] = `SESSION=${options.session}`;
-                (requestOptions.headers as any)["x-xsrf-token"] = options.xsrftoken;
             }
+
+            if (options.mode === "credentials") {
+                (requestOptions.headers as any)["Authorization"] = `Bearer ${await sdk.GetToken()}`;
+            } else {
+                if (requestOptions.headers.origin) {
+                    requestOptions.headers.origin = `https://${options.host}`;
+                }
+
+                let newCookie = `SESSION=${options.session}; XSRF-TOKEN=${options.xsrftoken}`;
+                if (region && region !== "") {
+                    newCookie += `;REGION-SESSION=${region}`;
+                }
+
+                console.log(newCookie, region);
+
+                (requestOptions.headers as any)["cookie"] = newCookie;
+
+                (requestOptions.headers as any)["x-xsrf-token"] = options.xsrftoken;
+                console.log(requestOptions.headers);
+            }
+
             const proxy = https.request(requestOptions, function (proxyres) {
                 const allHeaders = { ...headers, ...proxyres.headers };
                 const logColor = res.statusCode >= 200 && res.statusCode < 400 ? color : red;
@@ -140,7 +160,6 @@ async function serve({
                 }
 
                 let body = "";
-
                 proxyres.on("data", (data) => {
                     if (data) {
                         body += data;
@@ -166,27 +185,48 @@ async function serve({
                         delete responseHeaders["content-length"];
                     }
 
-                    // if (responseHeaders["set-cookie"]) {
-                    //     ((responseHeaders["set-cookie"] as string[]) || []).forEach((x) => {
-                    //         x = x.replace("Secure;", "");
-                    //         x = x.replace("Secure", "");
-                    //         x = x.replace("HttpOnly", "");
-                    //         x = x.trim();
-                    //     });
-                    // }
+                    const logColor = res.statusCode >= 200 && res.statusCode < 400 ? color : red;
 
-                    if (options.xsrftoken) {
-                        responseHeaders["set-cookie"] = [
-                            `SESSION=${options.session}; Path=/;`,
-                            `XSRF-TOKEN=${options.xsrftoken}; Path=/`,
-                        ];
+                    if (options.mode === "session") {
+                        const cookies: string[] = [];
+
+                        responseHeaders["set-cookie"]?.forEach((element) => {
+                            const elements = element.split("=");
+
+                            if (elements[0] === "REGION-SESSION") {
+                                region = elements[1].split(";")[0];
+                            }
+                        });
+
+                        if (region) {
+                            cookies.push(`REGION-SESSION=${region}; Path=/;`);
+                        }
+
+                        if (responseHeaders["set-cookie"]) {
+                            cookies.push(`SESSION=${options.session}; Path=/;`);
+                            cookies.push(`XSRF-TOKEN=${options.xsrftoken}; Path=/;`);
+
+                            console.log(
+                                `[${logColor(new Date().toISOString())}] changing cookies from ${JSON.stringify(
+                                    responseHeaders["set-cookie"]
+                                )}`
+                            );
+                        }
+
+                        responseHeaders["set-cookie"] = cookies;
+
+                        options.verbose &&
+                            console.log(
+                                `[${logColor(new Date().toISOString())}] setting the cookies to ${JSON.stringify(
+                                    responseHeaders["set-cookie"]
+                                )}`
+                            );
                     }
 
                     res.writeHead(proxyres.statusCode || 500, responseHeaders);
                     res.statusCode = proxyres.statusCode || 500;
                     res.end(replaced);
 
-                    const logColor = res.statusCode >= 200 && res.statusCode < 300 ? color : red;
                     console.log(
                         `[${logColor(new Date().toISOString())}] ${logColor(res.statusCode)} ${requestOptions.method} ${
                             requestOptions.path
@@ -219,11 +259,11 @@ function addWarning(req: any) {
     if (!req.headers["x-xsrf-token"] && !req.headers["X-XSRF-TOKEN"] && !(req.method === "GET")) {
         console.log(
             `[${color(new Date().toISOString())}] ${yellow(
-                "WARN: x-xsrf-token is missing. the app will not work after deployment."
+                "WARN: x-xsrf-token is missing. the app will not work after deployment if you use frontend authentication"
             )}`
         );
         console.log(
-            `[${color(new Date().toISOString())}] ${yellow("WARN: see")}: ${color(
+            `[${color(new Date().toISOString())}] ${yellow("WARN: see")}: ${yellow(
                 "https://developer.mindsphere.io/concepts/concept-authentication.html#calling-apis-from-frontend"
             )}`
         );
@@ -231,8 +271,20 @@ function addWarning(req: any) {
 }
 
 function checkRequiredParamaters(options: any) {
-    !options.passkey &&
-        throwError(
-            "you have to provide the passkey to start development proxy (see mc dev-proxy --help for more help) "
-        );
+    ["credentials", "session"].indexOf(options.mode) < 0 &&
+        throwError("the mode must be either credentials or session");
+
+    options.mode === "credentials" &&
+        !options.passkey &&
+        throwError("you have to specify passkey for credentials mode");
+
+    options.mode === "credentials" &&
+        (options.session || options.xsrftoken || options.host) &&
+        throwError("session, xsrftoken and host are invalid options more credentials mode");
+
+    options.mode === "session" && options.passkey && throwError("you don't have to specify passkey for session mode");
+
+    options.mode === "session" &&
+        (!options.session || !options.xsrftoken || !options.host) &&
+        throwError("you have to specifiy session, xsrftoken and host for session mode");
 }

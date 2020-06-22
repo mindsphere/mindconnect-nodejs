@@ -2,7 +2,7 @@ import { TokenRotation } from "./mindconnect-base";
 import { removeUndefined, throwError } from "./utils";
 
 function log(message: string) {
-    if ((window as any).DEBUGMINDSPHERESDK === true) {
+    if ((window as any).DEBUGSDK === true) {
         console.log(message);
     }
 }
@@ -140,13 +140,21 @@ export class BrowserAuth implements TokenRotation {
             delete headers["Content-Type"];
         }
 
-        headers["x-xsrf-token"] = this.getCookieValue("XSRF-TOKEN");
+        const xsrfTokenFromCookie = this.getCookieValue("XSRF-TOKEN");
+
+        if (xsrfTokenFromCookie && xsrfTokenFromCookie !== "") {
+            headers["x-xsrf-token"] = xsrfTokenFromCookie;
+            log(`Set x-xsrf-token to ${headers["x-xsrf-token"]}`);
+        } else {
+            log("There is no XSRF-TOKEN cookie.");
+        }
+
         headers = removeUndefined({ ...headers, ...additionalHeaders });
 
         const url = `${gateway}${baseUrl}`;
-        log(`${message} Headers ${JSON.stringify(headers)} Url ${url}`);
+        log(`${message || ""} Headers ${JSON.stringify(headers)} Url ${url}`);
         try {
-            const request: any = { method: verb, headers: headers, mode: "cors" };
+            const request: any = { method: verb, headers: headers, credentials: "include" };
             if (verb !== "GET" && verb !== "DELETE") {
                 request.body = octetStream || multiPartFormData ? body : JSON.stringify(body);
             }
@@ -179,16 +187,47 @@ export class BrowserAuth implements TokenRotation {
         }
     }
 
-    constructor() {}
+    /**
+     * * Returns true; MindSphere Gateway is taking care of this
+     *
+     * @returns {Promise<boolean>}
+     *
+     * @memberOf BrowserAuth
+     */
     async RenewToken(): Promise<boolean> {
         return true; // the mindsphere gateway is doing this for us
     }
+
+    /**
+     * * Returns ""; MindSphere Gateway is taking care of this
+     *
+     * @returns {Promise<string>}
+     *
+     * @memberOf BrowserAuth
+     */
     async GetToken(): Promise<string> {
         return ""; // the mindsphere gateway is doing this for us
     }
+
+    /**
+     * * Returns ""; MindSphere Gateway is taking care of this
+     *
+     * @returns {string}
+     *
+     * @memberOf BrowserAuth
+     */
     GetGateway(): string {
         return ""; // the mindsphere gateway is doing this for us
     }
+
+    /**
+     *
+     * * Returns ""; MindSphere Gateway is taking care of this
+     *
+     * @returns {string}
+     *
+     * @memberOf BrowserAuth
+     */
     GetTenant(): string {
         return ""; // the mindsphere gateway is doing this for us
     }
