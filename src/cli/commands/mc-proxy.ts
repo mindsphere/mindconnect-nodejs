@@ -6,6 +6,7 @@ import * as url from "url";
 import { MindSphereSdk } from "../../api/sdk";
 import { authJson, decrypt, loadAuth, throwError } from "../../api/utils";
 import { errorLog, getColor, homeDirLog, proxyLog } from "./command-utils";
+import chalk = require("chalk");
 const HttpsProxyAgent = require("https-proxy-agent");
 
 const color = getColor("magenta");
@@ -116,32 +117,70 @@ async function serve({ configPort, options }: { configPort?: number; options: an
             requestOptions.headers.host = hostname;
             if (requestOptions.headers.origin) {
                 requestOptions.headers["X-DevProxy-For"] = requestOptions.headers.origin;
+                options.verbose &&
+                    console.log(
+                        `[${green(new Date().toISOString())}] Setting X-Dev-Proxy-For to ${
+                            requestOptions.headers.origin
+                        }}`
+                    );
             }
 
             if (req.method === "GET") {
+                // prevent navigation and redirects when called from a browser
                 delete requestOptions.headers["sec-fetch-mode"];
                 delete requestOptions.headers["sec-fetch-dest"];
                 delete requestOptions.headers["sec-fetch-site"];
+                delete requestOptions.headers["sec-fetch-user"];
+
+                delete requestOptions.headers["Sec-Fetch-Mode"];
+                delete requestOptions.headers["Sec-Fetch-Dest"];
+                delete requestOptions.headers["Sec-Fetch-Site"];
+                delete requestOptions.headers["Sec-Fetch-User"];
+                options.verbose &&
+                    console.log(
+                        `[${green(
+                            new Date().toISOString()
+                        )}] deleting sec-fetch-* headers to prevent redirects when cookies are not correctly setup`
+                    );
             }
 
             if (options.mode === "credentials") {
                 (requestOptions.headers as any)["Authorization"] = `Bearer ${await sdk.GetToken()}`;
+                options.verbose &&
+                    console.log(
+                        `[${green(new Date().toISOString())}] Setting authorization to Bearer ${
+                            requestOptions.headers["Authorization"]
+                        }`
+                    );
             } else {
                 if (requestOptions.headers.origin) {
                     requestOptions.headers.origin = `https://${options.host}`;
+                    options.verbose &&
+                        console.log(
+                            `[${green(new Date().toISOString())}] Setting origin to ${requestOptions.headers.origin}}`
+                        );
                 }
 
                 let newCookie = `SESSION=${options.session}; XSRF-TOKEN=${options.xsrftoken}`;
                 if (region && region !== "") {
                     newCookie += `;REGION-SESSION=${region}`;
+                    options.verbose &&
+                        console.log(`[${green(new Date().toISOString())}] Adding REGION-SESSION cookie ${newCookie}}`);
                 }
 
-                console.log(newCookie, region);
-
                 (requestOptions.headers as any)["cookie"] = newCookie;
+                options.verbose &&
+                    console.log(
+                        `[${green(new Date().toISOString())}] Setting mindsphere request cookies to ${newCookie}`
+                    );
 
                 (requestOptions.headers as any)["x-xsrf-token"] = options.xsrftoken;
-                console.log(requestOptions.headers);
+                options.verbose &&
+                    console.log(
+                        `[${green(new Date().toISOString())}] Setting mindsphere request x-xsrf-token to ${
+                            options.xsrftoken
+                        }`
+                    );
             }
 
             const proxy = https.request(requestOptions, function (proxyres) {
@@ -177,15 +216,27 @@ async function serve({ configPort, options }: { configPort?: number; options: an
 
                     if (!options.norewrite) {
                         const regex = new RegExp(`https://${requestOptions.hostname}`, "g");
-                        replaced = body.replace(regex, `http://localhost:${port}`);
+                        const target = `http://localhost:${port}`;
+                        replaced = body.replace(regex, target);
+                        options.verbose &&
+                            console.log(
+                                `[${green(new Date().toISOString())}] adjusting body (replacing ${
+                                    requestOptions.hostname
+                                } with ${target})`
+                            );
                         responseHeaders["content-length"] = `${replaced.length}`;
+                        options.verbose && console.log(`[${green(new Date().toISOString())}] adjusted content length`);
                     }
 
                     if (responseHeaders["transfer-encoding"] === "chunked") {
                         delete responseHeaders["content-length"];
+                        options.verbose &&
+                            console.log(
+                                `[${green(
+                                    new Date().toISOString()
+                                )}] deleted content-length (transfer-encoding was chunked)`
+                            );
                     }
-
-                    const logColor = res.statusCode >= 200 && res.statusCode < 400 ? color : red;
 
                     if (options.mode === "session") {
                         const cookies: string[] = [];
@@ -198,39 +249,44 @@ async function serve({ configPort, options }: { configPort?: number; options: an
                             }
                         });
 
-                        if (region) {
+                        if (responseHeaders["set-cookie"] && responseHeaders["set-cookie"].length > 0 && region) {
                             cookies.push(`REGION-SESSION=${region}; Path=/;`);
                         }
 
-                        if (responseHeaders["set-cookie"]) {
+                        if (responseHeaders["set-cookie"] && responseHeaders["set-cookie"].length > 0) {
                             cookies.push(`SESSION=${options.session}; Path=/;`);
                             cookies.push(`XSRF-TOKEN=${options.xsrftoken}; Path=/;`);
 
-                            console.log(
-                                `[${logColor(new Date().toISOString())}] changing cookies from ${JSON.stringify(
-                                    responseHeaders["set-cookie"]
-                                )}`
-                            );
+                            options.verbose &&
+                                console.log(
+                                    `[${green(new Date().toISOString())}] changing cookies from \n ${JSON.stringify(
+                                        responseHeaders["set-cookie"],
+                                        null,
+                                        2
+                                    )}`
+                                );
+
+                            responseHeaders["set-cookie"] = cookies;
+                            options.verbose &&
+                                console.log(
+                                    `[${green(
+                                        new Date().toISOString()
+                                    )}] rewriting response cookies to \n ${JSON.stringify(cookies)})}`
+                                );
                         }
-
-                        responseHeaders["set-cookie"] = cookies;
-
-                        options.verbose &&
-                            console.log(
-                                `[${logColor(new Date().toISOString())}] setting the cookies to ${JSON.stringify(
-                                    responseHeaders["set-cookie"]
-                                )}`
-                            );
                     }
 
                     res.writeHead(proxyres.statusCode || 500, responseHeaders);
                     res.statusCode = proxyres.statusCode || 500;
                     res.end(replaced);
 
+                    const okColor = res.statusCode >= 200 && res.statusCode <= 399 ? color : red;
+                    const finalLogColor = res.statusCode >= 300 && res.statusCode <= 399 ? chalk.grey : okColor;
+
                     console.log(
-                        `[${logColor(new Date().toISOString())}] ${logColor(res.statusCode)} ${requestOptions.method} ${
-                            requestOptions.path
-                        }`
+                        `[${finalLogColor(new Date().toISOString())}] ${finalLogColor(res.statusCode)} ${
+                            requestOptions.method
+                        } ${requestOptions.path}`
                     );
                 });
             });
