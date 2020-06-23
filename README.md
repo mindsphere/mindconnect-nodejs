@@ -3,7 +3,7 @@
 ## nodejs library for the MindConnect API (V3)
 
 <!-- markdownlint-disable MD033 -->
-<img src="images/mindconnect-nodejs-new-logo.svg" alt="mindconnect-nodejs" width="250px"/>
+<img src="images/mindconnect-nodejs-new-logo.svg" alt="mindconnect-nodejs" width="300px"/>
 <!-- markdownlint-enableMD033 -->
 
 The mindconnect-nodejs library enables the user to upload time series data, files and events to Siemens MindSphere Platform.
@@ -29,47 +29,23 @@ There are several ways to install the library. The most common one is via npm re
 
 ```bash
 # install the latest stable library from the npm registry
-npm install @mindconnect/mindconnect-nodejs
-
-# install the latest alpha version from the npm registry
-npm install @mindconnect/mindconnect-nodejs@alpha
+npm install @mindconnect/mindconnect-nodejs --save
+# install the latest alpha library from the npm registry
+npm install @mindconnect/mindconnect-nodejs@alpha --save
 ```
 
-As an alternative, you can also clone the repository, pack and install the files from local file:
-
-```bash
-# clone the repository and run in the library directory
-npm install
-npm pack
-
-#this creates a mindconnect-....tgz file
-
-# in your project directory run
-npm install mindconnect-...tgz --save
-```
-
-## Using CLI to generate starter projects
+## Getting started
 
 [![Documentation](https://img.shields.io/badge/cli-documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html)
 
-The easiest way to start is to use CLI to create a starter project:
+The easiest way to start is to use the provided command line interface to create a starter project:
 
 ```bash
-# install the library globaly if you want to use its command line interface.
- npm install -g @mindconnect/mindconnect-nodejs
-
 # for typescript nodejs project run
-mc starter-ts
+npx @mindconnect/mindconnect-nodejs starter-ts
 
 # for javascript nodejs project run
-mc starter-js
-
-# This will create a folder starterts (or starterjs) which you can use as a starting point for your agent.
-# Don't forget to run npm install there.
-
-# for full help run
-mc starter-ts --help # or
-mc starter-js --help
+npx @mindconnect/mindconnect-nodejs starter-js
 ```
 
 ## How to create a nodejs MindSphere agent
@@ -334,12 +310,16 @@ The library comes with the typescript SDK which can be used to access MindSphere
 
 [![SDK](https://img.shields.io/badge/SDK-full%20documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/sdk/index.html)
 
-It implements support for
+It implements support for both frontend (browser e.g. angular, react...) and backend development in node.js. and different MindSphere authentication types:
 
-- UserCredentials
-- AppCredentials
-- ServiceCredentials
-- MindSphere Agents
+**Frontend:**
+    - Browser (Session, Cookies)
+
+**Backend (node-js):**
+    - UserCredentials
+    - AppCredentials
+    - ServiceCredentials
+    - MindSphere Agents
 
 and Clients for following APIs
 
@@ -356,10 +336,19 @@ and Clients for following APIs
 - TimeSeriesClient
 - TrendPredictionClient
 
-``` typescript
-// example Get Assets from MindSphere with custom AssetTypes
+The example below shows how to use the sdk.
 
-const sdk = new MindSphereSdk (...); // use UserCredentials, AppCredentials, ServiceCredentials or MindSphere agent in constructor
+``` typescript
+// The example shows how to  Get Assets from MindSphere with custom AssetType using frontend authentication
+// you can pass an instance an Authorizer (BrowserAuth, CredentialsAuth, TokenManagerAuth, MindConnectAgent)
+// to use different authorization types in MindSphere or implement the TokenRotation interface if you want to
+// provide your own authorizer.
+//
+// The default constructor uses frontend authorization.
+
+const sdk = new MindSphereSdk ();
+
+const sdk = new MindSphereSdk ();
 const am = sdk.GetAssetManagementClient();
 
 const assets = await am.GetAssets({
@@ -432,28 +421,51 @@ mc --help
 
 ![CLI](images/cli.png)
 
-### Important Command: Development Proxy
+### MindSphere Development Proxy
 
 The CLI comes with a development proxy which can be used to kickstart your MindSphere development. It provides an endpoint
 at your local machine at
 
 [http://localhost:7707](http://localhost:7707)
 
-which will authenticate all requests with the configured app credentials or service credentials.
+which will authenticate all requests using either [a borrowed SESSION and XSRF-TOKEN cookie from MindSphere](https://developer.mindsphere.io/howto/howto-local-development.html#generate-user-credentials) or the the configured app credentials or service credentials.
 
-This endpoint can be used to simplify development of your MindSphere applications in your development environment or when using REST tools like postman etc.
+The command below will start your development proxy without any installation and configuration (you just need the cookies from an existing app):
+
+```bash
+npx @mindconnect/mindconnect-nodejs dev-proxy --session <SESSION-TOKEN> --xsrftoken <XSRF-TOKEN> --host <appname>.<tenant>.<region>.mindsphere.io
+```
+
+For more complex tasks install and configure the CLI
 
 ```text
-mc dev-proxy --passkey yourpasskey
+$mc dev-proxy --help
 
-CORS support on
-Rewrite hal+json support https://gateway.eu1.mindsphere.io -> http://localhost:7707 on
-warn on missing x-xsrf-token on
+Usage: mc dev-proxy|px [options]
 
-proxy is available at http://localhost:7707
-example api call (list of assets): http://localhost:7707/api/assetmanagement/v3/assets
-API documentation: https://developer.mindsphere.io/apis/index.html
-press CTRL + C to exit
+starts mindsphere development proxy *
+
+Options:
+  -m, --mode [credentials|session]  service/app credentials authentication of
+                                    session authentication (default: "session")
+  -o, --port <port>                 port for web server (default: "7707")
+  -r, --norewrite                   don't rewrite hal+json urls
+  -w, --nowarn                      don't warn for missing headers
+  -v, --verbose                     verbose output
+  -s, --session <session>           borrowed SESSION cookie from brower
+  -x, --xsrftoken <xsrftoken>       borrowed XSRF-TOKEN cookie from browser
+  -h, --host <host>                 the address where SESSION and XSRF-TOKEN
+                                    have been borrowed from
+  -k, --passkey <passkey>           passkey
+  --help                            display help for command
+
+  Examples:
+
+    mc dev-proxy --passkey <yourpasskey>                starts mindsphere development proxy on default port (7707)
+    mc dev-proxy --port 7777 --passkey <yourpasskey>    starts mindsphere development proxy on port 7777
+
+    see more documentation at https://opensource.mindsphere.io/docs/mindconnect-nodejs/development-proxy.html
+
 ````
 
 ## Legal

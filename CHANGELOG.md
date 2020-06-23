@@ -2,7 +2,23 @@
 
 ## 3.8.0 - (Electric Blue Vienna) - June 2020
 
+### Highlights 3.8.0
+
+- Agent: added support for creating automatic data source configuration and automatic mappings
+- CLI: mc configure-agent can now automatically create the data source configuration and the mappings for selected assetid
 - SDK: typescript sdk released to beta status
+- SDK: typescript browser support (e.g. for react, angular, etc)
+- CLI: mc service-credentials command has now http based configuration frontend
+- CLI: mc dev-proxy added simple api proxy for mindsphere local app development
+
+### Contributions 3.8.0 heart: <3
+
+- Thanks to Sharath N.S. for contributing on automatic data source configuration and automatic mappings!
+
+### Bugfixes and Improvements 3.8.0
+
+- SDK: typescript sdk released to beta status
+- SDK: typescript browser support (e.g. for react, angular, etc)
 - SDK: AgentManagementClient released to beta
 - SDK: AssetManagementClient released to beta
 - SDK: EventManagementClient released to beta
