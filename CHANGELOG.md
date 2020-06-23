@@ -19,6 +19,7 @@
 
 - SDK: typescript sdk released to beta status
 - SDK: typescript browser support (e.g. for react, angular, etc)
+- SDK: IdentityManagementClient released to beta
 - SDK: AgentManagementClient released to beta
 - SDK: AssetManagementClient released to beta
 - SDK: EventManagementClient released to beta
@@ -33,12 +34,17 @@
 - SDK: TrendPredictionClient released to beta
 - SDK: IdentityManagementClient released to beta
 - SDK: added utility class for MQTT OPC UA PubSub key rotation
+- SDK: added BrowserAuth to SDK
+- SDK: added UserAuth to SDK
 - SDK: added TokenManagerAuth to SDK
+- SDK: added ServiceCredentialsAuth to SDK
 - Agent: added support for creating automatic data source configuration and automatic mappings
 - Agent: added support for typed events
 - Agent: exposed Sdk() property on the Agent for future use (at the moment only some APIs of mindsphere can be called with Agent Credentials)
 - SDK: added utility class for MQTT OPC UA PubSub key rotation
 - SDK: added TokenManagerAuth to SDK
+- CLI: mc iam command can now manage mindsphere users
+- CLI: mc configure-agent can now automatically create the data source configuration and the mappings for selected assetid
 - CLI: mc configure-agent can now automatically create the data source configuration and the mappings for selected assetid
 - CLI: mc offboard-agent has now a command to offboard an agent with the id only  (mc offboard --assetid) (#130)
 - CLI: added mc mqtt-createjwt command which can create a key for MQTT OPC UA PubSub authentication

@@ -327,6 +327,7 @@ and Clients for following APIs
 - AssetManagementClient
 - EventManagementClient
 - IotFileClient
+- IdentityManagementClient
 - KPICalculationClient
 - MindConnectAPIClient
 - SignalValidationClient
@@ -335,7 +336,6 @@ and Clients for following APIs
 - TimeSeriesBulkClient
 - TimeSeriesClient
 - TrendPredictionClient
-- IdentityManagementClient
 
 The example below shows how to use the sdk.
 

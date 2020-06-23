@@ -9,10 +9,12 @@ import { errorLog, getColor, homeDirLog, proxyLog } from "./command-utils";
 import chalk = require("chalk");
 const HttpsProxyAgent = require("https-proxy-agent");
 
-const color = getColor("magenta");
+const magenta = getColor("magenta");
 const red = getColor("red");
 const yellow = getColor("yellow");
 const green = getColor("green");
+
+let color = green;
 
 const headers = {
     "Access-Control-Allow-Origin": "*",
@@ -40,10 +42,11 @@ export default (program: CommanderStatic) => {
         .option("-x, --xsrftoken <xsrftoken>", "borrowed XSRF-TOKEN cookie from browser")
         .option("-h, --host <host>", "the address where SESSION and XSRF-TOKEN have been borrowed from")
         .option("-k, --passkey <passkey>", "passkey")
-        .description(color("starts mindsphere development proxy *"))
+        .description(color(`starts mindsphere development proxy ${magenta("(optional passkey) *")}`))
         .action((options) => {
             (async () => {
                 try {
+                    color = options.mode === "credentials" ? magenta : green;
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
 
