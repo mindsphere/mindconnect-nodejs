@@ -125,25 +125,6 @@ async function serve({ configPort, options }: { configPort?: number; options: an
                     );
             }
 
-            if (req.method === "GET") {
-                // prevent navigation and redirects when called from a browser
-                delete requestOptions.headers["sec-fetch-mode"];
-                delete requestOptions.headers["sec-fetch-dest"];
-                delete requestOptions.headers["sec-fetch-site"];
-                delete requestOptions.headers["sec-fetch-user"];
-
-                delete requestOptions.headers["Sec-Fetch-Mode"];
-                delete requestOptions.headers["Sec-Fetch-Dest"];
-                delete requestOptions.headers["Sec-Fetch-Site"];
-                delete requestOptions.headers["Sec-Fetch-User"];
-                options.verbose &&
-                    console.log(
-                        `[${green(
-                            new Date().toISOString()
-                        )}] deleting sec-fetch-* headers to prevent redirects when cookies are not correctly setup`
-                    );
-            }
-
             if (options.mode === "credentials") {
                 (requestOptions.headers as any)["Authorization"] = `Bearer ${await sdk.GetToken()}`;
                 options.verbose &&
