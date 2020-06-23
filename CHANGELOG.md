@@ -31,6 +31,7 @@
 - SDK: TimeSeriesBulkClient released to beta
 - SDK: TimeSeriesClient released to beta
 - SDK: TrendPredictionClient released to beta
+- SDK: IdentityManagementClient released to beta
 - SDK: added utility class for MQTT OPC UA PubSub key rotation
 - SDK: added TokenManagerAuth to SDK
 - Agent: added support for creating automatic data source configuration and automatic mappings

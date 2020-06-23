@@ -8,6 +8,8 @@ export * from "./common/mindsphere-sdk";
 export * from "./common/sdk-client";
 export * from "./event/event-management";
 export * from "./event/event-models";
+export * from "./identity/identity";
+export * from "./identity/identity-models";
 export * from "./iot/iot-timeseries";
 export * from "./iot/iot-timeseries-models";
 export * from "./iotaggregate/iot-timeseries-aggregate";

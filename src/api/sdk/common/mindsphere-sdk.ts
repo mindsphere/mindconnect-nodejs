@@ -1,6 +1,7 @@
 import { AgentManagementClient } from "../agent/agent-management";
 import { AssetManagementClient } from "../asset/asset-management";
 import { EventManagementClient } from "../event/event-management";
+import { IdentityManagementClient } from "../identity/identity";
 import { TimeSeriesClient } from "../iot/iot-timeseries";
 import { TimeSeriesAggregateClient } from "../iotaggregate/iot-timeseries-aggregate";
 import { TimeSeriesBulkClient } from "../iotbulk/iot-timeseries-bulk";
@@ -190,4 +191,19 @@ export class MindSphereSdk extends SdkClient {
         this._mindConnectApiClient = this._mindConnectApiClient || new MindConnectApiClient(this._authenticator);
         return this._mindConnectApiClient;
     }
+
+    /**
+     * Identity Management Client
+     *
+     * @returns {IdentityManagementClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetIdentityManagementClient(): IdentityManagementClient {
+        this._identityManagementClient =
+            this._identityManagementClient || new IdentityManagementClient(this._authenticator);
+        return this._identityManagementClient;
+    }
+
+    private _identityManagementClient?: IdentityManagementClient;
 }

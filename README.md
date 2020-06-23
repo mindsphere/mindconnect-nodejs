@@ -335,6 +335,7 @@ and Clients for following APIs
 - TimeSeriesBulkClient
 - TimeSeriesClient
 - TrendPredictionClient
+- IdentityManagementClient
 
 The example below shows how to use the sdk.
 
