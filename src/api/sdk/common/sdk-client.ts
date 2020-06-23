@@ -4,11 +4,10 @@ import { isTokenRotation, TokenRotation } from "../../mindconnect-base";
 import { TokenManagerAuth } from "../../tokenmanager-auth";
 import {
     AppCredentials,
-    isCredentialAuth,
-    isTokenManagerAuth,
+    isAppCredentials,
+    isServiceCredentials,
     MindSphereCredentials,
-    TenantCredentials,
-    UserCredentials,
+    ServiceCrendtials,
 } from "./credentials";
 
 export abstract class SdkClient {
@@ -76,12 +75,29 @@ export abstract class SdkClient {
         });
     }
 
-    constructor(credentialsOrAuthorizer?: UserCredentials | TenantCredentials | AppCredentials | TokenRotation) {
+    /**
+     * * Creates a client for MinSphere API
+     *
+     * @param {(TokenRotation | ServiceCrendtials | AppCredentials)} [credentialsOrAuthorizer]
+     *
+     * you can pass either an instance an Authorizer:
+     * UserAuth, BrowserAuth, CredentialsAuth, TokenManagerAuth or MindConnectAgent
+     *
+     * or a set of Credentials:
+     * ServiceCredentials or AppCredentials
+     *
+     * implement the TokenRotation interface if you want to provide your own authorizer.
+     *
+     * The default constructor uses frontend authorization.
+     *
+     * @memberOf SdkClient
+     */
+    constructor(credentialsOrAuthorizer?: TokenRotation | ServiceCrendtials | AppCredentials) {
         if (credentialsOrAuthorizer === undefined) {
             this._authenticator = new BrowserAuth();
         } else if (isTokenRotation(credentialsOrAuthorizer)) {
             this._authenticator = credentialsOrAuthorizer as TokenRotation;
-        } else if (isTokenManagerAuth(credentialsOrAuthorizer)) {
+        } else if (isAppCredentials(credentialsOrAuthorizer)) {
             const appCredentials = credentialsOrAuthorizer as AppCredentials;
 
             this._authenticator = new TokenManagerAuth(
@@ -92,7 +108,7 @@ export abstract class SdkClient {
                 appCredentials.appName,
                 appCredentials.appVersion
             );
-        } else if (isCredentialAuth(credentialsOrAuthorizer)) {
+        } else if (isServiceCredentials(credentialsOrAuthorizer)) {
             const credentialsAuth = credentialsOrAuthorizer as MindSphereCredentials;
             this._authenticator = new CredentialAuth(
                 credentialsAuth.gateway,

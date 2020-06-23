@@ -13,4 +13,5 @@ export * from "./api/mindconnect-validators";
 export * from "./api/mqtt-opcua-auth";
 export * from "./api/sdk/index";
 export * from "./api/tokenmanager-auth";
+export * from "./api/user-auth";
 export { convertToTdpArray, retry } from "./api/utils";

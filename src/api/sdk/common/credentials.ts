@@ -8,10 +8,8 @@ export interface MindSphereCredentials {
 
 export interface AgentCredentials extends IMindConnectConfiguration {}
 
-export interface UserCredentials extends MindSphereCredentials {}
-
-export interface TenantCredentials extends MindSphereCredentials {
-    subTenant?: string;
+export interface ServiceCrendtials extends MindSphereCredentials {
+    subTenant?: string; // not supported yet
 }
 
 export interface AppCredentials extends MindSphereCredentials {
@@ -40,10 +38,10 @@ export function isAgentAuth(obj: any): boolean {
     );
 }
 
-export function isTokenManagerAuth(obj: any): boolean {
+export function isAppCredentials(obj: any): boolean {
     return obj && obj.gateway && obj.basicAuth && obj.tenant && obj.appName && obj.appVersion && obj.usertenant;
 }
 
-export function isCredentialAuth(obj: any): boolean {
+export function isServiceCredentials(obj: any): boolean {
     return obj && obj.gateway && obj.basicAuth && obj.tenant && !obj.appName && !obj.appVersion && !obj.usertenant;
 }

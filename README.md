@@ -340,7 +340,7 @@ The example below shows how to use the sdk.
 
 ``` typescript
 // The example shows how to  Get Assets from MindSphere with custom AssetType using frontend authentication
-// you can pass an instance an Authorizer (BrowserAuth, CredentialsAuth, TokenManagerAuth, MindConnectAgent)
+// you can pass an instance an Authorizer (BrowserAuth, UserAuth, CredentialsAuth, TokenManagerAuth, MindConnectAgent)
 // to use different authorization types in MindSphere or implement the TokenRotation interface if you want to
 // provide your own authorizer.
 //
