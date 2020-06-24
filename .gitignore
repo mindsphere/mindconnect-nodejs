@@ -88,3 +88,6 @@ report.xml
 # signal validation
 timeseries-sample.json
 signal-validation-*.json
+
+# cli test
+clitest
