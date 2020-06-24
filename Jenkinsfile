@@ -36,7 +36,7 @@ pipeline {
         sh '''
         dirname=`date +%s`
         mkdir $dirname
-        cd clitest
+        cd $dirname
         alias mc='node ../src/cli/mc'
         set -e
         export MDSP_PASSKEY=passkey.4.unit.test
