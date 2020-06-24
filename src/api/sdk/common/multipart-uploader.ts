@@ -6,7 +6,7 @@ import * as path from "path";
 import * as stream from "stream";
 import { URL } from "url";
 import { MindConnectAgent } from "../../..";
-import { MindConnectBase, TokenRotation } from "../../mindconnect-base";
+import { TokenRotation } from "../../mindconnect-base";
 import { retry, throwError } from "../../utils";
 import { SdkClient } from "./sdk-client";
 import _ = require("lodash");
