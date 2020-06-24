@@ -11,21 +11,21 @@ const red = getColor("red");
 const cyan = getColor("cyan");
 
 export const serviceCredentialLog = (color: Function = magenta) => {
-    log(`\n  Important: \n`);
-    log(
-        `    you need to supply the ${color("service credentials (deprecated)")} or ${color(
-            "application credentials"
-        )} for this operation and provide the passkey \n`
-    );
-    log(`    how to get service credentials: `);
-    log(
-        color(`    https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials`)
-    );
-    log(`    how to get application credentials: `);
-    log(color(`    https://documentation.mindsphere.io/resources/html/developer-cockpit/en-US/124342231819.html`));
+    log(`\n  Important: `);
+    log(`\n  Authentication with ${color("service credentials")} or ${color("app credentials")} \n`);
 
-    log(`\n  More Information: \n`);
-    log(`    ${color("https://opensource.mindsphere.io")}\n`);
+    log(`    \t- append option [--passkey <your passkey>] to the command `);
+    log(`    \t- create environment variable ${color("MDSP_PASSKEY")} with your current passkey`);
+
+    log(`\n  Authentication with ${yellow("borrowed session cookie and xsrf-token cookie")} \n`);
+
+    log(
+        `    \t- create environment variables ${yellow("MDSP_HOST")} , ${yellow("MDSP_SESSION")} and ${yellow(
+            "MDSP_XSRF_TOKEN"
+        )} using borrowed cookies `
+    );
+    log(`\n  Full Documentation: \n`);
+    log(`    ${color("https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/setting-up-the-cli.html")}\n`);
 };
 
 export function colorizeStatus(message: string) {
@@ -144,17 +144,26 @@ export function getSdk(options: any) {
     const yellow = getColor("yellow");
 
     if (options.passkey) {
-        console.log(`The passkey was specified as command line option using ${magenta("service/app credentials")}`);
+        verboseLog(
+            `The passkey was specified as command line option using ${magenta("service/app credentials")}`,
+            options.verbose
+        );
         sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
     } else if (process.env.MDSP_PASSKEY && process.env.MDSP_PASSKEY !== "") {
-        console.log(
-            `The passkey was specified in environment variable MDSP_PASSKEY using ${magenta("service/app credentials")}`
+        verboseLog(
+            `The passkey was specified in environment variable MDSP_PASSKEY using ${magenta(
+                "service/app credentials"
+            )}`,
+            options.verbose
         );
         options.passkey = process.env.MDSP_PASSKEY;
         sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
     } else if (process.env.MDSP_HOST && process.env.MDSP_SESSION && process.env.MDSP_XSRF_TOKEN) {
-        console.log(
-            `Using borrowed SESSION and XSRF-TOKEN cookies from ${yellow(process.env.MDSP_HOST)} for authentication`
+        verboseLog(
+            `Using borrowed ${yellow("SESSION")}  and ${yellow("XSRF-TOKEN")}  cookies from ${yellow(
+                process.env.MDSP_HOST
+            )} for authentication`,
+            options.verbose
         );
 
         sdk = new MindSphereSdk(

@@ -15,7 +15,7 @@ const red = getColor("red");
 const yellow = getColor("yellow");
 const green = getColor("green");
 
-let color = green;
+let color = yellow;
 
 const headers = {
     "Access-Control-Allow-Origin": "*",
