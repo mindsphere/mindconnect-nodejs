@@ -34,7 +34,8 @@ pipeline {
     stage('Test-CLI') {
       steps {
         sh '''
-        mkdir clitest
+        dirname=`date +%s`
+        mkdir $dirname
         cd clitest
         alias mc='node ../src/cli/mc'
         set -e
@@ -63,7 +64,7 @@ pipeline {
         mc delete-file --file $filename --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
         mc iam --mode list --group
         cd ..
-        rm -rf clitest
+        rm -rf $dirname
         '''
       }
     }
@@ -80,7 +81,6 @@ pipeline {
         lock ('package') {
           sh '''
           rm -rf dist
-          rm -rf clitest
           npm pack --unsafe-perm
           '''
         }
