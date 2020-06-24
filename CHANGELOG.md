@@ -6,6 +6,7 @@
 
 - Agent: added support for creating automatic data source configuration and automatic mappings
 - CLI: mc configure-agent can now automatically create the data source configuration and the mappings for selected assetid
+- CLI: cookie based authentication, you don't have to have service or app credentials (app/service credentials are still recommended)
 - SDK: typescript sdk released to beta status
 - SDK: typescript browser support (e.g. for react, angular, etc)
 - CLI: mc service-credentials command has now http based configuration frontend
@@ -17,6 +18,7 @@
 
 ### Bugfixes and Improvements 3.8.0
 
+- CLI: cookie based authentication, you don't have to have service or app credentials (app/service credentials are still recommended)
 - SDK: typescript sdk released to beta status
 - SDK: typescript browser support (e.g. for react, angular, etc)
 - SDK: IdentityManagementClient released to beta

@@ -45,13 +45,20 @@ export default (program: CommanderStatic) => {
         .option("-h, --host <host>", "the address where SESSION and XSRF-TOKEN have been borrowed from")
         .option("-t, --timeout <timeout>", "keep alive timeout in seconds", "60")
         .option("-k, --passkey <passkey>", "passkey")
-        .description(color(`starts mindsphere development proxy ${magenta("(optional passkey) *")}`))
+        .description(color(`starts mindsphere development proxy & ${magenta("(optional passkey) *")}`))
         .action((options) => {
             (async () => {
                 try {
-                    color = options.mode === "credentials" ? magenta : green;
+                    color = options.mode === "credentials" ? magenta : yellow;
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
+
+                    if (options.mode === "session") {
+                        options.session = options.session || process.env.MDSP_SESSION;
+                        options.xsrftoken = options.xsrftoken || process.env.MDSP_XSRF_TOKEN;
+                        options.host = options.host || process.env.MDSP_HOST;
+                        console.log(options.session, options.xsrftoken, options.host);
+                    }
 
                     checkRequiredParamaters(options);
 
@@ -71,6 +78,7 @@ export default (program: CommanderStatic) => {
                     );
 
                     console.log(`warn on missing x-xsrf-token ${options.nowarn ? red("off") : green("on")}\n`);
+
                     await serve({ configPort: options.port, options: options });
                 } catch (err) {
                     errorLog(err, options.verbose);
@@ -79,11 +87,18 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
+            log(`    mc dev-proxy  \t\t\t\t runs on default port (7707) using ${yellow("cookies")}`);
             log(
-                `    mc dev-proxy --passkey <yourpasskey> \t\t\t starts mindsphere development proxy on default port (7707)`
+                `    mc dev-proxy --port 7777 --passkey passkey \t runs on port 7777 using ${magenta(
+                    "app/service credentials"
+                )}`
             );
+
+            log("\n  Configuration:\n");
             log(
-                `    mc dev-proxy --port 7777 --passkey <yourpasskey> \t\t starts mindsphere development proxy on port 7777`
+                `    \t- create environment variables: ${color("MDSP_HOST")}, ${color("MDSP_SESSION")} and ${color(
+                    "MDSP_XSRF_TOKEN"
+                )} using borrowed cookies `
             );
 
             log(
@@ -182,12 +197,12 @@ async function serve({ configPort, options }: { configPort?: number; options: an
 
             const proxy = https.request(requestOptions, function (proxyres) {
                 const allHeaders = { ...headers, ...proxyres.headers };
-                const logColor = res.statusCode >= 200 && res.statusCode < 400 ? color : red;
+                const logColor = res.statusCode >= 200 && res.statusCode < 400 ? green : red;
 
                 if (req.method === "OPTIONS") {
                     res.writeHead(204, allHeaders);
                     console.log(
-                        `[${logColor(new Date().toISOString())}] ${logColor(res.statusCode)} ${requestOptions.method} ${
+                        `[${color(new Date().toISOString())}] ${logColor(res.statusCode)} ${requestOptions.method} ${
                             requestOptions.path
                         }`
                     );
@@ -277,11 +292,11 @@ async function serve({ configPort, options }: { configPort?: number; options: an
                     res.statusCode = proxyres.statusCode || 500;
                     res.end(replaced);
 
-                    const okColor = res.statusCode >= 200 && res.statusCode <= 399 ? color : red;
+                    const okColor = res.statusCode >= 200 && res.statusCode <= 399 ? green : red;
                     const finalLogColor = res.statusCode >= 300 && res.statusCode <= 399 ? chalk.grey : okColor;
 
                     console.log(
-                        `[${finalLogColor(new Date().toISOString())}] ${finalLogColor(res.statusCode)} ${
+                        `[${color(new Date().toISOString())}] ${finalLogColor(res.statusCode)} ${
                             requestOptions.method
                         } ${requestOptions.path}`
                     );

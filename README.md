@@ -382,21 +382,24 @@ The library comes with a command line interface which can also be installed glob
 
 ### Configuring CLI
 
-First step is to configure the CLI. For this you will need either service credentials (which have been deprecated) or application credentials from your developer cockpit.
+First step is to configure the CLI. For this you will need a session cookie from mindsphere, service credentials (which have been deprecated) or application credentials from your developer cockpit.
 
-- how to get [application credentials](https://documentation.mindsphere.io/resources/html/developer-cockpit/en-US/124342231819.html)
-- how to get [service credentials (deprecated)](https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials)
+- [SESSION and XSRF-TOKEN cookie](https://developer.mindsphere.io/howto/howto-local-development.html#generate-user-credentials)
+- [Application Credentials](https://documentation.mindsphere.io/resources/html/developer-cockpit/en-US/124342231819.html)
+- [Service Credentials](https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials)
+
+First start the credentials configuration. This will start a web server on your local computer where you can enter the credentials.
 
 ```bash
 # run mc service-credentials --help for full information
-# this will start a web server on your local computer where you can enter the credentials
+
 $ mc service-credentials
 navigate to http://localhost:4994 to configure the CLI
 press CTRL + C to exit
 
 ```
 
-Navigate to [http://localhost:4994](http://localhost:4994) to configure the CLI.
+Navigate to [http://localhost:4994](http://localhost:4994) to configure the CLI. (see [full documentation](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html) for XSRF-TOKEN and SESSION)
 
 The image below shows the dialog for adding new credentials (press on the + sign in the upper left corner)
 
@@ -486,14 +489,15 @@ Commands:
 
   Documentation:
 
-    the magenta colored commands * require app or service credentials.
+    the magenta colored commands * use app or service credentials or borrowed mindsphere cookies
     the cyan colored commands require mindconnectlib (agent) credentials
     the blue colored commands @ use analytical functions of MindSphere
     the green colored commands # are used as setup and utility commands
-    the app or service credentials should only be used in secure environments
+    the yellow colored commands & use borrowed mindsphere application cookies
+    the credentials and cookies should only be used in secure environments
     Full documentation: https://opensource.mindsphere.io
-```
 
+```
 
 ### MindSphere Development Proxy
 
@@ -513,11 +517,9 @@ npx @mindconnect/mindconnect-nodejs dev-proxy --session <SESSION-TOKEN> --xsrfto
 For more complex tasks install and configure the CLI
 
 ```text
-$mc dev-proxy --help
-
 Usage: mc dev-proxy|px [options]
 
-starts mindsphere development proxy *
+starts mindsphere development proxy (optional passkey) *
 
 Options:
   -m, --mode [credentials|session]  service/app credentials authentication of
@@ -525,18 +527,25 @@ Options:
   -o, --port <port>                 port for web server (default: "7707")
   -r, --norewrite                   don't rewrite hal+json urls
   -w, --nowarn                      don't warn for missing headers
+  -d, --dontkeepalive               don't keep the session alive
   -v, --verbose                     verbose output
   -s, --session <session>           borrowed SESSION cookie from brower
   -x, --xsrftoken <xsrftoken>       borrowed XSRF-TOKEN cookie from browser
   -h, --host <host>                 the address where SESSION and XSRF-TOKEN
                                     have been borrowed from
+  -t, --timeout <timeout>           keep alive timeout in seconds (default:
+                                    "60")
   -k, --passkey <passkey>           passkey
   --help                            display help for command
 
   Examples:
 
-    mc dev-proxy --passkey <yourpasskey>                starts mindsphere development proxy on default port (7707)
-    mc dev-proxy --port 7777 --passkey <yourpasskey>    starts mindsphere development proxy on port 7777
+    mc dev-proxy                                 runs on default port (7707) using cookies
+    mc dev-proxy --port 7777 --passkey passkey   runs on port 7777 using app/service credentials
+
+  Configuration:
+
+        - create environment variables: MDSP_HOST, MDSP_SESSION and MDSP_XSRF_TOKEN using borrowed cookies
 
     see more documentation at https://opensource.mindsphere.io/docs/mindconnect-nodejs/development-proxy.html
 
