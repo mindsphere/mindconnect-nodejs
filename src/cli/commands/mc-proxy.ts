@@ -1,5 +1,6 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
+import fetch from "cross-fetch";
 import * as http from "http";
 import * as https from "https";
 import * as url from "url";
@@ -37,10 +38,12 @@ export default (program: CommanderStatic) => {
         .option("-o, --port <port>", "port for web server", "7707")
         .option("-r, --norewrite", "don't rewrite hal+json urls")
         .option("-w, --nowarn", "don't warn for missing headers")
+        .option("-d, --dontkeepalive", "don't keep the session alive")
         .option("-v, --verbose", "verbose output")
         .option("-s, --session <session>", "borrowed SESSION cookie from brower")
         .option("-x, --xsrftoken <xsrftoken>", "borrowed XSRF-TOKEN cookie from browser")
         .option("-h, --host <host>", "the address where SESSION and XSRF-TOKEN have been borrowed from")
+        .option("-t, --timeout <timeout>", "keep alive timeout in seconds", "60")
         .option("-k, --passkey <passkey>", "passkey")
         .description(color(`starts mindsphere development proxy ${magenta("(optional passkey) *")}`))
         .action((options) => {
@@ -53,7 +56,14 @@ export default (program: CommanderStatic) => {
                     checkRequiredParamaters(options);
 
                     console.log(`\nMode ${color(options.mode)}`);
-                    console.log(`\CORS support ${green("on")}`);
+                    console.log(`\nCORS support ${green("on")}`);
+                    options.mode === "session" &&
+                        !options.dontkeepalive &&
+                        console.log(
+                            `\nKeep alive session ${color(options.session)} on ${color(options.host)} every ${color(
+                                options.timeout
+                            )} seconds: ${green("on")} `
+                        );
                     console.log(
                         `Rewrite hal+json support ${options.host || loadAuth().gateway} -> ${
                             "http://localhost:" + options.port
@@ -98,6 +108,8 @@ async function serve({ configPort, options }: { configPort?: number; options: an
         sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
     }
 
+    keepAliveIfConfigured(options, proxyHttpAgent);
+
     server.on("error", (err) => {
         console.log(`[${red(new Date().toISOString())}] ${red(err)}`);
     });
@@ -139,6 +151,7 @@ async function serve({ configPort, options }: { configPort?: number; options: an
             } else {
                 if (requestOptions.headers.origin) {
                     requestOptions.headers.origin = `https://${options.host}`;
+
                     options.verbose &&
                         console.log(
                             `[${green(new Date().toISOString())}] Setting origin to ${requestOptions.headers.origin}}`
@@ -293,6 +306,29 @@ async function serve({ configPort, options }: { configPort?: number; options: an
     );
     console.log(`API documentation: ${color("https://developer.mindsphere.io/apis/index.html")}`);
     console.log(`press ${color("CTRL + C")} to exit`);
+}
+
+function keepAliveIfConfigured(options: any, proxyHttpAgent: any) {
+    options.mode === "session" &&
+        !options.dontkeepalive &&
+        setInterval(async () => {
+            const host = `https://${options.host}`;
+            const newCookie = `SESSION=${options.session}; XSRF-TOKEN=${options.xsrftoken}`;
+            const keepAlive = await fetch(host, {
+                method: "GET",
+                headers: { cookie: newCookie },
+                agent: proxyHttpAgent,
+            } as RequestInit);
+
+            const okColor = keepAlive.status >= 200 && keepAlive.status <= 399 ? color : red;
+            const finalLogColor = keepAlive.status >= 300 && keepAlive.status <= 499 ? chalk.gray : okColor;
+
+            console.log(
+                `[${finalLogColor(new Date().toISOString())}] ${finalLogColor(keepAlive.status)} keep alive ${
+                    options.host
+                } `
+            );
+        }, options.timeout * 1000);
 }
 
 function addWarning(req: any) {
