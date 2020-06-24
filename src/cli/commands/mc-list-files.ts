@@ -1,10 +1,12 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
-import { IotFileModels, MindSphereSdk } from "../../api/sdk";
-import { decrypt, loadAuth, retry } from "../../api/utils";
+import { IotFileModels } from "../../api/sdk";
+import { retry } from "../../api/utils";
 import {
+    adjustColor,
     errorLog,
     getColor,
+    getSdk,
     homeDirLog,
     humanFileSize,
     proxyLog,
@@ -12,7 +14,7 @@ import {
     verboseLog,
 } from "./command-utils";
 
-const color = getColor("magenta");
+let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -32,12 +34,11 @@ export default (program: CommanderStatic) => {
         .action((options) => {
             (async () => {
                 try {
+                    checkRequiredParameters(options);
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
-
-                    checkRequiredParameters(options);
-                    const auth = loadAuth();
-                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     const iotFile = sdk.GetIoTFileClient();
 
@@ -82,11 +83,5 @@ export default (program: CommanderStatic) => {
         });
 };
 function checkRequiredParameters(options: any) {
-    !options.passkey &&
-        errorLog(
-            "you have to provide a passkey to get the service token (run mc ls --help for full description)",
-            true
-        );
-
     !options.assetid && errorLog("You have to provide an assetid.", true);
 }

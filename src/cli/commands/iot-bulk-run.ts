@@ -5,19 +5,21 @@ import * as fs from "fs";
 import * as _ from "lodash";
 import * as path from "path";
 import { sleep } from "../../../test/test-utils";
+import { AssetManagementModels, MindSphereSdk, TimeSeriesBulkModels } from "../../api/sdk";
+import { retry, throwError } from "../../api/utils";
 import {
-    AssetManagementClient,
-    AssetManagementModels,
-    TimeSeriesBulkClient,
-    TimeSeriesBulkModels,
-    TimeSeriesClient,
-} from "../../api/sdk";
-import { IotFileClient } from "../../api/sdk/iotfile/iot-file";
-import { decrypt, loadAuth, retry, throwError } from "../../api/utils";
-import { errorLog, getColor, modeInformation, verboseLog } from "./command-utils";
+    adjustColor,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    modeInformation,
+    proxyLog,
+    verboseLog,
+} from "./command-utils";
 import ora = require("ora");
 
-const color = getColor("magenta");
+let color = getColor("magenta");
 const warn = getColor("yellow");
 
 export default (program: CommanderStatic) => {
@@ -38,11 +40,16 @@ export default (program: CommanderStatic) => {
             (async () => {
                 try {
                     checkRequiredParamaters(options);
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
+                    homeDirLog(options.verbose, color);
+                    proxyLog(options.verbose, color);
                     const asset = (await createOrReadAsset(
+                        sdk,
                         options
                     )) as AssetManagementModels.AssetResourceWithHierarchyPath;
 
-                    modeInformation(asset, options);
+                    modeInformation(asset, options, color);
 
                     const aspects = getAspectsFromDirNames(options);
                     const spinner = ora("creating files");
@@ -112,14 +119,14 @@ export default (program: CommanderStatic) => {
                         const spinner = ora("running");
                         !options.verbose && spinner.start("");
                         if (asset.twinType === AssetManagementModels.TwinType.Simulation) {
-                            await runSimulationUpload(options, jobstate, spinner);
+                            await runSimulationUpload(sdk, options, jobstate, spinner);
                         } else if (
                             asset.twinType === AssetManagementModels.TwinType.Performance &&
                             !options.timeseries
                         ) {
-                            await runSimulationUpload(options, jobstate, spinner);
+                            await runSimulationUpload(sdk, options, jobstate, spinner);
                         } else {
-                            await runTimeSeriesUpload(options, jobstate, spinner);
+                            await runTimeSeriesUpload(sdk, options, jobstate, spinner);
                         }
 
                         !options.verbose && spinner.succeed("Done");
@@ -145,12 +152,11 @@ export default (program: CommanderStatic) => {
         });
 };
 
-async function runTimeSeriesUpload(options: any, jobstate: jobState, spinner: ora.Ora) {
+async function runTimeSeriesUpload(sdk: MindSphereSdk, options: any, jobstate: jobState, spinner: ora.Ora) {
     const SLEEP_ON_429 = 5000; // wait 5s on 429
     const SLEEP_BETWEEN = 2000; // wait 1 sec between posts
     const pause = Math.max((options.size / 500) * SLEEP_BETWEEN, 2000); // wait at least two second, two second per 1000 records
-    const auth = loadAuth();
-    const tsClient = new TimeSeriesClient({ ...auth, basicAuth: decrypt(auth, options.passkey) });
+    const tsClient = sdk.GetTimeSeriesClient();
     for (const file of jobstate.uploadFiles) {
         const timeSeries = require(path.resolve(file.path));
 
@@ -190,11 +196,11 @@ function formatDate(date: string | Date) {
     } else return `${color(date)}`;
 }
 
-async function runSimulationUpload(options: any, jobstate: jobState, spinner: ora.Ora) {
-    await uploadFiles(options, jobstate, spinner);
+async function runSimulationUpload(sdk: MindSphereSdk, options: any, jobstate: jobState, spinner: ora.Ora) {
+    await uploadFiles(sdk, options, jobstate, spinner);
     saveJobState(options, jobstate);
     if (!jobstate.bulkImports || jobstate.bulkImports.length === 0) {
-        await createUploadJobs(jobstate, options, spinner);
+        await createUploadJobs(sdk, jobstate, options, spinner);
         saveJobState(options, jobstate);
     } else {
         verboseLog(`the jobs for ${options.dir} have already been created.`, options.verbose, spinner);
@@ -202,7 +208,7 @@ async function runSimulationUpload(options: any, jobstate: jobState, spinner: or
     }
 }
 
-async function createUploadJobs(jobstate: jobState, options: any, spinner: ora.Ora) {
+async function createUploadJobs(sdk: MindSphereSdk, jobstate: jobState, options: any, spinner: ora.Ora) {
     const results = _(jobstate.uploadFiles)
         .groupBy((x) => {
             const date = new Date(x.mintime);
@@ -222,8 +228,7 @@ async function createUploadJobs(jobstate: jobState, options: any, spinner: ora.O
         };
         jobstate.bulkImports.push({ data: [data] });
     }
-    const auth = loadAuth();
-    const bulkupload = new TimeSeriesBulkClient({ ...auth, basicAuth: decrypt(auth, options.passkey) });
+    const bulkupload = sdk.GetTimeSeriesBulkClient();
     for (const bulkImport of jobstate.bulkImports) {
         const job = await bulkupload.PostImportJob(bulkImport);
         (bulkImport as any).jobid = job.id;
@@ -239,9 +244,8 @@ function saveJobState(options: any, jobstate: jobState) {
     fs.writeFileSync(`${options.dir}/jobstate.json`, JSON.stringify(jobstate, null, 2));
 }
 
-async function uploadFiles(options: any, jobstate: jobState, spinner?: any) {
-    const auth = loadAuth();
-    const fileUploadClient = new IotFileClient({ ...auth, basicAuth: decrypt(auth, options.passkey) });
+async function uploadFiles(sdk: MindSphereSdk, options: any, jobstate: jobState, spinner?: any) {
+    const fileUploadClient = sdk.GetIoTFileClient();
     for (const entry of jobstate.uploadFiles) {
         let etag: number | undefined;
 
@@ -431,10 +435,9 @@ function getAspectsFromDirNames(options: any): string[] {
     return aspects;
 }
 
-async function createOrReadAsset(options: any) {
+async function createOrReadAsset(sdk: MindSphereSdk, options: any) {
     let asset = require(path.resolve(`${options.dir}/asset.json`));
-    const auth = loadAuth();
-    const assetMgmt = new AssetManagementClient({ ...auth, basicAuth: decrypt(auth, options.passkey) });
+    const assetMgmt = sdk.GetAssetManagementClient();
     if (!asset.assetId) {
         verboseLog(`creating new asset ${color(asset.name)}`, options.verbose);
         asset = await assetMgmt.PostAsset(asset);
@@ -469,12 +472,6 @@ function checkRequiredParamaters(options: any) {
     !fs.existsSync(`${options.dir}/csv/`) &&
         throwError(
             `the directory ${color(options.dir)} must contain the csv/ folder. run mc prepare-bulk command first!`
-        );
-
-    !options.passkey &&
-        errorLog(
-            "you have to provide a passkey to get the service token (run mc rb --help for full description)",
-            true
         );
 }
 

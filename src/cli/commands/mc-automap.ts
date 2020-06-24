@@ -3,18 +3,27 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { DataPointValue, MindConnectAgent, MindSphereSdk } from "../..";
-import { decrypt, getAgentDir, loadAuth, retry, throwError } from "../../api/utils";
-import { agentConfigLog, errorLog, getColor, homeDirLog, proxyLog, verboseLog } from "./command-utils";
+import { getAgentDir, retry, throwError } from "../../api/utils";
+import {
+    adjustColor,
+    agentConfigLog,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    proxyLog,
+    verboseLog,
+} from "./command-utils";
 import ora = require("ora");
 
 const cyan = getColor("cyan");
-const magenta = getColor("magenta");
+let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
         .command("configure-agent")
         .alias("co")
-        .option("-c, --config <agentconfig>", "config file with agent configuration", "agentconfig.json")
+        .option("-c, --config <agentconfig>", "config file with agent configuration")
         .option("-m, --mode [config | map | print | delete | test]", "command mode", "config")
         .option("-a, --agentid <agentid>", "agentid")
         .option("-i, --assetid <assetid>", "target assetid for mapping")
@@ -22,23 +31,26 @@ export default (program: CommanderStatic) => {
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(`${cyan("create data source configuration and mappings")} ${magenta("(optional: passkey) *")}`)
+        .description(`${cyan("create data source configuration and mappings")} ${color("(optional: passkey) *")}`)
         .action((options) => {
             (async () => {
                 try {
-                    const color = options.passkey ? magenta : cyan;
+                    color = adjustColor(color, options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
 
                     checkParameters(options);
 
-                    const auth = loadAuth();
                     let agentid = options.agentid;
                     let agent: MindConnectAgent;
 
-                    const sdk = options.passkey
-                        ? new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) })
+                    const sdk = !options.config
+                        ? (() => {
+                              color = adjustColor(color, options);
+                              return getSdk(options);
+                          })()
                         : (() => {
+                              color = cyan;
                               const configFile = path.resolve(options.config);
                               verboseLog(`agent configuration in: ${color(configFile)}.`, options.verbose);
                               !fs.existsSync(configFile) && throwError(`Can't find file ${configFile}`);
@@ -54,6 +66,7 @@ export default (program: CommanderStatic) => {
                           })();
 
                     options.mode === "print" && (await print(sdk, agentid, color, options));
+                    options.mode === "print" && process.exit(0);
                     options.mode === "config" && (await config(sdk, agentid, color, options));
                     options.mode === "delete" && (await deleteMappings(sdk, agentid, color, options));
                     options.mode === "map" && (await map(sdk, agentid, color, options));

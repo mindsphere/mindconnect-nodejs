@@ -1,10 +1,19 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
-import { IdentityManagementClient, IdentityManagementModels, MindSphereSdk } from "../../api/sdk";
-import { decrypt, loadAuth, throwError } from "../../api/utils";
-import { errorLog, getColor, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
+import { IdentityManagementClient, IdentityManagementModels } from "../../api/sdk";
+import { throwError } from "../../api/utils";
+import {
+    adjustColor,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    proxyLog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
 
-const color = getColor("magenta");
+let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -25,13 +34,12 @@ export default (program: CommanderStatic) => {
         .action((options) => {
             (async () => {
                 try {
+                    checkRequiredParameters(options);
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
-                    checkRequiredParamaters(options);
 
-                    const auth = loadAuth();
-
-                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
                     const iam = sdk.GetIdentityManagementClient();
 
                     options.mode === "list" && options.user && (await listUsers(iam, options));
@@ -230,9 +238,7 @@ async function remove(iam: IdentityManagementClient, options: any) {
     }
 }
 
-function checkRequiredParamaters(options: any) {
-    !options.passkey && throwError("you have to provide the passkey for the mc iam command");
-
+function checkRequiredParameters(options: any) {
     !(["list", "create", "assign", "remove", "delete"].indexOf(options.mode) >= 0) &&
         throwError(`invalid mode ${options.mode} (must be config, list, select or add)`);
 

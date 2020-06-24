@@ -3,11 +3,20 @@ import { log } from "console";
 import * as fs from "fs";
 import * as _ from "lodash";
 import * as path from "path";
-import { MindSphereSdk, TrendPredictionClient, TrendPredictionModels } from "../../api/sdk";
-import { decrypt, loadAuth, retry } from "../../api/utils";
-import { errorLog, getColor, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
+import { TrendPredictionClient, TrendPredictionModels } from "../../api/sdk";
+import { retry } from "../../api/utils";
+import {
+    adjustColor,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    proxyLog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
 
-const color = getColor("blue");
+let color = getColor("blue");
 
 export default (program: CommanderStatic) => {
     program
@@ -31,12 +40,11 @@ export default (program: CommanderStatic) => {
         .action((options) => {
             (async () => {
                 try {
-                    checkParameters(options);
+                    checkRequiredParameters(options);
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
-
-                    const auth = loadAuth();
-                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     const trendPrediction = sdk.GetTrendPredictionClient();
 
@@ -216,8 +224,7 @@ async function listModels(trendPrediction: TrendPredictionClient, options: any) 
     });
 }
 
-function checkParameters(options: any) {
-    !options.passkey && errorLog(" You have to provide the passkey for the trend-prediction command.", true);
+function checkRequiredParameters(options: any) {
     !options.mode &&
         errorLog("You have to provide the mode for the command. Run mc tp --help for full syntax and examples.", true);
 

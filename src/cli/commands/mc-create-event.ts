@@ -5,20 +5,19 @@ import * as os from "os";
 import * as path from "path";
 import { retry } from "../..";
 import { MindConnectAgent } from "../../api/mindconnect-agent";
-import { EventManagementClient, MindSphereSdk } from "../../api/sdk";
-import { decrypt, loadAuth } from "../../api/utils";
-import { errorLog, getColor, homeDirLog, proxyLog, retrylog, verboseLog } from "./command-utils";
+import { EventManagementClient } from "../../api/sdk";
+import { adjustColor, errorLog, getColor, getSdk, homeDirLog, proxyLog, retrylog, verboseLog } from "./command-utils";
 import { getMindConnectAgent } from "./mc-upload-file";
 import ora = require("ora");
 
 let color = getColor("cyan");
-const adminColor = getColor("magenta");
+let adminColor = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
         .command("create-event")
         .alias("ce")
-        .option("-c, --config <agentconfig>", "config file with agent configuration", "agentconfig.json")
+        .option("-c, --config <agentconfig>", "config file with agent configuration")
         .option(
             "-r, --cert [privatekey]",
             "required for agents with RSA_3072 profile. create with: openssl genrsa -out private.key 3072"
@@ -40,7 +39,8 @@ export default (program: CommanderStatic) => {
         .action((options) => {
             (async () => {
                 try {
-                    color = options.passkey !== undefined ? adminColor : color;
+                    adminColor = adjustColor(adminColor, options);
+                    color = options.config === undefined ? adminColor : color;
                     checkParameters(options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
@@ -48,19 +48,20 @@ export default (program: CommanderStatic) => {
                     const spinner = ora("creating event");
                     !options.verbose && spinner.start();
 
-                    const configFile = path.resolve(options.config);
-                    verboseLog(
-                        `Event upload using the agent configuration stored in: ${color(configFile)}.`,
-                        options.verbose
-                    );
-                    if (!fs.existsSync(configFile)) {
-                        throw new Error(`Can't find file ${configFile}`);
+                    if (options.config) {
+                        const configFile = path.resolve(options.config);
+                        verboseLog(
+                            `Event upload using the agent configuration stored in: ${color(configFile)}.`,
+                            options.verbose
+                        );
+                        if (!fs.existsSync(configFile)) {
+                            throw new Error(`Can't find file ${configFile}`);
+                        }
                     }
-
                     let uploader: MindConnectAgent | EventManagementClient;
                     let assetid = options.assetid;
 
-                    if (options.passkey === undefined) {
+                    if (options.config) {
                         ({ assetid, uploader } = await getMindConnectAgent(assetid, options, spinner, color));
                     } else {
                         uploader = getEventManager(options);
@@ -103,8 +104,7 @@ export default (program: CommanderStatic) => {
 };
 
 function getEventManager(options: any) {
-    const auth = loadAuth();
-    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
+    const sdk = getSdk(options);
     const uploader = sdk.GetEventManagementClient();
     return uploader;
 }

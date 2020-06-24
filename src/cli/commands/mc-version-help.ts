@@ -23,7 +23,7 @@ export default (program: CommanderStatic) => {
         log(`    the ${blue("blue colored commands @")} use analytical functions of MindSphere`);
         log(`    the ${green("green colored commands #")} are used as setup and utility commands`);
         log(`    the ${yellow("yellow colored commands &")} use borrowed mindsphere application cookies`);
-        log(`    the app or service credentials should only be used in secure environments`);
+        log(`    the credentials and cookies should only be used in secure environments`);
         log(`    Full documentation: ${cyan("https://opensource.mindsphere.io")}\n`);
     });
 

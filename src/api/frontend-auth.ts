@@ -1,5 +1,5 @@
 import fetch from "cross-fetch";
-import { TokenRotation } from "./mindconnect-base";
+import { MindConnectBase, TokenRotation } from "./mindconnect-base";
 import { removeUndefined, throwError } from "./utils";
 
 function log(message: string) {
@@ -9,61 +9,13 @@ function log(message: string) {
 }
 
 /**
- * If the SDK is run in Browser this class implements the necessary HTTP handling.
+ *  Frontend Auth for Backend (only used from CLI)
  *
  * @export
  * @class BrowserAuth
  * @implements {TokenRotation}
  */
-export class BrowserAuth implements TokenRotation {
-    protected _headers = {
-        Accept: "*/*",
-        "X-Powered-By": "meowz",
-    };
-
-    /**
-     * Http headers used for /exchange endpoint handling.
-     *
-     * @protected
-     * @memberof MindConnectBase
-     */
-    protected _multipartHeaders = {
-        ...this._headers,
-        "Content-Type": "multipart/mixed; boundary=mindspheremessage",
-    };
-
-    protected _multipartFormData = {
-        ...this._headers,
-        "Content-Type": "multipart/form-data; boundary=--mindsphere",
-    };
-
-    /**
-     * Http headers used for onboarding message.
-     *
-     * @protected
-     * @memberof MindConnectBase
-     */
-    protected _apiHeaders = {
-        ...this._headers,
-        "Content-Type": "application/json",
-    };
-
-    protected _octetStreamHeaders = {
-        ...this._headers,
-        "Content-Type": "application/octet-stream",
-    };
-
-    /**
-     * Http headers used to register the client assertion and acquire the /exchange token.
-     *
-     * @protected
-     * @memberof MindConnectBase
-     */
-    protected _urlEncodedHeaders = {
-        ...this._headers,
-        "Content-Type": "application/x-www-form-urlencoded",
-    };
-
+export class FrontendAuth extends MindConnectBase implements TokenRotation {
     /**
      * perform http action
      *
@@ -141,7 +93,13 @@ export class BrowserAuth implements TokenRotation {
             delete headers["Content-Type"];
         }
 
-        const xsrfTokenFromCookie = this.getCookieValue("XSRF-TOKEN");
+        // this is only used in commands when working with browser authorization
+
+        if (this._sesionCookie && this._xsrfToken) {
+            headers["cookie"] = `SESSION=${this._sesionCookie}; XSRF-TOKEN=${this._xsrfToken}`;
+        }
+
+        const xsrfTokenFromCookie = this._xsrfToken || this.getCookieValue("XSRF-TOKEN");
 
         if (xsrfTokenFromCookie && xsrfTokenFromCookie !== "") {
             headers["x-xsrf-token"] = xsrfTokenFromCookie;
@@ -151,18 +109,22 @@ export class BrowserAuth implements TokenRotation {
         }
 
         headers = removeUndefined({ ...headers, ...additionalHeaders });
-
-        const url = `${baseUrl}`;
+        const url = this.isNodeOrCliCall() ? `${gateway}${baseUrl}` : `${baseUrl}`;
 
         log(`${message || ""} Headers ${JSON.stringify(headers)} Url ${url}`);
         try {
-            const request: any = { method: verb, headers: headers, credentials: "include" };
+            const request: any = {
+                method: verb,
+                headers: headers,
+                credentials: "include",
+                agent: this._proxyHttpAgent,
+            };
+
             if (verb !== "GET" && verb !== "DELETE") {
                 request.body = octetStream || multiPartFormData ? body : JSON.stringify(body);
             }
 
-            const f = typeof window === "undefined" ? fetch : window.fetch;
-            const response = await f(url, request);
+            const response = await fetch(url, request);
             const codeIgnored = ignoreCodes.indexOf(response.status) >= 0;
 
             !codeIgnored && !response.ok && throwError(`${response.statusText} ${await response.text()}`);
@@ -189,6 +151,10 @@ export class BrowserAuth implements TokenRotation {
             log(err);
             throw new Error(`Network error occured ${err.message}`);
         }
+    }
+
+    private isNodeOrCliCall() {
+        return this._sesionCookie && this._xsrfToken;
     }
 
     /**
@@ -221,7 +187,7 @@ export class BrowserAuth implements TokenRotation {
      * @memberOf BrowserAuth
      */
     GetGateway(): string {
-        return ""; // the mindsphere gateway is doing this for us
+        return this._gateway; // the mindsphere gateway is doing this for us
     }
 
     /**
@@ -244,5 +210,7 @@ export class BrowserAuth implements TokenRotation {
         return b ? b.pop() : "";
     }
 
-    constructor() {}
+    constructor(private _gateway: string = "", private _sesionCookie: string, private _xsrfToken: string) {
+        super();
+    }
 }

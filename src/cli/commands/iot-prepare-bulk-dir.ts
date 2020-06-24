@@ -1,12 +1,22 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
-import { AssetManagementClient, AssetManagementModels } from "../../api/sdk";
-import { authJson, checkAssetId, decrypt, loadAuth, throwError } from "../../api/utils";
-import { directoryReadyLog, errorLog, getColor, subtractSecond, verboseLog } from "./command-utils";
+import { AssetManagementModels, MindSphereSdk } from "../../api/sdk";
+import { checkAssetId, throwError } from "../../api/utils";
+import {
+    adjustColor,
+    directoryReadyLog,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    proxyLog,
+    subtractSecond,
+    verboseLog,
+} from "./command-utils";
 import ora = require("ora");
 
-const color = getColor("magenta");
+let color = getColor("magenta");
 const yellow = getColor("yellow");
 
 export default (program: CommanderStatic) => {
@@ -28,9 +38,13 @@ export default (program: CommanderStatic) => {
             (async () => {
                 try {
                     checkRequiredParamaters(options);
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
+                    homeDirLog(options.verbose, color);
+                    proxyLog(options.verbose, color);
+
                     const path = makeCsvAndJsonDir(options);
-                    const auth = loadAuth();
-                    const { root, asset, aspects } = await getAssetAndAspects(auth, options);
+                    const { root, asset, aspects } = await getAssetAndAspects(sdk, options);
 
                     checkTwinTypeOfAsset(asset, options);
 
@@ -107,8 +121,8 @@ export default (program: CommanderStatic) => {
         });
 };
 
-async function getAssetAndAspects(auth: authJson, options: any) {
-    const assetMgmt = new AssetManagementClient({ ...auth, basicAuth: decrypt(auth, options.passkey) });
+async function getAssetAndAspects(sdk: MindSphereSdk, options: any) {
+    const assetMgmt = sdk.GetAssetManagementClient();
     let aspects: any[] = [];
     let asset;
     if (options.assetid) {
@@ -148,12 +162,6 @@ function checkRequiredParamaters(options: any) {
 
     verboseLog(`creating directory: ${color(options.dir)}`, options.verbose);
     fs.existsSync(options.dir) && throwError(`the directory ${color(options.dir)} already exists`);
-
-    !options.passkey &&
-        errorLog(
-            "you have to provide a passkey to get the service token (run mc pb --help for full description)",
-            true
-        );
 }
 
 const generateRandom = (() => {

@@ -1,12 +1,21 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as path from "path";
-import { MindSphereSdk } from "../../api/sdk/";
-import { decrypt, loadAuth, retry } from "../../api/utils";
-import { errorLog, getColor, humanFileSize, serviceCredentialLog, verboseLog } from "./command-utils";
+import { retry } from "../../api/utils";
+import {
+    adjustColor,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    humanFileSize,
+    proxyLog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
 import ora = require("ora");
 
-const color = getColor("magenta");
+let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -22,10 +31,12 @@ export default (program: CommanderStatic) => {
         .action((options) => {
             (async () => {
                 try {
-                    checkParameters(options);
+                    checkRequiredParameters(options);
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
+                    homeDirLog(options.verbose, color);
+                    proxyLog(options.verbose, color);
 
-                    const auth = loadAuth();
-                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
                     const iotFileClient = sdk.GetIoTFileClient();
                     let fullpath = options.filepath ? `${options.filepath}/${options.file}` : `${options.file}`;
                     fullpath = fullpath.replace("//", "/");
@@ -83,12 +94,7 @@ export default (program: CommanderStatic) => {
         });
 };
 
-function checkParameters(options: any) {
-    !options.passkey &&
-        errorLog(
-            "you have to provide a passkey to get the service token (run mc de --help for full description)",
-            true
-        );
+function checkRequiredParameters(options: any) {
     !options.file &&
         errorLog("Missing file name for delete-file command. Run mc de --help for full syntax and examples.", true);
 

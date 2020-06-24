@@ -3,13 +3,22 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import * as util from "util";
-import { MindSphereSdk } from "../../api/sdk/";
-import { checksumFile, decrypt, loadAuth, retry, throwError } from "../../api/utils";
-import { errorLog, getColor, humanFileSize, serviceCredentialLog, verboseLog } from "./command-utils";
+import { checksumFile, retry, throwError } from "../../api/utils";
+import {
+    adjustColor,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    humanFileSize,
+    proxyLog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
 import ora = require("ora");
 const streamPipeline = util.promisify(require("stream").pipeline);
 
-const color = getColor("magenta");
+let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -26,9 +35,10 @@ export default (program: CommanderStatic) => {
             (async () => {
                 try {
                     checkParameters(options);
-
-                    const auth = loadAuth();
-                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
+                    color = adjustColor(color, options);
+                    homeDirLog(options.verbose, color);
+                    proxyLog(options.verbose, color);
+                    const sdk = getSdk(options);
                     const iotFileClient = sdk.GetIoTFileClient();
                     let fullpath = options.filepath ? `${options.filepath}/${options.file}` : `${options.file}`;
                     fullpath = fullpath.replace("//", "/");
@@ -98,11 +108,6 @@ export default (program: CommanderStatic) => {
 };
 
 function checkParameters(options: any) {
-    !options.passkey &&
-        errorLog(
-            "you have to provide a passkey to get the service token (run mc df --help for full description)",
-            true
-        );
     !options.file &&
         errorLog("Missing file name for download-file command. Run mc df --help for full syntax and examples.", true);
 

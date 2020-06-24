@@ -4,19 +4,20 @@ import * as fs from "fs";
 import * as path from "path";
 import { retry } from "../..";
 import { IMindConnectConfiguration } from "../../api/mindconnect-models";
-import { MindSphereSdk } from "../../api/sdk";
-import { decrypt, loadAuth, throwError } from "../../api/utils";
+import { throwError } from "../../api/utils";
 import {
+    adjustColor,
     agentConfigLog,
     errorLog,
     getColor,
+    getSdk,
     homeDirLog,
     proxyLog,
     retrylog,
     serviceCredentialLog,
 } from "./command-utils";
 
-const color = getColor("magenta");
+let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -31,12 +32,11 @@ export default (program: CommanderStatic) => {
         .action((options) => {
             (async () => {
                 try {
+                    checkRequiredParamaters(options);
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
-                    checkRequiredParamaters(options);
-
-                    const auth = loadAuth();
-                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     let agentid = options.agentid;
 
@@ -87,9 +87,6 @@ export default (program: CommanderStatic) => {
 };
 
 function checkRequiredParamaters(options: any) {
-    !options.passkey &&
-        errorLog("you have to provide a passkey to offboard an agent (run mc of --help for full description)", true);
-
     !options.agentid &&
         !options.config &&
         errorLog("you have to provide a filename for the agent configuration or assetid of the agent", true);

@@ -3,20 +3,19 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { MindConnectAgent, retry } from "../..";
-import { MindSphereSdk } from "../../api/sdk";
-import { checkCertificate, decrypt, getAgentDir, loadAuth } from "../../api/utils";
-import { errorLog, getColor, homeDirLog, proxyLog, retrylog, verboseLog } from "./command-utils";
+import { checkCertificate, getAgentDir } from "../../api/utils";
+import { adjustColor, errorLog, getColor, getSdk, homeDirLog, proxyLog, retrylog, verboseLog } from "./command-utils";
 import ora = require("ora");
 const mime = require("mime-types");
 
 let color = getColor("cyan");
-const adminColor = getColor("magenta");
+let adminColor = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
         .command("upload-file")
         .alias("uf")
-        .option("-c, --config <agentconfig>", "config file with agent configuration", "agentconfig.json")
+        .option("-c, --config <agentconfig>", "config file with agent configuration")
         .option(
             "-r, --cert [privatekey]",
             "required for agents with RSA_3072 profile. create with: openssl genrsa -out private.key 3072"
@@ -40,7 +39,8 @@ export default (program: CommanderStatic) => {
         .action((options) => {
             (async () => {
                 try {
-                    color = options.passkey ? adminColor : color;
+                    adminColor = adjustColor(adminColor, options);
+                    color = options.config === undefined ? adminColor : color;
                     checkParameters(options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
@@ -59,10 +59,11 @@ export default (program: CommanderStatic) => {
                     let assetid = options.assetid;
                     const chunked = options.chunked ? true : false;
 
-                    if (options.passkey === undefined) {
+                    if (options.config) {
                         ({ assetid, uploader } = await getMindConnectAgent(assetid, options, spinner, color));
                     } else {
-                        uploader = getIotFileUploader(options);
+                        const sdk = getSdk(options);
+                        uploader = sdk.GetIoTFileClient();
                     }
 
                     const mimeType = options.mime || mime.lookup(uploadFile) || "application/octet-stream";
@@ -136,12 +137,6 @@ export default (program: CommanderStatic) => {
             );
         });
 };
-function getIotFileUploader(options: any) {
-    const auth = loadAuth();
-    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
-    const uploader = sdk.GetIoTFileClient();
-    return uploader;
-}
 
 export async function getMindConnectAgent(assetid: any, options: any, spinner: any, color: Function) {
     const configFile = path.resolve(options.config);
@@ -172,7 +167,7 @@ export async function getMindConnectAgent(assetid: any, options: any, spinner: a
 function checkParameters(options: any) {
     !options.file &&
         errorLog("Missing file name for upload-file command. Run mc uf --help for full syntax and examples.", true);
-    options.passkey &&
+    !options.config &&
         !options.assetid &&
         errorLog(" You have to specify assetid when using service credential upload", true);
 }

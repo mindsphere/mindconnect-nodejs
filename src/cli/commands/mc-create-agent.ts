@@ -1,13 +1,15 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
-import { AgentManagementModels, AssetManagementModels, MindSphereSdk } from "../..";
+import { AgentManagementModels, AssetManagementModels } from "../..";
 import { sleep } from "../../../test/test-utils";
-import { decrypt, loadAuth, retry, throwError } from "../../api/utils";
+import { retry, throwError } from "../../api/utils";
 import {
+    adjustColor,
     agentConfigLog,
     errorLog,
     getColor,
+    getSdk,
     homeDirLog,
     proxyLog,
     retrylog,
@@ -15,7 +17,7 @@ import {
     verboseLog,
 } from "./command-utils";
 
-const color = getColor("magenta");
+let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -36,12 +38,11 @@ export default (program: CommanderStatic) => {
         .action((options) => {
             (async () => {
                 try {
+                    checkRequiredParamaters(options);
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
-                    checkRequiredParamaters(options);
-
-                    const auth = loadAuth();
-                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     const am = sdk.GetAssetManagementClient();
                     const ag = sdk.GetAgentManagementClient();
@@ -112,12 +113,6 @@ export default (program: CommanderStatic) => {
 };
 
 function checkRequiredParamaters(options: any) {
-    !options.passkey &&
-        errorLog(
-            "you have to provide a passkey to get the service token (run mc ca --help for full description)",
-            true
-        );
-
     !options.config && errorLog("you have to provide a filename for the agent configuration", true);
 
     options.profile !== "SHARED_SECRET" &&

@@ -2,10 +2,18 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as jwt from "jsonwebtoken";
 import { retry } from "../..";
-import { MindSphereSdk } from "../../api/sdk";
-import { decrypt, loadAuth } from "../../api/utils";
-import { errorLog, getColor, homeDirLog, proxyLog, retrylog, serviceCredentialLog, verboseLog } from "./command-utils";
-const color = getColor("magenta");
+import {
+    adjustColor,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    proxyLog,
+    retrylog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
+let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -18,26 +26,30 @@ export default (program: CommanderStatic) => {
         .action((options) => {
             (async () => {
                 try {
+                    // checkRequiredParamaters(options);
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
 
-                    if (!options.passkey) {
-                        errorLog(
-                            "you have to provide a passkey to get the service token (run mc stk --help for full description)",
-                            true
+                    if (options._selected_mode === "cookie") {
+                        console.log(`borrowed cookie authentication is using ${color("cookies")} and not using tokens`);
+                        verboseLog(`${color("MDSP_SESSION")}=${process.env.MDSP_SESSION}`, options.verbose);
+                        verboseLog(`${color("MDSP_XSRF_TOKEN")}=${process.env.MDSP_XSRF_TOKEN}`, options.verbose);
+                        verboseLog(`${color("MDSP_HOST")}=${process.env.MDSP_HOST}`, options.verbose);
+                    } else {
+                        let token: string = "";
+                        await retry(
+                            options.retry,
+                            async () => (token = await sdk.GetToken()),
+                            300,
+                            retrylog("GetToken")
                         );
+
+                        log(token);
+                        verboseLog("decoded token:\n", options.verbose);
+                        verboseLog(JSON.stringify(jwt.decode(token, { complete: true }), null, 2), options.verbose);
                     }
-                    const auth = loadAuth();
-
-                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
-
-                    verboseLog("encoded token:\n", options.verbose);
-                    let token: string = "";
-                    await retry(options.retry, async () => (token = await sdk.GetToken()), 300, retrylog("GetToken"));
-
-                    log(token);
-                    verboseLog("decoded token:\n", options.verbose);
-                    verboseLog(JSON.stringify(jwt.decode(token, { complete: true }), null, 2), options.verbose);
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }

@@ -1,6 +1,6 @@
 import * as chalk from "chalk";
 import { log } from "console";
-import { BrowserAuth } from "../../api/browser-auth";
+import { FrontendAuth } from "../../api/frontend-auth";
 import { AssetManagementModels, MindSphereSdk } from "../../api/sdk";
 import { decrypt, getHomeDotMcDir, loadAuth } from "../../api/utils";
 
@@ -92,19 +92,19 @@ export const directoryReadyLog = ({
     log(`\nthe directory ${green(path)} is ${green("ready")}`);
     log(`you can now edit the template files in the directory`);
     log(`\nwhen you are done run:`);
-    log(`\tmc ${magenta(runCommand)} command to upload files and start the job`);
+    log(`\tmc ${runCommand} command to upload files and start the job`);
     log(`\nchecking progress:`);
-    log(`\tmc ${magenta(jobCommand)} to check the progress of the job`);
+    log(`\tmc ${jobCommand} to check the progress of the job`);
 };
 
-export function modeInformation(asset: AssetManagementModels.AssetResourceWithHierarchyPath, options: any) {
+export function modeInformation(asset: AssetManagementModels.AssetResourceWithHierarchyPath, options: any, color: any) {
     const MAX_SIZE_FOR_TS = 100;
     console.log(
         `\nRunning ${
             options.timeseries
                 ? `${yellow("standard")} TimeSeries ${yellow("(deprecated)")}`
-                : `${magenta("bulk")} TimeSeries`
-        } ingest for ${magenta(asset.name)} of type ${magenta("" + asset.typeId)} with twintype ${magenta(
+                : `${color("bulk")} TimeSeries`
+        } ingest for ${color(asset.name)} of type ${color("" + asset.typeId)} with twintype ${color(
             "" + asset.twinType
         )}`
     );
@@ -112,11 +112,11 @@ export function modeInformation(asset: AssetManagementModels.AssetResourceWithHi
         if (parseInt(options.size, 10) > MAX_SIZE_FOR_TS) {
             options.size = MAX_SIZE_FOR_TS;
         }
-        console.log(`\n${magenta("Important:")}`);
-        console.log(`\nYou are using the ${magenta("standard timeseries")} ingest for the asset.`);
-        console.log(`The calls to the API will be ${magenta("throttled")} to match your throttling limits.`);
-        console.log(`The number of the records per message will be reduced to ${magenta(options.size)} per message.\n`);
-        console.log(`Using this feature has a direct impact on ${magenta("your")} MindSphere resource consumption.`);
+        console.log(`\n${color("Important:")}`);
+        console.log(`\nYou are using the ${color("standard timeseries")} ingest for the asset.`);
+        console.log(`The calls to the API will be ${color("throttled")} to match your throttling limits.`);
+        console.log(`The number of the records per message will be reduced to ${color(options.size)} per message.\n`);
+        console.log(`Using this feature has a direct impact on ${color("your")} MindSphere resource consumption.`);
         console.log(`You might get a notice that you will need to upgrade your account's data ingest rate.`);
         console.log(`${yellow("Warning")} This feature is ${yellow("deprecated")}!\n`);
     }
@@ -148,6 +148,8 @@ export function getSdk(options: any) {
             `The passkey was specified as command line option using ${magenta("service/app credentials")}`,
             options.verbose
         );
+
+        options._selected_mode = "passkey";
         sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
     } else if (process.env.MDSP_PASSKEY && process.env.MDSP_PASSKEY !== "") {
         verboseLog(
@@ -157,6 +159,7 @@ export function getSdk(options: any) {
             options.verbose
         );
         options.passkey = process.env.MDSP_PASSKEY;
+        options._selected_mode = "passkey";
         sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
     } else if (process.env.MDSP_HOST && process.env.MDSP_SESSION && process.env.MDSP_XSRF_TOKEN) {
         verboseLog(
@@ -166,9 +169,13 @@ export function getSdk(options: any) {
             options.verbose
         );
 
-        sdk = new MindSphereSdk(
-            new BrowserAuth(process.env.MDSP_HOST, process.env.MDSP_SESSION, process.env.MDSP_XSRF_TOKEN)
-        );
+        let host = process.env.MDSP_HOST || "";
+        if (!process.env.MDSP_HOST.toLowerCase().startsWith("https://")) {
+            host = `https://${host}`;
+        }
+
+        sdk = new MindSphereSdk(new FrontendAuth(host, process.env.MDSP_SESSION, process.env.MDSP_XSRF_TOKEN));
+        options._selected_mode = "cookie";
     } else {
         throw new Error("The passkey was not provided and there are no environment variables");
     }
