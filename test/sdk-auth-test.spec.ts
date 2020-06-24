@@ -7,17 +7,17 @@ const log = debug("mindconnect-agent-test");
 chai.should();
 
 describe("[SDK] using different auths", () => {
-    it.only("should instantiate", () => {
+    it("should instantiate", () => {
         const sdk = new MindSphereSdk();
         sdk.should.not.be.undefined;
     });
 
-    it.only("should instantiate with browser auth", () => {
+    it("should instantiate with browser auth", () => {
         const sdk = new MindSphereSdk(new BrowserAuth());
         sdk.should.not.be.undefined;
     });
 
-    it.only("should instantiate with backend auth", async () => {
+    it("should instantiate with backend auth", async () => {
         const sdk = new MindSphereSdk(new UserAuth("123", "https://gateway.eu1.mindsphere.io"));
         sdk.should.not.be.undefined;
         sdk.GetGateway().should.equal("https://gateway.eu1.mindsphere.io");
@@ -25,7 +25,7 @@ describe("[SDK] using different auths", () => {
         token.should.equal("123");
     });
 
-    it.only("should instantiate with backend auth and bearer", async () => {
+    it("should instantiate with backend auth and bearer", async () => {
         const sdk = new MindSphereSdk(new UserAuth("Bearer 123", "https://gateway.eu1.mindsphere.io"));
         sdk.should.not.be.undefined;
         sdk.GetGateway().should.equal("https://gateway.eu1.mindsphere.io");
@@ -33,7 +33,7 @@ describe("[SDK] using different auths", () => {
         token.should.equal("123");
     });
 
-    it.only("should instantiate with CredentialsAuth", async () => {
+    it("should instantiate with CredentialsAuth", async () => {
         const sdk = new MindSphereSdk(
             new CredentialAuth(
                 "https://gateway.eu1.mindsphere.io",
@@ -47,7 +47,7 @@ describe("[SDK] using different auths", () => {
         sdk.GetKPICalculationClient().GetTenant().should.equal("test");
     });
 
-    it.only("should instantiate with ServiceCredentials", async () => {
+    it("should instantiate with ServiceCredentials", async () => {
         const sdk = new MindSphereSdk({
             gateway: "https://gateway.eu1.mindsphere.io",
             basicAuth: "Basic: " + Buffer.from("a:b").toString("base64"),
@@ -59,7 +59,7 @@ describe("[SDK] using different auths", () => {
         sdk.GetKPICalculationClient().GetTenant().should.equal("test");
     });
 
-    it.only("should instantiate with AppCredentials", async () => {
+    it("should instantiate with AppCredentials", async () => {
         const sdk = new MindSphereSdk({
             gateway: "https://gateway.eu1.mindsphere.io",
             basicAuth: "Basic: " + Buffer.from("a:b").toString("base64"),
