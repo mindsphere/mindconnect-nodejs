@@ -86,8 +86,7 @@ pipeline {
         mc download-file --file agent.unittest.json --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
         mc delete-file --file $filename --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
         mc iam --mode list --group
-        cd ..
-        rm -rf clitest
+       
         '''
       }
     }
