@@ -1,7 +1,8 @@
 import * as chalk from "chalk";
 import { log } from "console";
-import { AssetManagementModels } from "../../api/sdk";
-import { getHomeDotMcDir } from "../../api/utils";
+import { BrowserAuth } from "../../api/browser-auth";
+import { AssetManagementModels, MindSphereSdk } from "../../api/sdk";
+import { decrypt, getHomeDotMcDir, loadAuth } from "../../api/utils";
 
 const magenta = getColor("magenta");
 const yellow = getColor("yellow");
@@ -123,6 +124,46 @@ export function modeInformation(asset: AssetManagementModels.AssetResourceWithHi
 
 export function getColor(name: string) {
     return chalk.level < 2 ? (chalk as any)[name] : (chalk as any)[`${name}Bright`];
+}
+
+export function adjustColor(color: any, options: any) {
+    if (process.env.MDSP_PASSKEY || options.passkey) {
+        return getColor("magenta");
+    } else if (process.env.MDSP_HOST && process.env.MDSP_SESSION && process.env.MDSP_XSRF_TOKEN) {
+        return getColor("yellow");
+    } else {
+        return color;
+    }
+}
+
+export function getSdk(options: any) {
+    const auth = loadAuth();
+
+    let sdk: MindSphereSdk;
+    const magenta = getColor("magenta");
+    const yellow = getColor("yellow");
+
+    if (options.passkey) {
+        console.log(`The passkey was specified as command line option using ${magenta("service/app credentials")}`);
+        sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
+    } else if (process.env.MDSP_PASSKEY && process.env.MDSP_PASSKEY !== "") {
+        console.log(
+            `The passkey was specified in environment variable MDSP_PASSKEY using ${magenta("service/app credentials")}`
+        );
+        options.passkey = process.env.MDSP_PASSKEY;
+        sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
+    } else if (process.env.MDSP_HOST && process.env.MDSP_SESSION && process.env.MDSP_XSRF_TOKEN) {
+        console.log(
+            `Using borrowed SESSION and XSRF-TOKEN cookies from ${yellow(process.env.MDSP_HOST)} for authentication`
+        );
+
+        sdk = new MindSphereSdk(
+            new BrowserAuth(process.env.MDSP_HOST, process.env.MDSP_SESSION, process.env.MDSP_XSRF_TOKEN)
+        );
+    } else {
+        throw new Error("The passkey was not provided and there are no environment variables");
+    }
+    return sdk;
 }
 
 export function agentConfigLog({

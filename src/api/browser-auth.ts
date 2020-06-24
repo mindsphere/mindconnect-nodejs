@@ -1,8 +1,9 @@
+import fetch from "cross-fetch";
 import { TokenRotation } from "./mindconnect-base";
 import { removeUndefined, throwError } from "./utils";
 
 function log(message: string) {
-    if ((window as any).DEBUGSDK === true) {
+    if (typeof window !== "undefined" && (window as any).DEBUGSDK === true) {
         console.log(message);
     }
 }
@@ -140,7 +141,13 @@ export class BrowserAuth implements TokenRotation {
             delete headers["Content-Type"];
         }
 
-        const xsrfTokenFromCookie = this.getCookieValue("XSRF-TOKEN");
+        // this is only used in commands when working with browser authorization
+
+        if (this._sesionCookie && this._xsrfToken) {
+            headers["cookie"] = `SESSION=${this._sesionCookie}; XSRF-TOKEN=${this._xsrfToken}`;
+        }
+
+        const xsrfTokenFromCookie = this._xsrfToken || this.getCookieValue("XSRF-TOKEN");
 
         if (xsrfTokenFromCookie && xsrfTokenFromCookie !== "") {
             headers["x-xsrf-token"] = xsrfTokenFromCookie;
@@ -151,14 +158,20 @@ export class BrowserAuth implements TokenRotation {
 
         headers = removeUndefined({ ...headers, ...additionalHeaders });
 
-        const url = `${gateway}${baseUrl}`;
+        this.isNodeOrCliCall();
+        const url = this.isNodeOrCliCall() ? `https://${gateway}${baseUrl}` : `${baseUrl}`;
+
         log(`${message || ""} Headers ${JSON.stringify(headers)} Url ${url}`);
         try {
             const request: any = { method: verb, headers: headers, credentials: "include" };
             if (verb !== "GET" && verb !== "DELETE") {
                 request.body = octetStream || multiPartFormData ? body : JSON.stringify(body);
             }
-            const response = await window.fetch(url, request);
+            // // const f = window ? window.fetch : fetch;
+            // console.log(url, request);
+
+            const f = typeof window === "undefined" ? fetch : window.fetch;
+            const response = await f(url, request);
             const codeIgnored = ignoreCodes.indexOf(response.status) >= 0;
 
             !codeIgnored && !response.ok && throwError(`${response.statusText} ${await response.text()}`);
@@ -185,6 +198,10 @@ export class BrowserAuth implements TokenRotation {
             log(err);
             throw new Error(`Network error occured ${err.message}`);
         }
+    }
+
+    private isNodeOrCliCall() {
+        return this._sesionCookie && this._xsrfToken;
     }
 
     /**
@@ -217,7 +234,7 @@ export class BrowserAuth implements TokenRotation {
      * @memberOf BrowserAuth
      */
     GetGateway(): string {
-        return ""; // the mindsphere gateway is doing this for us
+        return this._gateway; // the mindsphere gateway is doing this for us
     }
 
     /**
@@ -233,7 +250,12 @@ export class BrowserAuth implements TokenRotation {
     }
 
     private getCookieValue(a: string) {
+        if (!document) {
+            return undefined;
+        }
         const b = document.cookie.match("(^|;)\\s*" + a + "\\s*=\\s*([^;]+)");
         return b ? b.pop() : "";
     }
+
+    constructor(private _gateway: string = "", private _sesionCookie?: string, private _xsrfToken?: string) {}
 }

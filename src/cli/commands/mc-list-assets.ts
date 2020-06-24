@@ -1,10 +1,19 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
-import { AssetManagementModels, MindSphereSdk } from "../../api/sdk";
-import { decrypt, loadAuth, retry } from "../../api/utils";
-import { errorLog, getColor, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
+import { AssetManagementModels } from "../../api/sdk";
+import { retry } from "../../api/utils";
+import {
+    adjustColor,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    proxyLog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
 
-const color = getColor("magenta");
+let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -25,17 +34,15 @@ export default (program: CommanderStatic) => {
         .action((options) => {
             (async () => {
                 try {
+                    checkRequiredParameters(options);
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
-
-                    checkRequiredParameters(options);
-                    const auth = loadAuth();
-                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     const assetMgmt = sdk.GetAssetManagementClient();
 
                     let page = 0;
-
                     let assets;
 
                     const filter = buildFilter(options);
@@ -89,6 +96,7 @@ export default (program: CommanderStatic) => {
             serviceCredentialLog();
         });
 };
+
 function buildFilter(options: any) {
     const filter = (options.filter && JSON.parse(options.filter)) || {};
     let pointer = filter;
@@ -106,9 +114,9 @@ function buildFilter(options: any) {
 }
 
 function checkRequiredParameters(options: any) {
-    !options.passkey &&
-        errorLog(
-            "you have to provide a passkey to get the service token (run mc la --help for full description)",
-            true
-        );
+    // !options.passkey &&
+    // errorLog(
+    //     "you have to provide a passkey to get the service token (run mc la --help for full description)",
+    //     true
+    // );
 }
