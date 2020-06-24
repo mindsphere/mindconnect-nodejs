@@ -39,7 +39,7 @@ mkdir clitest
 cd clitest
 alias mc='node ../src/cli/mc'
 set -e
-MDSP_PASSKEY=passkey.4.unit.test
+export MDSP_PASSKEY=passkey.4.unit.test
 mc create-agent --config agent.unittest.json
 mc onboard --config agent.unittest.json
 mc atk --config agent.unittest.json
