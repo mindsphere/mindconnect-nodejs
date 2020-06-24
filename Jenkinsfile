@@ -37,6 +37,7 @@ pipeline {
         sh '''
 mkdir clitest
 cd clitest
+alias lmc='node ../src/cli/mc'
 set -e
 MDSP_PASSKEY=passkey.4.unit.test
 mc create-agent --config agent.unittest.json

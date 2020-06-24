@@ -6,7 +6,7 @@ import * as https from "https";
 import * as url from "url";
 import { MindSphereSdk } from "../../api/sdk";
 import { authJson, decrypt, loadAuth, throwError } from "../../api/utils";
-import { errorLog, getColor, homeDirLog, proxyLog } from "./command-utils";
+import { errorLog, getColor, homeDirLog, proxyLog, verboseLog } from "./command-utils";
 import chalk = require("chalk");
 const HttpsProxyAgent = require("https-proxy-agent");
 
@@ -57,7 +57,10 @@ export default (program: CommanderStatic) => {
                         options.session = options.session || process.env.MDSP_SESSION;
                         options.xsrftoken = options.xsrftoken || process.env.MDSP_XSRF_TOKEN;
                         options.host = options.host || process.env.MDSP_HOST;
-                        console.log(options.session, options.xsrftoken, options.host);
+                        verboseLog(
+                            `${color("cookies:")} ${options.session}, ${options.xsrftoken}, ${options.host}`,
+                            options.verbose
+                        );
                     }
 
                     checkRequiredParamaters(options);
@@ -335,7 +338,7 @@ function keepAliveIfConfigured(options: any, proxyHttpAgent: any) {
                 agent: proxyHttpAgent,
             } as RequestInit);
 
-            const okColor = keepAlive.status >= 200 && keepAlive.status <= 399 ? color : red;
+            const okColor = keepAlive.status >= 200 && keepAlive.status <= 399 ? green : red;
             const finalLogColor = keepAlive.status >= 300 && keepAlive.status <= 499 ? chalk.gray : okColor;
 
             console.log(
