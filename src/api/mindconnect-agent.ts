@@ -1,17 +1,23 @@
 // Copyright (C), Siemens AG 2017
 import * as ajv from "ajv";
+import fetch from "cross-fetch";
 import * as debug from "debug";
-import fetch from "node-fetch";
 import * as path from "path";
 import "url-search-params-polyfill";
-import { DataSourceConfiguration, Mapping, retry } from "..";
 import { AgentAuth } from "./agent-auth";
-import { BaseEvent, DataPointValue, IMindConnectConfiguration, TimeStampedDataPoint } from "./mindconnect-models";
+import {
+    BaseEvent,
+    DataPointValue,
+    DataSourceConfiguration,
+    IMindConnectConfiguration,
+    Mapping,
+    TimeStampedDataPoint,
+} from "./mindconnect-models";
 import { bulkDataTemplate, dataTemplate } from "./mindconnect-template";
 import { dataValidator, eventValidator } from "./mindconnect-validators";
 import { MindSphereSdk } from "./sdk";
 import { fileUploadOptionalParameters, MultipartUploader } from "./sdk/common/multipart-uploader";
-import { throwError } from "./utils";
+import { retry, throwError } from "./utils";
 import _ = require("lodash");
 const log = debug("mindconnect-agent");
 /**
@@ -499,7 +505,7 @@ export class MindConnectAgent extends AgentAuth {
                 body: dataMessage,
                 headers: headers,
                 agent: this._proxyHttpAgent,
-            });
+            } as RequestInit);
             if (!response.ok) {
                 log({ method: method, body: dataMessage, headers: headers, agent: this._proxyHttpAgent });
                 log(response);

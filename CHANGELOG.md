@@ -2,7 +2,26 @@
 
 ## 3.8.0 - (Electric Blue Vienna) - June 2020
 
+### Highlights 3.8.0
+
+- Agent: added support for creating automatic data source configuration and automatic mappings
+- CLI: mc configure-agent can now automatically create the data source configuration and the mappings for selected assetid
+- CLI: cookie based authentication, you don't have to have service or app credentials (app/service credentials are still recommended)
 - SDK: typescript sdk released to beta status
+- SDK: typescript browser support (e.g. for react, angular, etc)
+- CLI: mc service-credentials command has now http based configuration frontend
+- CLI: mc dev-proxy added simple api proxy for mindsphere local app development
+
+### Contributions 3.8.0 heart: <3
+
+- Thanks to Sharath N.S. for contributing on automatic data source configuration and automatic mappings!
+
+### Bugfixes and Improvements 3.8.0
+
+- CLI: cookie based authentication, you don't have to have service or app credentials (app/service credentials are still recommended)
+- SDK: typescript sdk released to beta status
+- SDK: typescript browser support (e.g. for react, angular, etc)
+- SDK: IdentityManagementClient released to beta
 - SDK: AgentManagementClient released to beta
 - SDK: AssetManagementClient released to beta
 - SDK: EventManagementClient released to beta
@@ -15,13 +34,19 @@
 - SDK: TimeSeriesBulkClient released to beta
 - SDK: TimeSeriesClient released to beta
 - SDK: TrendPredictionClient released to beta
+- SDK: IdentityManagementClient released to beta
 - SDK: added utility class for MQTT OPC UA PubSub key rotation
+- SDK: added BrowserAuth to SDK
+- SDK: added UserAuth to SDK
 - SDK: added TokenManagerAuth to SDK
+- SDK: added ServiceCredentialsAuth to SDK
 - Agent: added support for creating automatic data source configuration and automatic mappings
 - Agent: added support for typed events
 - Agent: exposed Sdk() property on the Agent for future use (at the moment only some APIs of mindsphere can be called with Agent Credentials)
 - SDK: added utility class for MQTT OPC UA PubSub key rotation
 - SDK: added TokenManagerAuth to SDK
+- CLI: mc iam command can now manage mindsphere users
+- CLI: mc configure-agent can now automatically create the data source configuration and the mappings for selected assetid
 - CLI: mc configure-agent can now automatically create the data source configuration and the mappings for selected assetid
 - CLI: mc offboard-agent has now a command to offboard an agent with the id only  (mc offboard --assetid) (#130)
 - CLI: added mc mqtt-createjwt command which can create a key for MQTT OPC UA PubSub authentication
@@ -30,6 +55,7 @@
 - CLI: mc dev-proxy added simple api proxy for mindsphere local app development
 - CLI: deprecated use of classical service credentials
 - Improved documentation for GetDataSourceConfiguration and GetDataMappings methods (#149, #150)
+- Switched the fetch library to cross-fetch for browser support for SDK
 - bumped all dependencies
 
 ## 3.7.0 - (Boysenberry Vienna) - February 2020

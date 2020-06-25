@@ -46,3 +46,6 @@ license-checker.txt
 # signal validation
 timeseries-sample.json
 signal-validation-*.json
+
+#clitest
+clitest

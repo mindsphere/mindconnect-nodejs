@@ -2,7 +2,9 @@
 
 ## nodejs library for the MindConnect API (V3)
 
-![mindconnect-nodejs](images/mc3.png)
+<!-- markdownlint-disable MD033 -->
+<img src="images/mindconnect-nodejs-new-logo.svg" alt="mindconnect-nodejs" width="300px"/>
+<!-- markdownlint-enableMD033 -->
 
 The mindconnect-nodejs library enables the user to upload time series data, files and events to Siemens MindSphere Platform.
 
@@ -27,47 +29,23 @@ There are several ways to install the library. The most common one is via npm re
 
 ```bash
 # install the latest stable library from the npm registry
-npm install @mindconnect/mindconnect-nodejs
-
-# install the latest alpha version from the npm registry
-npm install @mindconnect/mindconnect-nodejs@alpha
+npm install @mindconnect/mindconnect-nodejs --save
+# install the latest alpha library from the npm registry
+npm install @mindconnect/mindconnect-nodejs@alpha --save
 ```
 
-As an alternative, you can also clone the repository, pack and install the files from local file:
-
-```bash
-# clone the repository and run in the library directory
-npm install
-npm pack
-
-#this creates a mindconnect-....tgz file
-
-# in your project directory run
-npm install mindconnect-...tgz --save
-```
-
-## Using CLI to generate starter projects
+## Getting started
 
 [![Documentation](https://img.shields.io/badge/cli-documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html)
 
-The easiest way to start is to use CLI to create a starter project:
+The easiest way to start is to use the provided command line interface to create a starter project:
 
 ```bash
-# install the library globaly if you want to use its command line interface.
- npm install -g @mindconnect/mindconnect-nodejs
-
 # for typescript nodejs project run
-mc starter-ts
+npx @mindconnect/mindconnect-nodejs starter-ts
 
 # for javascript nodejs project run
-mc starter-js
-
-# This will create a folder starterts (or starterjs) which you can use as a starting point for your agent.
-# Don't forget to run npm install there.
-
-# for full help run
-mc starter-ts --help # or
-mc starter-js --help
+npx @mindconnect/mindconnect-nodejs starter-js
 ```
 
 ## How to create a nodejs MindSphere agent
@@ -332,12 +310,16 @@ The library comes with the typescript SDK which can be used to access MindSphere
 
 [![SDK](https://img.shields.io/badge/SDK-full%20documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/sdk/index.html)
 
-It implements support for
+It implements support for both frontend (browser e.g. angular, react...) and backend development in node.js. and different MindSphere authentication types:
 
-- UserCredentials
-- AppCredentials
-- ServiceCredentials
-- MindSphere Agents
+**Frontend:**
+    - Browser (Session, Cookies)
+
+**Backend (node-js):**
+    - UserCredentials
+    - AppCredentials
+    - ServiceCredentials
+    - MindSphere Agents
 
 and Clients for following APIs
 
@@ -345,6 +327,7 @@ and Clients for following APIs
 - AssetManagementClient
 - EventManagementClient
 - IotFileClient
+- IdentityManagementClient
 - KPICalculationClient
 - MindConnectAPIClient
 - SignalValidationClient
@@ -354,10 +337,19 @@ and Clients for following APIs
 - TimeSeriesClient
 - TrendPredictionClient
 
-``` typescript
-// example Get Assets from MindSphere with custom AssetTypes
+The example below shows how to use the sdk.
 
-const sdk = new MindSphereSdk (...); // use UserCredentials, AppCredentials, ServiceCredentials or MindSphere agent in constructor
+``` typescript
+// The example shows how to  Get Assets from MindSphere with custom AssetType using frontend authentication
+// you can pass an instance an Authorizer (BrowserAuth, UserAuth, CredentialsAuth, TokenManagerAuth, MindConnectAgent)
+// to use different authorization types in MindSphere or implement the TokenRotation interface if you want to
+// provide your own authorizer.
+//
+// The default constructor uses frontend authorization.
+
+const sdk = new MindSphereSdk ();
+
+const sdk = new MindSphereSdk ();
 const am = sdk.GetAssetManagementClient();
 
 const assets = await am.GetAssets({
@@ -390,21 +382,24 @@ The library comes with a command line interface which can also be installed glob
 
 ### Configuring CLI
 
-First step is to configure the CLI. For this you will need either service credentials (which have been deprecated) or application credentials from your developer cockpit.
+First step is to configure the CLI. For this you will need a session cookie from mindsphere, service credentials (which have been deprecated) or application credentials from your developer cockpit.
 
-- how to get [application credentials](https://documentation.mindsphere.io/resources/html/developer-cockpit/en-US/124342231819.html)
-- how to get [service credentials (deprecated)](https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials)
+- [SESSION and XSRF-TOKEN cookie](https://developer.mindsphere.io/howto/howto-local-development.html#generate-user-credentials)
+- [Application Credentials](https://documentation.mindsphere.io/resources/html/developer-cockpit/en-US/124342231819.html)
+- [Service Credentials](https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials)
+
+First start the credentials configuration. This will start a web server on your local computer where you can enter the credentials.
 
 ```bash
 # run mc service-credentials --help for full information
-# this will start a web server on your local computer where you can enter the credentials
+
 $ mc service-credentials
 navigate to http://localhost:4994 to configure the CLI
 press CTRL + C to exit
 
 ```
 
-Navigate to [http://localhost:4994](http://localhost:4994) to configure the CLI.
+Navigate to [http://localhost:4994](http://localhost:4994) to configure the CLI. (see [full documentation](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html) for XSRF-TOKEN and SESSION)
 
 The image below shows the dialog for adding new credentials (press on the + sign in the upper left corner)
 
@@ -428,30 +423,132 @@ Here is an overview of CLI commands:
 mc --help
 ```
 
-![CLI](images/cli.png)
+```text
+Usage: mc [options] [command]
 
-### Important Command: Development Proxy
+Options:
+  -V, --version                       output the version number
+  -h, --help                          display help for command
+
+Commands:
+  onboard|ob [options]                onboard the agent with configuration
+                                      stored in the config file
+  configure-agent|co [options]        create data source configuration and
+                                      mappings (optional: passkey) *
+  agent-token|atk [options]           displays the agent token for use in
+                                      other tools (e.g. postman)
+  upload-timeseries|ts [options]      parse .csv file with timeseriesdata and
+                                      upload the timeseries data to mindsphere
+  upload-file|uf [options]            upload the file to the mindsphere file
+                                      service (optional: passkey) *
+  create-event|ce [options]           create an event in the mindsphere
+                                      (optional: passkey) *
+  agent-status|as [options]           displays the agent status and agent
+                                      onboarding status *
+  create-agent|ca [options]           create an agent in the mindsphere *
+  offboard-agent|of [options]         offboards the agent in the mindsphere *
+  renew-agent|rn [options]            renews the agent secrets  *
+  service-credentials|sc [options]    provide login for commands which
+                                      require technical user credentials *
+  service-token|stk [options]         displays the service token for use in
+                                      other tools (e.g. postman) *
+  register-diagnostic|rd [options]    register agent for diagnostic *
+  get-diagnostic|gd [options]         get diagnostic information *
+  unregister-diagnostic|ud [options]  unregister agent from diagnostic *
+  prepare-bulk|pb [options]           creates a template directory for
+                                      timeseries (bulk) upload *
+  run-bulk|rb [options]               runs the timeseries (bulk) upload job
+                                      from <directoryname> directory *
+  check-bulk|cb [options]             checks the progress of the upload jobs
+                                      from <directoryname> directory *
+  download-bulk|db [options]          download the timeseries from mindsphere
+  list-assets|la [options]            list assets in the tenant *
+  delete-asset|da [options]           delete asset with id <assetid> from
+                                      mindsphere *
+  list-files|ls [options]             list files stored with the asset *
+  download-file|df [options]          download the file from mindsphere file
+                                      service *
+  delete-file|de [options]            delete the file from mindsphere file
+                                      service *
+  identity-management|iam [options]   manage mindsphere users and groups *
+  spectrum-analysis|sp [options]      perform spectrum analysis on a sound
+                                      file @
+  signal-validation|sv [options]      perform signal validation @
+  trend-prediction|tp [options]       perform trend prediction
+                                      (linear/polynomial) @
+  kpi-calculation|kp [options]        calculate kpi states or compute kpis @
+  dev-proxy|px [options]              starts mindsphere development proxy
+                                      (optional passkey) *
+  mqtt-createjwt|jw [options]         creates a signed token for opcua pub
+                                      sub authentication #
+  starter-ts|st [options]             creates a starter project in typescript
+                                      #
+  starter-js|sj [options]             creates a starter project in javascript
+                                      #
+  help [command]                      display help for command
+
+  Documentation:
+
+    the magenta colored commands * use app or service credentials or borrowed mindsphere cookies
+    the cyan colored commands require mindconnectlib (agent) credentials
+    the blue colored commands @ use analytical functions of MindSphere
+    the green colored commands # are used as setup and utility commands
+    the yellow colored commands & use borrowed mindsphere application cookies
+    the credentials and cookies should only be used in secure environments
+    Full documentation: https://opensource.mindsphere.io
+
+```
+
+### MindSphere Development Proxy
 
 The CLI comes with a development proxy which can be used to kickstart your MindSphere development. It provides an endpoint
 at your local machine at
 
 [http://localhost:7707](http://localhost:7707)
 
-which will authenticate all requests with the configured app credentials or service credentials.
+which will authenticate all requests using either [a borrowed SESSION and XSRF-TOKEN cookie from MindSphere](https://developer.mindsphere.io/howto/howto-local-development.html#generate-user-credentials) or the the configured app credentials or service credentials.
 
-This endpoint can be used to simplify development of your MindSphere applications in your development environment or when using REST tools like postman etc.
+The command below will start your development proxy without any installation and configuration (you just need the cookies from an existing app):
+
+```bash
+npx @mindconnect/mindconnect-nodejs dev-proxy --session <SESSION-TOKEN> --xsrftoken <XSRF-TOKEN> --host <appname>.<tenant>.<region>.mindsphere.io
+```
+
+For more complex tasks install and configure the CLI
 
 ```text
-mc dev-proxy --passkey yourpasskey
+Usage: mc dev-proxy|px [options]
 
-CORS support on
-Rewrite hal+json support https://gateway.eu1.mindsphere.io -> http://localhost:7707 on
-warn on missing x-xsrf-token on
+starts mindsphere development proxy (optional passkey) *
 
-proxy is available at http://localhost:7707
-example api call (list of assets): http://localhost:7707/api/assetmanagement/v3/assets
-API documentation: https://developer.mindsphere.io/apis/index.html
-press CTRL + C to exit
+Options:
+  -m, --mode [credentials|session]  service/app credentials authentication of
+                                    session authentication (default: "session")
+  -o, --port <port>                 port for web server (default: "7707")
+  -r, --norewrite                   don't rewrite hal+json urls
+  -w, --nowarn                      don't warn for missing headers
+  -d, --dontkeepalive               don't keep the session alive
+  -v, --verbose                     verbose output
+  -s, --session <session>           borrowed SESSION cookie from brower
+  -x, --xsrftoken <xsrftoken>       borrowed XSRF-TOKEN cookie from browser
+  -h, --host <host>                 the address where SESSION and XSRF-TOKEN
+                                    have been borrowed from
+  -t, --timeout <timeout>           keep alive timeout in seconds (default:
+                                    "60")
+  -k, --passkey <passkey>           passkey
+  --help                            display help for command
+
+  Examples:
+
+    mc dev-proxy                                 runs on default port (7707) using cookies
+    mc dev-proxy --port 7777 --passkey passkey   runs on port 7777 using app/service credentials
+
+  Configuration:
+
+        - create environment variables: MDSP_HOST, MDSP_SESSION and MDSP_XSRF_TOKEN using borrowed cookies
+
+    see more documentation at https://opensource.mindsphere.io/docs/mindconnect-nodejs/development-proxy.html
+
 ````
 
 ## Legal

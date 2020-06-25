@@ -2,12 +2,20 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
-import { MindSphereSdk } from "../../api/sdk";
-import { decrypt, loadAuth, retry } from "../../api/utils";
-import { errorLog, getColor, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
+import { retry } from "../../api/utils";
+import {
+    adjustColor,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    proxyLog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
 import _ = require("lodash");
 
-const color = getColor("blue");
+let color = getColor("blue");
 
 export default (program: CommanderStatic) => {
     program
@@ -30,11 +38,10 @@ export default (program: CommanderStatic) => {
             (async () => {
                 try {
                     checkParameters(options);
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
-
-                    const auth = loadAuth();
-                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     const kpiClient = sdk.GetKPICalculationClient();
                     const timeSeries = readDataFromFile(options.file, options.verbose);
@@ -142,7 +149,6 @@ function readDataFromFile(filename: string, verbose: any) {
 }
 
 function checkParameters(options: any) {
-    !options.passkey && errorLog(" You have to provide the passkey for the kpi-calculation command.", true);
     !options.mode &&
         errorLog("You have to provide the mode for the command. Run mc kp --help for full syntax and examples.", true);
 

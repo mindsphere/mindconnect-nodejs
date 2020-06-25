@@ -2,6 +2,7 @@
 import * as program from "commander";
 import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
+import identityCommand from "./commands/identity";
 import iotCheckBulkComand from "./commands/iot-bulk-check";
 import iotBulkRunCommand from "./commands/iot-bulk-run";
 import iotDownloadBulkCommand from "./commands/iot-download-bulk";
@@ -70,9 +71,11 @@ listFilesCommand(program);
 downloadFileCommand(program);
 deleteFileCommand(program);
 
-// * development proxy
+// * identity access management commands
 
-devProxyCommand(program);
+identityCommand(program);
+
+// * development proxy
 
 // * analytics command
 
@@ -81,8 +84,10 @@ signalValidationCommand(program);
 trendPredictionCommand(program);
 kpicalculationCommand(program);
 
-// * opcua pub sub commands
+// dev proxy command
+devProxyCommand(program);
 
+// * opcua pub sub commands
 mqttCreateCommand(program);
 
 // * cli for starter projects

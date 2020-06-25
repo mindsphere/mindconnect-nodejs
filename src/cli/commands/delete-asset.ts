@@ -1,10 +1,18 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
-import { MindSphereSdk } from "../../api/sdk";
-import { decrypt, loadAuth, retry } from "../../api/utils";
-import { errorLog, getColor, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
+import { retry } from "../../api/utils";
+import {
+    adjustColor,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    proxyLog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
 
-const color = getColor("magenta");
+let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -18,12 +26,11 @@ export default (program: CommanderStatic) => {
         .action((options) => {
             (async () => {
                 try {
+                    checkRequiredParameters(options);
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
-
-                    checkRequiredParameters(options);
-                    const auth = loadAuth();
-                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     const assetMgmt = sdk.GetAssetManagementClient();
                     const asset = await retry(options.retry, () => assetMgmt.GetAsset(options.assetid));
@@ -43,17 +50,11 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc delete-asset --assetid 123456...ef --passkey mypasskey \t\tdelete asset with id 132456...ef`);
+            log(`    mc delete-asset --assetid 123456...ef \t\tdelete asset with id 132456...ef`);
             serviceCredentialLog();
         });
 };
 
 function checkRequiredParameters(options: any) {
-    !options.passkey &&
-        errorLog(
-            "you have to provide a passkey to get the service token (run mc la --help for full description)",
-            true
-        );
-
     !options.assetid && errorLog("you have to provide a assetid", true);
 }

@@ -3,12 +3,21 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { sleep } from "../../../test/test-utils";
-import { MindSphereSdk, TimeSeriesModels } from "../../api/sdk/";
-import { decrypt, loadAuth, retry } from "../../api/utils";
-import { errorLog, getColor, serviceCredentialLog, verboseLog } from "./command-utils";
+import { TimeSeriesModels } from "../../api/sdk/";
+import { retry } from "../../api/utils";
+import {
+    adjustColor,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    proxyLog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
 import ora = require("ora");
 
-const color = getColor("magenta");
+let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -28,9 +37,10 @@ export default (program: CommanderStatic) => {
             (async () => {
                 try {
                     checkParameters(options);
-
-                    const auth = loadAuth();
-                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
+                    homeDirLog(options.verbose, color);
+                    proxyLog(options.verbose, color);
 
                     fs.mkdirSync(path.resolve(options.dir));
 
@@ -82,18 +92,13 @@ export default (program: CommanderStatic) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc download-bulk --assetid 12345..ef --from 12/10/2019 --to 12/16/2019 --passkey <yourpasskey> \t\t download timeseries from specified asset`
+                `    mc download-bulk --assetid 12345..ef --from 12/10/2019 --to 12/16/2019  \t\t download timeseries from specified asset`
             );
             serviceCredentialLog();
         });
 };
 
 function checkParameters(options: any) {
-    !options.passkey &&
-        errorLog(
-            "you have to provide a passkey to get the service token (run mc db --help for full description)",
-            true
-        );
     !options.dir &&
         errorLog("Missing dir name for download-bulk command. Run mc db --help for full syntax and examples.", true);
 

@@ -1,6 +1,7 @@
 import { AgentManagementClient } from "../agent/agent-management";
 import { AssetManagementClient } from "../asset/asset-management";
 import { EventManagementClient } from "../event/event-management";
+import { IdentityManagementClient } from "../identity/identity";
 import { TimeSeriesClient } from "../iot/iot-timeseries";
 import { TimeSeriesAggregateClient } from "../iotaggregate/iot-timeseries-aggregate";
 import { TimeSeriesBulkClient } from "../iotbulk/iot-timeseries-bulk";
@@ -12,10 +13,10 @@ import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
 import { TrendPredictionClient } from "../trend/trend-prediction";
 import { SdkClient } from "./sdk-client";
 /**
- * * Pre-Alpha SDK for the mindsphere APIs
  *
- * ! You can experiment with this but please note that these interfaces will
- * ! will change in the next major version. See also CHANGELOG.md
+ * MindSphere typescript SDK - BETA
+ *
+ * Runs in Browser and in Node using User Credentials, App Credentials and ServiceCredentials.
  *
  * @export
  * @class MindSphereSdk
@@ -190,4 +191,19 @@ export class MindSphereSdk extends SdkClient {
         this._mindConnectApiClient = this._mindConnectApiClient || new MindConnectApiClient(this._authenticator);
         return this._mindConnectApiClient;
     }
+
+    /**
+     * Identity Management Client
+     *
+     * @returns {IdentityManagementClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetIdentityManagementClient(): IdentityManagementClient {
+        this._identityManagementClient =
+            this._identityManagementClient || new IdentityManagementClient(this._authenticator);
+        return this._identityManagementClient;
+    }
+
+    private _identityManagementClient?: IdentityManagementClient;
 }

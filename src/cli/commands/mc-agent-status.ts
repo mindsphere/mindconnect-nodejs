@@ -3,11 +3,21 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { MindConnectAgent } from "../..";
-import { AgentManagementModels, MindSphereSdk } from "../../api/sdk";
-import { checkCertificate, decrypt, getAgentDir, loadAuth, retry } from "../../api/utils";
-import { errorLog, getColor, homeDirLog, proxyLog, retrylog, serviceCredentialLog, verboseLog } from "./command-utils";
+import { AgentManagementModels } from "../../api/sdk";
+import { checkCertificate, getAgentDir, retry } from "../../api/utils";
+import {
+    adjustColor,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    proxyLog,
+    retrylog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
 
-const color = getColor("magenta");
+let color = getColor("magenta");
 const green = getColor("green");
 const red = getColor("red");
 const yellow = getColor("yellow");
@@ -16,7 +26,8 @@ export default (program: CommanderStatic) => {
     program
         .command("agent-status")
         .alias("as")
-        .option("-c, --config <agentconfig>", "config file with agent configuration", "agentconfig.json")
+        .option("-c, --config <agentconfig>", "config file with agent configuration")
+        .option("-a, --agentid <agentid>", "agentid")
         .option("-k, --passkey <passkey>", "passkey")
         .option(
             "-r, --cert [privatekey]",
@@ -31,39 +42,40 @@ export default (program: CommanderStatic) => {
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
 
-                    const configFile = path.resolve(options.config);
-                    verboseLog(`Agent Status for the agent configuration in: ${color(configFile)}.`, options.verbose);
-
-                    if (!fs.existsSync(configFile)) {
-                        throw new Error(`Can't find file ${configFile}`);
-                    }
-
-                    const agentFolder = getAgentDir(path.dirname(options.config));
-                    verboseLog(`Using .mc folder for agent: ${color(agentFolder)}`, options.verbose);
-
-                    const configuration = require(configFile);
-                    const profile = checkCertificate(configuration, options);
-                    const agent = new MindConnectAgent(configuration, undefined, agentFolder);
-                    if (profile) {
-                        agent.SetupAgentCertificate(fs.readFileSync(options.cert));
-                    }
-
-                    coloredStatusLog(agent);
-
-                    if (!options.passkey) {
-                        errorLog(
-                            "you have to provide a passkey to get mindsphere boarding status and online status (run mc as --help for full description)",
-                            true
+                    let agentid = options.agentid;
+                    if (options.config) {
+                        const configFile = path.resolve(options.config);
+                        verboseLog(
+                            `Agent Status for the agent configuration in: ${color(configFile)}.`,
+                            options.verbose
                         );
+
+                        if (!fs.existsSync(configFile)) {
+                            throw new Error(`Can't find file ${configFile}`);
+                        }
+
+                        const agentFolder = getAgentDir(path.dirname(options.config));
+                        verboseLog(`Using .mc folder for agent: ${color(agentFolder)}`, options.verbose);
+
+                        const configuration = require(configFile);
+                        const profile = checkCertificate(configuration, options);
+                        const agent = new MindConnectAgent(configuration, undefined, agentFolder);
+                        if (profile) {
+                            agent.SetupAgentCertificate(fs.readFileSync(options.cert));
+                        }
+
+                        agentid = agent.ClientId();
+                        coloredStatusLog(agent);
                     }
 
-                    const auth = loadAuth();
-                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
+
                     const agentMgmt = sdk.GetAgentManagementClient();
 
                     const onlinestatus = await retry(
                         options.retry,
-                        async () => await agentMgmt.GetAgentOnlineStatus(agent.ClientId()),
+                        async () => await agentMgmt.GetAgentOnlineStatus(agentid),
                         300,
                         retrylog("GetAgentStatus")
                     );
@@ -71,7 +83,7 @@ export default (program: CommanderStatic) => {
 
                     const boardingstatus = await retry(
                         options.retry,
-                        async () => await agentMgmt.GetOnboardingStatus(agent.ClientId()),
+                        async () => await agentMgmt.GetOnboardingStatus(agentid),
                         300,
                         retrylog("GetBoardingStatus")
                     );
@@ -80,16 +92,6 @@ export default (program: CommanderStatic) => {
 
                     if (status) {
                         coloredBoardingStatusLog(boardingstatus);
-                    }
-
-                    if (status === "ONBOARDED" && agent.HasDataSourceConfiguration()) {
-                        verboseLog(color("Data Source Configuration\n"), options.verbose);
-                        verboseLog(JSON.stringify(await agent.GetDataSourceConfiguration(), null, 2), options.verbose);
-                    }
-
-                    if (status === "ONBOARDED" && agent.HasDataMappings()) {
-                        verboseLog(color("Data Mappings\n"), options.verbose);
-                        verboseLog(JSON.stringify(await agent.GetDataMappings(), null, 2), options.verbose);
                     }
                 } catch (err) {
                     errorLog(err, options.verbose);

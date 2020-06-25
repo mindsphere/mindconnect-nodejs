@@ -1,21 +1,15 @@
 import * as AsyncLock from "async-lock";
+import fetch from "cross-fetch";
 import * as debug from "debug";
 import * as jwt from "jsonwebtoken";
-import fetch from "node-fetch";
 import "url-search-params-polyfill";
 import * as uuid from "uuid";
-import {
-    AccessToken,
-    IConfigurationStorage,
-    IMindConnectConfiguration,
-    OnboardingStatus,
-    retry,
-    SelfSignedClientAssertion,
-    TokenKey,
-} from "..";
 import { MindConnectBase, TokenRotation } from "./mindconnect-base";
-import { DefaultStorage, IsConfigurationStorage } from "./mindconnect-storage";
+import { DefaultStorage, IsConfigurationStorage, IConfigurationStorage } from "./mindconnect-storage";
+
 import _ = require("lodash");
+import { AccessToken, OnboardingStatus, TokenKey, SelfSignedClientAssertion, IMindConnectConfiguration } from "./mindconnect-models";
+import { retry } from "./utils";
 const log = debug("mindconnect-agentauth");
 const rsaPemToJwk = require("rsa-pem-to-jwk");
 
@@ -94,7 +88,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
                 body: JSON.stringify(body),
                 headers: headers,
                 agent: this._proxyHttpAgent,
-            });
+            } as RequestInit);
 
             if (!response.ok) {
                 throw new Error(`${response.statusText} ${await response.text()}`);
@@ -197,7 +191,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
                 body: JSON.stringify(body),
                 headers: headers,
                 agent: this._proxyHttpAgent,
-            });
+            } as RequestInit);
 
             if (!response.ok) {
                 throw new Error(`${response.statusText} ${await response.text()}`);
@@ -305,7 +299,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
                 body: body,
                 headers: headers,
                 agent: this._proxyHttpAgent,
-            });
+            } as RequestInit);
 
             if (!response.ok) {
                 throw new Error(`${response.statusText} ${await response.text()}`);
@@ -356,7 +350,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
                 method: "GET",
                 headers: headers,
                 agent: this._proxyHttpAgent,
-            });
+            } as RequestInit);
 
             if (!response.ok) {
                 throw new Error(`${response.statusText} ${await response.text()}`);

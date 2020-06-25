@@ -1,7 +1,8 @@
 import * as chalk from "chalk";
 import { log } from "console";
-import { AssetManagementModels } from "../../api/sdk";
-import { getHomeDotMcDir } from "../../api/utils";
+import { FrontendAuth } from "../../api/frontend-auth";
+import { AssetManagementModels, MindSphereSdk } from "../../api/sdk";
+import { decrypt, getHomeDotMcDir, loadAuth } from "../../api/utils";
 
 const magenta = getColor("magenta");
 const yellow = getColor("yellow");
@@ -10,21 +11,21 @@ const red = getColor("red");
 const cyan = getColor("cyan");
 
 export const serviceCredentialLog = (color: Function = magenta) => {
-    log(`\n  Important: \n`);
-    log(
-        `    you need to supply the ${color("service credentials (deprecated)")} or ${color(
-            "application credentials"
-        )} for this operation and provide the passkey \n`
-    );
-    log(`    how to get service credentials: `);
-    log(
-        color(`    https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials`)
-    );
-    log(`    how to get application credentials: `);
-    log(color(`    https://documentation.mindsphere.io/resources/html/developer-cockpit/en-US/124342231819.html`));
+    log(`\n  Important: `);
+    log(`\n  Authentication with ${color("service credentials")} or ${color("app credentials")} \n`);
 
-    log(`\n  More Information: \n`);
-    log(`    ${color("https://opensource.mindsphere.io")}\n`);
+    log(`    \t- append option [--passkey <your passkey>] to the command `);
+    log(`    \t- create environment variable ${color("MDSP_PASSKEY")} with your current passkey`);
+
+    log(`\n  Authentication with ${yellow("borrowed session cookie and xsrf-token cookie")} \n`);
+
+    log(
+        `    \t- create environment variables ${yellow("MDSP_HOST")} , ${yellow("MDSP_SESSION")} and ${yellow(
+            "MDSP_XSRF_TOKEN"
+        )} using borrowed cookies `
+    );
+    log(`\n  Full Documentation: \n`);
+    log(`    ${color("https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/setting-up-the-cli.html")}\n`);
 };
 
 export function colorizeStatus(message: string) {
@@ -91,19 +92,19 @@ export const directoryReadyLog = ({
     log(`\nthe directory ${green(path)} is ${green("ready")}`);
     log(`you can now edit the template files in the directory`);
     log(`\nwhen you are done run:`);
-    log(`\tmc ${magenta(runCommand)} command to upload files and start the job`);
+    log(`\tmc ${runCommand} command to upload files and start the job`);
     log(`\nchecking progress:`);
-    log(`\tmc ${magenta(jobCommand)} to check the progress of the job`);
+    log(`\tmc ${jobCommand} to check the progress of the job`);
 };
 
-export function modeInformation(asset: AssetManagementModels.AssetResourceWithHierarchyPath, options: any) {
+export function modeInformation(asset: AssetManagementModels.AssetResourceWithHierarchyPath, options: any, color: any) {
     const MAX_SIZE_FOR_TS = 100;
     console.log(
         `\nRunning ${
             options.timeseries
                 ? `${yellow("standard")} TimeSeries ${yellow("(deprecated)")}`
-                : `${magenta("bulk")} TimeSeries`
-        } ingest for ${magenta(asset.name)} of type ${magenta("" + asset.typeId)} with twintype ${magenta(
+                : `${color("bulk")} TimeSeries`
+        } ingest for ${color(asset.name)} of type ${color("" + asset.typeId)} with twintype ${color(
             "" + asset.twinType
         )}`
     );
@@ -111,11 +112,11 @@ export function modeInformation(asset: AssetManagementModels.AssetResourceWithHi
         if (parseInt(options.size, 10) > MAX_SIZE_FOR_TS) {
             options.size = MAX_SIZE_FOR_TS;
         }
-        console.log(`\n${magenta("Important:")}`);
-        console.log(`\nYou are using the ${magenta("standard timeseries")} ingest for the asset.`);
-        console.log(`The calls to the API will be ${magenta("throttled")} to match your throttling limits.`);
-        console.log(`The number of the records per message will be reduced to ${magenta(options.size)} per message.\n`);
-        console.log(`Using this feature has a direct impact on ${magenta("your")} MindSphere resource consumption.`);
+        console.log(`\n${color("Important:")}`);
+        console.log(`\nYou are using the ${color("standard timeseries")} ingest for the asset.`);
+        console.log(`The calls to the API will be ${color("throttled")} to match your throttling limits.`);
+        console.log(`The number of the records per message will be reduced to ${color(options.size)} per message.\n`);
+        console.log(`Using this feature has a direct impact on ${color("your")} MindSphere resource consumption.`);
         console.log(`You might get a notice that you will need to upgrade your account's data ingest rate.`);
         console.log(`${yellow("Warning")} This feature is ${yellow("deprecated")}!\n`);
     }
@@ -123,6 +124,62 @@ export function modeInformation(asset: AssetManagementModels.AssetResourceWithHi
 
 export function getColor(name: string) {
     return chalk.level < 2 ? (chalk as any)[name] : (chalk as any)[`${name}Bright`];
+}
+
+export function adjustColor(color: any, options: any) {
+    if (process.env.MDSP_PASSKEY || options.passkey) {
+        return getColor("magenta");
+    } else if (process.env.MDSP_HOST && process.env.MDSP_SESSION && process.env.MDSP_XSRF_TOKEN) {
+        return getColor("yellow");
+    } else {
+        return color;
+    }
+}
+
+export function getSdk(options: any) {
+    const auth = loadAuth();
+
+    let sdk: MindSphereSdk;
+    const magenta = getColor("magenta");
+    const yellow = getColor("yellow");
+
+    if (options.passkey) {
+        verboseLog(
+            `The passkey was specified as command line option using ${magenta("service/app credentials")}`,
+            options.verbose
+        );
+
+        options._selected_mode = "passkey";
+        sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
+    } else if (process.env.MDSP_PASSKEY && process.env.MDSP_PASSKEY !== "") {
+        verboseLog(
+            `The passkey was specified in environment variable MDSP_PASSKEY using ${magenta(
+                "service/app credentials"
+            )}`,
+            options.verbose
+        );
+        options.passkey = process.env.MDSP_PASSKEY;
+        options._selected_mode = "passkey";
+        sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
+    } else if (process.env.MDSP_HOST && process.env.MDSP_SESSION && process.env.MDSP_XSRF_TOKEN) {
+        verboseLog(
+            `Using borrowed ${yellow("SESSION")}  and ${yellow("XSRF-TOKEN")}  cookies from ${yellow(
+                process.env.MDSP_HOST
+            )} for authentication`,
+            options.verbose
+        );
+
+        let host = process.env.MDSP_HOST || "";
+        if (!process.env.MDSP_HOST.toLowerCase().startsWith("https://")) {
+            host = `https://${host}`;
+        }
+
+        sdk = new MindSphereSdk(new FrontendAuth(host, process.env.MDSP_SESSION, process.env.MDSP_XSRF_TOKEN));
+        options._selected_mode = "cookie";
+    } else {
+        throw new Error("The passkey was not provided and there are no environment variables");
+    }
+    return sdk;
 }
 
 export function agentConfigLog({

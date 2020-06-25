@@ -1,5 +1,5 @@
+import fetch from "cross-fetch";
 import * as debug from "debug";
-import fetch from "node-fetch";
 import { AuthBase } from "./auth-base";
 import { TokenRotation } from "./mindconnect-base";
 import { isUrl, throwError } from "./utils";
@@ -38,7 +38,7 @@ export class TokenManagerAuth extends AuthBase implements TokenRotation {
                 body: JSON.stringify(body),
                 headers: headers,
                 agent: this._proxyHttpAgent,
-            });
+            } as RequestInit);
             if (!response.ok) {
                 throw new Error(`${response.statusText} ${await response.text()}`);
             }

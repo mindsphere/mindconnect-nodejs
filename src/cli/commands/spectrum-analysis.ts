@@ -2,13 +2,21 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
-import { MindSphereSdk } from "../../api/sdk";
 import { SpectrumAnalysisModels } from "../../api/sdk/spectrum/spectrum-analysis-models";
-import { decrypt, loadAuth, retry, throwError } from "../../api/utils";
-import { errorLog, getColor, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
+import { retry, throwError } from "../../api/utils";
+import {
+    adjustColor,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    proxyLog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
 import ora = require("ora");
 const mime = require("mime-types");
-const color = getColor("blue");
+let color = getColor("blue");
 
 export default (program: CommanderStatic) => {
     program
@@ -36,9 +44,12 @@ export default (program: CommanderStatic) => {
         .action((options) => {
             (async () => {
                 try {
-                    checkParameters(options);
+                    checkRequiredParameters(options);
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
+
                     const spinner = ora("uploadingFile");
                     !options.verbose && spinner.start();
                     options.file = options.file || "fft.spectrum.json";
@@ -54,9 +65,6 @@ export default (program: CommanderStatic) => {
                     fs.existsSync(outputfilename) && throwError(`The file ${outputfilename} already exists`);
                     verboseLog(`Mode: ${options.mode}`, options.verbose, spinner);
                     verboseLog(`OutputFileName: ${outputfilename}`, options.verbose, spinner);
-
-                    const auth = loadAuth();
-                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     const mimeType = mime.lookup(uploadFile);
 
@@ -124,7 +132,7 @@ export default (program: CommanderStatic) => {
                     options.mode === "fft" &&
                         console.log(
                             `\nPlease edit the thresholds in ${color(
-                                "thresholds.spectum.json"
+                                "thresholds.spectrum.json"
                             )} file before running the threshold violation detection\n`
                         );
                 } catch (err) {
@@ -148,14 +156,13 @@ export default (program: CommanderStatic) => {
         });
 };
 
-function checkParameters(options: any) {
+function checkRequiredParameters(options: any) {
     options.mode === "fft" &&
         !options.file &&
         errorLog(
             "Missing file name for spectrum-analytics command. Run mc sp --help for full syntax and examples.",
             true
         );
-    !options.passkey && errorLog(" You have to provide the passkey for spectrum-analytics command", true);
 
     options.mode !== "fft" && options.mode !== "threshold" && errorLog(`Invalid mode: ${options.mode}`, true);
     options.mode === "fft" &&

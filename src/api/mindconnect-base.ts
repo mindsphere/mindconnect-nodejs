@@ -1,5 +1,5 @@
+import fetch from "cross-fetch";
 import * as debug from "debug";
-import fetch from "node-fetch";
 import { removeUndefined, throwError } from "./utils";
 const HttpsProxyAgent = require("https-proxy-agent");
 const log = debug("mindconnect");
@@ -46,6 +46,36 @@ export interface TokenRotation {
      * @memberOf TokenRotation
      */
     GetTenant(): string;
+
+    HttpAction({
+        verb,
+        gateway,
+        baseUrl,
+        authorization,
+        body,
+        message,
+        octetStream,
+        multiPartFormData,
+        additionalHeaders,
+        noResponse,
+        rawResponse,
+        returnHeaders,
+        ignoreCodes,
+    }: {
+        verb: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
+        gateway: string;
+        baseUrl: string;
+        authorization: string;
+        body?: Object;
+        message?: string;
+        octetStream?: boolean;
+        multiPartFormData?: boolean;
+        additionalHeaders?: Object;
+        noResponse?: boolean;
+        rawResponse?: boolean;
+        returnHeaders?: boolean;
+        ignoreCodes?: number[];
+    }): Promise<Object | undefined>;
 }
 
 export function isTokenRotation(obj: any): boolean {

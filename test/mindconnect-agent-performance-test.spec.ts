@@ -272,7 +272,7 @@ describe("MindConnectApi RSA_3072 Agent performance test", () => {
             );
             await retry(3, () =>
                 agent.Upload(
-                    `images/mc4.png`,
+                    `images/environmentdata.PNG`,
                     "",
                     "desc",
                     true,

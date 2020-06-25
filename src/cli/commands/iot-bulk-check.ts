@@ -3,15 +3,23 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { sleep } from "../../../test/test-utils";
-import { AssetManagementModels, TimeSeriesBulkClient } from "../../api/sdk";
-import { decrypt, loadAuth, retry, throwError } from "../../api/utils";
-import { colorizeStatus, errorLog, getColor, verboseLog } from "./command-utils";
+import { AssetManagementModels } from "../../api/sdk";
+import { retry, throwError } from "../../api/utils";
+import {
+    adjustColor,
+    colorizeStatus,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    proxyLog,
+    verboseLog,
+} from "./command-utils";
 import { jobState } from "./iot-bulk-run";
 import _ = require("lodash");
 import ora = require("ora");
 
-const color = getColor("magenta");
-const yellow = getColor("yellow");
+let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -19,7 +27,7 @@ export default (program: CommanderStatic) => {
         .alias("cb")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
-        .option("-i, --timeseries", `use ${yellow("(deprecated)")} standard timeseries upload`)
+        .option("-i, --timeseries", `use ${color("(deprecated)")} standard timeseries upload`)
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
         .description(color("checks the progress of the upload jobs from <directoryname> directory *"))
@@ -27,6 +35,11 @@ export default (program: CommanderStatic) => {
             (async () => {
                 try {
                     checkRequiredParamaters(options);
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
+                    homeDirLog(options.verbose, color);
+                    proxyLog(options.verbose, color);
+
                     const jobState = require(path.resolve(`${options.dir}/jobstate.json`)) as jobState;
 
                     const asset = jobState.options.asset;
@@ -40,11 +53,7 @@ export default (program: CommanderStatic) => {
                         process.exit(0);
                     }
 
-                    const auth = loadAuth();
-                    const jobClient = new TimeSeriesBulkClient({
-                        ...auth,
-                        basicAuth: decrypt(auth, options.passkey),
-                    });
+                    const jobClient = sdk.GetTimeSeriesBulkClient();
 
                     const spinner = ora("checkingJobs");
                     !options.verbose && spinner.start();
@@ -111,11 +120,5 @@ function checkRequiredParamaters(options: any) {
             `the directory ${color(
                 options.dir
             )} must contain the jobstate.json file. run mc run-bulk --start command first!`
-        );
-
-    !options.passkey &&
-        errorLog(
-            "you have to provide a passkey to get the service token (run mc cb --help for full description)",
-            true
         );
 }

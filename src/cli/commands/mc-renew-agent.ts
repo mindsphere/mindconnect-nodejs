@@ -3,19 +3,20 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { IMindConnectConfiguration } from "../../api/mindconnect-models";
-import { MindSphereSdk } from "../../api/sdk";
-import { decrypt, loadAuth, throwError } from "../../api/utils";
+import { throwError } from "../../api/utils";
 import {
+    adjustColor,
     agentConfigLog,
     errorLog,
     getColor,
+    getSdk,
     homeDirLog,
     proxyLog,
     serviceCredentialLog,
     verboseLog,
 } from "./command-utils";
 
-const color = getColor("magenta");
+let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
@@ -29,12 +30,11 @@ export default (program: CommanderStatic) => {
         .action((options) => {
             (async () => {
                 try {
+                    checkRequiredParamaters(options);
+                    const sdk = getSdk(options);
+                    color = adjustColor(color, options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
-                    checkRequiredParamaters(options);
-
-                    const auth = loadAuth();
-                    const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
 
                     const configFile = path.resolve(options.config);
                     const configuration = require(configFile) as IMindConnectConfiguration;
