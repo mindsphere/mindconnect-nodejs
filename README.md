@@ -363,9 +363,7 @@ const assets = await am.GetAssets({
 // you will get fully typed assets in response
 ```
 
-**Important** [Call for help - How to Contribute to SDK](./CONTRIBUTING.md)
-
-If an API is missing and you would like to contribute take a look at [CONTRIBUTING.md](./CONTRIBUTING.md). With your help we will have a full set of MindSphere APIs.
+If an API is missing and you would like to contribute a Client for it take a look at [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Command Line Interface
 
