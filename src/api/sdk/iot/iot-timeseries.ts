@@ -111,12 +111,12 @@ export class TimeSeriesClient extends SdkClient {
      *
      * @param {string} entity
      * @param {string} propertysetname
-     * @param {[TimeSeriesModels.Timeseries]} timeseries
+     * @param {TimeSeriesModels.Timeseries[]} timeseries
      * @returns
      *
      * @memberOf TimeSeriesClient
      */
-    public async PutTimeSeries(entity: string, propertysetname: string, timeseries: [TimeSeriesModels.Timeseries]) {
+    public async PutTimeSeries(entity: string, propertysetname: string, timeseries: TimeSeriesModels.Timeseries[]) {
         checkAssetId(entity);
         return await this.HttpAction({
             verb: "PUT",
