@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.8.1 - (Electric Blue Vienna) - June 2020 
+
+## Bugfix
+
+- fixed model for PutTimeSeries in iot SDK
+
 ## 3.8.0 - (Electric Blue Vienna) - June 2020
 
 ### Highlights 3.8.0
