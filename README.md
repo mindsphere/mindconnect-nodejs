@@ -347,8 +347,6 @@ The example below shows how to use the sdk.
 // The default constructor uses frontend authorization.
 
 const sdk = new MindSphereSdk ();
-
-const sdk = new MindSphereSdk ();
 const am = sdk.GetAssetManagementClient();
 
 const assets = await am.GetAssets({
