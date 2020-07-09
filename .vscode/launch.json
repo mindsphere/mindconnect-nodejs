@@ -5,19 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Attach",
+            "port": 9229,
+            "request": "attach",
+            "skipFiles": ["<node_internals>/**"],
+            "type": "pwa-node"
+        },
+        {
             "type": "node",
             "request": "launch",
             "name": "Mocha Tests",
             "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
             "protocol": "inspector",
-            "args": [
-                "-u",
-                "tdd",
-                "--timeout",
-                "999999",
-                "--colors",
-                "${workspaceRoot}/test"
-            ],
+            "args": ["-u", "tdd", "--timeout", "999999", "--colors", "${workspaceRoot}/test"],
             "internalConsoleOptions": "openOnSessionStart",
             "env": {
                 "DEBUG": "*,-not_this"

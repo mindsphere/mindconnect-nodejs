@@ -537,6 +537,8 @@ export class MindConnectAgent extends AgentAuth {
      *
      * @param {string} assetTypeId
      * @param {("NUMERICAL" | "DESCRIPTIVE")} [mode="DESCRIPTIVE"]
+     * * NUMERICAL MODE will use names like CF0001 for configurationId , DS0001,DS0002,DS0003... for data source ids and DP0001, DP0002... for dataPointIds
+     * * DESCRIPTIVE MODE will use names like CF-assetName for configurationId , DS-aspectName... for data source ids and DP-variableName for data PointIds (default)
      * @returns {Promise<DataSourceConfiguration>}
      *
      * @memberOf MindConnectAgent
@@ -595,10 +597,10 @@ export class MindConnectAgent extends AgentAuth {
      *
      * @param {string} targetAssetId
      * @param {("NUMERICAL" | "DESCRIPTIVE")} mode
-     * @param {boolean} [overwrite=true] ignore eTag will overwrite mappings and data source configuration
      *
      * * NUMERICAL MODE will use names like CF0001 for configurationId , DS0001,DS0002,DS0003... for data source ids and DP0001, DP0002... for dataPointIds
      * * DESCRIPTIVE MODE will use names like CF-assetName for configurationId , DS-aspectName... for data source ids and DP-variableName for data PointIds (default)
+     * @param {boolean} [overwrite=true] ignore eTag will overwrite mappings and data source configuration
      * @memberOf MindConnectAgent
      */
     public async ConfigureAgentForAssetId(

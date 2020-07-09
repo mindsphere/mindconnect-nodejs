@@ -353,6 +353,8 @@ export class MindConnectApiClient extends SdkClient {
      *
      * @param {AssetManagementModels.AssetTypeResource} assetType
      * @param {("NUMERICAL" | "DESCRIPTIVE")} [mode="DESCRIPTIVE"]
+     * * NUMERICAL MODE will use names like CF0001 for configurationId , DS0001,DS0002,DS0003... for data source ids and DP0001, DP0002... for dataPointIds
+     * * DESCRIPTIVE MODE will use names like CF-assetName for configurationId , DS-aspectName... for data source ids and DP-variableName for data PointIds (default)
      * @returns {Promise<DataSourceConfiguration>}
      *
      * @memberOf MindconnectApiClient
@@ -361,7 +363,7 @@ export class MindConnectApiClient extends SdkClient {
         assetType: AssetManagementModels.AssetTypeResource,
         mode: "NUMERICAL" | "DESCRIPTIVE" = "DESCRIPTIVE"
     ): DataSourceConfiguration {
-        const dataSourceConfiguration: DataSourceConfiguration = {
+        let dataSourceConfiguration: DataSourceConfiguration = {
             configurationId: mode === "NUMERICAL" ? "CF0001" : `CF-${assetType!.id!.toString().substr(0, 34)}`,
             dataSources: [],
         };
@@ -404,7 +406,52 @@ export class MindConnectApiClient extends SdkClient {
             });
             dataSourceConfiguration.dataSources.push(dataSource);
         });
+
+        dataSourceConfiguration =
+            mode === "NUMERICAL" ? dataSourceConfiguration : this.CreateUniqueDataPoints(dataSourceConfiguration);
+
         return dataSourceConfiguration;
+    }
+
+    private CreateUniqueDataPoints(configuration: DataSourceConfiguration): DataSourceConfiguration {
+        // check if dataSourceNames are unique
+
+        const datasources = configuration.dataSources.map((x) => x.name);
+        const duplicates = this.getDuplicates(datasources);
+
+        duplicates.forEach((duplicate) => {
+            let ds: number = 0;
+            configuration.dataSources
+                .filter((x) => x.name === duplicate)
+                .forEach((d) => {
+                    d.name = `${d.name.substr(0, 58)}${(++ds).toString().padStart(5, "0")}`;
+                });
+        });
+
+        const dataPointIds: string[] = [];
+
+        configuration.dataSources.forEach((ds) => {
+            const ids = ds.dataPoints.map((x) => x.id);
+            dataPointIds.push(...ids);
+        });
+
+        const dataPointDuplicates = this.getDuplicates(dataPointIds);
+
+        dataPointDuplicates.forEach((duplicate) => {
+            let dp: number = 0;
+            configuration.dataSources.forEach((ds) => {
+                const dataPoints = ds.dataPoints.filter((x) => x.id === duplicate);
+                dataPoints.forEach((p) => {
+                    p.id = `${p.id.substr(0, 28)}${(++dp).toString().padStart(5, "0")}`;
+                });
+            });
+        });
+
+        return configuration;
+    }
+
+    getDuplicates(x: Array<any>): Array<any> {
+        return [...new Set(x.filter((e, i, a) => a.indexOf(e) !== i))];
     }
 
     /**
