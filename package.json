@@ -1,6 +1,6 @@
 {
     "name": "@mindconnect/mindconnect-nodejs",
-    "version": "3.8.1",
+    "version": "3.8.2",
     "description": "MindConnect Library for NodeJS (community based)",
     "main": "./dist/src/index.js",
     "browser": "./dist/src/index.bundle.js",
@@ -47,7 +47,7 @@
         "https-proxy-agent": "^5.0.0",
         "json-groupby": "^1.1.0",
         "jsonwebtoken": "^8.5.1",
-        "lodash": "^4.17.15",
+        "lodash": "^4.17.19",
         "mime-types": "^2.1.27",
         "ora": "^4.0.4",
         "rsa-pem-to-jwk": "^1.1.3",

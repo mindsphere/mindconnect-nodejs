@@ -2,8 +2,8 @@
 import * as chai from "chai";
 import { it } from "mocha";
 import "url-search-params-polyfill";
-import { DataPointValue, IMindConnectConfiguration, MindConnectAgent, retry } from "../src";
-import { AgentManagementModels, AssetManagementModels } from "../src/api/sdk";
+import { DataPointValue, DataSourceConfiguration, IMindConnectConfiguration, MindConnectAgent, retry } from "../src";
+import { AgentManagementModels, AssetManagementModels, MindConnectApiClient } from "../src/api/sdk";
 import { MindSphereSdk } from "../src/api/sdk/";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import {
@@ -195,5 +195,122 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
         billboard.should.not.be.undefined;
         const assetTypes = await retry(5, () => agentSdk.GetAssetManagementClient().GetAspectTypes());
         assetTypes.should.not.be.undefined;
+    });
+
+    it("should be able to fix double names", async () => {
+        const mcapi = new MindConnectApiClient();
+
+        const testConfig = {
+            id: "0226a716-4de7-4f77-8260-98cf17382ab3",
+            configurationId: "CF-castidev.UnitTestEngine",
+            dataSources: [
+                {
+                    name: "DS-EnvironmentData",
+                    customData: {
+                        aspect: "EnvironmentData",
+                    },
+                    description: "",
+                    dataPoints: [
+                        {
+                            id: "DP-Velocity",
+                            name: "Velocity",
+                            description: "",
+                            unit: "mm/s",
+                            type: "DOUBLE",
+                            customData: {
+                                variable: "Velocity",
+                            },
+                        },
+                        {
+                            id: "DP-Frequency",
+                            name: "Frequency",
+                            description: "",
+                            unit: "Hz",
+                            type: "DOUBLE",
+                            customData: {
+                                variable: "Frequency",
+                            },
+                        },
+                        {
+                            id: "DP-Displacement",
+                            name: "Displacement",
+                            description: "",
+                            unit: "mm",
+                            type: "DOUBLE",
+                            customData: {
+                                variable: "Displacement",
+                            },
+                        },
+                        {
+                            id: "DP-Acceleration",
+                            name: "Acceleration",
+                            description: "",
+                            unit: "mm/s^2",
+                            type: "DOUBLE",
+                            customData: {
+                                variable: "Acceleration",
+                            },
+                        },
+                    ],
+                },
+                {
+                    name: "DS-EnvironmentData",
+                    customData: {
+                        aspect: "VibrationData",
+                    },
+                    description: "",
+                    dataPoints: [
+                        {
+                            id: "DP-Velocity",
+                            name: "Velocity",
+                            description: "",
+                            unit: "mm/s",
+                            type: "DOUBLE",
+                            customData: {
+                                variable: "Velocity",
+                            },
+                        },
+                        {
+                            id: "DP-Frequency",
+                            name: "Frequency",
+                            description: "",
+                            unit: "Hz",
+                            type: "DOUBLE",
+                            customData: {
+                                variable: "Frequency",
+                            },
+                        },
+                        {
+                            id: "DP-Displacement",
+                            name: "Displacement",
+                            description: "",
+                            unit: "mm",
+                            type: "DOUBLE",
+                            customData: {
+                                variable: "Displacement",
+                            },
+                        },
+                        {
+                            id: "DP-Acceleration",
+                            name: "Acceleration",
+                            description: "",
+                            unit: "mm/s^2",
+                            type: "DOUBLE",
+                            customData: {
+                                variable: "Acceleration",
+                            },
+                        },
+                    ],
+                },
+            ],
+            eTag: "2",
+        };
+
+        const fixedConfig = ((mcapi as unknown) as any).CreateUniqueDataPoints(
+            (testConfig as unknown) as DataSourceConfiguration
+        );
+        fixedConfig.dataSources[0].name.should.equal("DS-EnvironmentData00001");
+        fixedConfig.dataSources[1].name.should.equal("DS-EnvironmentData00002");
+        fixedConfig.dataSources[1].dataPoints[0].id.should.equal("DP-Velocity00002");
     });
 });
