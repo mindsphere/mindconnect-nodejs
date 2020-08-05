@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.8.3 - (Electric Blue Vienna) - August 2020
+
+## Bugfix 3.8.3
+
+- frontend authentication works without configured service credentials [#177](https://github.com/mindsphere/mindconnect-nodejs/issues/177)
+- [Snyk] Security upgrade ajv from 6.12.2 to 6.12.3 [#176](https://github.com/mindsphere/mindconnect-nodejs/pull/176)
+
 ## 3.8.2 - (Electric Blue Vienna) - July 2020
 
 ## Bugfix 3.8.2

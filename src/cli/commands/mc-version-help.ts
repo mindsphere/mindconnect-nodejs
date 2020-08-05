@@ -10,7 +10,7 @@ const blue = getColor("blue");
 const yellow = getColor("yellow");
 
 export default (program: CommanderStatic) => {
-    program.version("MindConnect NodeJS CLI - Version: 3.8.2");
+    program.version("MindConnect NodeJS CLI - Version: 3.8.3");
 
     program.on("--help", () => {
         log(`\n  Documentation:\n`);

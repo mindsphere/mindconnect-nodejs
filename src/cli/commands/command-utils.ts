@@ -137,8 +137,6 @@ export function adjustColor(color: any, options: any) {
 }
 
 export function getSdk(options: any) {
-    const auth = loadAuth();
-
     let sdk: MindSphereSdk;
     const magenta = getColor("magenta");
     const yellow = getColor("yellow");
@@ -149,6 +147,7 @@ export function getSdk(options: any) {
             options.verbose
         );
 
+        const auth = loadAuth();
         options._selected_mode = "passkey";
         sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
     } else if (process.env.MDSP_PASSKEY && process.env.MDSP_PASSKEY !== "") {
@@ -158,6 +157,7 @@ export function getSdk(options: any) {
             )}`,
             options.verbose
         );
+        const auth = loadAuth();
         options.passkey = process.env.MDSP_PASSKEY;
         options._selected_mode = "passkey";
         sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, options.passkey) });
