@@ -57,19 +57,19 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log(`\n  Example:\n`);
-            log(`    mc --mode list --user \t\t list all users`);
-            log(`    mc --mode list --user prefix \t list all users which start with "prefix"`);
-            log(`    mc --mode list --group \t\t list all groups`);
-            log(`    mc --mode list --group prefix \t list all groups which start with "prefix"`);
-            log(`\n    mc --mode create|delete --group groupName \t create or delete group`);
-            log(`    mc --mode create|delete --user userName \t create or delete user`);
-            log(`\n    mc --mode assign --group groupName --user userName \t\t Assign userName to groupName`);
+            log(`    mc iam --mode list --user \t\t list all users`);
+            log(`    mc iam --mode list --user prefix \t list all users which start with "prefix"`);
+            log(`    mc iam --mode list --group \t\t list all groups`);
+            log(`    mc iam --mode list --group prefix \t list all groups which start with "prefix"`);
+            log(`\n    mc iam --mode create|delete --group groupName \t create or delete group`);
+            log(`    mc iam --mode create|delete --user userName \t create or delete user`);
+            log(`\n    mc iam --mode assign --group groupName --user userName \t\t Assign userName to groupName`);
             log(
-                `    mc --mode assign --group groupName --membergroup memberGroupName \t Assign memberGroupName to groupName`
+                `    mc iam --mode assign --group groupName --membergroup memberGroupName \t Assign memberGroupName to groupName`
             );
-            log(`    mc --mode remove --group groupName --user userName \t\t Delete userName from groupName`);
+            log(`    mc iam --mode remove --group groupName --user userName \t\t Delete userName from groupName`);
             log(
-                `    mc --mode remove --group groupName --membergroup memberGroupName \t Delete memberGroupName from groupName`
+                `    mc iam --mode remove --group groupName --membergroup memberGroupName \t Delete memberGroupName from groupName`
             );
 
             serviceCredentialLog();
