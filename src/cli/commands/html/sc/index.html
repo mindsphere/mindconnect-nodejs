@@ -62,7 +62,7 @@
     </head>
 
     <body>
-        <div class="mdsp mdsp-defaults forceDefaultElements" id="_mdspcontent" style="overflow: auto !important;">
+        <div class="mdsp mdsp-defaults forceDefaultElements" id="_mdspcontent" style="overflow: auto !important">
             <div class="notificationContainer">
                 <div class="notifications">
                     <!-- single notification item START -->
@@ -100,12 +100,10 @@
                 </div>
             </div>
             <div class="appWrapper">
-                <div class="appWrapper__regions has-appBar has-bgColor-forced-white" style="overflow: auto !important;">
-                    <div class="container" style="margin: 15px;">
+                <div class="appWrapper__regions has-appBar has-bgColor-forced-white" style="overflow: auto !important">
+                    <div class="container" style="margin: 15px">
                         <div class="container__title">
-                            <div class="title__content">
-                                Command Line Interface
-                            </div>
+                            <div class="title__content">Command Line Interface</div>
                             <div class="title__actions">
                                 <button class="button--ghost has-icon-only" onclick="showDialog()">
                                     <span aria-hidden="true" class="iconMdsp add" title="Add credentials"></span>
@@ -124,7 +122,7 @@
                                 cli commands.
                                 <a
                                     class="is-external"
-                                    style="text-decoration: none !important;"
+                                    style="text-decoration: none !important"
                                     href="https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/setting-up-the-cli.html"
                                     target="_new"
                                 >
@@ -136,7 +134,7 @@
                                 <ul class="list__list" id="configurationList"></ul>
                             </div>
 
-                            <div style="text-align: right;">
+                            <div style="text-align: right">
                                 <button
                                     class="button--primary is-disabled"
                                     id="saveButton"
@@ -204,9 +202,7 @@
                                         <label for="radio-button02">Service Credentials (deprecated)</label>
                                     </div>
 
-                                    <label class="inputGroup__label is-required" for="text-passkey">
-                                        Passkey
-                                    </label>
+                                    <label class="inputGroup__label is-required" for="text-passkey"> Passkey </label>
                                     <input
                                         class="inputGroup__textInput"
                                         type="text"
@@ -219,9 +215,7 @@
                                         retrieve it.
                                     </div>
 
-                                    <label class="inputGroup__label is-required" for="text-user">
-                                        User
-                                    </label>
+                                    <label class="inputGroup__label is-required" for="text-user"> User </label>
                                     <input
                                         class="inputGroup__textInput"
                                         type="text"
@@ -233,9 +227,7 @@
                                         Username for application or service credentials.
                                     </div>
 
-                                    <label class="inputGroup__label is-required" for="text-password">
-                                        Password
-                                    </label>
+                                    <label class="inputGroup__label is-required" for="text-password"> Password </label>
                                     <input
                                         class="inputGroup__textInput"
                                         type="text"
@@ -247,9 +239,7 @@
                                         Password for application or service credentials.
                                     </div>
 
-                                    <label class="inputGroup__label is-required" for="text-gateway">
-                                        Gateway
-                                    </label>
+                                    <label class="inputGroup__label is-required" for="text-gateway"> Gateway </label>
                                     <input
                                         class="inputGroup__textInput"
                                         type="text"
@@ -257,13 +247,9 @@
                                         id="text-gateway"
                                         onblur="validateInput('#text-gateway')"
                                     />
-                                    <div class="inputGroup__description">
-                                        Region string or full gateway url
-                                    </div>
+                                    <div class="inputGroup__description">Region string or full gateway url</div>
 
-                                    <label class="inputGroup__label is-required" for="text-tenant">
-                                        Tenant
-                                    </label>
+                                    <label class="inputGroup__label is-required" for="text-tenant"> Tenant </label>
                                     <input
                                         class="inputGroup__textInput"
                                         type="text"
@@ -300,9 +286,7 @@
                                             id="text-appname"
                                             onblur="validateInput('#text-appname')"
                                         />
-                                        <div class="inputGroup__description">
-                                            Application name
-                                        </div>
+                                        <div class="inputGroup__description">Application name</div>
                                         <label class="inputGroup__label is-required" for="text-appversion">
                                             Application Version
                                         </label>
@@ -313,9 +297,7 @@
                                             id="text-appversion"
                                             onblur="validateInput('#text-appversion')"
                                         />
-                                        <div class="inputGroup__description">
-                                            Application version
-                                        </div>
+                                        <div class="inputGroup__description">Application version</div>
                                     </div>
                                 </div>
                             </form>
@@ -338,7 +320,7 @@
 
             <script type="text/javascript">
                 _msb.init({
-                    title: "mindconnect-nodejs 3.8.3",
+                    title: "mindconnect-nodejs 3.9.0",
                     appId: "_mdspcontent",
                     appInfoPath: "/app-info.json",
                     polyfills: {
