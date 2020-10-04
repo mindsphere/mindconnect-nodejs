@@ -49,3 +49,8 @@ signal-validation-*.json
 
 #clitest
 clitest
+
+# pkg files
+mindconnect-nodejs-linux
+mindconnect-nodejs-macos
+mindconnect-nodejs-win.exe
