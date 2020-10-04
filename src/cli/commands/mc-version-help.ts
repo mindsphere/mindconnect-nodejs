@@ -34,9 +34,9 @@ export default (program: CommanderStatic) => {
                 version: `${MC_VERSION}`,
             },
         };
-        
+
         const notifier = updateNotifier(pkgInfo);
-        
+
         if (notifier.update) {
             console.log(
                 `\n\t There is an update available: ${magenta(notifier.update.latest + " ")} (${notifier.update.type})`
