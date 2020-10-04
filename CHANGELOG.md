@@ -5,6 +5,7 @@
 - provided binary versions of the command line interface for windows, macos and linux (#185) [#hacktoberfest issue-03]
 - improved the build script to run in powershell as well (#184) [#hacktoberfest coding4funrocks]
 - fixed the example in `mc iam` command (#182) [#hacktoberfest, coding4funrocks]
+- bumped all dependencies
 
 ### Contributions 3.9.0
 
