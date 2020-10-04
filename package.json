@@ -96,5 +96,8 @@
     },
     "bin": {
         "mc": "bin/mc"
+    },
+    "pkg": {
+        "assets": "dist/**/*"
     }
 }
