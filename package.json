@@ -27,7 +27,8 @@
         "copyfiles:doc": "copyfiles images/* docs/",
         "createkey": "openssl genrsa -out private.key 3072",
         "license": "license-checker --csv --onlyAllow \"Apache-2.0; Apache*; BSD; BSD-2-Clause; BSD-3-Clause; ISC; MIT; Unlicense; WTFPL; CC-BY-3.0; CC0-1.0\" --production",
-        "license:summary": "license-checker --summary --onlyAllow \"Apache-2.0; Apache*; BSD; BSD-2-Clause; BSD-3-Clause; ISC; MIT; Unlicense; WTFPL; CC-BY-3.0; CC0-1.0\" --production"
+        "license:summary": "license-checker --summary --onlyAllow \"Apache-2.0; Apache*; BSD; BSD-2-Clause; BSD-3-Clause; ISC; MIT; Unlicense; WTFPL; CC-BY-3.0; CC0-1.0\" --production",
+        "pkg": "npm run prepare && pkg ."
     },
     "keywords": [
         "MindConnect",
@@ -78,6 +79,7 @@
         "mocha": "^8.0.1",
         "mocha-jenkins-reporter": "^0.4.3",
         "nock": "^12.0.3",
+        "pkg": "^4.4.9",
         "rimraf": "^3.0.2",
         "rollup": "^2.18.0",
         "rollup-plugin-node-polyfills": "^0.2.1",
