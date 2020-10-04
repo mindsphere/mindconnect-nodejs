@@ -1,5 +1,3 @@
-// Copyright Siemens AG, 2017
-
 export * from "./api/agent-auth";
 export * from "./api/auth-base";
 export * from "./api/browser-auth";
@@ -15,3 +13,4 @@ export * from "./api/sdk/index";
 export * from "./api/tokenmanager-auth";
 export * from "./api/user-auth";
 export { convertToTdpArray, retry } from "./api/utils";
+export * from "./version";

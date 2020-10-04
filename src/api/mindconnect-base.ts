@@ -1,6 +1,7 @@
 import fetch from "cross-fetch";
 import * as debug from "debug";
 import { removeUndefined, throwError } from "./utils";
+import { MC_NAME, MC_VERSION } from "../version";
 const HttpsProxyAgent = require("https-proxy-agent");
 const log = debug("mindconnect");
 
@@ -114,7 +115,7 @@ export abstract class MindConnectBase {
     protected _headers = {
         Accept: "*/*",
         "X-Powered-By": "meowz",
-        "User-Agent": "mindconnect-nodejs (3.9.0)",
+        "User-Agent": `${MC_NAME} (${MC_VERSION})`,
     };
 
     /**

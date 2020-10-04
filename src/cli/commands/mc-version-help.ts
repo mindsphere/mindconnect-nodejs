@@ -1,6 +1,7 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import { getColor } from "./command-utils";
+import { MC_VERSION } from "../../version";
 
 const magenta = getColor("magenta");
 const cyan = getColor("cyan");
@@ -10,7 +11,7 @@ const blue = getColor("blue");
 const yellow = getColor("yellow");
 
 export default (program: CommanderStatic) => {
-    program.version("MindConnect NodeJS CLI - Version: 3.8.3");
+    program.version(`MindConnect NodeJS CLI - Version: ${MC_VERSION}`);
 
     program.on("--help", () => {
         log(`\n  Documentation:\n`);
