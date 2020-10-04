@@ -1,7 +1,8 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import { getColor } from "./command-utils";
-import { MC_VERSION } from "../../version";
+import * as updateNotifier from "update-notifier";
+import { MC_NAME, MC_VERSION } from "../../version";
 
 const magenta = getColor("magenta");
 const cyan = getColor("cyan");
@@ -26,6 +27,24 @@ export default (program: CommanderStatic) => {
         log(`    the ${yellow("yellow colored commands &")} use borrowed mindsphere application cookies`);
         log(`    the credentials and cookies should only be used in secure environments`);
         log(`    Full documentation: ${cyan("https://opensource.mindsphere.io")}\n`);
+
+        const pkgInfo = {
+            pkg: {
+                name: `@mindconnect/${MC_NAME}`,
+                version: `${MC_VERSION}`,
+            },
+        };
+        
+        const notifier = updateNotifier(pkgInfo);
+        
+        if (notifier.update) {
+            console.log(
+                `\n\t There is an update available: ${magenta(notifier.update.latest + " ")} (${notifier.update.type})`
+            );
+            console.log(`\t Run ${magenta("npm install -g ")}${magenta(pkgInfo.pkg.name)} to update`);
+            console.log(`\t or download the release for your system from`);
+            console.log(`\t ${magenta("https://github.com/mindsphere/mindconnect-nodejs/releases")}\n`);
+        }
     });
 
     program.on("command:*", function () {
