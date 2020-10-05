@@ -3,6 +3,7 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { DataPointValue, MindConnectAgent, MindSphereSdk } from "../..";
+import { TimeStampedDataPoint } from "../../api/mindconnect-models";
 import { getAgentDir, retry, throwError } from "../../api/utils";
 import {
     adjustColor,
@@ -28,6 +29,8 @@ export default (program: CommanderStatic) => {
         .option("-a, --agentid <agentid>", "agentid")
         .option("-i, --assetid <assetid>", "target assetid for mapping")
         .option("-t, --typeid <typeid>", "asset type for configuration")
+        .option("-s, --timespan <timespan>", "timespan between generated timestamps (in ms)", "1000")
+        .option("-c, --count <count>", "Number of generated records", "10")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
@@ -211,6 +214,10 @@ function checkParameters(options: any) {
         !((options.assetid && !options.typeid) || (!options.assetid && options.typeid)) &&
         throwError("you have to specify either assetid or typeid for config mode but not both");
 
+    options.mode === "test" &&
+        !(options.timespan && options.count) &&
+        throwError("you have to specify the timespan and the count");
+
     ["map"].indexOf(options.mode) >= 0 &&
         !options.assetid &&
         throwError(`you have to specify assetid for ${options.mode}`);
@@ -219,23 +226,52 @@ function checkParameters(options: any) {
 async function inject(agent: MindConnectAgent, color: any, options: any) {
     const configuration = await agent.GetDataSourceConfiguration();
 
-    const data: DataPointValue[] = [];
-    configuration.dataSources.forEach((datasource) => {
-        datasource.dataPoints.forEach((dp) => {
-            data.push({ dataPointId: dp.id, qualityCode: "0", value: generateValue(dp.type.toString()) });
+    const bulkData: TimeStampedDataPoint[] = [];
+    const span = parseInt(options.timespan);
+    const count = parseInt(options.count);
+
+    let dataPointsCount = 0;
+    let startTime = new Date().getTime() - span * count;
+    for (let index = 0; index < options.count; index++) {
+        const data: DataPointValue[] = [];
+        const timeStamp = new Date(startTime);
+        configuration.dataSources.forEach((datasource) => {
+            datasource.dataPoints.forEach((dp) => {
+                data.push({
+                    dataPointId: dp.id,
+                    qualityCode: "0",
+                    value: generateValue(dp.type.toString(), timeStamp),
+                });
+                dataPointsCount++;
+            });
         });
-    });
 
-    verboseLog(JSON.stringify(data), options.verbose);
+        bulkData.push({ timestamp: timeStamp.toISOString(), values: data });
+        startTime += parseInt(options.timespan);
+    }
 
-    await retry(options.retry, () => agent.PostData(data));
-    console.log(`Injected ${color(data.length)} datapoints`);
+    verboseLog(JSON.stringify(bulkData, null, 2), options.verbose);
+
+    await retry(options.retry, () => agent.BulkPostData(bulkData));
+    console.log(
+        `Injected a bulk message with ${color(count)} timestamps and total number of ${color(
+            dataPointsCount
+        )} datapoints.`
+    );
 }
 
-function generateValue(type: string) {
-    let result = Math.floor(100 * Math.sin(new Date().getTime())).toString();
-    if (type === "TIMESTAMP") {
+function generateValue(type: string, timeStamp: Date) {
+    let result: number | string | boolean = 100 * Math.sin(timeStamp.getTime());
+
+    if (type === "INT" || type === "LONG") {
+        result = Math.floor(result);
+    } else if (type === "TIMESTAMP") {
         result = new Date().toISOString();
+    } else if (type === "BOOLEAN") {
+        result = Math.floor(result) % 2 === 0;
+    } else if (type === "STRING" || type === "BIG_STRING") {
+        result = `${type}_${result}`;
     }
-    return result;
+
+    return result.toString();
 }
