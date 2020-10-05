@@ -102,12 +102,12 @@ function checkParameters(options: any) {
     !options.dir &&
         errorLog("Missing dir name for download-bulk command. Run mc db --help for full syntax and examples.", true);
 
-    !options.assetid && errorLog(" You have to specify assetid. Run  mc df --help for full syntax and examples.", true);
+    !options.assetid && errorLog(" You have to specify assetid. Run  mc db --help for full syntax and examples.", true);
 
     !options.aspectname &&
-        errorLog(" You have to specify aspectname. Run  mc df --help for full syntax and examples.", true);
+        errorLog(" You have to specify aspectname. Run  mc db --help for full syntax and examples.", true);
 
-    !options.from && errorLog(" You have to specify from date. Run  mc df --help for full syntax and examples.", true);
+    !options.from && errorLog(" You have to specify from date. Run  mc db --help for full syntax and examples.", true);
 
-    !options.to && errorLog(" You have to specify to date. Run  mc df --help for full syntax and examples.", true);
+    !options.to && errorLog(" You have to specify to date. Run  mc db --help for full syntax and examples.", true);
 }

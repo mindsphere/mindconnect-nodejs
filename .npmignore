@@ -33,6 +33,7 @@ report.xml
 
 bulkupload*
 bulkdownload*
+eventdownload*
 
 # nyc
 .nyc_output
