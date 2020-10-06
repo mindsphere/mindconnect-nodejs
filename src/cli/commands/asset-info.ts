@@ -2,16 +2,7 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import { AssetManagementModels } from "../../api/sdk";
 import { retry } from "../../api/utils";
-import {
-    adjustColor,
-    errorLog,
-    getColor,
-    getSdk,
-    homeDirLog,
-    proxyLog,
-    serviceCredentialLog,
-    verboseLog,
-} from "./command-utils";
+import { adjustColor, errorLog, getColor, getSdk, homeDirLog, proxyLog, serviceCredentialLog } from "./command-utils";
 
 let color = getColor("magenta");
 
@@ -37,7 +28,6 @@ export default (program: CommanderStatic) => {
                     const asset = (await retry(options.retry, () =>
                         assetMgmt.GetAsset(options.assetid)
                     )) as AssetManagementModels.AssetResourceWithHierarchyPath;
-                    verboseLog(JSON.stringify(asset, null, 2), options.verbose);
 
                     const assetType = (await retry(options.retry, () =>
                         assetMgmt.GetAssetType(`${asset.typeId}`)
@@ -74,14 +64,18 @@ export default (program: CommanderStatic) => {
                             console.log(`\t - ${color(variable.name)} ${variable.unit} ${variable.dataType}`);
                         });
 
-                        const ts = await sdk.GetTimeSeriesClient().GetTimeSeries(asset.assetId!, entry.name!);
+                        const ts = await retry(options.retry, () =>
+                            sdk.GetTimeSeriesClient().GetTimeSeries(asset.assetId!, entry.name!)
+                        );
                         console.log("\nLast Timeseries Entry:");
                         console.table(ts);
                     }
                     console.log("\nLast Event Entries:");
-                    const events = await sdk
-                        .GetEventManagementClient()
-                        .GetEvents({ sort: "timestamp,desc", filter: JSON.stringify({ entityId: asset.assetId! }) });
+                    const events = await retry(options.retry, () =>
+                        sdk
+                            .GetEventManagementClient()
+                            .GetEvents({ sort: "timestamp,desc", filter: JSON.stringify({ entityId: asset.assetId! }) })
+                    );
                     console.table(events._embedded?.events?.slice(0, 10) || [], [
                         "timestamp",
                         "source",
@@ -90,7 +84,9 @@ export default (program: CommanderStatic) => {
                     ]);
 
                     console.log("\n Last uploaded Files:");
-                    const files = await sdk.GetIoTFileClient().GetFiles(asset.assetId!, { order: "updated desc" });
+                    const files = await retry(options.retry, () =>
+                        sdk.GetIoTFileClient().GetFiles(asset.assetId!, { order: "updated desc" })
+                    );
                     console.table(files.slice(0, 10), ["name", "path", "type", "timestamp"]);
 
                     console.log("\nAsset Manager:");
@@ -118,7 +114,7 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc asset-info --assetid 123456...ef \t\tdelete asset with id 132456...ef`);
+            log(`    mc asset-info --assetid 123456...ef \t print out infos about asset with id 132456...ef`);
             serviceCredentialLog();
         });
 };
