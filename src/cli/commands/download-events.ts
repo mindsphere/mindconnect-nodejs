@@ -2,7 +2,18 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
-import { adjustColor, errorLog, getColor, getSdk, homeDirLog, proxyLog, serviceCredentialLog } from "./command-utils";
+import { sleep } from "../../../test/test-utils";
+import { retry } from "../../api/utils";
+import {
+    adjustColor,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    proxyLog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
 import ora = require("ora");
 
 let color = getColor("magenta");
@@ -10,16 +21,22 @@ let color = getColor("magenta");
 export default (program: CommanderStatic) => {
     program
         .command("download-events")
-        .alias("de")
+        .alias("dn")
         .option("-d, --dir <directoryname>", "directory for the download (shouldn't exist)", "eventdownload")
-        .option("-i, --assetid <assetid>", "asset id from the mindsphere")
+        .option(
+            "-f, --filter [filter]",
+            `filter (see: ${color(
+                "https://developer.mindsphere.io/apis/advanced-eventmanagement/api-eventmanagement-best-practices.html"
+            )}) `
+        )
+        .option("-t, --typeid [typeid]", "event type")
         .option("-f, --from <from>", "from date")
         .option("-t, --to <to>", "to date")
-        .option("-s, --size <size>", "max entries per file ", "200")
+        .option("-s, --size <size>", "max entries per file ", "100")
         .option("-p, --passkey <passkey>", `passkey`)
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(`${color("download the timeseries from mindsphere")}`)
+        .description(`${color("download the events from mindsphere *")}`)
         .action((options) => {
             (async () => {
                 try {
@@ -33,48 +50,28 @@ export default (program: CommanderStatic) => {
 
                     const eventManagement = sdk.GetEventManagementClient();
 
-                    // const result = eventManagement.GetEvents()
+                    const spinner = ora("downloading mindsphere events");
+                    !options.verbose && spinner.start();
 
-                    // const iotTs = sdk.GetTimeSeriesClient();
+                    const result = await retry(options.retry, () => eventManagement.GetEvents({ size: options.size }));
+                    verboseLog(`downloading events_0.json`, options.verbose, spinner);
+                    fs.writeFileSync(`${path.resolve(options.dir)}/events_0.json`, JSON.stringify(result._embedded));
+                    await sleep(500);
 
-                    // let file = 0;
-                    // const spinner = ora(`downloading ${options.aspectname} data`);
-                    // !options.verbose && spinner.start();
-                    // let ts = await retry(
-                    //     options.retry,
-                    //     () =>
-                    //         (iotTs.GetTimeSeriesBulkStyle(options.assetid, options.aspectname, {
-                    //             from: new Date(options.from),
-                    //             to: new Date(options.to),
-                    //             limit: options.size,
-                    //         }) as unknown) as TimeSeriesModels.BulkTimeseries
-                    // );
+                    for (let index = 1; index < (result.page?.totalPages || 0); index++) {
+                        const next = await retry(options.retry, () =>
+                            eventManagement.GetEvents({ size: result!.page!.size, page: index })
+                        );
+                        verboseLog(`downloading events_${index}.json`, options.verbose, spinner);
+                        fs.writeFileSync(
+                            `${path.resolve(options.dir)}/events_${index}.json`,
+                            JSON.stringify(next._embedded)
+                        );
+                        await sleep(500);
+                    }
 
-                    // fs.writeFileSync(
-                    //     `${path.resolve(options.dir)}/${options.aspectname}_${file++}.json`,
-                    //     JSON.stringify(ts.records)
-                    // );
-
-                    // verboseLog(`downloaded ${ts.records.length} records`, options.verbose, spinner);
-
-                    // await sleep(500);
-                    // for (;;) {
-                    //     if (ts.nextRecord) {
-                    //         const url: string = `${ts.nextRecord}`;
-                    //         ts = await retry(options.retry, () => iotTs.GetNextRecordsBulkStyle(url));
-                    //         fs.writeFileSync(
-                    //             `${path.resolve(options.dir)}/${options.aspectname}_${file++}.json`,
-                    //             JSON.stringify(ts.records)
-                    //         );
-                    //         verboseLog(`downloaded ${ts.records.length} records`, options.verbose, spinner);
-                    //         await sleep(500);
-                    //     } else {
-                    //         break;
-                    //     }
-                    // }
-
-                    // !options.verbose && spinner.succeed("Done");
-                    // console.log(`Files with timeseries data are in ${color(path.resolve(options.dir))} directory`);
+                    !options.verbose && spinner.succeed("Done");
+                    console.log(`Files with event data are in ${color(path.resolve(options.dir))} directory`);
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
@@ -83,7 +80,7 @@ export default (program: CommanderStatic) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc download-bulk --assetid 12345..ef --from 12/10/2019 --to 12/16/2019  \t\t download timeseries from specified asset`
+                `    mc download-events --assetid 12345..ef --from 12/10/2019 --to 12/16/2019  \t\t download events from specified asset`
             );
             serviceCredentialLog();
         });
@@ -91,11 +88,11 @@ export default (program: CommanderStatic) => {
 
 function checkParameters(options: any) {
     !options.dir &&
-        errorLog("Missing dir name for download-bulk command. Run mc db --help for full syntax and examples.", true);
+        errorLog("Missing dir name for download-events command. Run mc dn --help for full syntax and examples.", true);
 
-    !options.assetid && errorLog(" You have to specify assetid. Run  mc df --help for full syntax and examples.", true);
+    // !options.assetid && errorLog(" You have to specify assetid. Run  mc de --help for full syntax and examples.", true);
 
-    !options.from && errorLog(" You have to specify from date. Run  mc df --help for full syntax and examples.", true);
+    // !options.from && errorLog(" You have to specify from date. Run  mc de --help for full syntax and examples.", true);
 
-    !options.to && errorLog(" You have to specify to date. Run  mc df --help for full syntax and examples.", true);
+    // !options.to && errorLog(" You have to specify to date. Run  mc de --help for full syntax and examples.", true);
 }

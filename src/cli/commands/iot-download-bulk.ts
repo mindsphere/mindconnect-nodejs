@@ -32,7 +32,7 @@ export default (program: CommanderStatic) => {
         .option("-p, --passkey <passkey>", `passkey`)
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(`${color("download the timeseries from mindsphere")}`)
+        .description(`${color("download the timeseries data in bulk from mindsphere *")}`)
         .action((options) => {
             (async () => {
                 try {

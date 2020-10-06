@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import * as program from "commander";
+import assetInfoCommand from "./commands/asset-info";
 import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
+import downloadEventsCommand from "./commands/download-events";
 import identityCommand from "./commands/identity";
 import iotCheckBulkComand from "./commands/iot-bulk-check";
 import iotBulkRunCommand from "./commands/iot-bulk-run";
@@ -64,18 +66,18 @@ iotBulkRunCommand(program);
 iotCheckBulkComand(program);
 iotDownloadBulkCommand(program);
 
-// * assets and files handling commands
+// * assets files and event handling commands
 listAssetsCommand(program);
+assetInfoCommand(program);
 deleteAssetCommand(program);
 listFilesCommand(program);
 downloadFileCommand(program);
 deleteFileCommand(program);
+downloadEventsCommand(program);
 
 // * identity access management commands
 
 identityCommand(program);
-
-// * development proxy
 
 // * analytics command
 
@@ -84,7 +86,7 @@ signalValidationCommand(program);
 trendPredictionCommand(program);
 kpicalculationCommand(program);
 
-// dev proxy command
+// * dev proxy command
 devProxyCommand(program);
 
 // * opcua pub sub commands
