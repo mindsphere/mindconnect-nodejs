@@ -37,8 +37,14 @@ function getLength(dataType: string, options: any) {
     return null;
 }
 
-function toMindSphereDataType(schemaProperty: JSONSchemaProperty): string {
+function toMindSphereDataType(schemaProperty: JSONSchemaProperty, options: any): string {
     let result = undefined;
+    verboseLog(JSON.stringify(schemaProperty), options.verbose);
+    if (!schemaProperty.type) {
+        console.log("Invalid property in Schema");
+        console.log(JSON.stringify(schemaProperty));
+    }
+
     switch (schemaProperty.type.toLowerCase()) {
         case "integer":
             result = "INT";
@@ -333,7 +339,7 @@ function generateVariables(prefix: string, inputSchema: JSONSchema, options: any
     for (const key in inputSchema.properties!) {
         const obj = (inputSchema.properties! as any)[key]! as JSONSchemaProperty;
         if (obj.type !== "object") {
-            const type = toMindSphereDataType(obj);
+            const type = toMindSphereDataType(obj, options);
 
             // only targeted properties
             if (options.targetonly && obj.target !== options.aspect) continue;
