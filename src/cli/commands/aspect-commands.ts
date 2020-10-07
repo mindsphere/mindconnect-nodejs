@@ -80,8 +80,10 @@ export default (program: CommanderStatic) => {
         .option("-n, --aspect <aspect>", "the aspect type name")
         .option("-p, --prefixflattened", "prefix variable names with previous name when flattening schema")
         .option("-t, --targetonly", "consider only variables which have target equal to aspect in schema")
+        .option("-u, --untargeted", "consider only variables which don't have target in schema")
         .option("-l, --length <length>", "default string length", "255")
         .option("-b, --biglength <biglength>", "default bigstring length", "10000")
+        .option("-i, --idonly", "list only ids")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
@@ -159,6 +161,7 @@ async function createAspectType(options: any, sdk: MindSphereSdk) {
 
     const name = aspect.name!.includes(".") ? aspect.name : `${sdk.GetTenant()}.${aspect.name}`;
     await sdk.GetAssetManagementClient().PutAspectType(name, aspect);
+    console.log(`creted aspect ${color(name)}`);
 }
 
 function createTemplate(options: any) {
@@ -274,7 +277,7 @@ async function listAspectTypes(sdk: MindSphereSdk, options: any) {
     const filter = buildFilter(options);
     verboseLog(JSON.stringify(filter, null, 2), options.verbose);
 
-    console.log(`aspectid  etag  type variables name`);
+    !options.idonly && console.log(`id  etag  type variables name`);
 
     let assetCount = 0;
 
@@ -294,10 +297,14 @@ async function listAspectTypes(sdk: MindSphereSdk, options: any) {
 
         for (const aspect of aspects._embedded.aspectTypes || []) {
             assetCount++;
-            console.log(
-                `${aspect.id}\t${aspect.etag} ${aspect.category} [${aspect.variables.length}]\t${color(aspect.name)}`
-            );
+            !options.idonly &&
+                console.log(
+                    `${aspect.id}\t${aspect.etag} ${aspect.category} [${aspect.variables.length}]\t${color(
+                        aspect.name
+                    )}`
+                );
 
+            options.idonly && console.log(`${aspect.id}`);
             verboseLog(JSON.stringify(aspect, null, 2), options.verbose);
         }
     } while (page++ < (aspects.page.totalPages || 0));
@@ -329,6 +336,7 @@ function generateVariables(prefix: string, inputSchema: JSONSchema, options: any
 
             // only targeted properties
             if (options.targetonly && obj.target !== options.aspect) continue;
+            if (options.untargeted && obj.target) continue;
 
             let name = options.prefixflattened ? `${prefix}_${key}` : key;
 

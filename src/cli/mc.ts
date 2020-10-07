@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import * as program from "commander";
 import aspectCommands from "./commands/aspect-commands";
+import assetTypeCommand from "./commands/aspecttypes-commands";
 import assetInfoCommand from "./commands/asset-info";
 import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
@@ -38,6 +39,7 @@ import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
 import trendPredictionCommand from "./commands/trend-prediction";
 // * generic commands
+
 versionAndHelp(program);
 
 // * agent commands
@@ -69,6 +71,7 @@ iotDownloadBulkCommand(program);
 
 // * assets files and event handling commands
 aspectCommands(program);
+assetTypeCommand(program);
 listAssetsCommand(program);
 assetInfoCommand(program);
 deleteAssetCommand(program);
