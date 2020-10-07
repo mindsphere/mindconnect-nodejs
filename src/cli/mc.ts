@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import * as program from "commander";
+import aspectCommands from "./commands/aspect-commands";
 import assetInfoCommand from "./commands/asset-info";
 import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
@@ -67,6 +68,7 @@ iotCheckBulkComand(program);
 iotDownloadBulkCommand(program);
 
 // * assets files and event handling commands
+aspectCommands(program);
 listAssetsCommand(program);
 assetInfoCommand(program);
 deleteAssetCommand(program);

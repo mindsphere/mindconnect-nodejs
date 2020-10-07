@@ -113,10 +113,4 @@ function buildFilter(options: any) {
     return filter;
 }
 
-function checkRequiredParameters(options: any) {
-    // !options.passkey &&
-    // errorLog(
-    //     "you have to provide a passkey to get the service token (run mc la --help for full description)",
-    //     true
-    // );
-}
+function checkRequiredParameters(options: any) {}

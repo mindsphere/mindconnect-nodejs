@@ -55,3 +55,6 @@ clitest
 mindconnect-nodejs-linux
 mindconnect-nodejs-macos
 mindconnect-nodejs-win.exe
+
+# mindsphere files
+*.mdsp.json
