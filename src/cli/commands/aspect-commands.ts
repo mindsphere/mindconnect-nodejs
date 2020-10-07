@@ -45,6 +45,7 @@ function toMindSphereDataType(schemaProperty: JSONSchemaProperty): string {
             break;
         case "number":
             result = "DOUBLE";
+            break;
         case "boolean":
             result = "BOOLEAN";
             break;
