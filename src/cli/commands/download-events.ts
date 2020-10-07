@@ -23,6 +23,7 @@ export default (program: CommanderStatic) => {
         .command("download-events")
         .alias("dn")
         .option("-d, --dir <directoryname>", "directory for the download (shouldn't exist)", "eventdownload")
+        .option("-i, --assetid <assetid>", "asset id from the mindsphere ")
         .option(
             "-f, --filter [filter]",
             `filter (see: ${color(
@@ -53,7 +54,16 @@ export default (program: CommanderStatic) => {
                     const spinner = ora("downloading mindsphere events");
                     !options.verbose && spinner.start();
 
-                    const result = await retry(options.retry, () => eventManagement.GetEvents({ size: options.size }));
+                    let filter: any;
+
+                    // TODO: add proper filtering
+                    if (options.filter) {
+                        filter = options.filter;
+                    }
+
+                    const result = await retry(options.retry, () =>
+                        eventManagement.GetEvents({ size: options.size, filter: filter })
+                    );
                     verboseLog(`downloading events_0.json`, options.verbose, spinner);
                     fs.writeFileSync(`${path.resolve(options.dir)}/events_0.json`, JSON.stringify(result._embedded));
                     await sleep(500);
@@ -90,9 +100,7 @@ function checkParameters(options: any) {
     !options.dir &&
         errorLog("Missing dir name for download-events command. Run mc dn --help for full syntax and examples.", true);
 
-    // !options.assetid && errorLog(" You have to specify assetid. Run  mc de --help for full syntax and examples.", true);
-
-    // !options.from && errorLog(" You have to specify from date. Run  mc de --help for full syntax and examples.", true);
-
-    // !options.to && errorLog(" You have to specify to date. Run  mc de --help for full syntax and examples.", true);
+    options.filter &&
+        (options.from || options.to || options.typeid) &&
+        errorLog("Please use either the filter or the from, to and typeid parameters but not both.", true);
 }
