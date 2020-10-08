@@ -101,3 +101,4 @@ mindconnect-nodejs-win.exe
 # mindsphere files
 *.mdsp.json
 *.mdsp.js
+/.venv

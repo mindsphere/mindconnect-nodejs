@@ -28,7 +28,7 @@ interface JSONSchemaProperty {
     format?: string;
     unit?: string;
     default?: number | string;
-    target?: string;
+    target?: string | string[];
 }
 
 function getLength(dataType: string, options: any) {
@@ -151,10 +151,10 @@ export default (program: CommanderStatic) => {
                 `    mc aspects --mode convert --schema Environment.schema.json --aspect Environment \n\t create a template file for aspect type Environment from JSON schema`
             );
             log(
-                `    mc aspects --mode convert --schema Environment.schema.json --aspect Environment -prefixflattened \n\t prefixes the variable names with parent object names (e.g. Environment_Temperature)`
+                `    mc aspects --mode convert --schema Environment.schema.json --aspect Environment --prefixflattened \n\t prefixes the variable names with parent object names (e.g. Environment_Temperature)`
             );
             log(
-                `    mc aspects --mode convert --schema Environment.schema.json --aspect Environment -targetonly \n\t select only variables from json schema with target property equal to assettype`
+                `    mc aspects --mode convert --schema Environment.schema.json --aspect Environment --targetonly \n\t select only variables from json schema with target property equal to assettype`
             );
 
             serviceCredentialLog();
@@ -341,9 +341,19 @@ function generateVariables(prefix: string, inputSchema: JSONSchema, options: any
         if (obj.type !== "object") {
             const type = toMindSphereDataType(obj, options);
 
+            // helper to deal with targets being string or string[]
+            const isTarget = (aspect: any, target?: string | string[]) => {
+                if (!target) {
+                    return false;
+                } else {
+                    const targets: string[] = target instanceof Array ? target : [target];
+                    return targets.includes(aspect);
+                }
+            };
+
             // only targeted properties
-            if (options.targetonly && obj.target !== options.aspect) continue;
-            if (options.untargeted && obj.target) continue;
+            if (options.targetonly && !isTarget(options.aspect, obj.target)) continue;
+            if (options.untargeted && isTarget(options.aspect, obj.target)) continue;
 
             let name = options.prefixflattened ? `${prefix}_${key}` : key;
 
