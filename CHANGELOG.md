@@ -2,6 +2,8 @@
 
 ## 3.9.0 - (Pewter Vienna) - October 2020
 
+- SDK: event analytics api (#162)
+- SDK: EventManagement: sharedEvents support included in GetEvents operation (#170)
 - CLI: mc configure-agent --mode test can now produce a configurable number of test records
 - CLI will now notify users that there is a new version of the CLI available (#190) [#hacktoberfest lyallemma]
 - provided binary versions of the command line interface for windows, macos and linux (#185) [#hacktoberfest issue-03]

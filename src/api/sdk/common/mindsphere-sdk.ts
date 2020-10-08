@@ -1,5 +1,6 @@
 import { AgentManagementClient } from "../agent/agent-management";
 import { AssetManagementClient } from "../asset/asset-management";
+import { EventAnalyticsClient } from "../event-analytics/eventanalytics";
 import { EventManagementClient } from "../event/event-management";
 import { IdentityManagementClient } from "../identity/identity";
 import { TimeSeriesClient } from "../iot/iot-timeseries";
@@ -206,4 +207,18 @@ export class MindSphereSdk extends SdkClient {
     }
 
     private _identityManagementClient?: IdentityManagementClient;
+
+    /**
+     * Event Analytics Client
+     *
+     * @returns {EventAnalyticsClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetEventAnalyticsClient(): EventAnalyticsClient {
+        this._eventAnalyticsClient = this._eventAnalyticsClient || new EventAnalyticsClient(this._authenticator);
+        return this._eventAnalyticsClient;
+    }
+
+    private _eventAnalyticsClient?: EventAnalyticsClient;
 }

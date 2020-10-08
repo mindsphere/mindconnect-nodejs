@@ -33,6 +33,7 @@ report.xml
 
 bulkupload*
 bulkdownload*
+eventdownload*
 
 # nyc
 .nyc_output
@@ -54,3 +55,7 @@ clitest
 mindconnect-nodejs-linux
 mindconnect-nodejs-macos
 mindconnect-nodejs-win.exe
+
+# mindsphere files
+*.mdsp.json
+*.mdsp.js

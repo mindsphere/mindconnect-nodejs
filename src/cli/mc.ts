@@ -1,7 +1,12 @@
 #!/usr/bin/env node
 import * as program from "commander";
+import aspectCommands from "./commands/aspect-commands";
+import assetTypeCommand from "./commands/aspecttypes-commands";
+import assetInfoCommand from "./commands/asset-info";
+import createAssetCommand from "./commands/create-asset";
 import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
+import downloadEventsCommand from "./commands/download-events";
 import identityCommand from "./commands/identity";
 import iotCheckBulkComand from "./commands/iot-bulk-check";
 import iotBulkRunCommand from "./commands/iot-bulk-run";
@@ -35,6 +40,7 @@ import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
 import trendPredictionCommand from "./commands/trend-prediction";
 // * generic commands
+
 versionAndHelp(program);
 
 // * agent commands
@@ -64,18 +70,21 @@ iotBulkRunCommand(program);
 iotCheckBulkComand(program);
 iotDownloadBulkCommand(program);
 
-// * assets and files handling commands
+// * assets files and event handling commands
+aspectCommands(program);
+assetTypeCommand(program);
 listAssetsCommand(program);
+assetInfoCommand(program);
+createAssetCommand(program);
 deleteAssetCommand(program);
 listFilesCommand(program);
 downloadFileCommand(program);
 deleteFileCommand(program);
+downloadEventsCommand(program);
 
 // * identity access management commands
 
 identityCommand(program);
-
-// * development proxy
 
 // * analytics command
 
@@ -84,7 +93,7 @@ signalValidationCommand(program);
 trendPredictionCommand(program);
 kpicalculationCommand(program);
 
-// dev proxy command
+// * dev proxy command
 devProxyCommand(program);
 
 // * opcua pub sub commands

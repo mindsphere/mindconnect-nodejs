@@ -32,7 +32,7 @@ export class EventManagementClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/events`,
-            body: event
+            body: event,
         })) as EventManagementModels.CustomEventCreated;
     }
 
@@ -68,6 +68,8 @@ export class EventManagementClient extends SdkClient {
      * @param {boolean} [params.history]
      * Optional paramater, if we want to retrieve the history of an event which is based on using the same correlationID, entityID, typeID.
      * If the latest event instance in a history of an event is deleted then the history of the event will be deleted.Default value : false
+     * @param {boolean} [params.includeShared]
+     * Specifies if received event or eventTypes should be consider for the API operation.
      * @returns {Promise<EventManagementModels.EmbeddedEventsList>}
      *
      * @memberOf EventManagementClient
@@ -79,16 +81,17 @@ export class EventManagementClient extends SdkClient {
         filter?: string;
         ifNoneMatch?: string;
         history?: boolean;
+        includeShared?: boolean;
     }): Promise<EventManagementModels.EmbeddedEventsList> {
         const parameters = params || {};
-        const { page, size, sort, filter, ifNoneMatch, history } = parameters;
+        const { page, size, sort, filter, ifNoneMatch, history, includeShared } = parameters;
 
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/events?${toQueryString({ page, size, sort, filter, history })}`,
-            additionalHeaders: { "If-None-Match": ifNoneMatch }
+            baseUrl: `${this._baseUrl}/events?${toQueryString({ page, size, sort, filter, history, includeShared })}`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch },
         });
 
         return result as EventManagementModels.EmbeddedEventsList;
@@ -116,7 +119,7 @@ export class EventManagementClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/events/${eventId}`,
-            additionalHeaders: parameters
+            additionalHeaders: parameters,
         })) as EventManagementModels.CustomEvent;
     }
 
@@ -157,7 +160,7 @@ export class EventManagementClient extends SdkClient {
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/events/${eventId}`,
             body: event,
-            additionalHeaders: { "If-Match": ifMatch }
+            additionalHeaders: { "If-Match": ifMatch },
         })) as EventManagementModels.CustomEvent;
     }
 
@@ -189,7 +192,7 @@ export class EventManagementClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/eventTypes`,
-            body: eventType
+            body: eventType,
         })) as EventManagementModels.EventType;
     }
 
@@ -225,7 +228,7 @@ export class EventManagementClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/eventTypes?${toQueryString({ page, size, sort, filter, history })}`,
-            additionalHeaders: { "If-None-Match": ifNoneMatch }
+            additionalHeaders: { "If-None-Match": ifNoneMatch },
         });
 
         return result as EventManagementModels.EmbeddedEventsTypesList;
@@ -253,7 +256,7 @@ export class EventManagementClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/eventTypes/${eventTypeId}`,
-            additionalHeaders: parameters
+            additionalHeaders: parameters,
         })) as EventManagementModels.EventType;
     }
 
@@ -319,7 +322,7 @@ export class EventManagementClient extends SdkClient {
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/eventTypes/${eventTypeId}`,
             body: eventTypePatch,
-            additionalHeaders: { "If-Match": ifMatch }
+            additionalHeaders: { "If-Match": ifMatch },
         })) as EventManagementModels.EventType;
     }
 
@@ -344,7 +347,7 @@ export class EventManagementClient extends SdkClient {
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/eventTypes/${eventTypeId}`,
             additionalHeaders: { "If-Match": ifMatch },
-            noResponse: true
+            noResponse: true,
         });
     }
 
@@ -374,7 +377,7 @@ export class EventManagementClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/deleteEventsJobs`,
-            body: deleteEventsJob
+            body: deleteEventsJob,
         })) as EventManagementModels.JobResource;
     }
 
@@ -393,7 +396,7 @@ export class EventManagementClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/deleteEventsJobs/${jobId}`
+            baseUrl: `${this._baseUrl}/deleteEventsJobs/${jobId}`,
         })) as EventManagementModels.DeleteJobResource;
     }
 
@@ -417,7 +420,7 @@ export class EventManagementClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/createEventsJobs`,
-            body: createEventsJob
+            body: createEventsJob,
         })) as EventManagementModels.JobResource;
     }
 
@@ -434,7 +437,7 @@ export class EventManagementClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/createEventsJobs/${jobId}`
+            baseUrl: `${this._baseUrl}/createEventsJobs/${jobId}`,
         })) as EventManagementModels.CreateJobResource;
     }
 
@@ -451,7 +454,7 @@ export class EventManagementClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/`
+            baseUrl: `${this._baseUrl}/`,
         })) as EventManagementModels.Billboard;
     }
 }
