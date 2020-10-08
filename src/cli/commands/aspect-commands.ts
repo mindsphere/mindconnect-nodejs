@@ -89,7 +89,7 @@ export default (program: CommanderStatic) => {
         .option("-t, --targetonly", "consider only variables which have target equal to aspect in schema")
         .option("-u, --untargeted", "consider only variables which don't have target in schema")
         .option("-l, --length <length>", "default string length", "255")
-        .option("-b, --biglength <biglength>", "default bigstring length", "10000")
+        .option("-b, --biglength <biglength>", "default bigstring length", "5000")
         .option("-i, --idonly", "list only ids")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
@@ -395,4 +395,7 @@ function checkRequiredParamaters(options: any) {
     options.mode === "convert" &&
         !options.schema &&
         errorLog("you have to provide the json schema to convert (see mc aspects --help for more details)", true);
+    options.mode === "convert" &&
+        !options.aspect &&
+        errorLog("you have to provide the aspect name for the schema (see mc aspects --help for more details)", true);
 }
