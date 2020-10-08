@@ -2,8 +2,7 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
-import { DataPointValue, MindConnectAgent, MindSphereSdk } from "../..";
-import { TimeStampedDataPoint } from "../../api/mindconnect-models";
+import { DataPointValue, MindConnectAgent, MindSphereSdk, TimeStampedDataPoint } from "../..";
 import { getAgentDir, retry, throwError } from "../../api/utils";
 import {
     adjustColor,
@@ -25,7 +24,7 @@ export default (program: CommanderStatic) => {
         .command("configure-agent")
         .alias("co")
         .option("-c, --config <agentconfig>", "config file with agent configuration")
-        .option("-m, --mode [config | map | print | delete | test]", "command mode", "config")
+        .option("-m, --mode [config | map | print | delete | test | func]", "command mode", "config")
         .option("-a, --agentid <agentid>", "agentid")
         .option("-i, --assetid <assetid>", "target assetid for mapping")
         .option("-t, --typeid <typeid>", "asset type for configuration")
@@ -70,6 +69,8 @@ export default (program: CommanderStatic) => {
 
                     options.mode === "print" && (await print(sdk, agentid, color, options));
                     options.mode === "print" && process.exit(0);
+                    options.mode === "func" && (await printFunc(sdk, agentid, color, options));
+                    options.mode === "func" && process.exit(0);
                     options.mode === "config" && (await config(sdk, agentid, color, options));
                     options.mode === "delete" && (await deleteMappings(sdk, agentid, color, options));
                     options.mode === "map" && (await map(sdk, agentid, color, options));
@@ -104,9 +105,7 @@ export default (program: CommanderStatic) => {
                 `    mc configure-agent --mode map --agentid 12345..ef --assetid 1234567 \tcreates the mappings for assetid`
             );
 
-            log(
-                `    mc configure-agent --mode delete --agentid 12345..ef --assetid 1234567 \tdeletes the mappings for assetid`
-            );
+            log(`    mc configure-agent --mode delete --agentid 12345..ef \t\tdeletes the mappings for agentid`);
             log(`    mc configure-agent --config agent.json --mode test \t\t\t\tsends test data to mindsphere`);
         });
 };
@@ -181,6 +180,43 @@ async function print(sdk: MindSphereSdk, agentid: any, color: any, options: any)
     verboseLog(JSON.stringify(mappings, null, 2), options.verbose);
 }
 
+async function printFunc(sdk: MindSphereSdk, agentid: any, color: any, options: any) {
+    const configuration = await sdk.GetAgentManagementClient().GetDataSourceConfiguration(agentid);
+
+    let result = "";
+    result += "\nfunction convertToDataPoint (rawVariable, aspect) {";
+
+    result += "\n  let variable = rawVariable;";
+    result += "\n  variable = variable.replace(' ', '_');";
+    result += "\n  variable = variable.replace('-', '_');";
+    result += "\n  variable = variable.replace(/[W_]/g, '_');";
+    result += "\n  variable = variable.trim();";
+    result += "\n  variable = variable.replace(/^[_]/, '');";
+
+    configuration.dataSources.forEach((element) => {
+        if (!element.customData) {
+            throw Error("cant create function there is no custom data avaiable, the config was not done via CLI");
+        }
+        result += `\n   if (aspect === '${element.customData!.aspect}') { `;
+        element.dataPoints.forEach((dataPoint) => {
+            if (!dataPoint.customData) {
+                throw Error("cant create function there is no custom data avaiable, the config was not done via CLI");
+            }
+            if (dataPoint.id !== `DP-${dataPoint.customData!.variable}`) {
+                result += `\n    if (variable === '${dataPoint.customData!.variable}') return '${dataPoint.id}';`;
+            }
+        });
+        result += `\n    return \`DP-\${variable}\`;`;
+        result += `\n  }`;
+    });
+
+    result += "\n}";
+
+    fs.writeFileSync("mappingfuntion.mdsp.js", result);
+    console.log(`The file ${color("mappingfuntion.mdsp.js")} with mapping function was created.`);
+    verboseLog(result, options.verbose);
+}
+
 async function config(sdk: MindSphereSdk, agentid: any, color: any, options: any) {
     let assettypeid = options.typeid;
 
@@ -203,8 +239,8 @@ async function config(sdk: MindSphereSdk, agentid: any, color: any, options: any
 }
 
 function checkParameters(options: any) {
-    ["map", "config", "print", "delete", "test"].indexOf(options.mode) < 0 &&
-        throwError("The mode must be map | configure | print | delete | test");
+    ["map", "config", "print", "delete", "test", "func"].indexOf(options.mode) < 0 &&
+        throwError("The mode must be map | configure | print | delete | test | func");
 
     options.passkey &&
         options.mode === "test" &&
