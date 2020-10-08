@@ -12,6 +12,7 @@ export default (program: CommanderStatic) => {
         .alias("cs")
         .option("-n, --assetname <assetname>", "assetname")
         .option("-p, --parentid <parentid>", "parentid")
+        .option("-e, --externalid <externalid>", "externalid")
         .option("-t, --typeid <typeid>", "typeid")
         .option("-d, --desc <desc>", "description", "created with mindsphere CLI")
         .option("-k, --passkey <passkey>", "passkey")
@@ -33,6 +34,7 @@ export default (program: CommanderStatic) => {
                         assetMgmt.PostAsset({
                             name: options.assetname,
                             parentId: options.parentid || (await assetMgmt.GetRootAsset()).assetId!,
+                            externalId: options.externalid,
                             typeId: options.typeid,
                             description: options.desc,
                         })
