@@ -151,10 +151,10 @@ export default (program: CommanderStatic) => {
                 `    mc aspects --mode convert --schema Environment.schema.json --aspect Environment \n\t create a template file for aspect type Environment from JSON schema`
             );
             log(
-                `    mc aspects --mode convert --schema Environment.schema.json --aspect Environment -prefixflattened \n\t prefixes the variable names with parent object names (e.g. Environment_Temperature)`
+                `    mc aspects --mode convert --schema Environment.schema.json --aspect Environment --prefixflattened \n\t prefixes the variable names with parent object names (e.g. Environment_Temperature)`
             );
             log(
-                `    mc aspects --mode convert --schema Environment.schema.json --aspect Environment -targetonly \n\t select only variables from json schema with target property equal to assettype`
+                `    mc aspects --mode convert --schema Environment.schema.json --aspect Environment --targetonly \n\t select only variables from json schema with target property equal to assettype`
             );
 
             serviceCredentialLog();
