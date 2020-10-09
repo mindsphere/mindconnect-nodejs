@@ -15,10 +15,10 @@ export default (program: CommanderStatic) => {
         .option("-e, --externalid <externalid>", "externalid")
         .option("-t, --typeid <typeid>", "typeid")
         .option("-d, --desc <desc>", "description", "created with mindsphere CLI")
+        .option("-w, --twintype <twintype>", "digital twin type [performance|simulation]")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .option("-w, --twintype <twintype>", "digital twin type [performance|simulation]")
         .description(color(`create asset in mindsphere *`))
         .action((options) => {
             (async () => {
@@ -38,7 +38,7 @@ export default (program: CommanderStatic) => {
                             externalId: options.externalid,
                             typeId: options.typeid,
                             description: options.desc,
-                            twinType: options.twintype || AssetManagementModels.TwinType.Performance
+                            twinType: options.twintype || AssetManagementModels.TwinType.Performance,
                         })
                     )) as AssetManagementModels.AssetResourceWithHierarchyPath;
 
@@ -66,5 +66,7 @@ export default (program: CommanderStatic) => {
 
 function checkRequiredParameters(options: any) {
     (!options.assetname || !options.typeid) && errorLog("you have to specify at least the asset name and typeid", true);
-    options.twintype && !["performance", "simulation"].includes(options.twintype) && errorLog("the twin type must be either performance or simulation", true);
+    options.twintype &&
+        !["performance", "simulation"].includes(options.twintype) &&
+        errorLog("the twin type must be either performance or simulation", true);
 }
