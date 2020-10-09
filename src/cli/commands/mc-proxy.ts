@@ -380,5 +380,5 @@ function checkRequiredParamaters(options: any) {
 
     options.mode === "session" &&
         (!options.session || !options.xsrftoken || !options.host) &&
-        throwError("you have to specifiy session, xsrftoken and host for session mode");
+        throwError("you have to specify session, xsrftoken and host for session mode");
 }
