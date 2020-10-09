@@ -53,7 +53,7 @@ The following steps describe the easiest way to test the library. You can of cou
 
 ### Step 0: Create an asset type and aspect types
 
-Mindsphere V3 IoT model requires that you create an asset type and aspect types to describe your assets. For the example we will create an asset type of type Engine with two aspect types: Environment and Vibration. (Note that my tenant is called castidev, you will have to use your own tenant name)
+MindSphere V3 IoT model requires that you create an asset type and aspect types to describe your assets. For the example we will create an asset type of type Engine with two aspect types: Environment and Vibration. (Note that my tenant is called castidev, you will have to use your own tenant name)
 
 ![assetype](images/types.png)
 
@@ -63,7 +63,7 @@ More information about [MindSphere Data Model](https://siemens.mindsphere.io/en/
 
 Create an asset (In example it is called **AcmeMotor**) of type Engine in AssetManager for your data.
 
-### Step 2: Create an agent of type MindConnectLib in Mindsphere
+### Step 2: Create an agent of type MindConnectLib in MindSphere
 
 Create an agent in Asset Manager of type core.MindConnectLib create initial JSON token and store it to file (e.g. agentconfig.json)
 
@@ -105,7 +105,7 @@ agent.SetupAgentCertificate(fs.readFileSync("private.key"));
 
 ### Step 4: Onboard the agent
 
-The first operation is onboarding of the agent. This creates a client secret which is used for the communication with mindshpere.
+The first operation is onboarding of the agent. This creates a client secret which is used for the communication with MindSphere.
 
 This data is stored by default in the .mc folder in your application if you don't change the base path in the constructor of the agent.
 
@@ -149,7 +149,7 @@ await assetMgmt.GetAspectTypes(...);
 
 ```
 
-If you take a look at the mindsphere configuration of your agent now it should look like this:
+If you take a look at the MindSphere configuration of your agent now it should look like this:
 
 ![datasources](images/datasources.png)
 
@@ -181,7 +181,7 @@ for (let index = 0; index < 5; index++) {
 
 ### Step 6.1 using bulk upload
 
-If you don't want to send the data points one by one, you can also use the bulkpostdata method
+If you don't want to send the data points one by one, you can also use the BulkPostData method
 
 ```typescript
 const bulk: TimeStampedDataPoint[] =
@@ -202,7 +202,7 @@ await agent.BulkPostData (bulk);
 
 ## Events
 
-Events can now be created with the library. You can create events for your agent or for your entities. In order to create an event for your entity you need to know the asssetid of the asset.
+Events can now be created with the library. You can create events for your agent or for your entities. In order to create an event for your entity you need to know the assetId of the asset.
 
 ```javascript
 const configuration = require("../../agentconfig.json");
@@ -233,7 +233,7 @@ await agent.PostEvent(event);
 Files can now be uploaded via the library. You can upload files for your agent or for your entities. In order to create an event for your entity you need to know the assetid of the asset.
 
 Since version 3.5.1. the agents are using the multipart upload API of the MindSphere. This means that the agents can upload files also bigger > 8 MB, The
-multipart upload must be switched on (chunk:true) if you want to activate this behavior. The parameter parallelUploads determine the maximal number of paraellel uploads. You can increase this on a powerfull computer to speed up the upload or decrease to prevent network congestion.
+multipart upload must be switched on (chunk:true) if you want to activate this behavior. The parameter parallelUploads determine the maximal number of parallel uploads. You can increase this on a powerful computer to speed up the upload or decrease to prevent network congestion.
 
 ```javascript
 const configuration = require("../../agentconfig.json");
@@ -291,7 +291,7 @@ await retry(5, () => agent.BulkPostData(bulk));
 
 ```
 
-The data in the mindsphere can be observed in the fleet manager.
+The data in the MindSphere can be observed in the fleet manager.
 
 ## Proxy support
 
@@ -314,7 +314,7 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 **Frontend:**
     - Browser (Session, Cookies)
 
-**Backend (node-js):**
+**Backend (node.js):**
     - UserCredentials
     - AppCredentials
     - ServiceCredentials
@@ -364,11 +364,11 @@ If an API is missing and you would like to contribute a Client for it take a loo
 
 ## Command Line Interface
 
-The full docmumentation for the command line interface can be found at
+The full documentation for the command line interface can be found at
 
 [![Documentation](https://img.shields.io/badge/cli-full%20documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html)
 
-The library comes with a command line interface which can also be installed globally. You can use the command line mode to upload timeseries, files and create events in the mindsphere.
+The library comes with a command line interface which can also be installed globally. You can use the command line mode to upload timeseries, files and create events in the MindSphere.
 
 ```bash
 # install the library globaly if you want to use its command line interface.
@@ -377,7 +377,7 @@ The library comes with a command line interface which can also be installed glob
 
 ### Configuring CLI
 
-First step is to configure the CLI. For this you will need a session cookie from mindsphere, service credentials (which have been deprecated) or application credentials from your developer cockpit.
+First step is to configure the CLI. For this you will need a session cookie from MindSphere, service credentials (which have been deprecated) or application credentials from your developer cockpit.
 
 - [SESSION and XSRF-TOKEN cookie](https://developer.mindsphere.io/howto/howto-local-development.html#generate-user-credentials)
 - [Application Credentials](https://documentation.mindsphere.io/resources/html/developer-cockpit/en-US/124342231819.html)
@@ -404,12 +404,12 @@ You can get the application credentials from your developer or operator cockpit 
 
 ![CLI](images/cockpit.png)
 
-Once configred you can press CTRL + C to stop the configuration server and start using the CLI. Remember the passkey you have created as you will be using it with almost all CLI commands.
+Once configured you can press CTRL + C to stop the configuration server and start using the CLI. Remember the passkey you have created as you will be using it with almost all CLI commands.
 
 ### Using CLI
 
 The CLI can be used to create starter projects, upload timeseries, events and files, read agent diagnostics etc.
-The CLI commands should only be used **in secure enviroments!** (e.g on your working station, not on the agents).
+The CLI commands should only be used **in secure environments!** (e.g on your working station, not on the agents).
 
 Here is an overview of CLI commands:
 

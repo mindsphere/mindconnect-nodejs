@@ -59,3 +59,6 @@ mindconnect-nodejs-win.exe
 # mindsphere files
 *.mdsp.json
 *.mdsp.js
+
+# Spellchecker files
+.spelling
