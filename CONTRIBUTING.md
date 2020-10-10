@@ -191,7 +191,7 @@ A useful shortcut is to create an alias in your shell for this:
 alias lmc='node src/cli/mc'
 ```
 
-Running the commands is now very similar to the installed version but instead of `mc command [options]` 
+Running the commands is now very similar to the installed version but instead of `mc command [options]`
 you will use `lmc command [options]`, for example like this:
 
 ```bash
@@ -276,5 +276,3 @@ Prints out a license summary for the whole dependency tree.
 ### `npm run pkg`
 
 Creates the binary files with the CLI for Windows, Linux and MacOS.
-
-
