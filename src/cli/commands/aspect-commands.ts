@@ -242,7 +242,7 @@ function writeAspectTypeToFile(
         variables: any[];
     }
 ) {
-    const fileName = `${options.aspect}.aspect.mdsp.json`;
+    const fileName = options.file || `${options.aspect}.aspect.mdsp.json`;
     fs.writeFileSync(fileName, JSON.stringify(aspectType, null, 2));
     console.log(
         `The data was written into ${color(

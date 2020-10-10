@@ -1,17 +1,7 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
-import { AssetManagementModels } from "../../api/sdk";
-import { retry } from "../../api/utils";
-import {
-    adjustColor,
-    errorLog,
-    getColor,
-    getSdk,
-    homeDirLog,
-    proxyLog,
-    serviceCredentialLog,
-    verboseLog,
-} from "./command-utils";
+import { listAssets } from "./assets";
+import { adjustColor, errorLog, getColor, getSdk, homeDirLog, proxyLog, serviceCredentialLog } from "./command-utils";
 
 let color = getColor("magenta");
 
@@ -40,45 +30,7 @@ export default (program: CommanderStatic) => {
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
 
-                    const assetMgmt = sdk.GetAssetManagementClient();
-
-                    let page = 0;
-                    let assets;
-
-                    const filter = buildFilter(options);
-                    verboseLog(JSON.stringify(filter, null, 2), options.verbose);
-
-                    console.log(`assetid  etag  twintype  [typeid]  name`);
-
-                    let assetCount = 0;
-
-                    do {
-                        assets = (await retry(options.retry, () =>
-                            assetMgmt.GetAssets({
-                                page: page,
-                                size: 100,
-                                filter: Object.keys(filter).length === 0 ? undefined : JSON.stringify(filter),
-                                sort: "name,asc",
-                            })
-                        )) as AssetManagementModels.AssetListResource;
-
-                        assets._embedded = assets._embedded || { assets: [] };
-
-                        assets.page = assets.page || { totalPages: 0 };
-
-                        for (const asset of assets._embedded.assets || []) {
-                            assetCount++;
-                            console.log(
-                                `${asset.assetId}  ${asset.etag}\t${asset.twinType}\t[${asset.typeId}]\t${color(
-                                    asset.name
-                                )}`
-                            );
-
-                            verboseLog(JSON.stringify(asset, null, 2), options.verbose);
-                        }
-                    } while (page++ < (assets.page.totalPages || 0));
-
-                    console.log(`${color(assetCount)} assets listed.\n`);
+                    await listAssets(options, sdk);
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
