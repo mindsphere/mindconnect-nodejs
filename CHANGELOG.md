@@ -2,19 +2,29 @@
 
 ## 3.9.0 - (Pewter Vienna) - October 2020
 
-- SDK: event analytics api (#162)
-- SDK: EventManagement: sharedEvents support included in GetEvents operation (#170)
+- CLI: mc aspects command (list, create, delete)
+- CLI: mc asset-types command (list, create, delete)
+- CLI: mc assets command (list, create, delete)
+- CLI: mc download-events command
+- CLI: mc aspects command (list, create, delete)
 - CLI: mc configure-agent --mode test can now produce a configurable number of test records
 - CLI will now notify users that there is a new version of the CLI available (#190) [#hacktoberfest lyallemma]
+- SDK: event analytics api (#162)
+- SDK: EventManagement: sharedEvents support included in GetEvents operation (#170)
 - provided binary versions of the command line interface for windows, macos and linux (#185) [#hacktoberfest issue-03]
-- improved the build script to run in powershell as well (#184) [#hacktoberfest coding4funrocks]
-- fixed the example in `mc iam` command (#182) [#hacktoberfest, coding4funrocks]
+- CLI: mc aspects command -- mode convert added support for multiple targets in schema (#193) [#hacktopberfest phbender]
 - bumped all dependencies
+
+## Bugfix 3.9.0
+
+- fixed the example in `mc iam` command (#182) [#hacktoberfest, coding4funrocks]
+- improved the build script to run in powershell as well (#184) [#hacktoberfest coding4funrocks]
+- added the digital twin type to mc assets --mode create command (#195) [#hacktoberfest RhnSaxena]
 
 ### Contributions 3.9.0
 
 - The mindconnect-nodejs participated in #hacktoberfest2020
-- Thanks to coding4funrocks, issue-03 and lyallemma for their #hacktoberfest contributions. <3 :heart:
+- Thanks to coding4funrocks, issue-03, lyallemma, RhnSaxena and PhBender for their #hacktoberfest contributions. <3 :heart:
 
 ## 3.8.3 - (Electric Blue Vienna) - August 2020
 

@@ -62,7 +62,7 @@ export default (program: CommanderStatic) => {
                             break;
 
                         default:
-                            break;
+                            throw Error(`no such option: ${options.mode}`);
                     }
                 } catch (err) {
                     errorLog(err, options.verbose);
