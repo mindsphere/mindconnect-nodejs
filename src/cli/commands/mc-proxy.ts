@@ -239,8 +239,6 @@ async function serve({ configPort, options }: { configPort?: number; options: an
                                     requestOptions.hostname
                                 } with ${target})`
                             );
-                        responseHeaders["content-length"] = `${replaced.length}`;
-                        options.verbose && console.log(`[${green(new Date().toISOString())}] adjusted content length`);
                     }
 
                     if (responseHeaders["transfer-encoding"] === "chunked") {
