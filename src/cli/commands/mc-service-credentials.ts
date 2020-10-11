@@ -105,6 +105,7 @@ async function serve(configPort?: number) {
     server.on("request", async (req, res) => {
         const uri = url.parse(req.url);
 
+        // prettier-ignore
         try {
             const filePath = uri.path === "/" ? "index.html" : uri.path;
             const fullName = path.resolve(`${__dirname}/html/sc/${filePath}`);
@@ -131,9 +132,9 @@ async function serve(configPort?: number) {
                         )} to exit`
                     );
                 });
-            } else if (fs.existsSync(fullName)) {
+            } else if (fs.existsSync(fullName)) { // lgtm [js/path-injection]
                 res.writeHead(200, { "Content-Type": mime.lookup(filePath) });
-                const stream = fs.createReadStream(fullName);
+                const stream = fs.createReadStream(fullName); // lgtm [js/path-injection]
                 stream.pipe(res);
             } else {
                 res.writeHead(404);
