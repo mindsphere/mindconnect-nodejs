@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import * as program from "commander";
+import eventAnalyticsCommand from "./commands/analyze-events";
 import aspectCommands from "./commands/aspect-commands";
 import assetInfoCommand from "./commands/asset-info";
 import assetTypeCommand from "./commands/asset-types";
@@ -95,6 +96,7 @@ spectrumAnalysisCommand(program);
 signalValidationCommand(program);
 trendPredictionCommand(program);
 kpicalculationCommand(program);
+eventAnalyticsCommand(program);
 
 // * dev proxy command
 devProxyCommand(program);

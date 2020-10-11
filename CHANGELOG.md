@@ -24,7 +24,13 @@
 ### Contributions 3.9.0
 
 - The mindconnect-nodejs participated in #hacktoberfest2020
-- Thanks to coding4funrocks, issue-03, lyallemma, RhnSaxena and PhBender for their #hacktoberfest contributions. <3 :heart:
+- Thanks to :
+  - coding4funrocks
+  - issue-03
+  - lyallemma
+  - RhnSaxena
+  - PhBender
+  for their #hacktoberfest contributions. <3 :heart:
 
 ## 3.8.3 - (Electric Blue Vienna) - August 2020
 
