@@ -125,7 +125,7 @@ function createTemplate(options: any) {
 }
 
 function writeAssetTypeToFile(options: any, AssetType: any) {
-    const fileName = `${options.assettype}.assettype.mdsp.json`;
+    const fileName = options.file || `${options.assettype}.assettype.mdsp.json`;
     fs.writeFileSync(fileName, JSON.stringify(AssetType, null, 2));
     console.log(
         `The data was written into ${color(

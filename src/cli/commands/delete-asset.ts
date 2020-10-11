@@ -1,16 +1,7 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
-import { retry } from "../../api/utils";
-import {
-    adjustColor,
-    errorLog,
-    getColor,
-    getSdk,
-    homeDirLog,
-    proxyLog,
-    serviceCredentialLog,
-    verboseLog,
-} from "./command-utils";
+import { deleteAsset } from "./assets";
+import { adjustColor, errorLog, getColor, getSdk, homeDirLog, proxyLog, serviceCredentialLog } from "./command-utils";
 
 let color = getColor("magenta");
 
@@ -32,17 +23,7 @@ export default (program: CommanderStatic) => {
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
 
-                    const assetMgmt = sdk.GetAssetManagementClient();
-                    const asset = await retry(options.retry, () => assetMgmt.GetAsset(options.assetid));
-                    verboseLog(JSON.stringify(asset, null, 2), options.verbose);
-
-                    await retry(options.retry, () =>
-                        assetMgmt.DeleteAsset(options.assetid, {
-                            ifMatch: asset?.etag || "0",
-                        })
-                    );
-
-                    console.log(`Asset with assetid ${color(asset.assetId)} (${color(asset.name)}) was deleted.`);
+                    await deleteAsset(options, sdk);
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }

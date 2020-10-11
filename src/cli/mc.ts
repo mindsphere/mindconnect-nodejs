@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import * as program from "commander";
+import eventAnalyticsCommand from "./commands/analyze-events";
 import aspectCommands from "./commands/aspect-commands";
-import assetTypeCommand from "./commands/aspecttypes-commands";
 import assetInfoCommand from "./commands/asset-info";
-import createAssetCommand from "./commands/create-asset";
+import assetTypeCommand from "./commands/asset-types";
+import assetsCommand from "./commands/assets";
 import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
 import downloadEventsCommand from "./commands/download-events";
@@ -71,16 +72,19 @@ iotCheckBulkComand(program);
 iotDownloadBulkCommand(program);
 
 // * assets files and event handling commands
-aspectCommands(program);
+assetsCommand(program);
 assetTypeCommand(program);
-listAssetsCommand(program);
+aspectCommands(program);
 assetInfoCommand(program);
-createAssetCommand(program);
+downloadEventsCommand(program);
+
+// * deprecated commands for 4.0.0
+
+listAssetsCommand(program);
 deleteAssetCommand(program);
 listFilesCommand(program);
 downloadFileCommand(program);
 deleteFileCommand(program);
-downloadEventsCommand(program);
 
 // * identity access management commands
 
@@ -92,6 +96,7 @@ spectrumAnalysisCommand(program);
 signalValidationCommand(program);
 trendPredictionCommand(program);
 kpicalculationCommand(program);
+eventAnalyticsCommand(program);
 
 // * dev proxy command
 devProxyCommand(program);
