@@ -5,6 +5,7 @@ import aspectCommands from "./commands/aspect-commands";
 import assetInfoCommand from "./commands/asset-info";
 import assetTypeCommand from "./commands/asset-types";
 import assetsCommand from "./commands/assets";
+import dataLakeCommand from "./commands/data-lake";
 import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
 import downloadEventsCommand from "./commands/download-events";
@@ -89,6 +90,9 @@ deleteFileCommand(program);
 // * identity access management commands
 
 identityCommand(program);
+
+// * data lake
+dataLakeCommand(program);
 
 // * analytics command
 
