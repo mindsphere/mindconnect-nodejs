@@ -6,6 +6,8 @@ export * from "./asset/asset-models";
 export * from "./common/credentials";
 export * from "./common/mindsphere-sdk";
 export * from "./common/sdk-client";
+export * from "./data-lake/data-lake";
+export * from "./data-lake/data-lake.models";
 export * from "./event-analytics/eventanalytics";
 export * from "./event-analytics/eventanalytics-models";
 export * from "./event/event-management";

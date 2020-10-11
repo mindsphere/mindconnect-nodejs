@@ -1,5 +1,6 @@
 import { AgentManagementClient } from "../agent/agent-management";
 import { AssetManagementClient } from "../asset/asset-management";
+import { DataLakeClient } from "../data-lake/data-lake";
 import { EventAnalyticsClient } from "../event-analytics/eventanalytics";
 import { EventManagementClient } from "../event/event-management";
 import { IdentityManagementClient } from "../identity/identity";
@@ -221,4 +222,18 @@ export class MindSphereSdk extends SdkClient {
     }
 
     private _eventAnalyticsClient?: EventAnalyticsClient;
+
+    private _dataLakeClient?: DataLakeClient;
+
+    /**
+     * Data Lake Client
+     *
+     * @returns {DataLakeClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetDataLakeClient(): DataLakeClient {
+        this._dataLakeClient = this._dataLakeClient || new DataLakeClient(this._authenticator);
+        return this._dataLakeClient;
+    }
 }

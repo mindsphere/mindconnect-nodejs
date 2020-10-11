@@ -2,16 +2,24 @@
 
 ## 3.9.0 - (Pewter Vienna) - October 2020
 
+### Highlights 3.9.0
+  
+- CLI: Binary release for MacOs, Windows and Linux (#185) [#hacktoberfest issue-03]
+- Merged 6 Hacktoberfest Contributions
+
+### Improvements 3.9.0
+
+- CLI: mc data-lake command (manage permissions and tokens of data lake)
 - CLI: mc aspects command (list, create, delete)
 - CLI: mc asset-types command (list, create, delete)
 - CLI: mc assets command (list, create, delete)
 - CLI: mc download-events command
-- CLI: mc aspects command (list, create, delete)
+- CLI: mc aspects command (list, create, delete, create from JSON Schema)
 - CLI: mc configure-agent --mode test can now produce a configurable number of test records
 - CLI will now notify users that there is a new version of the CLI available (#190) [#hacktoberfest lyallemma]
+- SDK: data lake token operations
 - SDK: event analytics api (#162)
 - SDK: EventManagement: sharedEvents support included in GetEvents operation (#170)
-- provided binary versions of the command line interface for windows, macos and linux (#185) [#hacktoberfest issue-03]
 - CLI: mc aspects command -- mode convert added support for multiple targets in schema (#193) [#hacktopberfest phbender]
 - bumped all dependencies
 
@@ -20,6 +28,7 @@
 - fixed the example in `mc iam` command (#182) [#hacktoberfest, coding4funrocks]
 - improved the build script to run in powershell as well (#184) [#hacktoberfest coding4funrocks]
 - added the digital twin type to mc assets --mode create command (#195) [#hacktoberfest RhnSaxena]
+- fixed the issue with `mc dev-proxy` rewrite option (#181)
 
 ### Contributions 3.9.0
 
