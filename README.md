@@ -373,6 +373,18 @@ The library comes with a command line interface which can also be installed glob
  npm install -g @mindconnect/mindconnect-nodejs
 ```
 
+### Binary Releases
+
+The library can also be downloaded as executable from the [GitHub release page](https://github.com/mindsphere/mindconnect-nodejs/releases).
+
+Download the version for your system and place it in folder which is in your PATH.
+
+- `mc.exe` for windows
+- `mc-macos` for macOS
+- `mc-linux` for Linux
+
+Linux, macOS: Rename the file to `mc` and make sure that the file is marked as executable (`chmod +x`).
+
 ### Configuring CLI
 
 First step is to configure the CLI. For this you will need a session cookie from MindSphere, service credentials (which have been deprecated) or application credentials from your developer cockpit.
