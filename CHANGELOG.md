@@ -10,11 +10,10 @@
 ### Improvements 3.9.0
 
 - CLI: mc data-lake command (manage permissions and tokens of data lake)
-- CLI: mc aspects command (list, create, delete)
+- CLI: mc aspects command (list, create, delete, create from JSON Schema)
 - CLI: mc asset-types command (list, create, delete)
 - CLI: mc assets command (list, create, delete)
 - CLI: mc download-events command
-- CLI: mc aspects command (list, create, delete, create from JSON Schema)
 - CLI: mc configure-agent --mode test can now produce a configurable number of test records
 - CLI will now notify users that there is a new version of the CLI available (#190) [#hacktoberfest lyallemma]
 - SDK: data lake token operations

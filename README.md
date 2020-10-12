@@ -82,8 +82,6 @@ Create an agent in Asset Manager of type core.MindConnectLib create initial JSON
 }
 ```
 
-More Information about [core.MindConnectLib](http://bit.ly/2HZ2ehE) configuration.
-
 ### Step 3 : Create an agent
 
 Read the initial configuration from the config file and create the agent.
