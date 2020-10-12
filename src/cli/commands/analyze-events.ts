@@ -167,6 +167,8 @@ function checkRequiredParameters(options: any) {
     !["timeseries", "event"].includes(options.type) &&
         errorLog(`invalid type ${options.type}; type must be timeseries or event`, true);
 
+    !options.file && errorLog(`you have to specify the file name in the --file option`, true);
+
     if (options.filterlist) {
         try {
             const obj = JSON.parse(options.filterlist);

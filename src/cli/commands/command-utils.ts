@@ -12,12 +12,12 @@ const cyan = getColor("cyan");
 
 export const serviceCredentialLog = (color: Function = magenta) => {
     log(`\n  Important: `);
-    log(`\n  Authentication with ${color("service credentials")} or ${color("app credentials")} \n`);
+    log(`\n  Authentication with ${color("service credentials")} or ${color("app credentials")}:\n`);
 
-    log(`    \t- append option [--passkey <your passkey>] to the command `);
-    log(`    \t- create environment variable ${color("MDSP_PASSKEY")} with your current passkey`);
+    log(`    \t- either append option [--passkey <your passkey>] to the command `);
+    log(`    \t- or create environment variable ${color("MDSP_PASSKEY")} with your current passkey`);
 
-    log(`\n  Authentication with ${yellow("borrowed session cookie and xsrf-token cookie")} \n`);
+    log(`\n  Authentication with ${yellow("borrowed session cookie and xsrf-token cookie")}: \n`);
 
     log(
         `    \t- create environment variables ${yellow("MDSP_HOST")} , ${yellow("MDSP_SESSION")} and ${yellow(
