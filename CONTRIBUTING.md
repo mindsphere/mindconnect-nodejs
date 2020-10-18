@@ -8,7 +8,7 @@ We welcome contributions in several forms, e.g.
 * Coding
 * etc.
 
-Please check for the issues in the project and look for unassigned ones or create a new one. The good issues for newcomers are marked with **help-wanted** and **good-first-issue**.
+Please check for the issues in the project and look for unassigned ones or create a new one. The good issues for newcomers are marked with **good-first-issue**.
 
 Working together in an open and welcoming environment is the foundation of our
 success, so please respect our [Code of Conduct](CODE_OF_CONDUCT.md).
