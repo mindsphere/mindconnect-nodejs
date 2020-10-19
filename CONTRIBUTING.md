@@ -158,7 +158,13 @@ mc service-credentials
 
 [Setting up the MindSphere CLI](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/setting-up-the-cli.html)
 
-after that you will need a 3072 bit certificate
+Please use 
+
+#### `passkey.4.unit.test` 
+
+as your passkey when setting up the credentials, because this is the passkey which the unit tests are using to decrypt the app credentials.
+
+After that you will need a 3072 bit certificate
 
 ```bash
 # run only once to create certificate
