@@ -52,22 +52,44 @@ First: install the library and CLI globally and run the create service credentia
 ```bash
 # install the cli
 npm install -g @mindconnect/mindconnect-nodejs
+```
 
+After that setup the app or service credentials which you will be using for unit testing
+
+```bash
 # create service credentials
 mc service-credentials
 
 # mc service-credentials --help will provide more help (you can use app credentials or service credentials)
 ```
 
+Here is a step by step description how to set up the app or service credentials:
+
 [Setting up the MindSphere CLI](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/setting-up-the-cli.html)
 
-Please use 
+After that you have to configure the MDSP_PASSKEY variable in your environment:
 
-#### `passkey.4.unit.test` 
+Bash:
 
-as your passkey when setting up the credentials, because this is the passkey which the unit tests are using to decrypt the app credentials. (this will change in the versions after 3.9.0)
+```bash
+export MDSP_PASSKEY="my.complex.passkey"
+```
 
-After that you will need a 3072 bit certificate
+Windows CMD
+
+```cmd
+set "MDSP_PASSKEY=my.complex.passkey"
+```
+
+Windows PowerShell
+
+```powershell
+$Env:MDSP_PASSKEY="my.complex.passkey"
+```
+
+*(Note: The older versions, including 3.9.0 had hardcoded passkey for unit tests `passkey.4.unit.test` . Please set up your app/service credentials accordingly if you are running unit tests for older versions)*
+
+After setting up the CLI, you will need a 3072 bit certificate. (make sure that you have **OpenSSL** installed and available)
 
 ```bash
 # run only once to create certificate
@@ -281,5 +303,4 @@ export * from "./iotaggregate/iot-timeseries-aggregate-models";
 ...
 ```
 
-make sure that the tests are running and create a pull request. We would also really appreciate a CLI contribution.
-
+Make sure that the tests are running and create a pull request. We would also really appreciate a CLI contribution.

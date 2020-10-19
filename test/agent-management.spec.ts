@@ -1,6 +1,7 @@
 import * as chai from "chai";
 import { AgentManagementModels, AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
 import { decrypt, loadAuth } from "../src/api/utils";
+import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
 
 const timeOffset = new Date().getTime();
@@ -9,7 +10,7 @@ describe("[SDK] AgentManagementClient", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
-        basicAuth: decrypt(auth, "passkey.4.unit.test"),
+        basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
     const assetMgmt = sdk.GetAssetManagementClient();
     const agentMgmt = sdk.GetAgentManagementClient();

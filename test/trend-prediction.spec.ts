@@ -3,13 +3,14 @@ import "url-search-params-polyfill";
 import { MindSphereSdk, TrendPredictionModels } from "../src/api/sdk";
 import { decrypt, loadAuth } from "../src/api/utils";
 import { generateTestData } from "../src/cli/commands/command-utils";
+import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
 
 describe("[SDK] TrendPredictionClient", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
-        basicAuth: decrypt(auth, "passkey.4.unit.test"),
+        basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
 
     const trendPredictionClient = sdk.GetTrendPredictionClient();

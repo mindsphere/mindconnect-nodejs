@@ -8,7 +8,7 @@ import { ClientIdentifier, IMindConnectConfiguration, MindConnectAgent, Onboardi
 import { AgentManagementModels, MindSphereSdk } from "../src/api/sdk/";
 import { decrypt, loadAuth, retry } from "../src/api/utils";
 import { AgentUnitTestConfiguration, tearDownAgents, unitTestSetup } from "./test-agent-setup-utils";
-import { errorHelper } from "./test-utils";
+import { errorHelper, getPasskeyForUnitTest } from "./test-utils";
 
 const log = debug("mindconnect-agent-auth");
 chai.should();
@@ -17,7 +17,7 @@ describe("Agent Auth Rotation", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
-        basicAuth: decrypt(auth, "passkey.4.unit.test"),
+        basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
 
     let agentConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;

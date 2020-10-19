@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.10.0 - (Seafoam Vienna)
+
+### Improvements 3.10.0
+
+- unit tests: changed passkey for unit tests to work with passkey set up in environment (#207)
+
 ## 3.9.0 - (Pewter Vienna) - October 2020
 
 ### Highlights 3.9.0
