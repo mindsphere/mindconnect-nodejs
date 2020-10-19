@@ -2,7 +2,7 @@ import * as chai from "chai";
 import "url-search-params-polyfill";
 import { AssetManagementClient, AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
 import { decrypt, loadAuth, retry } from "../src/api/utils";
-import { sleep } from "./test-utils";
+import { getPasskeyForUnitTest, sleep } from "./test-utils";
 chai.should();
 
 const timeOffset = new Date().getTime();
@@ -11,7 +11,7 @@ describe("[SDK] AssetManagementClient.Files", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
-        basicAuth: decrypt(auth, "passkey.4.unit.test"),
+        basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
     const am = sdk.GetAssetManagementClient();
 

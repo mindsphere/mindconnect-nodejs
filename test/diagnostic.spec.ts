@@ -5,7 +5,7 @@ import { DataPoint, IMindConnectConfiguration, MindConnectAgent } from "../src";
 import { AgentManagementModels, MindSphereSdk } from "../src/api/sdk";
 import { decrypt, loadAuth } from "../src/api/utils";
 import { AgentUnitTestConfiguration, tearDownAgents, unitTestSetup } from "./test-agent-setup-utils";
-import {} from "./test-utils";
+import { getPasskeyForUnitTest } from "./test-utils";
 const log = debug("mindconnect-setup-test");
 chai.should();
 
@@ -14,7 +14,7 @@ describe("[SDK] Diagnostic API tests", () => {
 
     const sdk = new MindSphereSdk({
         ...auth,
-        basicAuth: decrypt(auth, "passkey.4.unit.test"),
+        basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
 
     let sharedSecretConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;

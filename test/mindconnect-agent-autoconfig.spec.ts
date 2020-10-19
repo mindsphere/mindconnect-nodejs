@@ -12,13 +12,14 @@ import {
     tearDownAgents,
     unitTestSetup,
 } from "./test-agent-setup-utils";
+import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
 
 describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configuration", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
-        basicAuth: decrypt(auth, "passkey.4.unit.test"),
+        basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
 
     let agentConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;

@@ -3,13 +3,14 @@ import "url-search-params-polyfill";
 import { MindSphereSdk } from "../src/api/sdk";
 import { KPICalculationModels } from "../src/api/sdk/kpi/kpi-models";
 import { decrypt, loadAuth } from "../src/api/utils";
+import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
 
 describe("[SDK] KPICalculationClient", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
-        basicAuth: decrypt(auth, "passkey.4.unit.test"),
+        basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
 
     const kpiCalculationClient = sdk.GetKPICalculationClient();

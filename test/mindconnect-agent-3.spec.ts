@@ -21,6 +21,7 @@ import { AgentManagementModels } from "../src/api/sdk";
 import { MindSphereSdk } from "../src/api/sdk/";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import { AgentUnitTestConfiguration, tearDownAgents, unitTestSetup } from "./test-agent-setup-utils";
+import { getPasskeyForUnitTest } from "./test-utils";
 const log = debug("mindconnect-agent-test");
 const HttpsProxyAgent = require("https-proxy-agent");
 chai.should();
@@ -29,7 +30,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
-        basicAuth: decrypt(auth, "passkey.4.unit.test"),
+        basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
 
     let agentConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;

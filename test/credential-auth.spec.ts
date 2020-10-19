@@ -5,7 +5,7 @@ import * as nock from "nock";
 import "url-search-params-polyfill";
 import { MindSphereSdk } from "../src/api/sdk/";
 import { decrypt, loadAuth } from "../src/api/utils";
-import { mochaAsync } from "./test-utils";
+import { getPasskeyForUnitTest, mochaAsync } from "./test-utils";
 
 chai.should();
 
@@ -23,7 +23,7 @@ describe("[SDK] Credential Auth", () => {
     it("should acquire token", async () => {
         const sdk = new MindSphereSdk({
             ...auth,
-            basicAuth: decrypt(auth, "passkey.4.unit.test"),
+            basicAuth: decrypt(auth, getPasskeyForUnitTest()),
         });
         const agentManagement = sdk.GetAgentManagementClient();
         const token = await agentManagement.GetToken();
@@ -35,7 +35,7 @@ describe("[SDK] Credential Auth", () => {
         mochaAsync(async () => {
             const sdk = new MindSphereSdk({
                 ...auth,
-                basicAuth: decrypt(auth, "passkey.4.unit.test"),
+                basicAuth: decrypt(auth, getPasskeyForUnitTest()),
             });
             const agentManagement = sdk.GetAgentManagementClient();
 
@@ -81,7 +81,7 @@ describe("[SDK] Credential Auth", () => {
         mochaAsync(async () => {
             const sdk = new MindSphereSdk({
                 ...auth,
-                basicAuth: decrypt(auth, "passkey.4.unit.test"),
+                basicAuth: decrypt(auth, getPasskeyForUnitTest()),
             });
             const assetManagement = sdk.GetAssetManagementClient();
             nock(`https://${sdk.GetTenant()}.piam.eu1.mindsphere.io:443`, {
@@ -132,7 +132,7 @@ describe("[SDK] Credential Auth", () => {
     it("should just work", async () => {
         const sdk = new MindSphereSdk({
             ...auth,
-            basicAuth: decrypt(auth, "passkey.4.unit.test"),
+            basicAuth: decrypt(auth, getPasskeyForUnitTest()),
         });
         const agentManagement = sdk.GetAgentManagementClient();
 

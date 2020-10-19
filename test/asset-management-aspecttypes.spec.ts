@@ -2,7 +2,7 @@ import * as chai from "chai";
 import "url-search-params-polyfill";
 import { AssetManagementClient, AssetManagementModels, MindSphereSdk } from "../src/api/sdk";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
-import { sleep } from "./test-utils";
+import { getPasskeyForUnitTest, sleep } from "./test-utils";
 chai.should();
 
 const timeOffset = new Date().getTime();
@@ -10,7 +10,7 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
-        basicAuth: decrypt(auth, "passkey.4.unit.test"),
+        basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
     const am = sdk.GetAssetManagementClient();
     const tenant = sdk.GetTenant();
@@ -149,6 +149,8 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         await am.DeleteAspectType(`${tenant}.UnitTestEngine_${timeOffset}_E`, { ifMatch: `${aspectType.etag}` });
     });
 });
+
+
 async function deleteAspectTypes(am: AssetManagementClient, tenant: string) {
     const aspectTypes = (await am.GetAspectTypes({
         filter: JSON.stringify({

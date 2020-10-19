@@ -2,13 +2,14 @@ import * as chai from "chai";
 import "url-search-params-polyfill";
 import { IdentityManagementClient, IdentityManagementModels, MindSphereSdk } from "../src/api/sdk";
 import { decrypt, loadAuth } from "../src/api/utils";
+import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
 
 describe("[SDK] Identity Management Client", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
-        basicAuth: decrypt(auth, "passkey.4.unit.test"),
+        basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
     const identity = sdk.GetIdentityManagementClient();
     const username = `${new Date().getTime()}@unit.test.mindconnect.rocks`;

@@ -10,6 +10,7 @@ import { AgentManagementModels, MindSphereSdk } from "../src/api/sdk";
 import { TokenManagerAuth } from "../src/api/tokenmanager-auth";
 import { decrypt, loadAuth } from "../src/api/utils";
 import { AgentUnitTestConfiguration, tearDownAgents, unitTestSetup } from "./test-agent-setup-utils";
+import { getPasskeyForUnitTest } from "./test-utils";
 const log = debug("mindconnect-agent-test");
 const HttpsProxyAgent = require("https-proxy-agent");
 chai.should();
@@ -18,7 +19,7 @@ describe("[SDK] using agent authorization", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
-        basicAuth: decrypt(auth, "passkey.4.unit.test"),
+        basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
 
     let agentConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;

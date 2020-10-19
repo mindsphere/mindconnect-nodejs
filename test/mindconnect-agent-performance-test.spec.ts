@@ -16,7 +16,7 @@ import {
 import { AgentManagementModels, MindSphereSdk } from "../src/api/sdk";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import { AgentUnitTestConfiguration, tearDownAgents, unitTestSetup } from "./test-agent-setup-utils";
-import {} from "./test-utils";
+import { getPasskeyForUnitTest } from "./test-utils";
 
 chai.should();
 
@@ -24,7 +24,7 @@ describe("MindConnectApi RSA_3072 Agent performance test", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
-        basicAuth: decrypt(auth, "passkey.4.unit.test"),
+        basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
 
     let rsaConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;

@@ -28,7 +28,10 @@ pipeline {
     }
     stage('Test') {
       steps {
-        sh 'npm run test-jenkins'
+        sh '''
+        export MDSP_PASSKEY="passkey.4.unit.test"
+        npm run test-jenkins
+        '''
       }
     }
     stage('Test-CLI') {
@@ -39,7 +42,7 @@ pipeline {
         cd $dirname
         alias mc='node ../src/cli/mc'
         set -e
-        export MDSP_PASSKEY=passkey.4.unit.test
+        export MDSP_PASSKEY="passkey.4.unit.test"
         mc create-agent --config agent.unittest.json
         mc onboard --config agent.unittest.json
         mc atk --config agent.unittest.json
