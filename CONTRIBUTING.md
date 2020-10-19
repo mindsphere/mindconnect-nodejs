@@ -162,7 +162,7 @@ Please use
 
 #### `passkey.4.unit.test` 
 
-as your passkey when setting up the credentials, because this is the passkey which the unit tests are using to decrypt the app credentials.
+as your passkey when setting up the credentials, because this is the passkey which the unit tests are using to decrypt the app credentials. (this will change in the versions after 3.9.0)
 
 After that you will need a 3072 bit certificate
 
