@@ -5,7 +5,6 @@ import * as fs from "fs";
 import { it } from "mocha";
 import * as os from "os";
 import "url-search-params-polyfill";
-import { EventManagementModels } from "../dist/src";
 import {
     BaseEvent,
     DataPoint,
@@ -18,7 +17,7 @@ import {
     retry,
     TimeStampedDataPoint,
 } from "../src";
-import { AgentManagementModels } from "../src/api/sdk";
+import { AgentManagementModels, EventManagementModels } from "../src/api/sdk";
 import { MindSphereSdk } from "../src/api/sdk/";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import { AgentUnitTestConfiguration, tearDownAgents, unitTestSetup } from "./test-agent-setup-utils";
