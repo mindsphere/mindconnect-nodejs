@@ -23,6 +23,8 @@ describe("Agent Auth Rotation", () => {
     let agentConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;
     let unitTestConfiguration: AgentUnitTestConfiguration = ({} as unknown) as AgentUnitTestConfiguration;
 
+    const southgateUrl = sdk.GetGateway().replace("gateway", "southgate");
+
     before(async () => {
         nock.cleanAll();
         unitTestConfiguration = await unitTestSetup(
@@ -36,10 +38,14 @@ describe("Agent Auth Rotation", () => {
         await tearDownAgents(sdk, unitTestConfiguration);
     });
 
+    it("should use correct url", async () => {
+        southgateUrl.should.contain("southgate");
+    });
+
     it("onboarding should be able to handle internet connection problems", async () => {
         // respond 3 times with internal server error before returning the correct response
         let errors = 0;
-        const scope = nock("https://southgate.eu1.mindsphere.io:443", {
+        const scope = nock(`${southgateUrl}:443`, {
             encodedQueryParams: true,
             allowUnmocked: true,
         })
@@ -126,7 +132,7 @@ describe("Agent Auth Rotation", () => {
         (agent as any)._configuration.recovery.length.should.be.greaterThan(1);
 
         let error = 0;
-        const scope = nock("https://southgate.eu1.mindsphere.io:443", {
+        const scope = nock(`${southgateUrl}:443`, {
             encodedQueryParams: true,
             allowUnmocked: true,
         })
@@ -175,7 +181,7 @@ describe("Agent Auth Rotation", () => {
         if (!agent.IsOnBoarded()) await retry(5, () => agent.OnBoard());
 
         let error = 0;
-        const scope = nock("https://southgate.eu1.mindsphere.io:443", {
+        const scope = nock(`${southgateUrl}:443`, {
             encodedQueryParams: true,
             allowUnmocked: true,
         })

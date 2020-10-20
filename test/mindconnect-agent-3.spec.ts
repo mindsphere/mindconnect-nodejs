@@ -17,7 +17,7 @@ import {
     retry,
     TimeStampedDataPoint,
 } from "../src";
-import { AgentManagementModels } from "../src/api/sdk";
+import { AgentManagementModels, EventManagementModels } from "../src/api/sdk";
 import { MindSphereSdk } from "../src/api/sdk/";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import { AgentUnitTestConfiguration, tearDownAgents, unitTestSetup } from "./test-agent-setup-utils";
@@ -553,10 +553,24 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             await agent.OnBoard();
         }
 
+        const eventManagement = sdk.GetEventManagementClient();
+        const eventType = await eventManagement.GetEventTypes({
+            filter: JSON.stringify({ name: "UnitTestEventType" }),
+        });
+
+        if (!eventType._embedded) {
+            const eventType = await eventManagement.PostEventType({
+                id: `${sdk.GetTenant()}.UnitTestEventType`,
+                name: `UnitTestEventType`,
+                fields: [{ name: "temperature", type: EventManagementModels.Field.TypeEnum.DOUBLE }],
+            });
+            eventType.should.not.be.undefined;
+        }
+
         await agent.PostEvent({
             entityId: agentConfig!.content!.clientId!,
             timestamp: new Date().toISOString(),
-            typeId: "d29e4385-25c5-46b0-b2b1-82eeeadf19fb",
+            typeId: `${sdk.GetTenant()}.UnitTestEventType`,
             temperature: 23.7,
         });
     });
