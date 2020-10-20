@@ -141,8 +141,10 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
         const config = agent.GetMindConnectConfiguration();
 
         config.dataSourceConfiguration?.configurationId.should.eq(`CF-${agent.GetTenant()}.UnitTestEngine`);
-        config.dataSourceConfiguration?.dataSources[0].dataPoints.length.should.equal(3);
-        config.dataSourceConfiguration?.dataSources[1].dataPoints.length.should.equal(4);
+        (
+            config.dataSourceConfiguration!.dataSources[0].dataPoints.length +
+            config.dataSourceConfiguration!.dataSources[1].dataPoints.length
+        ).should.equal(7);
         agent.GetMindConnectConfiguration().mappings?.length.should.equal(7);
 
         const mappings = await agent.GetDataMappings();
@@ -176,8 +178,10 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
         const config = agent.GetMindConnectConfiguration();
 
         config.dataSourceConfiguration?.configurationId.should.eq(`CF-${agent.GetTenant()}.UnitTestEngine`);
-        config.dataSourceConfiguration?.dataSources[0].dataPoints.length.should.equal(3);
-        config.dataSourceConfiguration?.dataSources[1].dataPoints.length.should.equal(4);
+        (
+            config.dataSourceConfiguration!.dataSources[0].dataPoints.length +
+            config.dataSourceConfiguration!.dataSources[1].dataPoints.length
+        ).should.equal(7);
         agent.GetMindConnectConfiguration().mappings?.length.should.equal(7);
 
         const mappings = await agent.GetDataMappings();

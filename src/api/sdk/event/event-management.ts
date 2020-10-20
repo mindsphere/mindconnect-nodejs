@@ -227,7 +227,7 @@ export class EventManagementClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/eventTypes?${toQueryString({ page, size, sort, filter, history })}`,
+            baseUrl: `${this._baseUrl}/eventTypes?${toQueryString({ page, size, sort, filter })}`,
             additionalHeaders: { "If-None-Match": ifNoneMatch },
         });
 

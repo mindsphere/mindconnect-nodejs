@@ -76,6 +76,16 @@ describe("[SDK] Credential Auth", () => {
         })
     );
 
+    it("should use correct URL in tests", () => {
+        const sdk = new MindSphereSdk({
+            ...auth,
+            basicAuth: decrypt(auth, getPasskeyForUnitTest()),
+        });
+
+        const url = sdk.GetGateway().replace("gateway", `${sdk.GetTenant()}.piam`);
+        url.should.contain(".piam.");
+    });
+
     it(
         "should throw error if there is no key",
         mochaAsync(async () => {
@@ -84,7 +94,8 @@ describe("[SDK] Credential Auth", () => {
                 basicAuth: decrypt(auth, getPasskeyForUnitTest()),
             });
             const assetManagement = sdk.GetAssetManagementClient();
-            nock(`https://${sdk.GetTenant()}.piam.eu1.mindsphere.io:443`, {
+            const url = sdk.GetGateway().replace("gateway", `${sdk.GetTenant()}.piam`);
+            nock(`${url}:443`, {
                 allowUnmocked: true,
             })
                 .get("/token_keys")
