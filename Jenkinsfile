@@ -23,7 +23,10 @@ pipeline {
     }
     stage('Build') {
       steps {
-        sh 'npm install'
+        sh '''
+        npm install
+        npm run ts:build
+        '''
       }
     }
     stage('Test') {
