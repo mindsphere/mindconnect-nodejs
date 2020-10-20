@@ -12,12 +12,12 @@ describe("[SDK] using different auths", () => {
         sdk.should.not.be.undefined;
     });
 
-    it("should instantiate with browser auth", () => {
+    it("should instantiate with browser auth @sanity", () => {
         const sdk = new MindSphereSdk(new BrowserAuth());
         sdk.should.not.be.undefined;
     });
 
-    it("should instantiate with backend auth", async () => {
+    it("should instantiate with backend auth @sanity", async () => {
         const sdk = new MindSphereSdk(new UserAuth("123", "https://gateway.eu1.mindsphere.io"));
         sdk.should.not.be.undefined;
         sdk.GetGateway().should.equal("https://gateway.eu1.mindsphere.io");
@@ -25,7 +25,7 @@ describe("[SDK] using different auths", () => {
         token.should.equal("123");
     });
 
-    it("should instantiate with backend auth and bearer", async () => {
+    it("should instantiate with backend auth and bearer @sanity", async () => {
         const sdk = new MindSphereSdk(new UserAuth("Bearer 123", "https://gateway.eu1.mindsphere.io"));
         sdk.should.not.be.undefined;
         sdk.GetGateway().should.equal("https://gateway.eu1.mindsphere.io");

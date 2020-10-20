@@ -59,7 +59,7 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         (await am.GetToken()).length.should.be.greaterThan(200);
     });
 
-    it("should GET aspecttypes", async () => {
+    it("should GET aspecttypes @sanity", async () => {
         am.should.not.be.undefined;
         const aspectTypes = await am.GetAspectTypes();
         aspectTypes.should.not.be.undefined;
@@ -149,7 +149,6 @@ describe("[SDK] AssetManagementClient.AspectTypes", () => {
         await am.DeleteAspectType(`${tenant}.UnitTestEngine_${timeOffset}_E`, { ifMatch: `${aspectType.etag}` });
     });
 });
-
 
 async function deleteAspectTypes(am: AssetManagementClient, tenant: string) {
     const aspectTypes = (await am.GetAspectTypes({

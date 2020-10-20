@@ -20,7 +20,7 @@ describe("[SDK] Credential Auth", () => {
         nock.cleanAll();
     });
 
-    it("should acquire token", async () => {
+    it("should acquire token @sanity", async () => {
         const sdk = new MindSphereSdk({
             ...auth,
             basicAuth: decrypt(auth, getPasskeyForUnitTest()),
@@ -76,7 +76,7 @@ describe("[SDK] Credential Auth", () => {
         })
     );
 
-    it("should use correct URL in tests", () => {
+    it("should use correct URL in tests @sanity", () => {
         const sdk = new MindSphereSdk({
             ...auth,
             basicAuth: decrypt(auth, getPasskeyForUnitTest()),

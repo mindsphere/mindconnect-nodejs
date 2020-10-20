@@ -27,7 +27,7 @@ describe("[SDK] AssetManagementClient.Files", () => {
         sdk.should.not.be.undefined;
     });
 
-    it("should be able to POST AND GET file", async () => {
+    it("should be able to POST AND GET file @sanity", async () => {
         if (process.env.CI) {
             return; // ! lets do this only locally as mindsphere sometimes behaves strange on fast deletion of files
         }

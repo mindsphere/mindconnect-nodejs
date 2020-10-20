@@ -27,7 +27,7 @@ describe("[SDK] Identity Management Client", () => {
         identity.should.not.be.undefined;
     });
 
-    it("should list all users", async () => {
+    it("should list all users @sanity", async () => {
         const users = await identity.GetUsers();
         users.totalResults!.should.be.greaterThan(0);
     });

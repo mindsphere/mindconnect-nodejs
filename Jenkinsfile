@@ -1,5 +1,8 @@
 pipeline {
   options { disableConcurrentBuilds() }
+  parameters {
+        string(name: 'PROD_B', defaultValue: '', description: 'Indicates if prod_b is used')
+    }
   agent {
     docker {
       image 'node'
@@ -34,7 +37,7 @@ pipeline {
         sh '''
         alias mc='node src/cli/mc'
         export MDSP_PASSKEY="passkey.4.unit.test"
-        [[ ! -z "$PROD_B" ]] && ( mc sc --mode select --index 1 && printf "\n\nTesting on PROD-B using app credentials in tpbde19\n\n") || ( mc sc --mode select --index 0 && printf "\n\nTesting on PROD-A using service credentials in tenant castidev\n\n")
+        [[ ! -z "${params.PROD_B}" ]] && ( mc sc --mode select --index 1 && printf "\n\nTesting on PROD-B using app credentials in tpbde19\n\n") || ( mc sc --mode select --index 0 && printf "\n\nTesting on PROD-A using service credentials in tenant castidev\n\n")
         npm run test-jenkins
         '''
       }

@@ -38,11 +38,11 @@ describe("Agent Auth Rotation", () => {
         await tearDownAgents(sdk, unitTestConfiguration);
     });
 
-    it("should use correct url", async () => {
+    it("should use correct url @sanity", async () => {
         southgateUrl.should.contain("southgate");
     });
 
-    it("onboarding should be able to handle internet connection problems", async () => {
+    it("onboarding should be able to handle internet connection problems @sanity", async () => {
         // respond 3 times with internal server error before returning the correct response
         let errors = 0;
         const scope = nock(`${southgateUrl}:443`, {
@@ -86,16 +86,7 @@ describe("Agent Auth Rotation", () => {
         const errorShouldOccur = await errorHelper(() => (agent as any).RotateKey());
         errorShouldOccur.should.be.true;
 
-        // await agent.TryRecovery();
-
-        // await (agent as any).RotateKey();
-
-        // (agent as any)._configuration.response = { test: "XX" };
-
-        // await agent.TryRecovery();
         await agent.RenewToken();
-
-        // await (agent as any).SaveConfig();
     });
 
     it("should be able to store old keys", async () => {
