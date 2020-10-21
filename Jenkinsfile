@@ -72,7 +72,7 @@ pipeline {
               export MDSP_PASSKEY="passkey.4.unit.test"
 
               mc assets --mode list
-              mc asset-types --mode lsit
+              mc asset-types --mode list
               mc aspects --mode list
               mc iam --mode list --group
               mc starter-js
