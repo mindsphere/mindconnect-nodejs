@@ -30,7 +30,7 @@ describe("[SDK] IotTsAggregateClient", () => {
         token.length.should.be.gte(100);
     });
 
-    it("should get aggregates per hour of the last 7 days using the test asset", async () => {
+    it("should get aggregates per hour of the last 7 days using the test asset @sanity", async () => {
         const aggregateClient = sdk.GetTimeSeriesAggregateClient();
         assetid.should.not.be.undefined;
         assetid.should.not.be.equal("");

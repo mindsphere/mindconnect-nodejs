@@ -7,7 +7,7 @@ chai.should();
 describe("[SDK] TokenManager Auth", () => {
     const auth = loadAuth();
 
-    it("should update old service credentials configuration", () => {
+    it("should update old service credentials configuration @sanity @s4f", () => {
         const oldConfig = {
             auth: "test",
             gateway: "test",

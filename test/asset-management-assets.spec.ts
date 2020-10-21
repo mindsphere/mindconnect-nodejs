@@ -192,7 +192,7 @@ describe("[SDK] AssetManagementClient.Assets", () => {
         (aspects as any)._embedded.aspects.length.should.be.greaterThan(0);
     });
 
-    it("should GET Variables  ", async () => {
+    it("should GET Variables  @sanity", async () => {
         am.should.not.be.undefined;
         const asset = await am.GetRootAsset();
         const variables = await am.GetVariables(`${asset.assetId}`, { size: 2000 });

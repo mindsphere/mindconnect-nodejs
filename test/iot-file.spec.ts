@@ -31,7 +31,7 @@ describe("[SDK] IotFileClient", () => {
         iotFile.should.not.be.undefined;
     });
 
-    it("should be able to PUT AND GET file", async () => {
+    it("should be able to PUT AND GET file @sanity", async () => {
         await retry(5, () =>
             iotFile.PutFile(rootId, `unit/test/xyz${timeOffset}.txt`, Buffer.from("xyz"), {
                 description: "blubb",

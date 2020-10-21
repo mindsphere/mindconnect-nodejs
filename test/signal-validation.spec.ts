@@ -20,7 +20,7 @@ describe("[SDK] SignalValidationClient", () => {
         signalValidationClient.should.not.be.undefined;
     });
 
-    it("Signal Validation should perform a Range Check.", async () => {
+    it("Signal Validation should perform a Range Check. @sanity", async () => {
         sdk.should.not.be.undefined;
         signalValidationClient.should.not.be.undefined;
 

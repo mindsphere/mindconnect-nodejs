@@ -76,7 +76,7 @@ describe("[SDK] AgentManagementClient", () => {
         agents.size.should.be.lessThan(11);
     });
 
-    it("should GET agent(s) with filter", async () => {
+    it("should GET agent(s) with filter @sanity", async () => {
         agentMgmt.should.not.be.undefined;
         const agents = await agentMgmt.GetAgents({
             filter: JSON.stringify({

@@ -59,7 +59,7 @@ describe("[SDK] AssetManagementClient.AssetTypes", () => {
         (await am.GetToken()).length.should.be.greaterThan(200);
     });
 
-    it("should GET asset types", async () => {
+    it("should GET asset types @sanity", async () => {
         am.should.not.be.undefined;
         const assetTypes = await am.GetAssetTypes();
         assetTypes.should.not.be.undefined;

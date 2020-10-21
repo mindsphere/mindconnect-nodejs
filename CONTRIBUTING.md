@@ -96,7 +96,8 @@ After setting up the CLI, you will need a 3072 bit certificate. (make sure that 
 npm run createkey
 ```
 
-You are now all set and should be able to run the unit tests locally. Please note that not all tests will run on your machine if you have a start-for-free account due to MindSphere restrictions.
+You are now all set and should be able to run the unit tests locally. Please note that not all tests will run on your machine if you have a start-for-free account due to MindSphere restrictions. There is a special set of unit tests which you can call with `npm run s4f` if you want to
+sanity-check the library before creating a pull request.
 
 ```bash
 npm run test
@@ -158,7 +159,16 @@ copies the html files for `mc service-credentials` command to `dist/` directory.
 
 ### `npm run test`
 
-Transpiles the typescript and runs the mocha unit test suite
+Transpiles the typescript and runs the full mocha unit test suite. (this only works on normal developer tenants)
+
+### `npm run sanity`
+
+Transpiles the typescript and runs the mocha unit tests marked with @sanity (this only works on normal developer tenants)
+
+### `npm run s4f`
+
+Transpiles the typescript and runs the mocha unit tests marked with @s4f. This can be used on start-for-free tenants to 
+sanity check the library before submiting a pull request.
 
 ### `npm run test-dev`
 

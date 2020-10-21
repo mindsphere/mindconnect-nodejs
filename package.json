@@ -1,6 +1,6 @@
 {
     "name": "@mindconnect/mindconnect-nodejs",
-    "version": "3.10.0-0",
+    "version": "3.10.0-1",
     "description": "MindConnect Library for NodeJS (community based)",
     "main": "./dist/src/index.js",
     "browser": "./dist/src/index.bundle.js",
@@ -11,6 +11,8 @@
         "prepare": "npm run clean && npm run ts:build:dist && npm run copyfiles:dist && npm run browser:build",
         "copyfiles:dist": "copyfiles src/cli/commands/html/sc/* dist/src/cli/commands/html/sc/ --flat",
         "test": "npm run ts:build && mocha --colors --timeout=0",
+        "sanity": "npm run ts:build && mocha --colors --grep @sanity --timeout=0",
+        "s4f": "npm run ts:build && mocha --colors --grep @s4f --timeout=0",
         "test-dev": "npm run ts:build && cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 mocha --reporter=list --timeout=0",
         "mocha-run": "mocha --colors --timeout=0",
         "test-jenkins": "npm run ts:build && cross-env JUNIT_REPORT_PATH=./report.xml mocha --colors --reporter mocha-jenkins-reporter --timeout=0",

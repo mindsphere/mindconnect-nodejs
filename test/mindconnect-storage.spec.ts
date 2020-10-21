@@ -14,7 +14,7 @@ describe("Default Storage", () => {
     process.env.DEBUG = "mindconnect-storage";
 
     it(
-        "should instantiate.",
+        "should instantiate. @s4f",
         mochaAsync(async () => {
             const storage = new DefaultStorage("./.mochatest/");
             storage.should.not.be.null;
@@ -23,7 +23,7 @@ describe("Default Storage", () => {
     );
 
     it(
-        "should be able to read configuration",
+        "should be able to read configuration @s4f",
         mochaAsync(async () => {
             const storage = new DefaultStorage("./.mochatest/");
             const config = await storage.GetConfig(rsaConfig);
@@ -34,7 +34,7 @@ describe("Default Storage", () => {
     );
 
     it(
-        "should be able to save configuration",
+        "should be able to save configuration @s4f",
         mochaAsync(async () => {
             const storage = new DefaultStorage("./.mochatest/");
             rsaConfig.urls = ["TEST"];
@@ -55,7 +55,7 @@ describe("Default Storage", () => {
     );
 
     it(
-        "should be able to revert configuration if content changes",
+        "should be able to revert configuration if content changes @s4f",
         mochaAsync(async () => {
             const storage = new DefaultStorage("./.mochatest/");
             rsaConfig.urls = ["TEST"];
@@ -83,7 +83,7 @@ describe("Default Storage", () => {
     );
 
     it(
-        "should be able to syncronize the locks",
+        "should be able to syncronize the locks @s4f",
         mochaAsync(async () => {
             const storage = new DefaultStorage("./.mochatest/");
             rsaConfig.urls = ["TEST"];

@@ -94,7 +94,7 @@ describe("MindConnectApi Version 3 Agent (RSA_3072)", () => {
         result.should.not.be.null;
     });
 
-    it("should be able to acquire a valid access token for exchange endpoint.", async () => {
+    it("should be able to acquire a valid access token for exchange endpoint. @sanity", async () => {
         const agent = new MindConnectAgent(rsaConfig);
         agent.SetupAgentCertificate(fs.readFileSync("private.key"));
         if (!agent.IsOnBoarded()) {
@@ -114,7 +114,7 @@ describe("MindConnectApi Version 3 Agent (RSA_3072)", () => {
         response.scope.length.should.be.greaterThan(0);
     });
 
-    it("should be able to validate the access token for exchange endpoint.", async () => {
+    it("should be able to validate the access token for exchange endpoint. @sanity", async () => {
         const agent = new MindConnectAgent(rsaConfig);
         agent.SetupAgentCertificate(fs.readFileSync("private.key"));
         if (!agent.IsOnBoarded()) {

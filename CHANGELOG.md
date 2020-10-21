@@ -6,6 +6,7 @@
 
 - SDK: fixed bug in EventManagementSDK GetEventTypes method (superflous history parameter)
 - unit tests: changed passkey for unit tests to work with passkey set up in environment (#207)
+- unit tests: added @sanity and @s4f (start for free) unit test suites (#208)
 
 ## 3.9.0 - (Pewter Vienna) - October 2020
 
