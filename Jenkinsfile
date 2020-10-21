@@ -61,7 +61,7 @@ pipeline {
     }
     stage('Test-CLI') {
       steps {
-        scripts {
+        script {
           if (PROD_B == "true") {
             sh '''
               dirname=`date +%s`
