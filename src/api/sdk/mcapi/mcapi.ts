@@ -364,7 +364,7 @@ export class MindConnectApiClient extends SdkClient {
         mode: "NUMERICAL" | "DESCRIPTIVE" = "DESCRIPTIVE"
     ): DataSourceConfiguration {
         let dataSourceConfiguration: DataSourceConfiguration = {
-            configurationId: mode === "NUMERICAL" ? "CF0001" : `CF-${assetType!.id!.toString().substr(0, 34)}`,
+            configurationId: mode === "NUMERICAL" ? "CF0001" : `CF-${assetType!.id!.toString().substr(0, 30)}`,
             dataSources: [],
         };
 
