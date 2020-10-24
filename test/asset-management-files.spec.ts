@@ -35,13 +35,13 @@ describe("[SDK] AssetManagementClient.Files", () => {
         const result = await retry(
             5,
             () =>
-                am.PostFile(Buffer.from("xyz"), `${timeOffset}xyz.text`, {
+                am.PostFile(Buffer.from("xyz"), `${timeOffset}xyz.2.text`, {
                     mimeType: "text/plain",
                     description: "Blubb2",
                 }),
             1000
         );
-        const files = await am.GetFiles({ filter: JSON.stringify({ name: `${timeOffset}xyz.text` }) });
+        const files = await am.GetFiles({ filter: JSON.stringify({ name: `${timeOffset}xyz.2.text` }) });
         (files._embedded as any).files.length.should.equal(1);
 
         await am.DeleteFile(`${result.id}`, { ifMatch: `${result.etag}` });
@@ -51,7 +51,7 @@ describe("[SDK] AssetManagementClient.Files", () => {
         if (process.env.CI) {
             return; // ! lets do this only locally as mindsphere sometimes behaves strange on fast deletion of files
         }
-        const result = await am.PostFile(Buffer.from("xyz"), `${timeOffset}xyz.text`, {
+        const result = await am.PostFile(Buffer.from("xyz"), `${timeOffset}xyz.2.text`, {
             mimeType: "text/plain",
             description: "Blubb2",
         });
@@ -64,7 +64,7 @@ describe("[SDK] AssetManagementClient.Files", () => {
     });
 
     it("should be able to DELETE file", async () => {
-        const result = await am.PostFile(Buffer.from("abc"), `${timeOffset}abc.text`, {
+        const result = await am.PostFile(Buffer.from("abc"), `${timeOffset}abc.2.text`, {
             mimeType: "text/plain",
             description: "Blubb2",
         });
@@ -72,12 +72,12 @@ describe("[SDK] AssetManagementClient.Files", () => {
     });
 
     it("should be able to PUT file", async () => {
-        const result = await am.PostFile(Buffer.from("abc"), `${timeOffset}test2.text`, {
+        const result = await am.PostFile(Buffer.from("abc"), `${timeOffset}test2.2.text`, {
             mimeType: "text/plain",
             description: "Blubb2",
         });
 
-        const updatedFile = await am.PutFile(`${result.id}`, Buffer.from("abcabc"), `${timeOffset}test2.text`, {
+        const updatedFile = await am.PutFile(`${result.id}`, Buffer.from("abcabc"), `${timeOffset}test2.2.text`, {
             scope: AssetManagementModels.FileMetadataResource.ScopeEnum.PRIVATE,
             description: result.description,
             ifMatch: `${result.etag}`,
@@ -97,7 +97,7 @@ async function deleteFiles(am: AssetManagementClient) {
         filter: JSON.stringify({
             and: {
                 name: {
-                    endsWith: ".text",
+                    endsWith: ".2.text",
                 },
             },
         }),
@@ -105,7 +105,8 @@ async function deleteFiles(am: AssetManagementClient) {
         page: 0,
         size: 0,
     })) as any;
-    for (const x of files._embedded.files) {
+
+    for await (const x of files._embedded.files) {
         await am.DeleteFile(x.id, { ifMatch: x.etag });
     }
 }
