@@ -69,7 +69,7 @@ export class KPICalculationClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/computekpi?${toQueryString(params)}`,
-            body: timeseries
+            body: timeseries,
         })) as KPICalculationModels.KpiSet;
     }
 
@@ -83,7 +83,7 @@ export class KPICalculationClient extends SdkClient {
      * @param {{
      *             from: Date;
      *             to: Date;
-     *             variableName: Date;
+     *             variableName: string;
      *             initialState: string;
      *             defaultState: string;
      *             threshold: number;
@@ -133,7 +133,77 @@ export class KPICalculationClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/calculatekpistates?${toQueryString(params)}`,
-            body: requestParametersBundle
+            body: requestParametersBundle,
+        })) as KPICalculationModels.KpiStateIndicationSet;
+    }
+
+    /**
+     *
+     * Launches kpi state computation task with specific parameters.
+     *
+     * @see https://developer.mindsphere.io/apis/analytics-kpicalculation/api-kpicalculation-basics-kpi-states.html
+     *
+     * @param {KPICalculationModels.RequestParametersBundle} requestParametersBundle
+     * @param {{
+     *             from: Date;
+     *             to: Date;
+     *             assetId: string;
+     *             aspectName: string;
+     *             variableName: string;
+     *             initialState: string;
+     *             defaultState: string;
+     *             threshold: number;
+     *             shutdownCorrelationThreshold: number;
+     *         }} params
+     * @param params.from Start time of the interval
+     * @param params.to End time of the interval
+     * @param params.assetId Unique identifier of the asset (entity)
+     * @param params.aspectName Name of the aspect (property set)
+     * @param params.variableName: Target variable name. Only this variable will be taken from the given timeseries data.
+     * @param params.initialState: initial KPI state (Available values : "RSH", "SH", "POH", FOH") -
+     * @param params.defaultState: default KPI state (Avaialble values: "RSH", "FOH")
+     * @param params.threshold: Threshould to check values. Positive value
+     * @param params.shutdownCorrelationThreshold: Shutdown correlation threshold in mills. The first event from the interval [timestamp - shutdownCorrelationThreshold, timestamp + shutdownCorrelationThreshold] will be analyzed for each timeseries item.
+     *
+     * * No Data Hours (NoData) - Time, in hours, where required data from the unit is unavailable. This KPI is introduced to deal with possible data gaps.
+     *
+     * * Period Hours (PH) – Time, in hours, inside the period under consideration.
+     *
+     * * Available Hours (AH) – Time, in hours, during which the unit was capable of providing service, regardless of the capacity level that it provides.\
+     *
+     * * Service Hours (SH) – Time, in hours, during which the unit was in-service.
+     *
+     * * Reserve Shutdown Hours (RSH) – Time, in hours, during which the unit was available, but not in service.
+     *
+     * * Unavailable Hours (UH) – Time, in hours, during which the unit was not capable of operation because of operational or equipment failures, external restrictions, testing, work being performed, or an adverse condition. The unavailable state persists until the unit is made available for operation.
+     *
+     * * Planned Outage Hours (POH) – Time, in hours, during which the unit (or a major item of equipment) was originally scheduled for a planned outage including the estimated duration plus the extension of planned work beyond this. The extension due to either a condition discovered during the planned outage or a startup failure would result as forced (unplanned) outage.
+     *
+     * * Forced Outage Hours (FOH) – Time, in hours, during which the unit was unavailable due to a component failure or another condition that requires the unit to be removed from service immediately or before the next planned outage.
+     *
+     * @returns {Promise<KPICalculationModels.KpiStateIndicationSet>}
+     * @memberOf KPICalculationClient
+     */
+    async CalculateKpiStatesDirect(
+        requestParametersBundle: KPICalculationModels.RequestParametersBundle,
+        params: {
+            from: Date;
+            to: Date;
+            assetId: string;
+            aspectName: string;
+            variableName: string;
+            initialState: string;
+            defaultState: string;
+            threshold: number;
+            shutdownCorrelationThreshold: number;
+        }
+    ) {
+        return (await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/calculatekpistatesDirect?${toQueryString(params)}`,
+            body: requestParametersBundle,
         })) as KPICalculationModels.KpiStateIndicationSet;
     }
 }
