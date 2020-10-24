@@ -4,6 +4,8 @@
 
 ### Improvements 3.10.0
 
+- SDK: feat: add support for direct interaction to TrendPrediction Client (#204) [#hacktoberfest, coding4funrocks]
+- SDK: added support for direct interaction to KPI Calculation Client (#203) [#hacktoberfest, coding4funrocks]
 - SDK: fixed bug in EventManagementSDK GetEventTypes method (superflous history parameter)
 - unit tests: changed passkey for unit tests to work with passkey set up in environment (#207)
 - unit tests: added @sanity and @s4f (start for free) unit test suites (#208)
