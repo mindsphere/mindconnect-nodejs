@@ -42,9 +42,52 @@ export class TrendPredictionClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/train`,
-            body: modelData
+            body: modelData,
         });
         return result as TrendPredictionModels.ModelDto;
+    }
+
+    /**
+     * Fits a regression model on the training dataset, storing the trained regression model in a database.
+     *
+     * @param {TrendPredictionModels.TrainBodyDirect} modelData
+     * @param {{
+     *             from: Date;
+     *             to: Date;
+     *         }} params
+     * @param params.from Beginning of the time range to be retrieved (exclusive)
+     * @param params.to End of the time range to be retrieved (exclusive)
+     *
+     * * Data structure with two parts - modelConfiguration, metadataConfiguration.
+     *
+     * * modelConfiguration
+     * contains the information necessary for configuring the regression model to
+     * be trained (e.g., the degree of a polynomial in case of polynomial regression).
+     *
+     * * metadataConfiguration
+     * specifies which variables are the input variables (regressors), and which one is the output variable
+     * (regressand) of the regression model. In order to specify time as one of the input variables,
+     * set propertyName equal to timestamp.
+     *
+     * @returns {Promise<TrendPredictionModels.ModelDtoDirect>}
+     *
+     * @memberOf TrendPredictionClient
+     */
+    public async TrainDirect(
+        modelData: TrendPredictionModels.TrainBodyDirect,
+        params: {
+            from: Date;
+            to: Date;
+        }
+    ): Promise<TrendPredictionModels.ModelDtoDirect> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/trainDirect?${toQueryString(params)}`,
+            body: modelData,
+        });
+        return result as TrendPredictionModels.ModelDtoDirect;
     }
 
     /**
@@ -76,9 +119,55 @@ export class TrendPredictionClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/predict`,
-            body: modelData
+            body: modelData,
         });
         return result as TrendPredictionModels.PredictionDataArray;
+    }
+
+    /**
+     * Predicts future values of a given output variable using a pre-trained regression model.
+     *
+     * @param {TrendPredictionModels.PredictBodyDirect} modelData
+     * @param {{
+     *             from: Date;
+     *             to: Date;
+     *         }} params
+     * @param params.from Beginning of the time range to be retrieved (exclusive)
+     * @param params.to End of the time range to be retrieved (exclusive)
+     *
+     * * Data structure with two parts - modelConfiguration and predictionData.
+     *
+     *  * modelConfiguration
+     * contains the information necessary to identify the pre-trained regression model (i.e., modelId).
+     *
+     *  * predictionData
+     * contains the values of the input variables used by the pre-trained regression model.
+     * Note that it is necessary to include the values for all of the input variables specified under
+     * metadataConfiguration at the training step.
+     *
+     * @example below assumes the two input variables that were used to train the regression model are
+     * [assetId: turbine1, aspectName: combustionSubpart1, variableName: pressure],
+     * [assetId: turbine1, aspectName: combustionSubpart1, variableName: temperature].
+     *
+     * @returns {Promise<TrendPredictionModels.PredictionDataArrayDirect>}
+     *
+     * @memberOf TrendPredictionClient
+     */
+    public async PredictDirect(
+        modelData: TrendPredictionModels.PredictBodyDirect,
+        params: {
+            from: Date;
+            to: Date;
+        }
+    ): Promise<TrendPredictionModels.PredictionDataArrayDirect> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/predictDirect?${toQueryString(params)}`,
+            body: modelData,
+        });
+        return result as TrendPredictionModels.PredictionDataArrayDirect;
     }
 
     /**
@@ -112,9 +201,59 @@ export class TrendPredictionClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/trainAndPredict`,
-            body: modelData
+            body: modelData,
         });
         return result as TrendPredictionModels.PredictionDataArray;
+    }
+
+    /**
+     * Fits a regression model on the training dataset and predicts future values of a
+     * given output variable using the trained regression model.
+     *
+     * @param {TrendPredictionModels.TrainPredictBodyDirect} modelData
+     * @param {{
+     *             trainFrom: Date;
+     *             trainTo: Date;
+     *             predictFrom: Date;
+     *             predictTo: Date;
+     *         }} params
+     * @param params.trainFrom Beginning of the time range to be retrieved (exclusive)
+     * @param params.trainTo End of the time range to be retrieved (exclusive)
+     * @param params.predictFrom Beginning of the time range to be retrieved (exclusive)
+     * @param params.predictTo End of the time range to be retrieved (exclusive)
+     *
+     * * Data structure with two parts - modelConfiguration and metadataConfiguration.
+     *
+     * * modelConfiguration
+     * contains the information necessary for configuring the regression model to be trained
+     * (e.g., the degree of a polynomial in case of polynomial regression).
+     *
+     * * metadataConfiguration
+     * specifies which variables are the input variables (regressors), and which one is the output variable
+     * (regressand) of the regression model. In order to specify time as one of the input variables,
+     * set propertyName equal to timestamp.
+     *
+     * @returns {Promise<TrendPredictionModels.PredictionDataArrayDirect>}
+     *
+     * @memberOf TrendPredictionClient
+     */
+    public async TrainAndPredictDirect(
+        modelData: TrendPredictionModels.TrainPredictBodyDirect,
+        params: {
+            trainFrom: Date;
+            trainTo: Date;
+            predictFrom: Date;
+            predictTo: Date;
+        }
+    ): Promise<TrendPredictionModels.PredictionDataArrayDirect> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/trainAndPredictDirect?${toQueryString(params)}`,
+            body: modelData,
+        });
+        return result as TrendPredictionModels.PredictionDataArrayDirect;
     }
 
     /**
@@ -148,7 +287,7 @@ export class TrendPredictionClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/models?${qs}`,
-            message: "GetModels"
+            message: "GetModels",
         })) as TrendPredictionModels.ModelDto[];
     }
 
@@ -167,7 +306,7 @@ export class TrendPredictionClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/models/${id}`,
-            message: "GetModel"
+            message: "GetModel",
         })) as TrendPredictionModels.ModelDto;
     }
 
@@ -188,7 +327,7 @@ export class TrendPredictionClient extends SdkClient {
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/models/${id}`,
             message: "DeleteModel",
-            noResponse: true
+            noResponse: true,
         });
     }
 }

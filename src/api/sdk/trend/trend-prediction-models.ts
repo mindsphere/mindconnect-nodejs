@@ -20,6 +20,52 @@ export namespace TrendPredictionModels {
     }
 
     /**
+     * All the information needed to identify a variable.
+     * @export
+     * @interface BasicVariableDefinitionDirect
+     */
+    export interface BasicVariableDefinitionDirect {
+        /**
+         *
+         * @type {string}
+         * @memberof BasicVariableDefinitionDirect
+         */
+        assetId: string;
+        /**
+         *
+         * @type {string}
+         * @memberof BasicVariableDefinitionDirect
+         */
+        aspectName: string;
+    }
+
+    /**
+     * All the information needed to identify a variable.
+     * @export
+     * @interface BasicVariableDefinitionPredictDirect
+     */
+    export interface BasicVariableDefinitionPredictDirect {
+        /**
+         *
+         * @type {string}
+         * @memberof BasicVariableDefinitionPredictDirect
+         */
+        assetId: string;
+        /**
+         *
+         * @type {string}
+         * @memberof BasicVariableDefinitionPredictDirect
+         */
+        aspectName: string;
+        /**
+         *
+         * @type {string}
+         * @memberof BasicVariableDefinitionPredictDirect
+         */
+        variableNames?: string;
+    }
+
+    /**
      *
      * @export
      * @interface Link
@@ -84,6 +130,44 @@ export namespace TrendPredictionModels {
     }
 
     /**
+     * A trained regression model.
+     * @export
+     * @interface ModelDtoDirect
+     */
+    export interface ModelDtoDirect {
+        /**
+         *
+         * @type {string}
+         * @memberof ModelDtoDirect
+         */
+        id?: string;
+        /**
+         *
+         * @type {MultivarParamsDirect}
+         * @memberof ModelDtoDirect
+         */
+        metadataConfiguration?: MultivarParamsDirect;
+        /**
+         *
+         * @type {number}
+         * @memberof ModelDtoDirect
+         */
+        intercept?: number;
+        /**
+         *
+         * @type {Array<number>}
+         * @memberof ModelDtoDirect
+         */
+        coefficients?: Array<number>;
+        /**
+         *
+         * @type {string}
+         * @memberof ModelDtoDirect
+         */
+        creationDate?: string;
+    }
+
+    /**
      * All the information needed to identify both the input and output variables.
      * @export
      * @interface MultivarParams
@@ -104,6 +188,26 @@ export namespace TrendPredictionModels {
     }
 
     /**
+     * All the information needed to identify both the input and output variables.
+     * @export
+     * @interface MultivarParamsDirect
+     */
+    export interface MultivarParamsDirect {
+        /**
+         *
+         * @type {VariableDefinitionDirect}
+         * @memberof MultivarParamsDirect
+         */
+        outputVariable?: VariableDefinitionDirect;
+        /**
+         *
+         * @type {Array<VariableDefinitionDirect>}
+         * @memberof MultivarParamsDirect
+         */
+        inputVariables?: Array<VariableDefinitionDirect>;
+    }
+
+    /**
      * Data structure containing all information required for predicting future values of a given output variable using a pre-trained regression model.
      * @export
      * @interface PredictBody
@@ -121,6 +225,26 @@ export namespace TrendPredictionModels {
          * @memberof PredictBody
          */
         predictionData?: Array<VariableToTimeseries>;
+    }
+
+    /**
+     * Data structure containing all information required for predicting future values of a given output variable using a pre-trained regression model.
+     * @export
+     * @interface PredictBodyDirect
+     */
+    export interface PredictBodyDirect {
+        /**
+         *
+         * @type {PredictBodyModelConfiguration}
+         * @memberof PredictBodyDirect
+         */
+        modelConfiguration?: PredictBodyModelConfiguration;
+        /**
+         *
+         * @type {Array<VariableToTimeseriesDirect>}
+         * @memberof PredictBodyDirect
+         */
+        predictionData?: Array<VariableToTimeseriesDirect>;
     }
 
     /**
@@ -145,19 +269,20 @@ export namespace TrendPredictionModels {
     export interface PredictionDataArray extends Array<VariableToTimeseries> {}
 
     /**
+     * An array containing the predicted values of a given output variable.
+     * @export
+     * @interface PredictionDataArrayDirect
+     */
+    export interface PredictionDataArrayDirect extends Array<VariableToTimeseriesResponseDirect> {}
+
+    /**
      *
      * @export
      * @interface Timeseries
      */
     export interface Timeseries {
-        [key: string]: number | any;
+        [key: string]: any | any;
 
-        /**
-         * string
-         * @type {any}
-         * @memberof Timeseries
-         */
-        string?: any;
         /**
          * time
          * @type {string}
@@ -190,6 +315,26 @@ export namespace TrendPredictionModels {
          * @memberof TrainBody
          */
         trainingData?: Array<VariableToTimeseries>;
+    }
+
+    /**
+     * Data structure containing all information required for training a regression model.
+     * @export
+     * @interface TrainBodyDirect
+     */
+    export interface TrainBodyDirect {
+        /**
+         *
+         * @type {TrainBodyModelConfiguration}
+         * @memberof TrainBodyDirect
+         */
+        modelConfiguration?: TrainBodyModelConfiguration;
+        /**
+         *
+         * @type {MultivarParamsDirect}
+         * @memberof TrainBodyDirect
+         */
+        metadataConfiguration?: MultivarParamsDirect;
     }
 
     /**
@@ -239,6 +384,26 @@ export namespace TrendPredictionModels {
     }
 
     /**
+     * Data structure containing all information required for training a regression model and predicting future values of a given output variable.
+     * @export
+     * @interface TrainPredictBodyDirect
+     */
+    export interface TrainPredictBodyDirect {
+        /**
+         *
+         * @type {TrainBodyModelConfiguration}
+         * @memberof TrainPredictBodyDirect
+         */
+        modelConfiguration?: TrainBodyModelConfiguration;
+        /**
+         *
+         * @type {MultivarParamsDirect}
+         * @memberof TrainPredictBodyDirect
+         */
+        metadataConfiguration?: MultivarParamsDirect;
+    }
+
+    /**
      * All the information needed to identify a variable.
      * @export
      * @interface VariableDefinition
@@ -250,6 +415,20 @@ export namespace TrendPredictionModels {
          * @memberof VariableDefinition
          */
         propertyName?: string;
+    }
+
+    /**
+     * All the information needed to identify a variable.
+     * @export
+     * @interface VariableDefinitionDirect
+     */
+    export interface VariableDefinitionDirect extends BasicVariableDefinitionDirect {
+        /**
+         *
+         * @type {string}
+         * @memberof VariableDefinitionDirect
+         */
+        variableName?: string;
     }
 
     /**
@@ -268,6 +447,40 @@ export namespace TrendPredictionModels {
          *
          * @type {Array<Timeseries>}
          * @memberof VariableToTimeseries
+         */
+        timeSeries?: Array<Timeseries>;
+    }
+
+    /**
+     * Data structure which allows to map the time series values to a given variable.
+     * @export
+     * @interface VariableToTimeseriesDirect
+     */
+    export interface VariableToTimeseriesDirect {
+        /**
+         *
+         * @type {BasicVariableDefinitionPredictDirect}
+         * @memberof VariableToTimeseriesDirect
+         */
+        variable?: BasicVariableDefinitionPredictDirect;
+    }
+
+    /**
+     * Data structure which allows to map the time series values to a given variable.
+     * @export
+     * @interface VariableToTimeseriesResponseDirect
+     */
+    export interface VariableToTimeseriesResponseDirect {
+        /**
+         *
+         * @type {BasicVariableDefinitionDirect}
+         * @memberof VariableToTimeseriesResponseDirect
+         */
+        variable?: BasicVariableDefinitionDirect;
+        /**
+         *
+         * @type {Array<Timeseries>}
+         * @memberof VariableToTimeseriesResponseDirect
          */
         timeSeries?: Array<Timeseries>;
     }
