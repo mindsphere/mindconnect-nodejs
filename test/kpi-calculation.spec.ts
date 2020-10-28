@@ -238,4 +238,39 @@ describe("[SDK] KPICalculationClient", () => {
 
         result.should.not.be.undefined;
     });
+
+    it("should calculate KPI states using direct method", async () => {
+        sdk.should.not.be.undefined;
+        kpiCalculationClient.should.not.be.undefined;
+
+        if (process.env.CI) {
+            return;
+        }
+
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const from = new Date();
+        from.setDate(from.getDate() - 2);
+        const result = await kpiCalculationClient.CalculateKpiStatesDirect(
+            {
+                calendar: {},
+                ControlSystemEvents: [],
+            },
+            {
+                from: yesterday,
+                to: today,
+                variableName: "Temperature",
+                assetId: "4e268313c91d4dbebade263322f55369",
+                aspectName: "Environment",
+                initialState: "POH",
+                defaultState: "SH",
+                threshold: 1.1,
+                shutdownCorrelationThreshold: 3000,
+            }
+        );
+
+        result.should.not.be.undefined;
+        result.indications?.length.should.be.greaterThan(0);
+    });
 });

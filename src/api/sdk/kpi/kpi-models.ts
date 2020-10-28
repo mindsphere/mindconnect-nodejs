@@ -77,7 +77,7 @@ export namespace KPICalculationModels {
          */
         export enum TypeEnum {
             SHUTDOWN = <any>"SHUTDOWN",
-            NORMALSTOP = <any>"NORMAL_STOP"
+            NORMALSTOP = <any>"NORMAL_STOP",
         }
     }
 
@@ -277,6 +277,21 @@ export namespace KPICalculationModels {
          * @memberof RequestParametersBundle
          */
         controlSystemEvents?: Array<ControlSystemEvent>;
+    }
+
+    export interface RequestParametersBundleDirect {
+        /**
+         *
+         * @type {Calendar}
+         * @memberof RequestParametersBundleDirect
+         */
+        calendar?: Calendar;
+        /**
+         *
+         * @type {Array<ControlSystemEvent>}
+         * @memberof RequestParametersBundleDirect
+         */
+        ControlSystemEvents?: Array<ControlSystemEvent>;
     }
 
     /**
