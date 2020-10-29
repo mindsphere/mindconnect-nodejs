@@ -24,8 +24,12 @@ export default (program: CommanderStatic) => {
         .option("-f, --file <timeseries>", `timeseries file`, `timeseries-sample.json`)
         .option("-c, --calendar <calendar>", `timeseries with planned outages`)
         .option("-e, --events <events>", `timeseries with control system events`)
-        .option("-m, --mode [states|kpis]", `mode see ${color("@ Additional Documentation")}`)
+        .option("-m, --mode [direct|states|kpis]", `mode see ${color("@ Additional Documentation")}`)
         .option("-t, --target <target>", `target variable`)
+        .option("-f, --from <from>", "timeseries begin  (used for direct state calculation)")
+        .option("-o, --to <to>", "timeseries end  (used for direct state calculation)")
+        .option("-i, --assetid <assetid>", "Asset id  (used for direct state calculation)")
+        .option("-a, --aspectname <aspectname>", "Aspect name (used for direct state calculation )")
         .option("-n, --initialstate <initialstate>", "Initial state [RSH, SH, POH, FOH]", "RSH")
         .option("-d, --defaultstate <defaultstate>", "Default state [RSH, FOH]", "FOH")
         .option("-h, --threshold <threshold>", `threshold parameter`, "1.0")
@@ -44,18 +48,67 @@ export default (program: CommanderStatic) => {
                     proxyLog(options.verbose, color);
 
                     const kpiClient = sdk.GetKPICalculationClient();
-                    const timeSeries = readDataFromFile(options.file, options.verbose);
-
-                    const from = new Date((_.minBy(timeSeries, "_time") as any)["_time"]);
-                    const to = new Date((_.maxBy(timeSeries, "_time") as any)["_time"]);
 
                     switch (options.mode) {
+                        case "direct":
+                            {
+                                verboseLog(
+                                    `calculating KPI states for target variable: ${options.input} using data stored in mindsphere`,
+                                    options.verbose
+                                );
+
+                                const from = new Date(options.from);
+                                const to = new Date(options.to);
+
+                                verboseLog(
+                                    `timeseries begin: ${from.toISOString()} timeseries end: ${to.toISOString()}`,
+                                    options.verbose
+                                );
+
+                                const calendar = options.calendar
+                                    ? readDataFromFile(options.calendar, options.verbose)
+                                    : { plannedOutage: [] };
+                                const events = options.events ? readDataFromFile(options.events, options.verbose) : [];
+
+                                const results = await retry(options.retry, () =>
+                                    kpiClient.CalculateKpiStatesDirect(
+                                        {
+                                            calendar: calendar,
+                                            ControlSystemEvents: events,
+                                        },
+                                        {
+                                            from: from,
+                                            to: to,
+                                            variableName: options.target,
+                                            initialState: options.initialstate,
+                                            defaultState: options.defaultstate,
+                                            assetId: options.assetid,
+                                            aspectName: options.aspectname,
+                                            threshold: options.threshold,
+                                            shutdownCorrelationThreshold: options.shutdown,
+                                        }
+                                    )
+                                );
+
+                                // create timeseries from kpi state indications
+                                const ts = _.map(results.indications, (item) => {
+                                    return { _time: item.timestamp, state: item.state, source: item.source };
+                                });
+
+                                console.log(JSON.stringify(ts, null, 2));
+                            }
+                            break;
                         case "states":
                             {
                                 verboseLog(
                                     `calculating kpi state for target variable: ${options.input}`,
                                     options.verbose
                                 );
+
+                                const timeSeries = readDataFromFile(options.file, options.verbose);
+
+                                const from = new Date((_.minBy(timeSeries, "_time") as any)["_time"]);
+                                const to = new Date((_.maxBy(timeSeries, "_time") as any)["_time"]);
 
                                 const calendar = options.calendar
                                     ? readDataFromFile(options.calendar, options.verbose)
@@ -67,7 +120,7 @@ export default (program: CommanderStatic) => {
                                         {
                                             calendar: calendar,
                                             timeseries: timeSeries,
-                                            controlSystemEvents: events,
+                                            ControlSystemEvents: events,
                                         },
                                         {
                                             from: from,
@@ -92,6 +145,11 @@ export default (program: CommanderStatic) => {
 
                         case "kpis":
                             {
+                                const timeSeries = readDataFromFile(options.file, options.verbose);
+
+                                const from = new Date((_.minBy(timeSeries, "_time") as any)["_time"]);
+                                const to = new Date((_.maxBy(timeSeries, "_time") as any)["_time"]);
+
                                 const results = await retry(options.retry, () =>
                                     kpiClient.ComputeKPI(timeSeries, {
                                         from: from,
@@ -113,10 +171,10 @@ export default (program: CommanderStatic) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc kpi-calculation --mode states --file timeseries.json --calendar calendar.json  --target Temperature --threshold 30 \t calculate kpi states based on temperature`
+                `    mc kpi-calculation --mode states --file timeseries.mdsp.json --calendar calendar.mdsp.json  --target Temperature --threshold 30 \t calculate kpi states based on temperature`
             );
             log(
-                `    mc kpi-calculation --mode kpis --file blubb.json --target state  \t calculate kpis for state timeseries`
+                `    mc kpi-calculation --mode kpis --file states.mdsp.json --target state  \t calculate kpis for state timeseries`
             );
 
             log("\n  State KPIs:\n");
@@ -152,7 +210,16 @@ function checkParameters(options: any) {
     !options.mode &&
         errorLog("You have to provide the mode for the command. Run mc kp --help for full syntax and examples.", true);
 
-    !options.file && errorLog("You have to provide at least the file with timeseries data", true);
+    options.mode !== "direct" &&
+        !options.file &&
+        errorLog("You have to provide at least the file with timeseries data", true);
+
+    options.mode === "direct" &&
+        (!options.assetid || !options.aspectname || !options.from || !options.to) &&
+        errorLog(
+            "You have to provide asssetid, aspectname, from and to for the direct kpi states calculation mode",
+            true
+        );
 
     !options.target && errorLog("You have to provide the target variable", true);
 
@@ -173,5 +240,6 @@ function checkParameters(options: any) {
             true
         );
 
-    !["states", "kpis"].includes(options.mode) && errorLog(`the mode must be either one of: states or kpis`, true);
+    !["states", "kpis", "direct"].includes(options.mode) &&
+        errorLog(`the mode must be either one of: states or kpis`, true);
 }

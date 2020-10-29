@@ -86,15 +86,15 @@ describe("[SDK] KPICalculationClient", () => {
         ControlSystemEvents: [
             {
                 _time: "2017-01-01T01:29:57.000Z",
-                type: "NORMAL_STOP",
+                type: KPICalculationModels.ControlSystemEvent.TypeEnum.NORMALSTOP,
             },
             {
                 _time: "2017-01-01T01:30:00.000Z",
-                type: "SHUTDOWN",
+                type: KPICalculationModels.ControlSystemEvent.TypeEnum.SHUTDOWN,
             },
             {
                 _time: "2017-01-01T04:30:01.000Z",
-                type: "SHUTDOWN",
+                type: KPICalculationModels.ControlSystemEvent.TypeEnum.SHUTDOWN,
             },
         ],
         calendar: {
@@ -223,18 +223,15 @@ describe("[SDK] KPICalculationClient", () => {
         const from = new Date();
         from.setDate(from.getDate() - 2);
         // console.log(data);
-        const result = await kpiCalculationClient.CaclulateKpiStates(
-            stateCalculationData as KPICalculationModels.RequestParametersBundle,
-            {
-                from: new Date(data[0]["_time"]),
-                to: new Date(data[data.length - 1]["_time"]),
-                variableName: "kpiStatus",
-                initialState: "RSH",
-                defaultState: "FOH",
-                threshold: 1.1,
-                shutdownCorrelationThreshold: 5000,
-            }
-        );
+        const result = await kpiCalculationClient.CaclulateKpiStates(stateCalculationData, {
+            from: new Date(data[0]["_time"]),
+            to: new Date(data[data.length - 1]["_time"]),
+            variableName: "kpiStatus",
+            initialState: "RSH",
+            defaultState: "FOH",
+            threshold: 1.1,
+            shutdownCorrelationThreshold: 5000,
+        });
 
         result.should.not.be.undefined;
     });
