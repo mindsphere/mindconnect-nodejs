@@ -43,7 +43,7 @@ export default (program: CommanderStatic) => {
                 try {
                     checkParameters(options);
                     const sdk = getSdk(options);
-                    color = adjustColor(color, options);
+                    color = adjustColor(color, options, true);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
 

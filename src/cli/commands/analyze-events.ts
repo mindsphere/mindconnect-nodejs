@@ -5,9 +5,18 @@ import { isArray } from "lodash";
 import * as path from "path";
 import { EventAnalyticsClient } from "../../api/sdk";
 import { retry } from "../../api/utils";
-import { errorLog, getColor, getSdk, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
+import {
+    adjustColor,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    proxyLog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
 
-const color = getColor("blue");
+let color = getColor("blue");
 
 export default (program: CommanderStatic) => {
     program
@@ -34,6 +43,7 @@ export default (program: CommanderStatic) => {
                 try {
                     checkRequiredParameters(options);
                     const sdk = getSdk(options);
+                    color = adjustColor(color, options, true);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
                     const fileName = path.resolve(options.file);
