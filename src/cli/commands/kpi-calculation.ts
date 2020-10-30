@@ -171,10 +171,13 @@ export default (program: CommanderStatic) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc kpi-calculation --mode states --file timeseries.mdsp.json --calendar calendar.mdsp.json  --target Temperature --threshold 30 \t calculate kpi states based on temperature`
+                `    mc kpi-calculation --mode states --file timeseries.mdsp.json --calendar calendar.mdsp.json  --target rpm --threshold 30 \n \t\tcalculate kpi states based on rpm`
             );
             log(
-                `    mc kpi-calculation --mode kpis --file states.mdsp.json --target state  \t calculate kpis for state timeseries`
+                `    mc kpi-calculation --mode direct --target rpm --assetid 123...ef --aspectname EngineParameters  --from <date> --to <date> \n \t\tcalculate kpi states based on asset data in MindSphere`
+            );
+            log(
+                `    mc kpi-calculation --mode kpis --file states.mdsp.json --target state \n \t\tcalculate kpis for state timeseries`
             );
 
             log("\n  State KPIs:\n");
@@ -194,6 +197,8 @@ export default (program: CommanderStatic) => {
                     "https://developer.mindsphere.io/apis/analytics-kpicalculation/api-kpicalculation-basics-kpi.html"
                 )}`
             );
+            log("\n  Example Jupyter Notebook:\n");
+            log(`    ${color("https://github.com/mindsphere/analytics-examples/blob/master/kpi-calculation.ipynb")}`);
             serviceCredentialLog(color);
         });
 };
