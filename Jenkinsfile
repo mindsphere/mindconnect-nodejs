@@ -53,8 +53,10 @@ pipeline {
           }
 
           sh '''
+          rm -f report.xml
           export MDSP_PASSKEY="passkey.4.unit.test"
           npm run test-jenkins
+          touch *.xml
           '''
         }
       }

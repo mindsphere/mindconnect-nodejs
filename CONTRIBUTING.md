@@ -167,7 +167,7 @@ Transpiles the typescript and runs the mocha unit tests marked with @sanity (thi
 
 ### `npm run s4f`
 
-Transpiles the typescript and runs the mocha unit tests marked with @s4f. This can be used on start-for-free tenants to 
+Transpiles the typescript and runs the mocha unit tests marked with @s4f. This can be used on start-for-free tenants to
 sanity check the library before submiting a pull request.
 
 ### `npm run test-dev`

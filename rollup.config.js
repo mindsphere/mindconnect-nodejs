@@ -15,7 +15,9 @@ export default [
             format: "umd",
         },
         plugins: [
-            resolve(),
+            resolve({
+                preferBuiltins: true,
+            }),
             commonjs({ extensions: [".js", ".ts"] }), // the ".ts" extension is required
             nodePolyfills(),
             json(),

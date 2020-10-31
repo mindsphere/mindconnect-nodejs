@@ -1,5 +1,6 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
+import * as path from "path";
 import { DataLakeModels, MindSphereSdk } from "../../api/sdk";
 import { removeUndefined, retry } from "../../api/utils";
 import {
@@ -12,6 +13,7 @@ import {
     serviceCredentialLog,
     verboseLog,
 } from "./command-utils";
+import ora = require("ora");
 
 let color = getColor("magenta");
 
@@ -20,19 +22,20 @@ export default (program: CommanderStatic) => {
         .command("data-lake")
         .alias("dlk")
         .option(
-            "-m, --mode [list|read|write|delete|readtoken|writetoken]",
-            "mode: list | read | write | delete | readtoken | writetoken",
+            "-m, --mode [...]",
+            "mode: list | read | write | delete | readtoken | writetoken | uploadurl | downloadurl | upload",
             "list"
         )
+        .option("-f, --file <file>", "file to upload")
         .option("-l, --shell [bash|ps|cmd]", "output format for STS token [bash | ps | cmd]", "bash")
-        .option("-p, --path <path>", "path for read/write token (default read: /)")
+        .option("-p, --path <path>", "path for read/write token or uploadUrl downloadUrl comamand")
         .option("-i, --permissionid <permissionid>", "permission id for delete operation")
         .option("-s, --subtenantid <subtenantid>", "subtenant id")
         .option("-d, --duration <duration>", "duration in seconds", "3600")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(color(`manage data lake access permissions and STS tokens *`))
+        .description(color(`manage data lake, data lake access permissions and STS tokens *`))
         .action((options) => {
             (async () => {
                 try {
@@ -56,6 +59,17 @@ export default (program: CommanderStatic) => {
                         case "writetoken":
                             await generateToken(sdk, options);
                             break;
+                        case "uploadurl":
+                            await uploadUrl(sdk, options);
+                            break;
+                        case "upload":
+                            await uploadFile(sdk, options);
+                            break;
+
+                        case "downloadurl":
+                            await downloadUrl(sdk, options);
+                            break;
+
                         default:
                             throw Error(`no such option: ${options.mode}`);
                     }
@@ -76,7 +90,15 @@ export default (program: CommanderStatic) => {
             );
 
             log(
-                `    mc data-lake --mode delete --permissionid  <permissionid>\t delete writing permission with selected permissionid`
+                `    mc data-lake --mode delete --permissionid  <permissionid>\t\t\t delete writing permission with selected permissionid`
+            );
+
+            log(
+                `    mc data-lake --mode upload --file CHANGELOG.md --path uploads/CHANGELOG.md \t upload file to data lake`
+            );
+
+            log(
+                `    mc data-lake --mode downloadurl --path uploads/CHANGELOG.md \t\t generate download url for the path`
             );
 
             log("\n  Additional Information:\n");
@@ -94,6 +116,51 @@ export default (program: CommanderStatic) => {
             serviceCredentialLog();
         });
 };
+
+async function downloadUrl(sdk: MindSphereSdk, options: any) {
+    const url = await sdk.GetDataLakeClient().GenerateDownloadObjectUrls({
+        paths: [{ path: `${options.path}` }],
+        subtenantId: options.subtenantid,
+    });
+    verboseLog(JSON.stringify(url, null, 2), options.verbose);
+    console.log(`\nDownload URL for ${color(url.objectUrls![0].path)}`);
+    console.log(`\nClick on the URL below to download the file:\n`);
+    console.log(color(url.objectUrls![0].signedUrl));
+}
+
+async function uploadFile(sdk: MindSphereSdk, options: any) {
+    const fullPath = path.resolve(options.file);
+
+    const spinner = ora(`Uploading ${color(fullPath)} to data Lake`);
+    !options.verbose && spinner.start();
+    verboseLog(`Creating Data Lake upload URL`, options.verbose, spinner);
+
+    const url = await sdk.GetDataLakeClient().GenerateUploadObjectUrls({
+        paths: [{ path: `${options.path}` }],
+        subtenantId: options.subtenantid,
+    });
+    verboseLog(
+        `Uploading file ${color(fullPath)} as ${color(url.objectUrls![0].path)} to data lake`,
+        options.verbose,
+        spinner
+    );
+
+    verboseLog(JSON.stringify(url, null, 2), options.verbose);
+    const result = await sdk.GetDataLakeClient().PutFile(fullPath, url.objectUrls![0].signedUrl!);
+    verboseLog(JSON.stringify(result, null, 2), options.verbose);
+    spinner.succeed(`Uploaded file ${color(fullPath)} as ${color(url.objectUrls![0].path)} to data lake`);
+}
+
+async function uploadUrl(sdk: MindSphereSdk, options: any) {
+    const url = await sdk.GetDataLakeClient().GenerateUploadObjectUrls({
+        paths: [{ path: `${options.path}` }],
+        subtenantId: options.subtenantid,
+    });
+    verboseLog(JSON.stringify(url, null, 2), options.verbose);
+    console.log(`\nUpload URL for ${color(url.objectUrls![0].path)}`);
+    console.log(`\nUpload file to the URL below:\n`);
+    console.log(color(url.objectUrls![0].signedUrl));
+}
 
 async function deletePermission(sdk: MindSphereSdk, options: any) {
     await sdk.GetDataLakeClient().DeleteAccessTokenPermission(options.permissionid);
@@ -193,6 +260,14 @@ export async function listPermissions(options: any, sdk: MindSphereSdk) {
 }
 
 function checkRequiredParameters(options: any) {
+    ["upload", "uploadurl", "downloadurl"].includes(options.mode) &&
+        !options.path &&
+        errorLog(`You have to specify --path for mc data-lake --mode ${options.mode} command.`, true);
+
+    ["upload", "uploadurl"].includes(options.mode) &&
+        !options.file &&
+        errorLog(`You have to specify --file for mc data-lake --mode ${options.mode} command.`, true);
+
     options.mode === "delete" &&
         !options.permissionid &&
         errorLog("You have to specify the permissionid for delete command.", true);

@@ -4,6 +4,8 @@
 
 ### Bugfixes and Improvements 3.10.0
 
+- CLI: support for uploading files to data lake (#221)
+- SDK: signed Url generation for upload and download (#221)
 - CLI: added support for direct calculation of KPI states to CLI mc kpi-calculation command
 - SDK: feat: add support for direct interaction to TrendPrediction Client (#204) [#hacktoberfest, coding4funrocks]
 - SDK: added support for direct interaction to KPI Calculation Client (#203) [#hacktoberfest, coding4funrocks]
