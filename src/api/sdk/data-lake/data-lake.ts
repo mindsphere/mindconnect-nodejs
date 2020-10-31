@@ -1,7 +1,8 @@
+import fetch from "cross-fetch";
+import * as fs from "fs";
 import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
 import { DataLakeModels } from "./data-lake.models";
-
 export class DataLakeClient extends SdkClient {
     private _baseUrl: string = "/api/datalake/v3";
 
@@ -113,5 +114,66 @@ export class DataLakeClient extends SdkClient {
             baseUrl: `${this._baseUrl}/accessTokenPermissions`,
             body: writePathPayload,
         })) as DataLakeModels.AccessTokenPermissionResource;
+    }
+
+    /**
+     *
+     * * Generate signed URLs to upload an object.
+     *
+     * @param {DataLakeModels.GenerateUrlPayload} generateUrlPayload
+     * upload payload with path details array and optional subtenant id
+     * @returns
+     *
+     * @memberOf DataLakeClient
+     */
+    public async GenerateUploadObjectUrls(
+        generateUrlPayload: DataLakeModels.GenerateUrlPayload
+    ): Promise<DataLakeModels.SignedUrlResponse> {
+        return (await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/generateUploadObjectUrls`,
+            body: generateUrlPayload,
+        })) as DataLakeModels.SignedUrlResponse;
+    }
+
+    /**
+     *
+     * * Generate signed URLs to download an object
+     *
+     * @param {DataLakeModels.GenerateUrlPayload} generateUrlPayload
+     * @returns {Promise<DataLakeModels.SignedUrlResponse>}
+     *
+     * @memberOf DataLakeClient
+     */
+    public async GenerateDownloadObjectUrls(
+        generateUrlPayload: DataLakeModels.GenerateUrlPayload
+    ): Promise<DataLakeModels.SignedUrlResponse> {
+        return (await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/generateDownloadObjectUrls`,
+            body: generateUrlPayload,
+        })) as DataLakeModels.SignedUrlResponse;
+    }
+
+    /**
+     * * Upload file to data lake via pre-signed URL
+     *
+     * @param {(string | Buffer)} file
+     * @param {string} signedUrl
+     * @returns {Promise<Headers>}
+     *
+     * @memberOf DataLakeClient
+     */
+    public async PutFile(file: string | Buffer, signedUrl: string): Promise<Headers> {
+        const myBuffer = typeof file === "string" ? fs.readFileSync(file) : (file as Buffer);
+
+        const request: any = { method: "PUT", headers: {} };
+        request.body = myBuffer;
+        const response = await fetch(signedUrl, request);
+        return response.headers;
     }
 }
