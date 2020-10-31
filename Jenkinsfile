@@ -56,6 +56,13 @@ pipeline {
           export MDSP_PASSKEY="passkey.4.unit.test"
           npm run test-jenkins
           '''
+
+          script {
+                    def testResults = findFiles(glob: '**/*.xml')
+                    for(xml in testResults) {
+                        touch xml.getPath()
+                    }
+                }
         }
       }
     }
