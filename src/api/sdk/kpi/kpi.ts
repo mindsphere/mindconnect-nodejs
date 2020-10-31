@@ -185,7 +185,7 @@ export class KPICalculationClient extends SdkClient {
      * @memberOf KPICalculationClient
      */
     async CalculateKpiStatesDirect(
-        requestParametersBundle: KPICalculationModels.RequestParametersBundle,
+        requestParametersBundle: KPICalculationModels.RequestParametersBundleDirect,
         params: {
             from: Date;
             to: Date;

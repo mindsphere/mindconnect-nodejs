@@ -22,10 +22,11 @@ export default (program: CommanderStatic) => {
     program
         .command("trend-prediction")
         .alias("tp")
-        .option("-f, --file <timeseries>", `timeseries file`, `timeseries-sample.json`)
+        .option("-f, --file <timeseries>", `timeseries file`, `timeseries-sample.mdsp.json`)
         .option(
             "-m, --mode [train|predict|trainandpredict|list|read|delete]",
-            `mode see ${color("@ Additional Documentation")}`
+            `mode see ${color("@ Additional Documentation")}`,
+            "list"
         )
         .option("-o, --output <output>", `output variables`)
         .option("-i, --input <input>", `input variables (comma separated)`)
@@ -42,7 +43,7 @@ export default (program: CommanderStatic) => {
                 try {
                     checkRequiredParameters(options);
                     const sdk = getSdk(options);
-                    color = adjustColor(color, options);
+                    color = adjustColor(color, options, true);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
 

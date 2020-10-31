@@ -126,8 +126,8 @@ export function getColor(name: string) {
     return chalk.level < 2 ? (chalk as any)[name] : (chalk as any)[`${name}Bright`];
 }
 
-export function adjustColor(color: any, options: any) {
-    if (process.env.MDSP_PASSKEY || options.passkey) {
+export function adjustColor(color: any, options: any, analyticcommand: boolean = false) {
+    if ((process.env.MDSP_PASSKEY || options.passkey) && !analyticcommand) {
         return getColor("magenta");
     } else if (process.env.MDSP_HOST && process.env.MDSP_SESSION && process.env.MDSP_XSRF_TOKEN) {
         return getColor("yellow");

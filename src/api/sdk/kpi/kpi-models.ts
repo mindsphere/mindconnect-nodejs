@@ -23,7 +23,7 @@ export namespace KPICalculationModels {
          * @type {Array<CalendarPlannedOutage>}
          * @memberof Calendar
          */
-        plannedOutage?: Array<CalendarPlannedOutage>;
+        PlannedOutage?: Array<CalendarPlannedOutage>;
     }
 
     /**
@@ -77,7 +77,7 @@ export namespace KPICalculationModels {
          */
         export enum TypeEnum {
             SHUTDOWN = <any>"SHUTDOWN",
-            NORMALSTOP = <any>"NORMAL_STOP"
+            NORMALSTOP = <any>"NORMAL_STOP",
         }
     }
 
@@ -276,7 +276,22 @@ export namespace KPICalculationModels {
          * @type {Array<ControlSystemEvent>}
          * @memberof RequestParametersBundle
          */
-        controlSystemEvents?: Array<ControlSystemEvent>;
+        ControlSystemEvents?: Array<ControlSystemEvent>;
+    }
+
+    export interface RequestParametersBundleDirect {
+        /**
+         *
+         * @type {Calendar}
+         * @memberof RequestParametersBundleDirect
+         */
+        calendar?: Calendar;
+        /**
+         *
+         * @type {Array<ControlSystemEvent>}
+         * @memberof RequestParametersBundleDirect
+         */
+        ControlSystemEvents?: Array<ControlSystemEvent>;
     }
 
     /**
@@ -285,6 +300,8 @@ export namespace KPICalculationModels {
      * @interface Timeseries
      */
     export interface Timeseries {
+        // ! fix: better model for timeseries
+        [x: string]: any;
         /**
          * particular variable (number of variables could be arbitary)
          * @type {string}
@@ -296,7 +313,7 @@ export namespace KPICalculationModels {
          * @type {string}
          * @memberof Timeseries
          */
-        time?: string;
+        _time?: string;
     }
 
     /**

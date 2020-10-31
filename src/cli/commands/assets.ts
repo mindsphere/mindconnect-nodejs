@@ -93,6 +93,8 @@ export default (program: CommanderStatic) => {
 export async function listAssets(options: any, sdk: MindSphereSdk) {
     const assetMgmt = sdk.GetAssetManagementClient();
 
+    color = adjustColor(color, options);
+
     let page = 0;
     let assets;
 
