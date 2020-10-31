@@ -1,10 +1,16 @@
 # Changelog
 
-## 3.10.0 - (Seafoam Vienna)
+## 3.10.0 - (Seafoam Vienna) - November 2020
+
+### Highlights 3.10.0
+
+- Merged 2 more Hacktoberfest contributions. Thanks to coding4funrocks! Great job!
+- Happy Halloween release!
 
 ### Bugfixes and Improvements 3.10.0
 
 - CLI: support for uploading files to data lake (#221)
+- SDK: upload files to data lake (#221)
 - SDK: signed Url generation for upload and download (#221)
 - CLI: added support for direct calculation of KPI states to CLI mc kpi-calculation command
 - SDK: feat: add support for direct interaction to TrendPrediction Client (#204) [#hacktoberfest, coding4funrocks]
