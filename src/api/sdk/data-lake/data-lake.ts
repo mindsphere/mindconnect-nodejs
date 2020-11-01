@@ -3,6 +3,8 @@ import * as fs from "fs";
 import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
 import { DataLakeModels } from "./data-lake.models";
+const HttpsProxyAgent = require("https-proxy-agent");
+
 export class DataLakeClient extends SdkClient {
     private _baseUrl: string = "/api/datalake/v3";
 
@@ -171,7 +173,10 @@ export class DataLakeClient extends SdkClient {
     public async PutFile(file: string | Buffer, signedUrl: string): Promise<Headers> {
         const myBuffer = typeof file === "string" ? fs.readFileSync(file) : (file as Buffer);
 
-        const request: any = { method: "PUT", headers: {} };
+        const proxy = process.env.http_proxy || process.env.HTTP_PROXY;
+        const proxyHttpAgent: any = proxy ? new HttpsProxyAgent(proxy) : null;
+
+        const request: any = { method: "PUT", headers: {}, agent: proxyHttpAgent };
         request.body = myBuffer;
         const response = await fetch(signedUrl, request);
         return response.headers;
