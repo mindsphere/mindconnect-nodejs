@@ -27,7 +27,7 @@ export default (program: CommanderStatic) => {
         .option("-i, --idonly", "list only ids")
         .option("-s, --schema <schema>", "JSON Schema")
         .option("-n, --assettype <assettype>", "the asset type name")
-        .option("-c, --includeshared", "include shared aspect types")
+        .option("-c, --includeshared", "include shared asset types")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")

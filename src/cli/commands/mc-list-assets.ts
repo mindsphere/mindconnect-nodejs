@@ -17,6 +17,7 @@ export default (program: CommanderStatic) => {
         )
         .option("-a, --assetname [name]", "search for assets with string [name] in asset name")
         .option("-t, --typeid [typeid]", "search for assets with string [typeid] in typeid")
+        .option("-c, --includeshared", "include shared assets")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
