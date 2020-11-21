@@ -1,14 +1,13 @@
-# MindConnect-NodeJS
 
-## nodejs library for the MindConnect API (V3)
+<!-- markdownlint-disable MD033 MD041 -->
+<p align="center">
+<img src="images/mindconnect-nodejs-new-logo.svg" alt="mindconnect-nodejs" width="200px"/>
+</p>
+<h1 align="center">MindConnect-NodeJS</h1>
+<p align="center">
+NodeJS Library for MindSphere Connectivity - TypeScript SDK for MindSphere - MindSphere Command Line Interface - MindSphere Development Proxy
 
-<!-- markdownlint-disable MD033 -->
-<img src="images/mindconnect-nodejs-new-logo.svg" alt="mindconnect-nodejs" width="300px"/>
 <!-- markdownlint-enableMD033 -->
-
-The mindconnect-nodejs library enables the user to upload time series data, files and events to Siemens MindSphere Platform.
-
-This project has started as a community effort at Siemens AG and is now available for general use.
 
 [![Build Status](https://jenkins.mindconnect.rocks/buildStatus/icon?job=mindconnect-nodejs/master)](https://jenkins.mindconnect.rocks/blue/organizations/jenkins/mindconnect-nodejs/activity/) [![The MIT License](https://img.shields.io/badge/license-MIT-009999.svg?style=flat)](./LICENSE.md)
 [![npm](https://img.shields.io/npm/v/@mindconnect/mindconnect-nodejs/latest.svg?style=flat)](https://www.npmjs.com/package/@mindconnect/mindconnect-nodejs) ![downloads](https://img.shields.io/npm/dw/@mindconnect/mindconnect-nodejs.svg?colorB=009999)
@@ -17,6 +16,7 @@ This project has started as a community effort at Siemens AG and is now availabl
 [![SDK](https://img.shields.io/badge/SDK-full%20documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/sdk/index.html)
 [![Documentation](https://img.shields.io/badge/cli-full%20documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html)
 [![Forum](https://img.shields.io/badge/mindsphere-community-%23009999.svg)](https://community.plm.automation.siemens.com/t5/Developer-Space/bd-p/MindSphere-platform-forum)
+</p>
 
 ## Full documentation
 
