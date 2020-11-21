@@ -1,4 +1,14 @@
 export namespace AssetManagementModels {
+    // ! fix (3.13.0): manual fixes for Asset Management Data Types
+    // ! fix (3.13.0): search for export interface.*\{\} , check if they are Ids and replace them with string types instead
+
+    export class RequiredError extends Error {
+        name: "RequiredError" = "RequiredError";
+        constructor(public field: string, msg?: string) {
+            super(msg);
+        }
+    }
+
     /**
      *
      * @export
@@ -187,8 +197,8 @@ export namespace AssetManagementModels {
          * @enum {string}
          */
         export enum CategoryEnum {
-            Dynamic = <any>"dynamic",
-            Static = <any>"static"
+            Dynamic = "dynamic",
+            Static = "static",
         }
     }
 
@@ -240,25 +250,26 @@ export namespace AssetManagementModels {
          * @enum {string}
          */
         export enum CategoryEnum {
-            Static = <any>"static",
-            Dynamic = <any>"dynamic"
+            Static = "static",
+            Dynamic = "dynamic",
         }
         /**
          * @export
          * @enum {string}
          */
         export enum ScopeEnum {
-            Public = <any>"public",
-            Private = <any>"private"
+            Public = "public",
+            Private = "private",
         }
     }
 
     /**
      * The aspect type's id is a unique identifier. The id's length must be between 1 and 128 characters and matches the following symbols \"A-Z\", \"a-z\", \"0-9\", \"_\" and \".\" beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id). Once set cannot be changed.
+     * ! fix: changed type to string
      * @export
      * @interface AspectTypeId
      */
-    export interface AspectTypeId {}
+    export type AspectTypeId = string;
 
     /**
      *
@@ -338,6 +349,12 @@ export namespace AssetManagementModels {
          * @memberof AspectTypeResource
          */
         etag?: ETag;
+        /**
+         *
+         * @type {SharingResource}
+         * @memberof AspectTypeResource
+         */
+        sharing?: SharingResource;
         /**
          *
          * @type {AspectTypeLinks}
@@ -662,6 +679,12 @@ export namespace AssetManagementModels {
         twinType?: TwinType;
         /**
          *
+         * @type {SharingResource}
+         * @memberof AssetResource
+         */
+        sharing?: SharingResource;
+        /**
+         *
          * @type {ETag}
          * @memberof AssetResource
          */
@@ -674,20 +697,7 @@ export namespace AssetManagementModels {
         _links?: AssetLinks;
     }
 
-    /**
-     * @export
-     * @namespace AssetResource
-     */
-    export namespace AssetResource {
-        /**
-         * @export
-         * @enum {string}
-         */
-        export enum TwinTypeEnum {
-            Performance = <any>"performance",
-            Simulation = <any>"simulation"
-        }
-    }
+    // ! fix 11/21/2020 : removed embedded TwinTypeEnum
 
     /**
      *
@@ -829,17 +839,18 @@ export namespace AssetManagementModels {
          * @enum {string}
          */
         export enum ScopeEnum {
-            Public = <any>"public",
-            Private = <any>"private"
+            Public = "public",
+            Private = "private",
         }
     }
 
     /**
      * The asset type's id is a unique identifier. The id's length must be between 1 and 128 characters and matches the following symbols \"A-Z\", \"a-z\", \"0-9\", \"_\" and \".\" beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id). Once set cannot be changed.
+     * ! fix: changed type to string
      * @export
      * @interface AssetTypeId
      */
-    export interface AssetTypeId {}
+    export type AssetTypeId = string;
 
     /**
      *
@@ -959,6 +970,12 @@ export namespace AssetManagementModels {
         fileAssignments?: Array<FileAssignmentResource>;
         /**
          *
+         * @type {SharingResource}
+         * @memberof AssetTypeResource
+         */
+        sharing?: SharingResource;
+        /**
+         *
          * @type {AssetTypeLinks}
          * @memberof AssetTypeResource
          */
@@ -970,6 +987,12 @@ export namespace AssetManagementModels {
      * @namespace AssetTypeResource
      */
     export namespace AssetTypeResource {}
+
+    /**
+     * @export
+     * @interface AssetTypeResourceAspectType
+     */
+    export interface AssetTypeResourceAspectType extends AspectTypeResource {}
 
     /**
      *
@@ -985,10 +1008,10 @@ export namespace AssetManagementModels {
         name?: string;
         /**
          *
-         * @type {any}
+         * @type {AssetTypeResourceAspectType}
          * @memberof AssetTypeResourceAspects
          */
-        aspectType?: any;
+        aspectType?: AssetTypeResourceAspectType;
         /**
          *
          * @type {AssetTypeResourceLinks}
@@ -1184,8 +1207,9 @@ export namespace AssetManagementModels {
     }
 
     /**
+     * ! fix: changed type to string
+     *
      * incremental counter for optimistic locking
-     * ! fix: manually converted ETag interface to string.
      * @export
      * @interface ETag
      */
@@ -1196,30 +1220,43 @@ export namespace AssetManagementModels {
      * @export
      * @interface Errors
      */
-    export interface Errors extends Array<ErrorsInner> {}
+    export interface Errors {
+        /**
+         *
+         * @type {Array<ErrorsErrors>}
+         * @memberof Errors
+         */
+        errors?: Array<ErrorsErrors>;
+    }
 
     /**
      *
      * @export
-     * @interface ErrorsInner
+     * @interface ErrorsErrors
      */
-    export interface ErrorsInner {
-        /**
-         *
-         * @type {number}
-         * @memberof ErrorsInner
-         */
-        errorcode?: number;
+    export interface ErrorsErrors {
         /**
          *
          * @type {string}
-         * @memberof ErrorsInner
+         * @memberof ErrorsErrors
+         */
+        code?: string;
+        /**
+         *
+         * @type {string}
+         * @memberof ErrorsErrors
+         */
+        errorcode?: string;
+        /**
+         *
+         * @type {string}
+         * @memberof ErrorsErrors
          */
         logref?: string;
         /**
          *
          * @type {string}
-         * @memberof ErrorsInner
+         * @memberof ErrorsErrors
          */
         message?: string;
     }
@@ -1456,8 +1493,8 @@ export namespace AssetManagementModels {
          * @enum {string}
          */
         export enum ScopeEnum {
-            PUBLIC = <any>"PUBLIC",
-            PRIVATE = <any>"PRIVATE"
+            Public = "public",
+            Private = "private",
         }
     }
 
@@ -1716,18 +1753,51 @@ export namespace AssetManagementModels {
     export namespace RootAssetResource {}
 
     /**
+     * Contains sharing information.
+     * @export
+     * @interface SharingResource
+     */
+    export interface SharingResource {
+        /**
+         * List of sharing modes applicable for this resource. The currently supported modes are SHARER and RECEIVER.  SHARER means this resource is shared by my tenant. RECEIVER means this resource is shared with my tenant. An empty array means this resource is not shared. New modes might be introduced later and clients must expect additional items to be contained in the array.
+         * @type {Array<string>}
+         * @memberof SharingResource
+         */
+        modes?: Array<SharingResource.ModesEnum>;
+    }
+
+    /**
+     * @export
+     * @namespace SharingResource
+     */
+    export namespace SharingResource {
+        /**
+         * @export
+         * @enum {string}
+         */
+        export enum ModesEnum {
+            SHARER = "SHARER",
+            RECEIVER = "RECEIVER",
+        }
+    }
+
+    /**
+     * ! fix: changed type to string
+     *
      * The unique identifier of the tenant
      * @export
      * @interface TenantId
      */
-    export interface TenantId {}
+    export type TenantId = string;
 
     /**
-     * The timezone to be used for timeseries aggregation. By default it is inherited from the tenant's defaultTimezone, but can be overwritten. The timezone value should be set to a Java time zone ID such as \"America/LosAngeles\" or \"Etc/GMT+2\". Time zones that 15 or 45 minutes off a UTC hour are not supported, such as Nepal standard time (UTC+05:45). Time zones that are 30 minutes off a UTC hour are supported, such as India (UTC+05:30).
+     * ! fix: changed type to string
+     *
+     * The timezone to be used for timeseries aggregation. By default it is inherited from the tenant's defaultTimezone, but can be overwritten only during asset creation. The timezone value should be set to a Java time zone ID such as \"America/LosAngeles\" or \"Etc/GMT+2\". Time zones that 15 or 45 minutes off a UTC hour are not supported, such as Nepal standard time (UTC+05:45). Time zones that are 30 minutes off a UTC hour are supported, such as India (UTC+05:30). Once an asset is created with a specific timezone, it cannot be changed later.
      * @export
      * @interface Timezone
      */
-    export interface Timezone {}
+    export type Timezone = string;
 
     /**
      * Indicates that the asset is a real asset (performance) or for simulation. If omitted on creation then it defaults to performance. Setting the twinType to simulation allows high resolution timestamps (microsecond precision).
@@ -1735,16 +1805,16 @@ export namespace AssetManagementModels {
      * @enum {string}
      */
     export enum TwinType {
-        Performance = <any>"performance",
-        Simulation = <any>"simulation"
+        Performance = "performance",
+        Simulation = "simulation",
     }
 
     /**
      *
+     * ! fix: changed type to string
      * @export
      * @interface UniqueId
      */
-    // * manual fix for the interface *Unique id extends string* otherwise the usage becomes very complicated
     export type UniqueId = string;
 
     /**
@@ -1772,43 +1842,19 @@ export namespace AssetManagementModels {
      * @export
      * @interface VariableDefinition
      */
-    export interface VariableDefinition {
-        /**
-         * Name of the variable. Once set cannot be changed. Reserved words (id, name, description, tenant, etag, scope, properties, propertySets, extends, variables, aspects, parentTypeId) cannot be used as variable names.
-         * @type {string}
-         * @memberof VariableDefinition
-         */
-        name: string;
+    export interface VariableDefinition extends VariableUpdate {
         /**
          * Data type of the variable. BIG_STRING could only be used by variables in dynamic aspect-types. Cannot be changed.
          * @type {string}
          * @memberof VariableDefinition
          */
-        dataType: VariableDefinition.DataTypeEnum;
-        /**
-         * Unit of measurement. Cannot be changed.
-         * @type {string}
-         * @memberof VariableDefinition
-         */
-        unit?: string;
+        dataType?: VariableDefinition.DataTypeEnum;
         /**
          * Indicates whether sorting and filtering is allowed on this variable. Only usable for static properties. Cannot be changed.
          * @type {boolean}
          * @memberof VariableDefinition
          */
         searchable?: boolean;
-        /**
-         * The max length of the variable's value. The length field is only used for variables of string or big_string dataType. Max length for string is 255 and max length for big_string 100000. Cannot be changed.
-         * @type {number}
-         * @memberof VariableDefinition
-         */
-        length?: number;
-        /**
-         * The default value of the variable. It must be compatible with the dataType! The default value will be inherited by the asset type's child types and by the asset instantiating it. It can be defined in aspect types and asset types.
-         * @type {string}
-         * @memberof VariableDefinition
-         */
-        defaultValue?: string;
     }
 
     /**
@@ -1821,13 +1867,13 @@ export namespace AssetManagementModels {
          * @enum {string}
          */
         export enum DataTypeEnum {
-            BOOLEAN = <any>"BOOLEAN",
-            INT = <any>"INT",
-            LONG = <any>"LONG",
-            DOUBLE = <any>"DOUBLE",
-            STRING = <any>"STRING",
-            TIMESTAMP = <any>"TIMESTAMP",
-            BIGSTRING = <any>"BIG_STRING"
+            BOOLEAN = "BOOLEAN",
+            INT = "INT",
+            LONG = "LONG",
+            DOUBLE = "DOUBLE",
+            STRING = "STRING",
+            TIMESTAMP = "TIMESTAMP",
+            BIGSTRING = "BIG_STRING",
         }
     }
 
@@ -1917,5 +1963,46 @@ export namespace AssetManagementModels {
          * @memberof VariableListResourceEmbedded
          */
         variables?: Array<VariableDefinition>;
+    }
+
+    /**
+     *
+     * @export
+     * @interface VariableUpdate
+     */
+    export interface VariableUpdate {
+        /**
+         * Name of the variable. Once set cannot be changed. Reserved words (id, name, description, tenant, etag, scope, properties, propertySets, extends, variables, aspects, parentTypeId) cannot be used as variable names.
+         * @type {string}
+         * @memberof VariableUpdate
+         */
+        name?: string;
+        /**
+         * Unit of measurement. Cannot be changed.
+         * @type {string}
+         * @memberof VariableUpdate
+         */
+        unit?: string;
+        /**
+         * The max length of the variable's value. The length field is only used for variables of string or big_string dataType. Max length for string is 255 and max length for big_string 100000. Cannot be changed.
+         * @type {number}
+         * @memberof VariableUpdate
+         */
+        length?: number;
+        /**
+         * The default value of the variable. It must be compatible with the dataType! The default value will be inherited by the asset type's child types and by the asset instantiating it. It can be defined in aspect types and asset types.
+         * @type {string}
+         * @memberof VariableUpdate
+         */
+        defaultValue?: string;
+    }
+
+    /**
+     *
+     * @export
+     * @interface VariableUpdateMap
+     */
+    export interface VariableUpdateMap {
+        [key: string]: VariableUpdate;
     }
 }

@@ -91,6 +91,7 @@ export default (program: CommanderStatic) => {
         .option("-l, --length <length>", "default string length", "255")
         .option("-b, --biglength <biglength>", "default bigstring length", "5000")
         .option("-i, --idonly", "list only ids")
+        .option("-c, --includeshared", "include shared aspect types")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
@@ -165,9 +166,10 @@ async function createAspectType(options: any, sdk: MindSphereSdk) {
     const filePath = path.resolve(options.file);
     const file = fs.readFileSync(filePath);
     const aspect = JSON.parse(file.toString());
+    const includeShared = options.includeshared;
 
     const name = aspect.name!.includes(".") ? aspect.name : `${sdk.GetTenant()}.${aspect.name}`;
-    await sdk.GetAssetManagementClient().PutAspectType(name, aspect);
+    await sdk.GetAssetManagementClient().PutAspectType(name, aspect, { includeShared: includeShared });
     console.log(`creted aspect ${color(name)}`);
 }
 
@@ -252,9 +254,10 @@ function writeAspectTypeToFile(
 }
 
 async function deleteAspectType(options: any, sdk: MindSphereSdk) {
+    const includeShared = options.includeshared;
     const id = (options.aspect! as string).includes(".") ? options.aspect : `${sdk.GetTenant()}.${options.aspect}`;
-    const aspType = await sdk.GetAssetManagementClient().GetAspectType(id);
-    await sdk.GetAssetManagementClient().DeleteAspectType(id, { ifMatch: aspType.etag! });
+    const aspType = await sdk.GetAssetManagementClient().GetAspectType(id, { includeShared: includeShared });
+    await sdk.GetAssetManagementClient().DeleteAspectType(id, { ifMatch: aspType.etag!, includeShared: includeShared });
     console.log(`Aspect with id ${color(id)} deleted.`);
 }
 
@@ -276,6 +279,7 @@ function convertAspectType(options: any) {
 }
 
 async function listAspectTypes(sdk: MindSphereSdk, options: any) {
+    const includeShared = options.includeshared;
     const assetMgmt = sdk.GetAssetManagementClient();
 
     let page = 0;
@@ -284,7 +288,7 @@ async function listAspectTypes(sdk: MindSphereSdk, options: any) {
     const filter = buildFilter(options);
     verboseLog(JSON.stringify(filter, null, 2), options.verbose);
 
-    !options.idonly && console.log(`id  etag  type variables name`);
+    !options.idonly && console.log(`id  etag  type variables name\tsharing`);
 
     let assetCount = 0;
 
@@ -294,7 +298,8 @@ async function listAspectTypes(sdk: MindSphereSdk, options: any) {
                 page: page,
                 size: 100,
                 filter: Object.keys(filter).length === 0 ? undefined : JSON.stringify(filter),
-                sort: "name,asc",
+                sort: "id,asc",
+                includeShared: includeShared,
             })
         )) as AssetManagementModels.AspectTypeListResource;
 
@@ -308,7 +313,7 @@ async function listAspectTypes(sdk: MindSphereSdk, options: any) {
                 console.log(
                     `${aspect.id}\t${aspect.etag} ${aspect.category} [${aspect.variables.length}]\t${color(
                         aspect.name
-                    )}`
+                    )}\t${aspect.sharing?.modes}`
                 );
 
             options.idonly && console.log(`${aspect.id}`);

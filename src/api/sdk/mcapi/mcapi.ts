@@ -395,8 +395,8 @@ export class MindConnectApiClient extends SdkClient {
                     id:
                         mode === "NUMERICAL"
                             ? `DP${(++dp).toString().padStart(5, "0")}`
-                            : `DP-${variable.name.substr(0, 33)}`,
-                    name: variable.name.substr(0, 64),
+                            : `DP-${variable!.name!.substr(0, 33)}`,
+                    name: variable!.name!.substr(0, 64),
                     type: (variable.dataType as unknown) as DataPoint.TypeEnum,
                     unit: `${variable.unit}`,
                     customData: {

@@ -27,6 +27,7 @@ export default (program: CommanderStatic) => {
         .option("-i, --idonly", "list only ids")
         .option("-s, --schema <schema>", "JSON Schema")
         .option("-n, --assettype <assettype>", "the asset type name")
+        .option("-c, --includeshared", "include shared aspect types")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
@@ -81,12 +82,13 @@ export default (program: CommanderStatic) => {
 };
 
 async function createAssetType(options: any, sdk: MindSphereSdk) {
+    const includeShared = options.includeshared;
     const filePath = path.resolve(options.file);
     const file = fs.readFileSync(filePath);
     const assettype = JSON.parse(file.toString());
 
     const name = assettype.name!.includes(".") ? assettype.name : `${sdk.GetTenant()}.${assettype.name}`;
-    await sdk.GetAssetManagementClient().PutAssetType(name, assettype);
+    await sdk.GetAssetManagementClient().PutAssetType(name, assettype, { includeShared: includeShared });
     console.log(`creted asset type ${color(name)}`);
 }
 
@@ -135,15 +137,17 @@ function writeAssetTypeToFile(options: any, AssetType: any) {
 }
 
 async function deleteAssetType(options: any, sdk: MindSphereSdk) {
+    const includeShared = options.includeshared;
     const id = (options.assettype! as string).includes(".")
         ? options.assettype
         : `${sdk.GetTenant()}.${options.assettype}`;
-    const aspType = await sdk.GetAssetManagementClient().GetAssetType(id);
-    await sdk.GetAssetManagementClient().DeleteAssetType(id, { ifMatch: aspType.etag! });
+    const aspType = await sdk.GetAssetManagementClient().GetAssetType(id, { includeShared: includeShared });
+    await sdk.GetAssetManagementClient().DeleteAssetType(id, { ifMatch: aspType.etag!, includeShared: includeShared });
     console.log(`assettype with id ${color(id)} deleted.`);
 }
 
 async function listAssetTypes(sdk: MindSphereSdk, options: any) {
+    const includeShared = options.includeshared;
     const assetMgmt = sdk.GetAssetManagementClient();
 
     let page = 0;
@@ -152,7 +156,7 @@ async function listAssetTypes(sdk: MindSphereSdk, options: any) {
     const filter = buildFilter(options);
     verboseLog(JSON.stringify(filter, null, 2), options.verbose);
 
-    !options.idonly && console.log(`id  etag aspects name`);
+    !options.idonly && console.log(`id  etag aspects name\t sharing`);
 
     let assetCount = 0;
 
@@ -162,7 +166,8 @@ async function listAssetTypes(sdk: MindSphereSdk, options: any) {
                 page: page,
                 size: 100,
                 filter: Object.keys(filter).length === 0 ? undefined : JSON.stringify(filter),
-                sort: "name,asc",
+                sort: "id,asc",
+                includeShared: includeShared,
             })
         )) as AssetManagementModels.AssetTypeListResource;
 
@@ -174,7 +179,9 @@ async function listAssetTypes(sdk: MindSphereSdk, options: any) {
             assetCount++;
             !options.idonly &&
                 console.log(
-                    `${assettype.id}\t${assettype.etag} aspects[${assettype.aspects?.length}]\t${color(assettype.name)}`
+                    `${assettype.id}\t${assettype.etag} aspects[${assettype.aspects?.length}]\t${color(
+                        assettype.name
+                    )}\t${assettype.sharing?.modes}`
                 );
 
             options.idonly && console.log(`${assettype.id}`);
