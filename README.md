@@ -1,7 +1,7 @@
 
 <!-- markdownlint-disable MD033 MD041 -->
 <p align="center">
-<img src="images/mindconnect-nodejs-new-logo.svg" alt="mindconnect-nodejs" width="200px"/>
+<img src="images/mindconnect-nodejs-new-logo.svg" alt="mindconnect-nodejs" width="300px"/>
 </p>
 <h1 align="center">MindConnect-NodeJS</h1>
 <p align="center">
