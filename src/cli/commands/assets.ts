@@ -30,6 +30,7 @@ export default (program: CommanderStatic) => {
         .option("-t, --typeid <typeid>", "typeid")
         .option("-d, --desc <desc>", "description", "created with mindsphere CLI")
         .option("-w, --twintype <twintype>", "digital twin type [performance|simulation]")
+        .option("-c, --includeshared", "include shared aspect types")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
@@ -91,6 +92,7 @@ export default (program: CommanderStatic) => {
 };
 
 export async function listAssets(options: any, sdk: MindSphereSdk) {
+    const includeShared = options.includeshared;
     const assetMgmt = sdk.GetAssetManagementClient();
 
     color = adjustColor(color, options);
@@ -101,7 +103,7 @@ export async function listAssets(options: any, sdk: MindSphereSdk) {
     const filter = buildFilter(options);
     verboseLog(JSON.stringify(filter, null, 2), options.verbose);
 
-    console.log(`assetid  etag  twintype  [typeid]  name`);
+    console.log(`assetid  etag  twintype  [typeid]  name  sharing`);
 
     let assetCount = 0;
 
@@ -112,6 +114,7 @@ export async function listAssets(options: any, sdk: MindSphereSdk) {
                 size: 100,
                 filter: Object.keys(filter).length === 0 ? undefined : JSON.stringify(filter),
                 sort: "name,asc",
+                includeShared: includeShared,
             })
         )) as AssetManagementModels.AssetListResource;
 
@@ -121,7 +124,11 @@ export async function listAssets(options: any, sdk: MindSphereSdk) {
 
         for (const asset of assets._embedded.assets || []) {
             assetCount++;
-            console.log(`${asset.assetId}  ${asset.etag}\t${asset.twinType}\t[${asset.typeId}]\t${color(asset.name)}`);
+            console.log(
+                `${asset.assetId}  ${asset.etag}\t${asset.twinType}\t[${asset.typeId}]\t${color(asset.name)} ${
+                    asset.sharing?.modes
+                }`
+            );
 
             verboseLog(JSON.stringify(asset, null, 2), options.verbose);
         }
@@ -218,6 +225,7 @@ function buildFilter(options: any) {
 }
 
 export async function deleteAsset(options: any, sdk: MindSphereSdk) {
+    const includeShared = options.includeshared;
     const assetMgmt = sdk.GetAssetManagementClient();
     const asset = await retry(options.retry, () => assetMgmt.GetAsset(options.assetid));
     verboseLog(JSON.stringify(asset, null, 2), options.verbose);
@@ -225,6 +233,7 @@ export async function deleteAsset(options: any, sdk: MindSphereSdk) {
     await retry(options.retry, () =>
         assetMgmt.DeleteAsset(options.assetid, {
             ifMatch: asset?.etag || "0",
+            includeShared: includeShared,
         })
     );
 

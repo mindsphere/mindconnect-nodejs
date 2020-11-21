@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.11.0 - (Sandcastle Vienna) - December 2020
+
+### Bugfixes and Improvements 3.11.0
+
+- CLI: `mc assets` new `--includeshared` parameter - support for cross-tenancy (#170)
+- CLI: `mc asset-types` new `--includeshared` parameter - support for cross-tenancy (#170)
+- CLI: `mc aspects` new `--includeshared` parameter - support for cross-tenancy (#170)
+- CLI: `mc list-assets` new `--includeshared` parameter - support for cross-tenancy (#170)
+- SDK: `AssetManagementClient` support for cross-tenancy (#170)
+
 ## 3.10.0 - (Seafoam Vienna) - November 2020
 
 ### Highlights 3.10.0
