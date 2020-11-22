@@ -15,7 +15,7 @@ NodeJS Library for MindSphere Connectivity - TypeScript SDK for MindSphere - Min
 [![Documentation](https://img.shields.io/badge/mindsphere-documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/index.html)
 [![SDK](https://img.shields.io/badge/SDK-full%20documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/sdk/index.html)
 [![Documentation](https://img.shields.io/badge/cli-full%20documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html)
-[![Forum](https://img.shields.io/badge/mindsphere-community-%23009999.svg)](https://community.plm.automation.siemens.com/t5/Developer-Space/bd-p/MindSphere-platform-forum) [![StartForFree](https://img.shields.io/badge/mindsphere-%23startForFree!-%23005578.svg)](https://siemens.mindsphere.io/en/start)
+[![Forum](https://img.shields.io/badge/mindsphere-community-%23009999.svg)](https://community.plm.automation.siemens.com/t5/Developer-Space/bd-p/MindSphere-platform-forum) [![StartForFree](https://img.shields.io/badge/mindsphere-%23startForFree!-%23005578.svg)](https://siemens.mindsphere.io/en/start) [![Contributors](https://img.shields.io/badge/community%20shoutout-thank%20you%21%20you%20rock%21%20%3A%29%0A-%23faa50a.svg)](#community)
 
 </p>
 
@@ -302,7 +302,7 @@ Set the http_proxy or HTTP_PROXY environment variable if you need to connect via
 export HTTP_PROXY=http://localhost:8888
 ```
 
-## MindSphere TypeScript SDK (beta)
+## MindSphere TypeScript SDK
 
 The library comes with the typescript SDK which can be used to access MindSphere APIs
 
@@ -324,6 +324,8 @@ and Clients for following APIs
 - AgentManagementClient
 - AssetManagementClient
 - EventManagementClient
+- DataLakeClient
+- EventAnalyticsClient
 - IotFileClient
 - IdentityManagementClient
 - KPICalculationClient
