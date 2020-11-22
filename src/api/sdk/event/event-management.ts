@@ -6,6 +6,23 @@ export class EventManagementClient extends SdkClient {
     private _baseUrl: string = "/api/eventmanagement/v3";
 
     /**
+     * Ideally, the billboard URI is the only address a REST client needs to know.
+     * From there onwards, it must be able to discover all other URIs of the service by using the returned
+     *
+     * @returns {Promise<EventManagementModels.Billboard>}
+     *
+     * @memberOf EventManagementClient
+     */
+    public async GetBillboard(): Promise<EventManagementModels.InfoResponse> {
+        return (await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/`,
+        })) as EventManagementModels.InfoResponse;
+    }
+
+    /**
      * * Events
      *
      * Creates an event with the provided content (Event model can be used).
@@ -20,18 +37,26 @@ export class EventManagementClient extends SdkClient {
      * !Restriction! After successful response, it may take 100ms to make it visible to the user.
      *
      * @param {EventManagementModels.CustomEvent} event
+     * @param {{
+     *         includeShared?: boolean;
+     *     }} [params]
+     * @param {{boolean}} [params.includeShared] To specify if received event or eventTypes should be consider for the API operation.
      * @returns {Promise<EventManagementModels.CustomEventCreated>}
      *
      * @memberOf EventManagementClient
      */
     public async PostEvent(
-        event: EventManagementModels.CustomEvent
+        event: EventManagementModels.CustomEvent,
+        params?: { includeShared?: boolean }
     ): Promise<EventManagementModels.CustomEventCreated> {
+        const parameters = params || {};
+        const { includeShared } = parameters;
+
         return (await this.HttpAction({
             verb: "POST",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/events`,
+            baseUrl: `${this._baseUrl}/events?${toQueryString({ includeShared })}`,
             body: event,
         })) as EventManagementModels.CustomEventCreated;
     }
@@ -49,6 +74,7 @@ export class EventManagementClient extends SdkClient {
      *         filter?: string;
      *         ifNoneMatch?: string;
      *         history?: boolean;
+     *         includeShared?: boolean;
      *     }} [params]
      *
      * @param {number} [params.size] Specifes the number of element in the page. Default is 20 , minimum is 1, maximum is 100.
@@ -70,7 +96,7 @@ export class EventManagementClient extends SdkClient {
      * If the latest event instance in a history of an event is deleted then the history of the event will be deleted.Default value : false
      * @param {boolean} [params.includeShared]
      * Specifies if received event or eventTypes should be consider for the API operation.
-     * @returns {Promise<EventManagementModels.EmbeddedEventsList>}
+     * @returns {Promise<EventManagementModels.QueryEventsResponse>}
      *
      * @memberOf EventManagementClient
      */
@@ -82,7 +108,7 @@ export class EventManagementClient extends SdkClient {
         ifNoneMatch?: string;
         history?: boolean;
         includeShared?: boolean;
-    }): Promise<EventManagementModels.EmbeddedEventsList> {
+    }): Promise<EventManagementModels.QueryEventsResponse> {
         const parameters = params || {};
         const { page, size, sort, filter, ifNoneMatch, history, includeShared } = parameters;
 
@@ -94,7 +120,7 @@ export class EventManagementClient extends SdkClient {
             additionalHeaders: { "If-None-Match": ifNoneMatch },
         });
 
-        return result as EventManagementModels.EmbeddedEventsList;
+        return result as EventManagementModels.QueryEventsResponse;
     }
 
     /**
@@ -103,24 +129,24 @@ export class EventManagementClient extends SdkClient {
      * Returns an event by Id.
      *
      * @param {string} eventId
-     * @param {{ ifNoneMatch?: string }} [params]
-     * @returns {Promise<EventManagementModels.CustomEvent>}
+     * @param {{ ifNoneMatch?: string; includeShared?: boolean }} [params]
+     * @returns {Promise<EventManagementModels.CustomEventResponse>}
      *
      * @memberOf EventManagementClient
      */
     public async GetEvent(
         eventId: string,
-        params?: { ifNoneMatch?: string }
-    ): Promise<EventManagementModels.CustomEvent> {
+        params?: { ifNoneMatch?: string; includeShared?: boolean }
+    ): Promise<EventManagementModels.CustomEventResponse> {
         const parameters = params || {};
-
+        const { ifNoneMatch, includeShared } = parameters;
         return (await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/events/${eventId}`,
-            additionalHeaders: parameters,
-        })) as EventManagementModels.CustomEvent;
+            baseUrl: `${this._baseUrl}/events/${eventId}?${toQueryString({ includeShared })}`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch },
+        })) as EventManagementModels.CustomEventResponse;
     }
 
     /**
@@ -149,16 +175,16 @@ export class EventManagementClient extends SdkClient {
     public async PutEvent(
         eventId: string,
         event: EventManagementModels.CustomEvent,
-        params: { ifMatch: number }
+        params: { ifMatch: number; includeShared?: boolean }
     ): Promise<EventManagementModels.CustomEvent> {
         const parameters = params || {};
-        const { ifMatch } = parameters;
+        const { ifMatch, includeShared } = parameters;
 
         return (await this.HttpAction({
             verb: "PUT",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/events/${eventId}`,
+            baseUrl: `${this._baseUrl}/events/${eventId}?${toQueryString({ includeShared })}`,
             body: event,
             additionalHeaders: { "If-Match": ifMatch },
         })) as EventManagementModels.CustomEvent;
@@ -182,18 +208,28 @@ export class EventManagementClient extends SdkClient {
      * Create new event type
      *
      * @param {EventManagementModels.EventType} eventType
-     * @returns {Promise<EventManagementModels.EventType>}
+     * @param {{
+     *         includeShared?: boolean;
+     *     }} [params]
+     * @param {{boolean}} [params.includeShared] To specify if received event or eventTypes should be consider for the API operation.
+     * @returns {Promise<EventManagementModels.EventTypeResponse>}
      *
      * @memberOf EventManagementClient
      */
-    public async PostEventType(eventType: EventManagementModels.EventType): Promise<EventManagementModels.EventType> {
+    public async PostEventType(
+        eventType: EventManagementModels.EventType,
+        params?: { includeShared?: boolean }
+    ): Promise<EventManagementModels.EventTypeResponse> {
+        const parameters = params || {};
+        const { includeShared } = parameters;
+
         return (await this.HttpAction({
             verb: "POST",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/eventTypes`,
+            baseUrl: `${this._baseUrl}/eventTypes?${toQueryString({ includeShared })}`,
             body: eventType,
-        })) as EventManagementModels.EventType;
+        })) as EventManagementModels.EventTypeResponse;
     }
 
     /**
@@ -208,8 +244,9 @@ export class EventManagementClient extends SdkClient {
      *         sort?: string;
      *         filter?: string;
      *         ifNoneMatch?: string;
+     *         includeShared?: boolean;
      *     }} [params]
-     * @returns {Promise<EventManagementModels.EmbeddedEventsTypesList>}
+     * @returns {Promise<EventManagementModels.QueryEventTypesResponse>}
      *
      * @memberOf EventManagementClient
      */
@@ -219,19 +256,20 @@ export class EventManagementClient extends SdkClient {
         sort?: string;
         filter?: string;
         ifNoneMatch?: string;
-    }): Promise<EventManagementModels.EmbeddedEventsTypesList> {
+        includeShared?: boolean;
+    }): Promise<EventManagementModels.QueryEventTypesResponse> {
         const parameters = params || {};
-        const { page, size, sort, filter, ifNoneMatch } = parameters;
+        const { page, size, sort, filter, ifNoneMatch, includeShared } = parameters;
 
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/eventTypes?${toQueryString({ page, size, sort, filter })}`,
+            baseUrl: `${this._baseUrl}/eventTypes?${toQueryString({ page, size, sort, filter, includeShared })}`,
             additionalHeaders: { "If-None-Match": ifNoneMatch },
         });
 
-        return result as EventManagementModels.EmbeddedEventsTypesList;
+        return result as EventManagementModels.QueryEventTypesResponse;
     }
 
     /**
@@ -240,24 +278,25 @@ export class EventManagementClient extends SdkClient {
      * ! In case of sub-tenant user, global and related T1 local event types are also visible.
      *
      * @param {string} eventTypeId
-     * @param {{ ifNoneMatch?: string }} [params]
-     * @returns {Promise<EventManagementModels.EventType>}
+     * @param {{ ifNoneMatch?: string; includeShared ?: boolean }} [params]
+     * @returns {Promise<EventManagementModels.EventTypeResponse>}
      *
      * @memberOf EventManagementClient
      */
     public async GetEventType(
         eventTypeId: string,
-        params?: { ifNoneMatch?: string }
-    ): Promise<EventManagementModels.EventType> {
+        params?: { ifNoneMatch?: string; includeShared?: boolean }
+    ): Promise<EventManagementModels.EventTypeResponse> {
         const parameters = params || {};
+        const { ifNoneMatch, includeShared } = parameters;
 
         return (await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/eventTypes/${eventTypeId}`,
-            additionalHeaders: parameters,
-        })) as EventManagementModels.EventType;
+            baseUrl: `${this._baseUrl}/eventTypes/${eventTypeId}?${toQueryString({ includeShared })}`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch },
+        })) as EventManagementModels.EventTypeResponse;
     }
 
     /**
@@ -311,19 +350,19 @@ export class EventManagementClient extends SdkClient {
     public async PatchEventType(
         eventTypeId: string,
         eventTypePatch: EventManagementModels.EventTypePatch,
-        params: { ifMatch: number }
-    ): Promise<EventManagementModels.EventType> {
+        params: { ifMatch: number; includeShared?: boolean }
+    ): Promise<EventManagementModels.EventTypeResponse> {
         const parameters = params || {};
-        const { ifMatch } = parameters;
+        const { ifMatch, includeShared } = parameters;
 
         return (await this.HttpAction({
             verb: "PUT",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/eventTypes/${eventTypeId}`,
+            baseUrl: `${this._baseUrl}/eventTypes/${eventTypeId}?${toQueryString({ includeShared })}`,
             body: eventTypePatch,
             additionalHeaders: { "If-Match": ifMatch },
-        })) as EventManagementModels.EventType;
+        })) as EventManagementModels.EventTypeResponse;
     }
 
     /**
@@ -337,22 +376,22 @@ export class EventManagementClient extends SdkClient {
      *
      * @memberOf EventManagementClient
      */
-    public async DeleteEventType(eventTypeId: string, params: { ifMatch: number }) {
+    public async DeleteEventType(eventTypeId: string, params: { ifMatch: number; includeShared?: boolean }) {
         const parameters = params || {};
-        const { ifMatch } = parameters;
+        const { ifMatch, includeShared } = parameters;
 
         return await this.HttpAction({
             verb: "DELETE",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/eventTypes/${eventTypeId}`,
+            baseUrl: `${this._baseUrl}/eventTypes/${eventTypeId}?${toQueryString({ includeShared })}`,
             additionalHeaders: { "If-Match": ifMatch },
             noResponse: true,
         });
     }
 
     /**
-     * * Event Jobs
+     * * Jobs
      *
      * Creates an asynchronous job which deletes events based on filter expression.
      * Maximum 1.000.000 events can be deleted at once. T
@@ -439,22 +478,5 @@ export class EventManagementClient extends SdkClient {
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/createEventsJobs/${jobId}`,
         })) as EventManagementModels.CreateJobResource;
-    }
-
-    /**
-     * Ideally, the billboard URI is the only address a REST client needs to know.
-     * From there onwards, it must be able to discover all other URIs of the service by using the returned
-     *
-     * @returns {Promise<EventManagementModels.Billboard>}
-     *
-     * @memberOf EventManagementClient
-     */
-    public async GetBillboard(): Promise<EventManagementModels.Billboard> {
-        return (await this.HttpAction({
-            verb: "GET",
-            gateway: this.GetGateway(),
-            authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/`,
-        })) as EventManagementModels.Billboard;
     }
 }

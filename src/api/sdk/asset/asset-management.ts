@@ -25,13 +25,15 @@ export class AssetManagementClient extends SdkClient {
      *         sort?: string;
      *         filter?: string;
      *         ifNoneMatch?: number;
+     *         includeShared?: boolean;
      *     }} [params]
      * @param [params.page] Specifies the requested page index
      * @param [params.size] Specifies the number of elements in a page
      * @param [params.sort] Specifies the ordering of returned elements
      * @param [params.filter] Specifies the additional filtering criteria
      * @param [params.ifnonematch] ETag hash of previous request to allow caching
-     *
+     * @param [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
+
      * @example await assetManagement.GetAspectTypes();
      * @example await assetManagement.GetAspectTypes({filter: "id eq mdsp.wing"});
 
@@ -45,15 +47,16 @@ export class AssetManagementClient extends SdkClient {
         sort?: string;
         filter?: string;
         ifNoneMatch?: number;
+        includeShared?: boolean;
     }): Promise<AssetManagementModels.AspectTypeListResource> {
         const parameters = params || {};
-        const { page, size, sort, filter, ifNoneMatch } = parameters;
+        const { page, size, sort, filter, ifNoneMatch, includeShared } = parameters;
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/aspecttypes?${toQueryString({ page, size, sort, filter })}`,
-            additionalHeaders: { "If-None-Match": ifNoneMatch }
+            baseUrl: `${this._baseUrl}/aspecttypes?${toQueryString({ page, size, sort, filter, includeShared })}`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch },
         });
 
         return result as AssetManagementModels.AspectTypeListResource;
@@ -68,11 +71,13 @@ export class AssetManagementClient extends SdkClient {
      * The length cannot be decreased.
      * The length of a dynamic STRING variable cannot be changed.
      *
-     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {string} id The type id is a unique identifier. The id length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9","_" and "." beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
      * @param {AssetManagementModels.AspectType} aspectType aspect type
-     * @param {{ ifMatch?: string; ifNoneMatch?: string }} [params]
+     * @param {{ ifMatch?: string; ifNoneMatch?: string, includeShared?:boolean }} [params]
      * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking. Required for modification.
-     * @param {{number}} [params.ifNoneMatch] Set ifNoneMatch header to “*” for ensuring create request
+     * @param {{number}} [params.ifNoneMatch] Set ifNoneMatch header to"*" for ensuring create request
+     * @param [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
+     *
      * @returns {Promise<AssetManagementModels.AspectTypeResource>}
      *
      * @example await am.PutAspectType ("mdsp.EnvironmentAspects", myAspectType, {ifNoneMatch:"*"})
@@ -81,17 +86,17 @@ export class AssetManagementClient extends SdkClient {
     public async PutAspectType(
         id: string,
         aspectType: AssetManagementModels.AspectType,
-        params?: { ifMatch?: string; ifNoneMatch?: string }
+        params?: { ifMatch?: string; ifNoneMatch?: string; includeShared?: boolean }
     ): Promise<AssetManagementModels.AspectTypeResource> {
         const parameters = params || {};
-        const { ifMatch, ifNoneMatch } = parameters;
+        const { ifMatch, ifNoneMatch, includeShared } = parameters;
         const result = await this.HttpAction({
             verb: "PUT",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/aspecttypes/${id}`,
+            baseUrl: `${this._baseUrl}/aspecttypes/${id}?${toQueryString({ includeShared })}`,
             body: aspectType,
-            additionalHeaders: { "If-Match": ifMatch, "If-None-Match": ifNoneMatch }
+            additionalHeaders: { "If-Match": ifMatch, "If-None-Match": ifNoneMatch },
         });
 
         return result as AssetManagementModels.AspectTypeResource;
@@ -104,9 +109,10 @@ export class AssetManagementClient extends SdkClient {
      * Patching requires the inclusion of already existing variables.
      *  Other fields may be omitted. Conforms to RFC 7396 - JSON merge Patch.
      *
-     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {string} id The type id is a unique identifier. The id length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9","_" and "." beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
      * @param {AssetManagementModels.AspectType} aspectType aspect type
-     * @param {{ ifMatch: string}} params
+     * @param {{ ifMatch: string, includeShared?: boolean}} params
+     * @param [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking. Required for modification.
      * @returns {Promise<AssetManagementModels.AspectTypeResource>}
      *
@@ -116,17 +122,17 @@ export class AssetManagementClient extends SdkClient {
     public async PatchAspectType(
         id: string,
         aspectType: AssetManagementModels.AspectType,
-        params: { ifMatch: string }
+        params: { ifMatch: string; includeShared?: boolean }
     ): Promise<AssetManagementModels.AspectTypeResource> {
         const parameters = params || {};
-        const { ifMatch } = parameters;
+        const { ifMatch, includeShared } = parameters;
         const result = await this.HttpAction({
             verb: "PATCH",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/aspecttypes/${id}`,
+            baseUrl: `${this._baseUrl}/aspecttypes/${id}?${toQueryString({ includeShared })}`,
             body: aspectType,
-            additionalHeaders: { "If-Match": ifMatch, "Content-Type": "application/merge-patch+json" }
+            additionalHeaders: { "If-Match": ifMatch, "Content-Type": "application/merge-patch+json" },
         });
 
         return result as AssetManagementModels.AspectTypeResource;
@@ -137,23 +143,26 @@ export class AssetManagementClient extends SdkClient {
      *
      * Delete an aspect type. Aspect type can only be deleted if there is no asset type using it.
      *
-     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
-     * @param {{ ifMatch: string }} params
+     * @param {string} id The type id is a unique identifier. The id length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9","_" and "." beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {{ ifMatch: string, includeShared?: boolean }} params
      * @param {{ ifMatch: string }} params.ifMatch Last known version to facilitate optimistic locking, required for deleting
+     * @param [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      * @returns {Promise<Object>} - return empty object
      *
      * @example await am.DeleteAspectType("mdsp.EnvironmentAspect", {ifMatch:0})
      * @memberOf AssetManagementClient
      *
      */
-    public async DeleteAspectType(id: string, params: { ifMatch: string }) {
+    public async DeleteAspectType(id: string, params: { ifMatch: string; includeShared?: boolean }) {
+        const parameters = params || {};
+        const { ifMatch, includeShared } = parameters;
         await this.HttpAction({
             verb: "DELETE",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/aspecttypes/${id}`,
-            additionalHeaders: { "If-Match": params.ifMatch },
-            noResponse: true
+            baseUrl: `${this._baseUrl}/aspecttypes/${id}?${toQueryString({ includeShared })}`,
+            additionalHeaders: { "If-Match": ifMatch },
+            noResponse: true,
         });
     }
 
@@ -162,25 +171,26 @@ export class AssetManagementClient extends SdkClient {
      *
      * Read an aspect type.
      *
-     * @param {string} id he type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
-     * @param {{ ifNoneMatch?: number }} [params] ETag hash of previous request to allow caching
-     * @returns {Promise<AssetManagementModels.AspectTypeResource>}
+     * @param {string} id he type id is a unique identifier. The id length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9","_" and "." beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {{ ifNoneMatch?: number, includeShared?: boolean }} [params] ETag hash of previous request to allow caching
+     * @param [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
+     *  @returns {Promise<AssetManagementModels.AspectTypeResource>}
      *
      * @example await am.GetAspectType("mdsp.EnvironmentAspect")
      * @memberOf AssetManagementClient
      */
     public async GetAspectType(
         id: string,
-        params?: { ifNoneMatch?: number }
+        params?: { ifNoneMatch?: number; includeShared?: boolean }
     ): Promise<AssetManagementModels.AspectTypeResource> {
         const parameters = params || {};
-        const { ifNoneMatch } = parameters;
+        const { ifNoneMatch, includeShared } = parameters;
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/aspecttypes/${id}`,
-            additionalHeaders: { "If-None-Match": ifNoneMatch }
+            baseUrl: `${this._baseUrl}/aspecttypes/${id}?${toQueryString({ includeShared })}`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch },
         });
 
         return result as AssetManagementModels.AspectTypeResource;
@@ -200,6 +210,7 @@ export class AssetManagementClient extends SdkClient {
      *         filter?: string;
      *         ifNoneMatch?: number;
      *         exploded?: boolean;
+     *         includeShared? boolean;
      *     }} [params]
      * @param [params.page] Specifies the requested page index
      * @param [params.size] Specifies the number of elements in a page
@@ -207,10 +218,10 @@ export class AssetManagementClient extends SdkClient {
      * @param [params.filter] Specifies the additional filtering criteria
      * @param [params.ifnonematch] ETag hash of previous request to allow caching
      * @param [params.exploded] Specifies if the asset type should include all of it’s inherited variables and aspects. Default is false.
+     * @param [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      *
      * @example await assetManagement.GetAssetTypes();
      * @example await assetManagement.GetAssetTypes({filter: "id eq mdsp.spaceship"});
-
      * @returns {Promise<AssetManagementModels.AssetTypeListResource>}
      *
      * @memberOf AssetManagementClient
@@ -223,16 +234,24 @@ export class AssetManagementClient extends SdkClient {
         filter?: string;
         ifNoneMatch?: string;
         exploded?: boolean;
+        includeShared?: boolean;
     }): Promise<AssetManagementModels.AssetTypeListResource> {
         const parameters = params || {};
-        const { page, size, sort, filter, ifNoneMatch, exploded } = parameters;
+        const { page, size, sort, filter, ifNoneMatch, exploded, includeShared } = parameters;
 
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assettypes?${toQueryString({ page, size, sort, filter, exploded })}`,
-            additionalHeaders: { "If-None-Match": ifNoneMatch }
+            baseUrl: `${this._baseUrl}/assettypes?${toQueryString({
+                page,
+                size,
+                sort,
+                filter,
+                exploded,
+                includeShared,
+            })}`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch },
         });
 
         return result as AssetManagementModels.AssetTypeListResource;
@@ -249,8 +268,9 @@ export class AssetManagementClient extends SdkClient {
      * @param {AssetManagementModels.AssetType} assetType
      * @param {{ ifMatch?: string; ifNoneMatch?: string; exploded?: boolean }} [params]
      * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking. Required for modification.
-     * @param {{string}} [params.ifNoneMatch] Set ifNoneMatch header to “*” for ensuring create request
-     * @param {{boolean}} [params.exploded] Specifies if the asset type should include all of it’s inherited variables and aspects. Default is false.
+     * @param {{string}} [params.ifNoneMatch] Set ifNoneMatch header to "*"" for ensuring create request
+     * @param {{boolean}} [params.exploded] Specifies if the asset type should include all of inherited variables and aspects. Default is false.
+     * @param {{boolean}} [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      * @returns {Promise<AssetManagementModels.AssetTypeResource>}
      *
      * @example await am.PutAssetType("mdsp.SimulationEngine", myAssetType)
@@ -259,17 +279,17 @@ export class AssetManagementClient extends SdkClient {
     public async PutAssetType(
         id: string,
         assetType: AssetManagementModels.AssetType,
-        params?: { ifMatch?: string; ifNoneMatch?: string; exploded?: boolean }
+        params?: { ifMatch?: string; ifNoneMatch?: string; exploded?: boolean; includeShared?: boolean }
     ): Promise<AssetManagementModels.AssetTypeResource> {
         const parameters = params || {};
-        const { ifMatch, ifNoneMatch, exploded } = parameters;
+        const { ifMatch, ifNoneMatch, exploded, includeShared } = parameters;
         const result = await this.HttpAction({
             verb: "PUT",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assettypes/${id}?${toQueryString({ exploded: exploded })}`,
+            baseUrl: `${this._baseUrl}/assettypes/${id}?${toQueryString({ exploded, includeShared })}`,
             body: assetType,
-            additionalHeaders: { "If-Match": ifMatch, "If-None-Match": ifNoneMatch }
+            additionalHeaders: { "If-Match": ifMatch, "If-None-Match": ifNoneMatch },
         });
 
         return result as AssetManagementModels.AssetTypeResource;
@@ -285,9 +305,10 @@ export class AssetManagementClient extends SdkClient {
      *
      * @param {string} id
      * @param {AssetManagementModels.AssetType} assetType
-     * @param {{ ifMatch: string; exploded?: boolean }} params
+     * @param {{ ifMatch: string; exploded?: boolean; includeShared?:boolean }} params
      * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking. Required for modification.
-     * @param {{boolean}} [params.exploded] Specifies if the asset type should include all of it’s inherited variables and aspects. Default is false.
+     * @param {{boolean}} [params.exploded] Specifies if the asset type should include all of inherited variables and aspects. Default is false.
+     * @param {{boolean}} [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      * @returns {Promise<AssetManagementModels.AssetTypeResource>}
      *
      * @example await am.PatchAssetType("mdsp.SimulationEngine", myAssetType)
@@ -296,17 +317,17 @@ export class AssetManagementClient extends SdkClient {
     public async PatchAssetType(
         id: string,
         assetType: AssetManagementModels.AssetType,
-        params: { ifMatch: string; exploded?: boolean }
+        params: { ifMatch: string; exploded?: boolean; includeShared?: boolean }
     ): Promise<AssetManagementModels.AssetTypeResource> {
         const parameters = params || {};
-        const { ifMatch, exploded } = parameters;
+        const { ifMatch, exploded, includeShared } = parameters;
         const result = await this.HttpAction({
             verb: "PATCH",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assettypes/${id}?${toQueryString({ exploded: exploded })}`,
+            baseUrl: `${this._baseUrl}/assettypes/${id}?${toQueryString({ exploded, includeShared })}`,
             body: assetType,
-            additionalHeaders: { "If-Match": ifMatch, "Content-Type": "application/merge-patch+json" }
+            additionalHeaders: { "If-Match": ifMatch, "Content-Type": "application/merge-patch+json" },
         });
 
         return result as AssetManagementModels.AssetTypeResource;
@@ -318,22 +339,25 @@ export class AssetManagementClient extends SdkClient {
      * Deletes an asset type.
      * Deletion only possible when the type has no child-type and there is no asset that instantiate it.
      *
-     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
-     * @param {{ ifMatch: string }} params
+     * @param {string} id The type id is a unique identifier. The id length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", "_' and "." beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {{ ifMatch: string; includeShared?:boolean; }} params
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking, required for deleting
+     * @param {{boolean}} [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      *
      * @example await am.DeleteAssetType("mdsp.SimulationEnigine", {ifMatch:0})
      * @memberOf AssetManagementClient
      *
      */
-    public async DeleteAssetType(id: string, params: { ifMatch: string }) {
+    public async DeleteAssetType(id: string, params: { ifMatch: string; includeShared?: boolean }) {
+        const parameters = params || {};
+        const { ifMatch, includeShared } = parameters;
         await this.HttpAction({
             verb: "DELETE",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assettypes/${id}`,
-            additionalHeaders: { "If-Match": params.ifMatch },
-            noResponse: true
+            baseUrl: `${this._baseUrl}/assettypes/${id}?${toQueryString({ includeShared })}`,
+            additionalHeaders: { "If-Match": ifMatch },
+            noResponse: true,
         });
     }
 
@@ -345,7 +369,7 @@ export class AssetManagementClient extends SdkClient {
      * ! important: @see [params.exploded]
      *
      * @param {string} id
-     * @param {{ ifNoneMatch?: string; exploded?: boolean }} [params]
+     * @param {{ ifNoneMatch?: string; exploded?: boolean; includeShared?: boolean }} [params]
      * @returns {Promise<AssetManagementModels.AssetTypeResource>}
      *
      * @example await am.GetAssetType("mdsp.SimulationEngine")
@@ -353,17 +377,17 @@ export class AssetManagementClient extends SdkClient {
      */
     public async GetAssetType(
         id: string,
-        params?: { ifNoneMatch?: string; exploded?: boolean }
+        params?: { ifNoneMatch?: string; exploded?: boolean; includeShared?: boolean }
     ): Promise<AssetManagementModels.AssetTypeResource> {
         const parameters = params || {};
-        const { ifNoneMatch, exploded } = parameters;
+        const { ifNoneMatch, exploded, includeShared } = parameters;
         const ex = exploded === undefined ? false : exploded;
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assettypes/${id}?exploded=${ex}`,
-            additionalHeaders: { "If-None-Match": ifNoneMatch }
+            baseUrl: `${this._baseUrl}/assettypes/${id}?${toQueryString({ exploded: ex, includeShared })}`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch },
         });
         return result as AssetManagementModels.AssetTypeResource;
     }
@@ -373,11 +397,12 @@ export class AssetManagementClient extends SdkClient {
      *
      * Add a new file assignment to a given asset type. All asset which extends these types will have its file by default.
      *
-     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {string} id The type id is a unique identifier. The id length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", "_" and "." beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
      * @param {string} key Keyword for the file to be assigned to an asset or asset type.
      * @param {AssetManagementModels.KeyedFileAssignment} assignment Data for file assignment
-     * @param {{ ifMatch: string }} params
+     * @param {{ ifMatch: string ; includeShared?: boolean}} params
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
+     * @param {{boolean}} [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      * @returns {Promise<AssetManagementModels.AssetTypeResource>}
      *
      * @memberOf AssetManagementClient
@@ -386,17 +411,17 @@ export class AssetManagementClient extends SdkClient {
         id: string,
         key: string,
         assignment: AssetManagementModels.KeyedFileAssignment,
-        params: { ifMatch: string }
+        params: { ifMatch: string; includeShared?: boolean }
     ): Promise<AssetManagementModels.AssetTypeResource> {
         const parameters = params || {};
-        const { ifMatch } = parameters;
+        const { ifMatch, includeShared } = parameters;
         const result = await this.HttpAction({
             verb: "PUT",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assettypes/${id}/fileAssignments/${key}`,
+            baseUrl: `${this._baseUrl}/assettypes/${id}/fileAssignments/${key}?${toQueryString({ includeShared })}`,
             body: assignment,
-            additionalHeaders: { "If-Match": ifMatch }
+            additionalHeaders: { "If-Match": ifMatch },
         });
 
         return result as AssetManagementModels.AssetTypeResource;
@@ -406,27 +431,71 @@ export class AssetManagementClient extends SdkClient {
      * *AssetTypes
      *
      * Deletes a file assignment from an asset type.
-     * If the type’s parent has defined a file with the same key, the key will be displayed with the inherited value.
+     * If the type parent has defined a file with the same key, the key will be displayed with the inherited value.
      *
-     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {string} id The type id is a unique identifier. The id length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9","_" and "." beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
      * @param {string} key Keyword for the file to be assigned to an asset or asset type.
      * @param {AssetManagementModels.KeyedFileAssignment} assignment Data for file assignment
-     * @param {{ ifMatch: string }} params
+     * @param {{ ifMatch: string; includeShared?: boolean }} params
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
+     * @param {{boolean}} [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      *
      * @memberOf AssetManagementClient
      */
-    public async DeleteAssetTypeFileAssignment(id: string, key: string, params: { ifMatch: string }) {
+    public async DeleteAssetTypeFileAssignment(
+        id: string,
+        key: string,
+        params: { ifMatch: string; includeShared?: boolean }
+    ) {
         const parameters = params || {};
-        const { ifMatch } = parameters;
+        const { ifMatch, includeShared } = parameters;
         await this.HttpAction({
             verb: "DELETE",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assettypes/${id}/fileAssignments/${key}`,
+            baseUrl: `${this._baseUrl}/assettypes/${id}/fileAssignments/${key}?${toQueryString({ includeShared })}`,
             additionalHeaders: { "If-Match": ifMatch },
-            noResponse: true
+            noResponse: true,
         });
+    }
+
+    /**
+     * * AssetTypes
+     *
+     * Updates an existing variable defined on an asset type. Variables cannot be added or deleted using this operation,
+     * for adding or deleting variables use patch/put assettype api. Any variable which is not part of the request will remain unchanged
+     * Variable's Name, Length, Default Value and Unit can be changed. The unit changes from the api does not compute any value changes
+     * derived after the unit changes, the values will remain as it is and only the unit will be updated.
+     * The length can only be increased of a string variable and it cannot be decreased.
+     * This operation will increment the asset type etag value.
+     *
+     * @param {string} id The type id is a unique identifier. The id length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9","_" and "." beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {{ ifMatch: string; includeShared?: boolean }} params
+     * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
+     * @param {{boolean}} [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
+     * @param {AssetManagementModels.VariableUpdateMap} variableMap
+     * @returns {Promise<Headers>}
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async PatchAssetTypeVariable(
+        id: string,
+        variableMap: AssetManagementModels.VariableUpdateMap,
+        params: { ifMatch: string; includeShared?: boolean }
+    ): Promise<Headers> {
+        const parameters = params || {};
+        const { ifMatch, includeShared } = parameters;
+        const result = await this.HttpAction({
+            verb: "PATCH",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/assettypes/${id}/variables?${toQueryString({ includeShared })}`,
+            body: variableMap,
+            returnHeaders: true,
+            additionalHeaders: { "If-Match": ifMatch, "Content-Type": "application/merge-patch+json" },
+        });
+
+        return result as Headers;
     }
 
     /**
@@ -440,13 +509,15 @@ export class AssetManagementClient extends SdkClient {
      *         sort?: string;
      *         filter?: string;
      *         ifNoneMatch?: string;
+     *         includeShared? boolean;
      *     }} [params]
      * @param [params.page] Specifies the requested page index
      * @param [params.size] Specifies the number of elements in a page
      * @param [params.sort] Specifies the ordering of returned elements
      * @param [params.filter] Specifies the additional filtering criteria
      * @param [params.ifnonematch] ETag hash of previous request to allow caching
-
+     * @param [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
+     *
      * @returns {Promise<AssetManagementModels.AssetListResource>}
      *
      * @example await assetManagement.GetAssets();
@@ -460,16 +531,17 @@ export class AssetManagementClient extends SdkClient {
         sort?: string;
         filter?: string;
         ifNoneMatch?: string;
+        includeShared?: boolean;
     }): Promise<AssetManagementModels.AssetListResource> {
         const parameters = params || {};
-        const { page, size, sort, filter, ifNoneMatch } = parameters;
+        const { page, size, sort, filter, ifNoneMatch, includeShared } = parameters;
 
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assets?${toQueryString({ page, size, sort, filter })}`,
-            additionalHeaders: { "If-None-Match": ifNoneMatch }
+            baseUrl: `${this._baseUrl}/assets?${toQueryString({ page, size, sort, filter, includeShared })}`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch },
         });
 
         return result as AssetManagementModels.AssetListResource;
@@ -479,6 +551,10 @@ export class AssetManagementClient extends SdkClient {
      * * Asset
      *
      * Creates a new asset with the provided content. Only instantiable types could be used.
+     * @param {{
+     *         includeShared? boolean;
+     *     }} [params]
+     * @param [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      *
      * @param {AssetManagementModels.Asset} asset
      * @returns {Promise<AssetManagementModels.AssetResourceWithHierarchyPath>}
@@ -487,14 +563,19 @@ export class AssetManagementClient extends SdkClient {
      * @memberOf AssetManagementClient
      */
     public async PostAsset(
-        asset: AssetManagementModels.Asset
+        asset: AssetManagementModels.Asset,
+        params?: { includeShared?: boolean }
     ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
+        const parameters = params || {};
+        const { includeShared } = parameters;
+
         const result = await this.HttpAction({
             verb: "POST",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assets`,
-            body: asset
+            baseUrl: `${this._baseUrl}/assets?${toQueryString({ includeShared })}
+            `,
+            body: asset,
         });
         return result as AssetManagementModels.AssetResourceWithHierarchyPath;
     }
@@ -505,24 +586,25 @@ export class AssetManagementClient extends SdkClient {
      * Read a single asset. All static properties of asset are returned.
      *
      * @param {string} assetId Unique identifier
-     * @param {{ ifNoneMatch?: string }} [params]
+     * @param {{ ifNoneMatch?: string; includeShared?: boolean}} [params]
      * @param {{string}} [params.ifNoneMatch]
+     * @param [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      * @returns {Promise<AssetManagementModels.AssetResourceWithHierarchyPath>}
      *
      * @memberOf AssetManagementClient
      */
     public async GetAsset(
         assetId: string,
-        params?: { ifNoneMatch?: string }
+        params?: { ifNoneMatch?: string; includeShared?: boolean }
     ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
         const parameters = params || {};
-        const { ifNoneMatch } = parameters;
+        const { ifNoneMatch, includeShared } = parameters;
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assets/${assetId}`,
-            additionalHeaders: { "If-None-Match": ifNoneMatch }
+            baseUrl: `${this._baseUrl}/assets/${assetId}?${toQueryString({ includeShared })}`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch },
         });
 
         return result as AssetManagementModels.AssetResourceWithHierarchyPath;
@@ -532,12 +614,13 @@ export class AssetManagementClient extends SdkClient {
      * * Asset
      *
      * Updates an asset with the provided content.
-     * Only values can be modified, asset’s structure have to be modified in asset’s type
+     * Only values can be modified, asset structure have to be modified in asset type
      *
      * @param {string} assetId
      * @param {AssetManagementModels.AssetUpdate} asset
-     * @param {{ ifMatch: string }} params
+     * @param {{ ifMatch: string; includeShared?: boolean }} params
      * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking. Required for modification.
+     * @param {{boolean}} [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      * @returns {Promise<AssetManagementModels.AssetResourceWithHierarchyPath>}
      *
      * @example await assetManagement.PutAsset (myAsset, {ifMatch: `${myAsset.etag}`})
@@ -547,18 +630,18 @@ export class AssetManagementClient extends SdkClient {
     public async PutAsset(
         assetId: string,
         asset: AssetManagementModels.AssetUpdate,
-        params: { ifMatch: string }
+        params: { ifMatch: string; includeShared?: boolean }
     ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
         const parameters = params || {};
-        const { ifMatch } = parameters;
+        const { ifMatch, includeShared } = parameters;
 
         const result = await this.HttpAction({
             verb: "PUT",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assets/${assetId}`,
+            baseUrl: `${this._baseUrl}/assets/${assetId}?${toQueryString({ includeShared })}`,
             body: asset,
-            additionalHeaders: { "If-Match": ifMatch }
+            additionalHeaders: { "If-Match": ifMatch },
         });
         return result as AssetManagementModels.AssetResourceWithHierarchyPath;
     }
@@ -567,13 +650,14 @@ export class AssetManagementClient extends SdkClient {
      * * Asset
      *
      * Patch an asset with the provided content.
-     * Only values can be modified, asset’s structure have to be modified in asset’s type.
+     * Only values can be modified, asset structure have to be modified in asset type.
      * Conforms to RFC 7396 - JSON merge Patch.
      *
      * @param {string} assetId
      * @param {AssetManagementModels.AssetUpdate} asset
-     * @param {{ ifMatch: string }} params
+     * @param {{ ifMatch: string; includeShared?: boolean; }} params
      * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking. Required for modification.
+     * @param {{boolean}} [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      * @returns {Promise<AssetManagementModels.AssetResourceWithHierarchyPath>}
      *
      * @example await assetManagement.Patch (myAsset, {ifMatch: `${myAsset.etag}`})
@@ -583,18 +667,18 @@ export class AssetManagementClient extends SdkClient {
     public async PatchAsset(
         assetId: string,
         asset: AssetManagementModels.AssetUpdate,
-        params: { ifMatch: string }
+        params: { ifMatch: string; includeShared?: boolean }
     ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
         const parameters = params || {};
-        const { ifMatch } = parameters;
+        const { ifMatch, includeShared } = parameters;
 
         const result = await this.HttpAction({
             verb: "PATCH",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assets/${assetId}`,
+            baseUrl: `${this._baseUrl}/assets/${assetId}?${toQueryString({ includeShared })}`,
             body: asset,
-            additionalHeaders: { "If-Match": ifMatch, "Content-Type": "application/merge-patch+json" }
+            additionalHeaders: { "If-Match": ifMatch, "Content-Type": "application/merge-patch+json" },
         });
         return result as AssetManagementModels.AssetResourceWithHierarchyPath;
     }
@@ -605,25 +689,63 @@ export class AssetManagementClient extends SdkClient {
      * Deletes the given asset.
      * After deletion only users with admin role can read it,
      * but modification is not possible anymore.
-     * It’s not possible to delete an asset if it has children.
+     * It is not possible to delete an asset if it has children.
      *
-     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
-     * @param {{ ifMatch: string }} params
+     * @param {string} id The type id is a unique identifier. The id s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", "_" and "." beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {{ ifMatch: string; includeShared?: booleanl }} params
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking, required for deleting
-     *
+     * @param {{boolean}} [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      * @example await assetManagement.DeleteAsset(id, {ifMatch:0})
      *
      * @memberOf AssetManagementClient
      */
-    public async DeleteAsset(id: string, params: { ifMatch: string }) {
+    public async DeleteAsset(id: string, params: { ifMatch: string; includeShared?: boolean }) {
+        const parameters = params || {};
+        const { ifMatch, includeShared } = parameters;
+
         await this.HttpAction({
             verb: "DELETE",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assets/${id}`,
-            additionalHeaders: { "If-Match": params.ifMatch },
-            noResponse: true
+            baseUrl: `${this._baseUrl}/assets/${id}?${toQueryString({ includeShared })}`,
+            additionalHeaders: { "If-Match": ifMatch },
+            noResponse: true,
         });
+    }
+
+    /**
+     * * Asset
+     *
+     * Moves an asset (and all asset children) in the instance hierarchy
+     *
+     * @param {string} assetId
+     * @param {AssetManagementModels.AssetMove} moveParameters
+     * @param {{ ifMatch: string; includeShared?: boolean }} params
+     * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking. Required for modification.
+     * @param {{boolean}} [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
+     * @returns {Promise<AssetManagementModels.AssetResourceWithHierarchyPath>}
+     *
+     * @example await assetManagement.PutAsset (myAsset, {ifMatch: `${myAsset.etag}`})
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async MoveAsset(
+        assetId: string,
+        moveParameters: AssetManagementModels.AssetMove,
+        params: { ifMatch: string; includeShared?: boolean }
+    ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
+        const parameters = params || {};
+        const { ifMatch, includeShared } = parameters;
+
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/assets/${assetId}?${toQueryString({ includeShared })}`,
+            body: moveParameters,
+            additionalHeaders: { "If-Match": ifMatch },
+        });
+        return result as AssetManagementModels.AssetResourceWithHierarchyPath;
     }
 
     /**
@@ -631,11 +753,13 @@ export class AssetManagementClient extends SdkClient {
      *
      * Save a file assignment to a given asset
      *
-     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {string} id The type id is a unique identifier. The id length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", "_" and ".
+     *  beginning with the tenant prefix what has a maximum of 8 characters. (e.g. ten_pref.type_id)
      * @param {string} key Keyword for the file to be assigned to an asset or asset type.
      * @param {AssetManagementModels.KeyedFileAssignment} assignment Data for file assignment
-     * @param {{ ifMatch: string }} params
-     * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
+     * @param {{ ifMatch: string; includeShared ?: boolean; }} params
+     * @param {{boolean}} [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
+     * @param {{number}} [params.ifMatch] Last known version to facilitate optimistic locking
      * @returns {Promise<AssetManagementModels.AssetTypeResource>}
      *
      * @memberOf AssetManagementClient
@@ -644,17 +768,17 @@ export class AssetManagementClient extends SdkClient {
         id: string,
         key: string,
         assignment: AssetManagementModels.KeyedFileAssignment,
-        params: { ifMatch: string }
+        params: { ifMatch: string; includeShared?: boolean }
     ): Promise<AssetManagementModels.AssetTypeResource> {
         const parameters = params || {};
-        const { ifMatch } = parameters;
+        const { ifMatch, includeShared } = parameters;
         const result = await this.HttpAction({
             verb: "PUT",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assets/${id}/fileAssignments/${key}`,
+            baseUrl: `${this._baseUrl}/assets/${id}/fileAssignments/${key}?${toQueryString({ includeShared })}`,
             body: assignment,
-            additionalHeaders: { "If-Match": ifMatch }
+            additionalHeaders: { "If-Match": ifMatch },
         });
 
         return result as AssetManagementModels.AssetTypeResource;
@@ -664,26 +788,30 @@ export class AssetManagementClient extends SdkClient {
      * * Asset
      *
      * Deletes a file assignment from an asset.
-     * If the asset’s parent type has defined a file with the same key, the key will be displayed with the inherited value.
+     * If the asset parent type has defined a file with the same key, the key will be displayed with the inherited value.
      *
-     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {string} id The type id is a unique identifier. The id length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9","_" and "." beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
      * @param {string} key Keyword for the file to be assigned to an asset or asset type.
      * @param {AssetManagementModels.KeyedFileAssignment} assignment Data for file assignment
-     * @param {{ ifMatch: string }} params
+     * @param {{ ifMatch: string; includeShared?: boolean }} params
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
      *
      * @memberOf AssetManagementClient
      */
-    public async DeleteAssetFileAssignment(id: string, key: string, params: { ifMatch: string }) {
+    public async DeleteAssetFileAssignment(
+        id: string,
+        key: string,
+        params: { ifMatch: string; includeShared?: boolean }
+    ) {
         const parameters = params || {};
-        const { ifMatch } = parameters;
+        const { ifMatch, includeShared } = parameters;
         await this.HttpAction({
             verb: "DELETE",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assets/${id}/fileAssignments/${key}`,
+            baseUrl: `${this._baseUrl}/assets/${id}/fileAssignments/${key}?${toQueryString({ includeShared })}`,
             additionalHeaders: { "If-Match": ifMatch },
-            noResponse: true
+            noResponse: true,
         });
     }
 
@@ -702,7 +830,6 @@ export class AssetManagementClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/assets/root`,
-            message: "PostAsset"
         });
         return result as AssetManagementModels.RootAssetResource;
     }
@@ -718,12 +845,14 @@ export class AssetManagementClient extends SdkClient {
      *             sort?: string;
      *             filter?: string;
      *             ifNoneMatch?: number;
+     *             includeShared?: number;
      *         }} [params]
      * @param [params.page] Specifies the requested page index
      * @param [params.size] Specifies the number of elements in a page
      * @param [params.sort] Specifies the ordering of returned elements
      * @param [params.filter] Specifies the additional filtering criteria
      * @param [params.ifnonematch] ETag hash of previous request to allow caching
+     * @param [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      *
      * @returns {Promise<AssetManagementModels.AspectListResource>}
      *
@@ -737,16 +866,23 @@ export class AssetManagementClient extends SdkClient {
             sort?: string;
             filter?: string;
             ifNoneMatch?: number;
+            includeShared?: number;
         }
     ): Promise<AssetManagementModels.AspectListResource> {
         const parameters = params || {};
-        const { page, size, sort, filter, ifNoneMatch } = parameters;
+        const { page, size, sort, filter, ifNoneMatch, includeShared } = parameters;
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assets/${assetId}/aspects?${toQueryString({ page, size, sort, filter })}`,
-            additionalHeaders: { "If-None-Match": ifNoneMatch }
+            baseUrl: `${this._baseUrl}/assets/${assetId}/aspects?${toQueryString({
+                page,
+                size,
+                sort,
+                filter,
+                includeShared,
+            })}`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch },
         });
         return result as AssetManagementModels.AspectListResource;
     }
@@ -762,12 +898,14 @@ export class AssetManagementClient extends SdkClient {
      *             sort?: string;
      *             filter?: string;
      *             ifNoneMatch?: number;
+     *             includeShared?: boolean;
      *         }} [params]
      * @param [params.page] Specifies the requested page index
      * @param [params.size] Specifies the number of elements in a page
      * @param [params.sort] Specifies the ordering of returned elements
      * @param [params.filter] Specifies the additional filtering criteria
      * @param [params.ifnonematch] ETag hash of previous request to allow caching
+     * @param [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      *
      * @returns {Promise<AssetManagementModels.AspectListResource>}
      *
@@ -781,16 +919,23 @@ export class AssetManagementClient extends SdkClient {
             sort?: string;
             filter?: string;
             ifNoneMatch?: number;
+            includeShared?: boolean;
         }
     ): Promise<AssetManagementModels.VariableListResource> {
         const parameters = params || {};
-        const { page, size, sort, filter, ifNoneMatch } = parameters;
+        const { page, size, sort, filter, ifNoneMatch, includeShared } = parameters;
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assets/${assetId}/variables?${toQueryString({ page, size, sort, filter })}`,
-            additionalHeaders: { "If-None-Match": ifNoneMatch }
+            baseUrl: `${this._baseUrl}/assets/${assetId}/variables?${toQueryString({
+                page,
+                size,
+                sort,
+                filter,
+                includeShared,
+            })}`,
+            additionalHeaders: { "If-None-Match": ifNoneMatch },
         });
         return result as AssetManagementModels.VariableListResource;
     }
@@ -803,12 +948,13 @@ export class AssetManagementClient extends SdkClient {
      * * If the given asset has own location, this endpoint will update that location.
      * * If the given asset has no location, this endpoint will create a new location and update the given asset.
      * * If the given asset has inherited location, this endpoint will create a new location and update the given asset.
-     * * If you wanted to update the inherited location you have to use the ‘location’ url in AssetResource object (with PUT method).
+     * * If you wanted to update the inherited location you have to use the location url in AssetResource object (with PUT method).
      *
-     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {string} id The type id is a unique identifier. The id length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9","_" and "." beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
      * @param {AssetManagementModels.Location} location Data for location
-     * @param {{ ifMatch: string }} params
+     * @param {{ ifMatch: string; includeShared ?: boolean }} params
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
+     * @param {{boolean}} [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      * @returns {Promise<AssetManagementModels.Location>}
      *
      * ! fix: 3.11. : the swagger documentation says that the method is returning Location but it returns AssetResourceWithHierarchyPath
@@ -818,17 +964,17 @@ export class AssetManagementClient extends SdkClient {
     public async PutAssetLocation(
         id: string,
         location: AssetManagementModels.Location,
-        params: { ifMatch: string }
+        params: { ifMatch: string; includeShared?: boolean }
     ): Promise<AssetManagementModels.AssetResourceWithHierarchyPath> {
         const parameters = params || {};
-        const { ifMatch } = parameters;
+        const { ifMatch, includeShared } = parameters;
         const result = await this.HttpAction({
             verb: "PUT",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assets/${id}/location`,
+            baseUrl: `${this._baseUrl}/assets/${id}/location?${toQueryString({ includeShared })}`,
             body: location,
-            additionalHeaders: { "If-Match": ifMatch }
+            additionalHeaders: { "If-Match": ifMatch },
         });
 
         return result as AssetManagementModels.AssetResourceWithHierarchyPath;
@@ -840,26 +986,27 @@ export class AssetManagementClient extends SdkClient {
      * Delete location assigned to given asset.
      *
      * * Only those locations can be deleted here which assigned to the given asset.
-     * * If the location inherited from an ancestor asset, you have to delete the location with the assigned assetId (using ‘location’ url in AssetResource object with DELETE method).
+     * * If the location inherited from an ancestor asset, you have to delete the location with the assigned assetId (using location url in AssetResource object with DELETE method).
      * * The response contains the updated AssetResource with the inherited Location details.
      *
-     * @param {string} id The type’s id is a unique identifier. The id’s length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9", “_” and “.” beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
+     * @param {string} id The type id is a unique identifier. The id length must be between 1 and 128 characters and matches the following symbols "A-Z", "a-z", "0-9","_" and "." beginning with the tenant prefix what has a maximum of 8 characters. (e.g . ten_pref.type_id)
      * @param {AssetManagementModels.Location} location Data for location
-     * @param {{ ifMatch: string }} params
+     * @param {{ ifMatch: string; includeShared?: boolean  }} params
      * @param {{number}} params.ifMatch Last known version to facilitate optimistic locking
+     * @param {{boolean}} [params.includeShared] Specifies if the operation should take into account shared (received) assets, aspects and asset types.
      * @returns {Promise<AssetManagementModels.AssetResourceWithHierarchyPath>}
      *
      * @memberOf AssetManagementClient
      */
-    public async DeleteAssetLocation(id: string, params: { ifMatch: string }) {
+    public async DeleteAssetLocation(id: string, params: { ifMatch: string; includeShared?: boolean }) {
         const parameters = params || {};
-        const { ifMatch } = parameters;
+        const { ifMatch, includeShared } = parameters;
         const result = await this.HttpAction({
             verb: "DELETE",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/assets/${id}/location`,
-            additionalHeaders: { "If-Match": ifMatch }
+            baseUrl: `${this._baseUrl}/assets/${id}/location?${toQueryString({ includeShared })}`,
+            additionalHeaders: { "If-Match": ifMatch },
         });
 
         return result as AssetManagementModels.AssetResourceWithHierarchyPath;
@@ -893,10 +1040,15 @@ export class AssetManagementClient extends SdkClient {
         const parameters = params || {};
         const { scope, description, mimeType } = parameters;
 
-        const template = `----mindsphere\r\nContent-Disposition: form-data; name="file"; filename="${name}"\r\nContent-Type: ${mimeType ||
-            "application/octet-stream"}\r\n\r\n${file.toString("ascii")}\r\n----mindsphere\r\nContent-Disposition: form-data; name="name"\r\n\r\n${name}\r\n----mindsphere\r\nContent-Disposition: form-data; name="description"\r\n\r\n${description ||
-            "uploaded file"}\r\n\----mindsphere\r\nContent-Disposition: form-data; name="scope"\r\n\r\n${scope ||
-            "PRIVATE"}\r\n----mindsphere--`;
+        const template = `----mindsphere\r\nContent-Disposition: form-data; name="file"; filename="${name}"\r\nContent-Type: ${
+            mimeType || "application/octet-stream"
+        }\r\n\r\n${file.toString(
+            "ascii"
+        )}\r\n----mindsphere\r\nContent-Disposition: form-data; name="name"\r\n\r\n${name}\r\n----mindsphere\r\nContent-Disposition: form-data; name="description"\r\n\r\n${
+            description || "uploaded file"
+        }\r\n\----mindsphere\r\nContent-Disposition: form-data; name="scope"\r\n\r\n${
+            scope || "PRIVATE"
+        }\r\n----mindsphere--`;
 
         const result = await this.HttpAction({
             verb: "POST",
@@ -904,7 +1056,7 @@ export class AssetManagementClient extends SdkClient {
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/files`,
             body: template,
-            multiPartFormData: true
+            multiPartFormData: true,
         });
 
         return result as AssetManagementModels.FileMetadataResource;
@@ -954,7 +1106,7 @@ export class AssetManagementClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/files?${toQueryString({ page, size, sort, filter })}`,
-            additionalHeaders: { "If-None-Match": ifNoneMatch }
+            additionalHeaders: { "If-None-Match": ifNoneMatch },
         });
 
         return result as AssetManagementModels.FileMetadataListResource;
@@ -986,7 +1138,7 @@ export class AssetManagementClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/files/${fileId}`,
-            additionalHeaders: { "If-None-Match": ifNoneMatch }
+            additionalHeaders: { "If-None-Match": ifNoneMatch },
         });
         return result as AssetManagementModels.FileMetadataResource;
     }
@@ -1016,7 +1168,7 @@ export class AssetManagementClient extends SdkClient {
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/files/${fileId}/file`,
             additionalHeaders: { "If-None-Match": ifNoneMatch },
-            rawResponse: true
+            rawResponse: true,
         });
         return result as Response;
     }
@@ -1054,10 +1206,13 @@ export class AssetManagementClient extends SdkClient {
         const parameters = params || {};
         const { scope, description, mimeType, ifMatch } = parameters;
 
-        const template = `----mindsphere\r\nContent-Disposition: form-data; name="file"; filename="${name}"\r\nContent-Type: ${mimeType ||
-            "application/octet-stream"}\r\n\r\n${file}\r\n----mindsphere\r\nContent-Disposition: form-data; name="name"\r\n\r\n${name}\r\n----mindsphere\r\nContent-Disposition: form-data; name="description"\r\n\r\n${description ||
-            "uploaded file"}\r\n\----mindsphere\r\nContent-Disposition: form-data; name="scope"\r\n\r\n${scope ||
-            "PRIVATE"}\r\n----mindsphere--`;
+        const template = `----mindsphere\r\nContent-Disposition: form-data; name="file"; filename="${name}"\r\nContent-Type: ${
+            mimeType || "application/octet-stream"
+        }\r\n\r\n${file}\r\n----mindsphere\r\nContent-Disposition: form-data; name="name"\r\n\r\n${name}\r\n----mindsphere\r\nContent-Disposition: form-data; name="description"\r\n\r\n${
+            description || "uploaded file"
+        }\r\n\----mindsphere\r\nContent-Disposition: form-data; name="scope"\r\n\r\n${
+            scope || "PRIVATE"
+        }\r\n----mindsphere--`;
 
         const result = await this.HttpAction({
             verb: "PUT",
@@ -1066,7 +1221,7 @@ export class AssetManagementClient extends SdkClient {
             baseUrl: `${this._baseUrl}/files/${fileid}`,
             body: template,
             multiPartFormData: true,
-            additionalHeaders: { "If-Match": ifMatch }
+            additionalHeaders: { "If-Match": ifMatch },
         });
 
         return result as AssetManagementModels.FileMetadataResource;
@@ -1092,7 +1247,7 @@ export class AssetManagementClient extends SdkClient {
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/files/${fileId}`,
             additionalHeaders: { "If-Match": ifMatch },
-            noResponse: true
+            noResponse: true,
         });
     }
 
@@ -1108,7 +1263,7 @@ export class AssetManagementClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/`
+            baseUrl: `${this._baseUrl}/`,
         });
 
         return result as AssetManagementModels.BillboardResource;

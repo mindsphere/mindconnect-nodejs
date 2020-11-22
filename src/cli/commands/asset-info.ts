@@ -59,8 +59,8 @@ export default (program: CommanderStatic) => {
 
                     console.log("Aspects:");
                     for await (const entry of assetType.aspects || []) {
-                        console.log(`- ${color(entry.name)}: ${entry.aspectType.id}`);
-                        entry.aspectType.variables?.forEach((variable: { name: any; unit: any; dataType: any }) => {
+                        console.log(`- ${color(entry.name)}: ${entry.aspectType?.id}`);
+                        entry.aspectType?.variables?.forEach((variable) => {
                             console.log(`\t - ${color(variable.name)} ${variable.unit} ${variable.dataType}`);
                         });
 

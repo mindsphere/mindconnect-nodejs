@@ -9,6 +9,7 @@ import dataLakeCommand from "./commands/data-lake";
 import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
 import downloadEventsCommand from "./commands/download-events";
+import eventTypesCommand from "./commands/event-types";
 import identityCommand from "./commands/identity";
 import iotCheckBulkComand from "./commands/iot-bulk-check";
 import iotBulkRunCommand from "./commands/iot-bulk-run";
@@ -41,6 +42,7 @@ import mqttCreateCommand from "./commands/mqtt-create-jwt";
 import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
 import trendPredictionCommand from "./commands/trend-prediction";
+
 // * generic commands
 
 versionAndHelp(program);
@@ -73,10 +75,12 @@ iotCheckBulkComand(program);
 iotDownloadBulkCommand(program);
 
 // * assets files and event handling commands
+assetInfoCommand(program);
 assetsCommand(program);
 assetTypeCommand(program);
 aspectCommands(program);
-assetInfoCommand(program);
+eventTypesCommand(program);
+
 downloadEventsCommand(program);
 
 // * deprecated commands for 4.0.0

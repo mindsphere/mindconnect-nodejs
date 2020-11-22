@@ -1,6 +1,6 @@
+import fetch from "cross-fetch";
 import * as debug from "debug";
 import * as jwt from "jsonwebtoken";
-import fetch from "cross-fetch";
 import { MindConnectBase, TokenRotation } from "./mindconnect-base";
 import { getPiamUrl, isUrl, retry } from "./utils";
 
@@ -11,7 +11,7 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
     protected _oauthResponse?: any;
     protected _publicKey: any;
 
-    protected abstract async AcquireToken(): Promise<boolean>;
+    protected abstract AcquireToken(): Promise<boolean>;
 
     private async ValidateToken(): Promise<boolean> {
         await retry(5, () => this.AcquirePublicKey());

@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.11.0 - (Sandcastle Vienna) - December 2020
+
+### Bugfixes and Improvements 3.11.0
+
+- CLI: new `--mode info` parameter on `mc asset-types` and `mc aspects` commands (#211)
+- CLI: new `mc event-types` command with `--includeshared` support for cross-tenancy (#170)
+- CLI: updated `mc assets` with new `--includeshared` parameter - support for cross-tenancy (#170)
+- CLI: updated `mc asset-types` with new `--includeshared` parameter - support for cross-tenancy (#170)
+- CLI: updated `mc aspects` with new `--includeshared` parameter - support for cross-tenancy (#170)
+- CLI: updated `mc list-assets` with new `--includeshared` parameter - support for cross-tenancy (#170)
+- SDK: `EventManagementClient` support for cross-tenancy (#170)
+- SDK: `AssetManagementClient` support for cross-tenancy (#170)
+- Bumped all dependencies
+
 ## 3.10.0 - (Seafoam Vienna) - November 2020
 
 ### Highlights 3.10.0

@@ -78,7 +78,7 @@ describe("[SDK] AssetManagementClient.Files", () => {
         });
 
         const updatedFile = await am.PutFile(`${result.id}`, Buffer.from("abcabc"), `${timeOffset}test2.2.text`, {
-            scope: AssetManagementModels.FileMetadataResource.ScopeEnum.PRIVATE,
+            scope: AssetManagementModels.FileMetadataResource.ScopeEnum.Private,
             description: result.description,
             ifMatch: `${result.etag}`,
         });

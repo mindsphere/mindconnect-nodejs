@@ -22,11 +22,12 @@ export default (program: CommanderStatic) => {
     program
         .command("asset-types")
         .alias("at")
-        .option("-m, --mode [list|create|delete|template]", "list | create | delete | template", "list")
+        .option("-m, --mode [list|create|delete|template | info]", "list | create | delete | template | info", "list")
         .option("-f, --file <file>", ".mdsp.json file with asset type definition")
         .option("-i, --idonly", "list only ids")
         .option("-s, --schema <schema>", "JSON Schema")
         .option("-n, --assettype <assettype>", "the asset type name")
+        .option("-c, --includeshared", "include shared asset types")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
@@ -57,6 +58,10 @@ export default (program: CommanderStatic) => {
                             await createAssetType(options, sdk);
                             break;
 
+                        case "info":
+                            await assetTypeInfo(options, sdk);
+                            break;
+
                         default:
                             throw Error(`no such option: ${options.mode}`);
                     }
@@ -67,13 +72,13 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc asset-types --mode list \t\t\t\t\t list all assettype types`);
-            log(`    mc asset-types --mode list --assettype Pump\t\t list all assettype types which are named Pump`);
+            log(`    mc asset-types --mode list \t\t\t\t\t list all asset types`);
+            log(`    mc asset-types --mode list --assettype Pump\t\t list all asset types which are named Pump`);
             log(
                 `    mc asset-types --mode template --assettype Pump \n\tcreate a template file (Enironment.assettype.mdsp.json) for assettype Pump`
             );
             log(
-                `    mc asset-types --mode create --file Pump.assettypes.mdsp.json \n\tcreate asset type Pump in MindSphere`
+                `    mc asset-types --mode create --file Pump.assettype.mdsp.json \n\tcreate asset type Pump in MindSphere`
             );
 
             serviceCredentialLog();
@@ -81,12 +86,13 @@ export default (program: CommanderStatic) => {
 };
 
 async function createAssetType(options: any, sdk: MindSphereSdk) {
+    const includeShared = options.includeshared;
     const filePath = path.resolve(options.file);
     const file = fs.readFileSync(filePath);
     const assettype = JSON.parse(file.toString());
 
     const name = assettype.name!.includes(".") ? assettype.name : `${sdk.GetTenant()}.${assettype.name}`;
-    await sdk.GetAssetManagementClient().PutAssetType(name, assettype);
+    await sdk.GetAssetManagementClient().PutAssetType(name, assettype, { includeShared: includeShared });
     console.log(`creted asset type ${color(name)}`);
 }
 
@@ -135,15 +141,17 @@ function writeAssetTypeToFile(options: any, AssetType: any) {
 }
 
 async function deleteAssetType(options: any, sdk: MindSphereSdk) {
+    const includeShared = options.includeshared;
     const id = (options.assettype! as string).includes(".")
         ? options.assettype
         : `${sdk.GetTenant()}.${options.assettype}`;
-    const aspType = await sdk.GetAssetManagementClient().GetAssetType(id);
-    await sdk.GetAssetManagementClient().DeleteAssetType(id, { ifMatch: aspType.etag! });
+    const aspType = await sdk.GetAssetManagementClient().GetAssetType(id, { includeShared: includeShared });
+    await sdk.GetAssetManagementClient().DeleteAssetType(id, { ifMatch: aspType.etag!, includeShared: includeShared });
     console.log(`assettype with id ${color(id)} deleted.`);
 }
 
 async function listAssetTypes(sdk: MindSphereSdk, options: any) {
+    const includeShared = options.includeshared;
     const assetMgmt = sdk.GetAssetManagementClient();
 
     let page = 0;
@@ -152,7 +160,7 @@ async function listAssetTypes(sdk: MindSphereSdk, options: any) {
     const filter = buildFilter(options);
     verboseLog(JSON.stringify(filter, null, 2), options.verbose);
 
-    !options.idonly && console.log(`id  etag aspects name`);
+    !options.idonly && console.log(`id  etag aspects name\t sharing`);
 
     let assetCount = 0;
 
@@ -162,7 +170,8 @@ async function listAssetTypes(sdk: MindSphereSdk, options: any) {
                 page: page,
                 size: 100,
                 filter: Object.keys(filter).length === 0 ? undefined : JSON.stringify(filter),
-                sort: "name,asc",
+                sort: "id,asc",
+                includeShared: includeShared,
             })
         )) as AssetManagementModels.AssetTypeListResource;
 
@@ -174,7 +183,9 @@ async function listAssetTypes(sdk: MindSphereSdk, options: any) {
             assetCount++;
             !options.idonly &&
                 console.log(
-                    `${assettype.id}\t${assettype.etag} aspects[${assettype.aspects?.length}]\t${color(assettype.name)}`
+                    `${assettype.id}\t${assettype.etag} aspects[${assettype.aspects?.length}]\t${color(
+                        assettype.name
+                    )}\t${assettype.sharing?.modes}`
                 );
 
             options.idonly && console.log(`${assettype.id}`);
@@ -202,6 +213,15 @@ function buildFilter(options: any) {
     return filter;
 }
 
+async function assetTypeInfo(options: any, sdk: MindSphereSdk) {
+    const includeShared = options.includeshared;
+    const id = (options.assettype! as string).includes(".")
+        ? options.assettype
+        : `${sdk.GetTenant()}.${options.assettype}`;
+    const assetType = await sdk.GetAssetManagementClient().GetAssetType(id, { includeShared: includeShared });
+    console.log(JSON.stringify(assetType, null, 2));
+}
+
 function checkRequiredParamaters(options: any) {
     options.mode === "template" &&
         !options.assettype &&
@@ -220,4 +240,8 @@ function checkRequiredParamaters(options: any) {
     options.mode === "delete" &&
         !options.assettype &&
         errorLog("you have to provide the asset type to delete (see mc asset-types --help for more details)", true);
+
+    options.mode === "info" &&
+        !options.assettype &&
+        errorLog("you have to provide the asset type (see mc asset-types --help for more details)", true);
 }

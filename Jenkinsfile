@@ -114,6 +114,10 @@ pipeline {
               mc download-file --file $filename --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
               mc delete-file --file $filename --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
               mc iam --mode list --group
+              mc assets --includeshared
+              mc asset-types --includeshared
+              mc aspects --includeshared
+              mc event-types --includeshared
               cd ..
               rm -rf $dirname
             '''

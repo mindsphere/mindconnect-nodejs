@@ -1,14 +1,13 @@
-# MindConnect-NodeJS
 
-## nodejs library for the MindConnect API (V3)
-
-<!-- markdownlint-disable MD033 -->
+<!-- markdownlint-disable MD033 MD041 -->
+<p align="center">
 <img src="images/mindconnect-nodejs-new-logo.svg" alt="mindconnect-nodejs" width="300px"/>
+</p>
+<h1 align="center">MindConnect-NodeJS</h1>
+<p align="center">
+NodeJS Library for MindSphere Connectivity - TypeScript SDK for MindSphere - MindSphere Command Line Interface - MindSphere Development Proxy
+
 <!-- markdownlint-enableMD033 -->
-
-The mindconnect-nodejs library enables the user to upload time series data, files and events to Siemens MindSphere Platform.
-
-This project has started as a community effort at Siemens AG and is now available for general use.
 
 [![Build Status](https://jenkins.mindconnect.rocks/buildStatus/icon?job=mindconnect-nodejs/master)](https://jenkins.mindconnect.rocks/blue/organizations/jenkins/mindconnect-nodejs/activity/) [![The MIT License](https://img.shields.io/badge/license-MIT-009999.svg?style=flat)](./LICENSE.md)
 [![npm](https://img.shields.io/npm/v/@mindconnect/mindconnect-nodejs/latest.svg?style=flat)](https://www.npmjs.com/package/@mindconnect/mindconnect-nodejs) ![downloads](https://img.shields.io/npm/dw/@mindconnect/mindconnect-nodejs.svg?colorB=009999)
@@ -16,7 +15,9 @@ This project has started as a community effort at Siemens AG and is now availabl
 [![Documentation](https://img.shields.io/badge/mindsphere-documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/index.html)
 [![SDK](https://img.shields.io/badge/SDK-full%20documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/sdk/index.html)
 [![Documentation](https://img.shields.io/badge/cli-full%20documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html)
-[![Forum](https://img.shields.io/badge/mindsphere-community-%23009999.svg)](https://community.plm.automation.siemens.com/t5/Developer-Space/bd-p/MindSphere-platform-forum)
+[![Forum](https://img.shields.io/badge/mindsphere-community-%23009999.svg)](https://community.plm.automation.siemens.com/t5/Developer-Space/bd-p/MindSphere-platform-forum) [![StartForFree](https://img.shields.io/badge/mindsphere-%23startForFree!-%23005578.svg)](https://siemens.mindsphere.io/en/start) [![Contributors](https://img.shields.io/badge/shoutout-thank%20you%21-%23faa50a.svg)](#community)
+
+</p>
 
 ## Full documentation
 
@@ -301,7 +302,7 @@ Set the http_proxy or HTTP_PROXY environment variable if you need to connect via
 export HTTP_PROXY=http://localhost:8888
 ```
 
-## MindSphere TypeScript SDK (beta)
+## MindSphere TypeScript SDK
 
 The library comes with the typescript SDK which can be used to access MindSphere APIs
 
@@ -323,6 +324,8 @@ and Clients for following APIs
 - AgentManagementClient
 - AssetManagementClient
 - EventManagementClient
+- DataLakeClient
+- EventAnalyticsClient
 - IotFileClient
 - IdentityManagementClient
 - KPICalculationClient
@@ -555,6 +558,12 @@ Options:
     see more documentation at https://opensource.mindsphere.io/docs/mindconnect-nodejs/development-proxy.html
 
 ````
+
+## Community
+
+[![Stargazers repo roster for @mindsphere/mindconnect-nodejs](https://reporoster.com/stars/mindsphere/mindconnect-nodejs)](https://github.com/mindsphere/mindconnect-nodejs/stargazers)
+
+[![Forkers repo roster for @mindsphere/mindconnect-nodejs](https://reporoster.com/forks/mindsphere/mindconnect-nodejs)](https://github.com/mindsphere/mindconnect-nodejs/network/members)
 
 ## Legal
 

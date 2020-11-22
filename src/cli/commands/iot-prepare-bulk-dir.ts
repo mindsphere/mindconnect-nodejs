@@ -255,7 +255,7 @@ async function generateCsv(
             let line = currentDate.toISOString() + ", ";
 
             variables.forEach((variable) => {
-                line += generateRandom(currentDate, variable.dataType, `${variable.name}`) + ", ";
+                line += generateRandom(currentDate, variable.dataType!, `${variable.name}`) + ", ";
                 if (variable.qualityCode) line += "0, ";
             });
 
