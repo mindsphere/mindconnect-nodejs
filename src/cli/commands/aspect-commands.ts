@@ -78,8 +78,8 @@ export default (program: CommanderStatic) => {
         .command("aspects")
         .alias("as")
         .option(
-            "-m, --mode [list|create|delete|convert|template]",
-            "list | create | delete | convert | template",
+            "-m, --mode [list|create|delete|convert|template|info]",
+            "list | create | delete | convert | template | info",
             "list"
         )
         .option("-f, --file <file>", ".mdsp.json file with aspect type definition")
@@ -126,6 +126,10 @@ export default (program: CommanderStatic) => {
 
                         case "create":
                             await createAspectType(options, sdk);
+                            break;
+
+                        case "info":
+                            await aspectTypeInfo(options, sdk);
                             break;
 
                         default:
@@ -390,6 +394,13 @@ function generateVariables(prefix: string, inputSchema: JSONSchema, options: any
             );
         }
     }
+}
+
+async function aspectTypeInfo(options: any, sdk: MindSphereSdk) {
+    const includeShared = options.includeshared;
+    const id = (options.aspect! as string).includes(".") ? options.aspect : `${sdk.GetTenant()}.${options.aspect}`;
+    const aspType = await sdk.GetAssetManagementClient().GetAspectType(id, { includeShared: includeShared });
+    console.log(JSON.stringify(aspType, null, 2));
 }
 
 function checkRequiredParamaters(options: any) {

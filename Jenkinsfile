@@ -117,6 +117,7 @@ pipeline {
               mc assets --includeshared
               mc asset-types --includeshared
               mc aspects --includeshared
+              mc event-types --includeshared
               cd ..
               rm -rf $dirname
             '''
