@@ -1,16 +1,17 @@
 export namespace EventManagementModels {
+    export class RequiredError extends Error {
+        name: "RequiredError" = "RequiredError";
+        constructor(public field: string, msg?: string) {
+            super(msg);
+        }
+    }
+
     /**
      *
      * @export
      * @interface BaseEvent
      */
     export interface BaseEvent {
-        /**
-         * Unique identifier of the event
-         * @type {string}
-         * @memberof BaseEvent
-         */
-        id?: string;
         /**
          * Unique identifier of the event type (filterable, not updatable)
          * @type {string}
@@ -35,30 +36,74 @@ export namespace EventManagementModels {
          * @memberof BaseEvent
          */
         entityId: string;
-        /**
-         * Incremental counter for optimistic concurrency control
-         * @type {number}
-         * @memberof BaseEvent
-         */
-        etag?: number;
-        /**
-         *
-         * @type {BaseEventLinks}
-         * @memberof BaseEvent
-         */
-        _links?: BaseEventLinks;
     }
 
     /**
      *
      * @export
-     * @interface BaseEventLinks
+     * @interface BaseEventResponse
      */
-    export interface BaseEventLinks {
+    export interface BaseEventResponse {
+        /**
+         * Unique identifier of the event
+         * @type {string}
+         * @memberof BaseEventResponse
+         */
+        id: string;
+        /**
+         * Unique identifier of the event type (filterable, not updatable)
+         * @type {string}
+         * @memberof BaseEventResponse
+         */
+        typeId: string;
+        /**
+         * Correlation ID of the event. It can be used to group related events (filterable, not updatable)
+         * @type {string}
+         * @memberof BaseEventResponse
+         */
+        correlationId: string;
+        /**
+         * Timestamp attached to the event in UTC format (filterable, not updatable)
+         * @type {string}
+         * @memberof BaseEventResponse
+         */
+        timestamp: string;
+        /**
+         * Entity attached to the event (filterable, not updatable)
+         * @type {string}
+         * @memberof BaseEventResponse
+         */
+        entityId: string;
+        /**
+         * Incremental counter for optimistic concurrency control
+         * @type {number}
+         * @memberof BaseEventResponse
+         */
+        etag: number;
+        /**
+         *
+         * @type {SharingResource}
+         * @memberof BaseEventResponse
+         */
+        sharing?: SharingResource;
+        /**
+         *
+         * @type {BaseEventResponseLinks}
+         * @memberof BaseEventResponse
+         */
+        _links: BaseEventResponseLinks;
+    }
+
+    /**
+     *
+     * @export
+     * @interface BaseEventResponseLinks
+     */
+    export interface BaseEventResponseLinks {
         /**
          *
          * @type {RelSelf}
-         * @memberof BaseEventLinks
+         * @memberof BaseEventResponseLinks
          */
         self?: RelSelf;
     }
@@ -149,7 +194,21 @@ export namespace EventManagementModels {
      * @export
      * @interface CustomEventCreated
      */
-    export interface CustomEventCreated extends BaseEvent {}
+    export interface CustomEventCreated extends BaseEventResponse {}
+
+    /**
+     *
+     * @export
+     * @interface CustomEventResponse
+     */
+    export interface CustomEventResponse extends BaseEventResponse {}
+
+    /**
+     *
+     * @export
+     * @interface CustomEventUpdated
+     */
+    export interface CustomEventUpdated extends BaseEventResponse {}
 
     /**
      *
@@ -263,18 +322,6 @@ export namespace EventManagementModels {
          */
         ttl?: number;
         /**
-         *
-         * @type {number}
-         * @memberof EventType
-         */
-        etag?: number;
-        /**
-         * The owner who created the event type
-         * @type {string}
-         * @memberof EventType
-         */
-        owner?: string;
-        /**
          * Scope of the event type
          * @type {string}
          * @memberof EventType
@@ -285,13 +332,7 @@ export namespace EventManagementModels {
          * @type {Array<Field>}
          * @memberof EventType
          */
-        fields?: Array<Field>;
-        /**
-         *
-         * @type {EventTypeLinks}
-         * @memberof EventType
-         */
-        _links?: EventTypeLinks;
+        fields: Array<Field>;
     }
 
     /**
@@ -304,29 +345,9 @@ export namespace EventManagementModels {
          * @enum {string}
          */
         export enum ScopeEnum {
-            LOCAL = <any>"LOCAL",
-            GLOBAL = <any>"GLOBAL"
+            LOCAL = "LOCAL",
+            GLOBAL = "GLOBAL",
         }
-    }
-
-    /**
-     *
-     * @export
-     * @interface EventTypeLinks
-     */
-    export interface EventTypeLinks {
-        /**
-         *
-         * @type {RelSelf}
-         * @memberof EventTypeLinks
-         */
-        self?: RelSelf;
-        /**
-         *
-         * @type {RelEvents}
-         * @memberof EventTypeLinks
-         */
-        events?: RelEvents;
     }
 
     /**
@@ -365,9 +386,112 @@ export namespace EventManagementModels {
          * @enum {string}
          */
         export enum OpEnum {
-            Add = <any>"add",
-            Replace = <any>"replace"
+            Add = "add",
+            Replace = "replace",
         }
+    }
+
+    /**
+     *
+     * @export
+     * @interface EventTypeResponse
+     */
+    export interface EventTypeResponse {
+        /**
+         * ID of the created event type
+         * @type {string}
+         * @memberof EventTypeResponse
+         */
+        id: string;
+        /**
+         * Name of the event type
+         * @type {string}
+         * @memberof EventTypeResponse
+         */
+        name: string;
+        /**
+         * Parent event type ID
+         * @type {string}
+         * @memberof EventTypeResponse
+         */
+        parentId: string;
+        /**
+         * Time to live in days
+         * @type {number}
+         * @memberof EventTypeResponse
+         */
+        ttl: number;
+        /**
+         *
+         * @type {number}
+         * @memberof EventTypeResponse
+         */
+        etag: number;
+        /**
+         * The owner who created the event type
+         * @type {string}
+         * @memberof EventTypeResponse
+         */
+        owner: string;
+        /**
+         * Scope of the event type
+         * @type {string}
+         * @memberof EventTypeResponse
+         */
+        scope: EventTypeResponse.ScopeEnum;
+        /**
+         *
+         * @type {Array<Field>}
+         * @memberof EventTypeResponse
+         */
+        fields: Array<Field>;
+        /**
+         *
+         * @type {SharingResource}
+         * @memberof EventTypeResponse
+         */
+        sharing?: SharingResource;
+        /**
+         *
+         * @type {EventTypeResponseLinks}
+         * @memberof EventTypeResponse
+         */
+        _links: EventTypeResponseLinks;
+    }
+
+    /**
+     * @export
+     * @namespace EventTypeResponse
+     */
+    export namespace EventTypeResponse {
+        /**
+         * @export
+         * @enum {string}
+         */
+        export enum ScopeEnum {
+            LOCAL = "LOCAL",
+            GLOBAL = "GLOBAL",
+        }
+    }
+
+    /**
+     *
+     * @export
+     * @interface EventTypeResponseLinks
+     */
+    export interface EventTypeResponseLinks {
+        /**
+         *
+         * @type {RelSelf}
+         * @memberof EventTypeResponseLinks
+         */
+        self?: RelSelf;
+        /**
+         *
+         * @type {RelEvents}
+         * @memberof EventTypeResponseLinks
+         */
+        events?: RelEvents;
     }
 
     /**
@@ -424,161 +548,71 @@ export namespace EventManagementModels {
          * @enum {string}
          */
         export enum TypeEnum {
-            STRING = <any>"STRING",
-            INTEGER = <any>"INTEGER",
-            DOUBLE = <any>"DOUBLE",
-            BOOLEAN = <any>"BOOLEAN",
-            LINK = <any>"LINK",
-            TIMESTAMP = <any>"TIMESTAMP",
-            UUID = <any>"UUID",
-            ENUM = <any>"ENUM"
+            STRING = "STRING",
+            INTEGER = "INTEGER",
+            DOUBLE = "DOUBLE",
+            BOOLEAN = "BOOLEAN",
+            LINK = "LINK",
+            TIMESTAMP = "TIMESTAMP",
+            UUID = "UUID",
+            ENUM = "ENUM",
         }
     }
 
     /**
      *
      * @export
-     * @interface InlineResponse200
+     * @interface InfoResponse
      */
-    export interface InlineResponse200 {
+    export interface InfoResponse {
         /**
          *
-         * @type {InlineResponse200Self}
-         * @memberof InlineResponse200
+         * @type {InfoResponseSelf}
+         * @memberof InfoResponse
          */
-        self?: InlineResponse200Self;
+        self?: InfoResponseSelf;
         /**
          *
-         * @type {InlineResponse200Events}
-         * @memberof InlineResponse200
+         * @type {InfoResponseEvents}
+         * @memberof InfoResponse
          */
-        events?: InlineResponse200Events;
+        events?: InfoResponseEvents;
         /**
          *
-         * @type {InlineResponse200EventTypes}
-         * @memberof InlineResponse200
+         * @type {InfoResponseEventTypes}
+         * @memberof InfoResponse
          */
-        eventTypes?: InlineResponse200EventTypes;
+        eventTypes?: InfoResponseEventTypes;
         /**
          *
-         * @type {InlineResponse200DeleteEventsJobs}
-         * @memberof InlineResponse200
+         * @type {InfoResponseDeleteEventsJobs}
+         * @memberof InfoResponse
          */
-        deleteEventsJobs?: InlineResponse200DeleteEventsJobs;
+        deleteEventsJobs?: InfoResponseDeleteEventsJobs;
         /**
          *
-         * @type {InlineResponse200CreateEventsJobs}
-         * @memberof InlineResponse200
+         * @type {InfoResponseCreateEventsJobs}
+         * @memberof InfoResponse
          */
-        createEventsJobs?: InlineResponse200CreateEventsJobs;
-    }
-
-    // ! fix for reasonable name
-
-    export interface Billboard extends InlineResponse200 {}
-
-    /**
-     *
-     * @export
-     * @interface InlineResponse2001
-     */
-    export interface InlineResponse2001 {
-        /**
-         *
-         * @type {InlineResponse2001Embedded}
-         * @memberof InlineResponse2001
-         */
-        _embedded?: InlineResponse2001Embedded;
-        /**
-         *
-         * @type {PagingLinks}
-         * @memberof InlineResponse2001
-         */
-        _links?: PagingLinks;
-        /**
-         *
-         * @type {Page}
-         * @memberof InlineResponse2001
-         */
-        page?: Page;
-    }
-
-    // ! fix: manual fix for the Event Management API to get a reasonable name
-    export interface EmbeddedEventsList extends InlineResponse2001 {}
-
-    /**
-     *
-     * @export
-     * @interface InlineResponse2001Embedded
-     */
-    export interface InlineResponse2001Embedded {
-        /**
-         *
-         * @type {Array<MindsphereStandardEvent>}
-         * @memberof InlineResponse2001Embedded
-         */
-        events?: Array<MindsphereStandardEvent>;
+        createEventsJobs?: InfoResponseCreateEventsJobs;
     }
 
     /**
      *
      * @export
-     * @interface InlineResponse2002
+     * @interface InfoResponseCreateEventsJobs
      */
-    export interface InlineResponse2002 {
-        /**
-         *
-         * @type {InlineResponse2002Embedded}
-         * @memberof InlineResponse2002
-         */
-        _embedded?: InlineResponse2002Embedded;
-    }
-
-    /**
-     *
-     * @export
-     * @interface InlineResponse2002Embedded
-     */
-    export interface InlineResponse2002Embedded {
-        /**
-         *
-         * @type {Array<EventType>}
-         * @memberof InlineResponse2002Embedded
-         */
-        eventTypes?: Array<EventType>;
-        /**
-         *
-         * @type {PagingLinks}
-         * @memberof InlineResponse2002Embedded
-         */
-        _links?: PagingLinks;
-        /**
-         *
-         * @type {Page}
-         * @memberof InlineResponse2002Embedded
-         */
-        page?: Page;
-    }
-
-    // ! fix: manual fix to have a reasonable type name
-    export interface EmbeddedEventsTypesList extends InlineResponse2002 {}
-
-    /**
-     *
-     * @export
-     * @interface InlineResponse200CreateEventsJobs
-     */
-    export interface InlineResponse200CreateEventsJobs {
+    export interface InfoResponseCreateEventsJobs {
         /**
          *
          * @type {string}
-         * @memberof InlineResponse200CreateEventsJobs
+         * @memberof InfoResponseCreateEventsJobs
          */
         href?: string;
         /**
          *
          * @type {boolean}
-         * @memberof InlineResponse200CreateEventsJobs
+         * @memberof InfoResponseCreateEventsJobs
          */
         templated?: boolean;
     }
@@ -586,19 +620,19 @@ export namespace EventManagementModels {
     /**
      *
      * @export
-     * @interface InlineResponse200DeleteEventsJobs
+     * @interface InfoResponseDeleteEventsJobs
      */
-    export interface InlineResponse200DeleteEventsJobs {
+    export interface InfoResponseDeleteEventsJobs {
         /**
          *
          * @type {string}
-         * @memberof InlineResponse200DeleteEventsJobs
+         * @memberof InfoResponseDeleteEventsJobs
          */
         href?: string;
         /**
          *
          * @type {boolean}
-         * @memberof InlineResponse200DeleteEventsJobs
+         * @memberof InfoResponseDeleteEventsJobs
          */
         templated?: boolean;
     }
@@ -606,19 +640,19 @@ export namespace EventManagementModels {
     /**
      *
      * @export
-     * @interface InlineResponse200EventTypes
+     * @interface InfoResponseEventTypes
      */
-    export interface InlineResponse200EventTypes {
+    export interface InfoResponseEventTypes {
         /**
          *
          * @type {string}
-         * @memberof InlineResponse200EventTypes
+         * @memberof InfoResponseEventTypes
          */
         href?: string;
         /**
          *
          * @type {boolean}
-         * @memberof InlineResponse200EventTypes
+         * @memberof InfoResponseEventTypes
          */
         templated?: boolean;
     }
@@ -626,19 +660,19 @@ export namespace EventManagementModels {
     /**
      *
      * @export
-     * @interface InlineResponse200Events
+     * @interface InfoResponseEvents
      */
-    export interface InlineResponse200Events {
+    export interface InfoResponseEvents {
         /**
          *
          * @type {string}
-         * @memberof InlineResponse200Events
+         * @memberof InfoResponseEvents
          */
         href?: string;
         /**
          *
          * @type {boolean}
-         * @memberof InlineResponse200Events
+         * @memberof InfoResponseEvents
          */
         templated?: boolean;
     }
@@ -646,13 +680,13 @@ export namespace EventManagementModels {
     /**
      *
      * @export
-     * @interface InlineResponse200Self
+     * @interface InfoResponseSelf
      */
-    export interface InlineResponse200Self {
+    export interface InfoResponseSelf {
         /**
          *
          * @type {string}
-         * @memberof InlineResponse200Self
+         * @memberof InfoResponseSelf
          */
         href?: string;
     }
@@ -687,10 +721,10 @@ export namespace EventManagementModels {
          * @enum {string}
          */
         export enum StateEnum {
-            ACCEPTED = <any>"ACCEPTED",
-            INPROGRESS = <any>"IN_PROGRESS",
-            FINISHED = <any>"FINISHED",
-            FINISHEDWITHERROR = <any>"FINISHED_WITH_ERROR"
+            ACCEPTED = "ACCEPTED",
+            INPROGRESS = "IN_PROGRESS",
+            FINISHED = "FINISHED",
+            FINISHEDWITHERROR = "FINISHED_WITH_ERROR",
         }
     }
 
@@ -728,6 +762,44 @@ export namespace EventManagementModels {
          *
          * @type {boolean}
          * @memberof MindsphereStandardEvent
+         */
+        acknowledged?: boolean;
+    }
+
+    /**
+     *
+     * @export
+     * @interface MindsphereStandardEventResponse
+     */
+    export interface MindsphereStandardEventResponse extends BaseEventResponse {
+        /**
+         *
+         * @type {number}
+         * @memberof MindsphereStandardEventResponse
+         */
+        severity?: number;
+        /**
+         *
+         * @type {string}
+         * @memberof MindsphereStandardEventResponse
+         */
+        description?: string;
+        /**
+         *
+         * @type {string}
+         * @memberof MindsphereStandardEventResponse
+         */
+        code?: string;
+        /**
+         *
+         * @type {string}
+         * @memberof MindsphereStandardEventResponse
+         */
+        source?: string;
+        /**
+         *
+         * @type {boolean}
+         * @memberof MindsphereStandardEventResponse
          */
         acknowledged?: boolean;
     }
@@ -778,10 +850,10 @@ export namespace EventManagementModels {
         first?: RelFirst;
         /**
          *
-         * @type {RelSelf}
+         * @type {SelfLink}
          * @memberof PagingLinks
          */
-        self?: RelSelf;
+        self?: SelfLink;
         /**
          *
          * @type {RelNext}
@@ -800,6 +872,86 @@ export namespace EventManagementModels {
          * @memberof PagingLinks
          */
         last?: RelLast;
+    }
+
+    /**
+     *
+     * @export
+     * @interface QueryEventTypesResponse
+     */
+    export interface QueryEventTypesResponse {
+        /**
+         *
+         * @type {QueryEventTypesResponseEmbedded}
+         * @memberof QueryEventTypesResponse
+         */
+        _embedded?: QueryEventTypesResponseEmbedded;
+        /**
+         *
+         * @type {PagingLinks}
+         * @memberof QueryEventTypesResponse
+         */
+        _links?: PagingLinks;
+        /**
+         *
+         * @type {Page}
+         * @memberof QueryEventTypesResponse
+         */
+        page?: Page;
+    }
+
+    /**
+     *
+     * @export
+     * @interface QueryEventTypesResponseEmbedded
+     */
+    export interface QueryEventTypesResponseEmbedded {
+        /**
+         *
+         * @type {Array<EventTypeResponse>}
+         * @memberof QueryEventTypesResponseEmbedded
+         */
+        eventTypes?: Array<EventTypeResponse>;
+    }
+
+    /**
+     *
+     * @export
+     * @interface QueryEventsResponse
+     */
+    export interface QueryEventsResponse {
+        /**
+         *
+         * @type {QueryEventsResponseEmbedded}
+         * @memberof QueryEventsResponse
+         */
+        _embedded?: QueryEventsResponseEmbedded;
+        /**
+         *
+         * @type {PagingLinks}
+         * @memberof QueryEventsResponse
+         */
+        _links?: PagingLinks;
+        /**
+         *
+         * @type {Page}
+         * @memberof QueryEventsResponse
+         */
+        page?: Page;
+    }
+
+    /**
+     *
+     * @export
+     * @interface QueryEventsResponseEmbedded
+     */
+    export interface QueryEventsResponseEmbedded {
+        /**
+         *
+         * @type {Array<MindsphereStandardEventResponse>}
+         * @memberof QueryEventsResponseEmbedded
+         */
+        events?: Array<MindsphereStandardEventResponse>;
     }
 
     /**
@@ -885,4 +1037,60 @@ export namespace EventManagementModels {
          */
         href?: string;
     }
+
+    /**
+     *
+     * @export
+     * @interface SelfLink
+     */
+    export interface SelfLink {
+        /**
+         *
+         * @type {string}
+         * @memberof SelfLink
+         */
+        href?: string;
+        /**
+         *
+         * @type {boolean}
+         * @memberof SelfLink
+         */
+        templated?: boolean;
+    }
+
+    /**
+     * Contains sharing information. This sharing information will be available only if 'includeShared' query parameter is 'true' in request.
+     * @export
+     * @interface SharingResource
+     */
+    export interface SharingResource {
+        /**
+         * List of sharing modes applicable for this resource. The currently supported modes are SHARER, RECEIVER and DEFAULT.  SHARER means this resource is shared by my tenant. RECEIVER means this resource is shared with my tenant. DEFAULT means this resource is provide by default. An empty array means this resource is not shared. New modes might be introduced later and clients must expect additional items to be contained in the array.
+         * @type {Array<string>}
+         * @memberof SharingResource
+         */
+        modes?: Array<SharingResource.ModesEnum>;
+    }
+
+    /**
+     * @export
+     * @namespace SharingResource
+     */
+    export namespace SharingResource {
+        /**
+         * @export
+         * @enum {string}
+         */
+        export enum ModesEnum {
+            SHARER = "SHARER",
+            RECEIVER = "RECEIVER",
+            DEFAULT = "DEFAULT",
+        }
+    }
+
+    // ! fix: compatibility with old naming
+
+    export interface Billboard extends InfoResponse {}
+    export interface EmbeddedEventsTypesList extends QueryEventTypesResponse {}
+    export interface EmbeddedEventsList extends QueryEventsResponse {}
 }
