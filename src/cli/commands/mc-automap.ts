@@ -3,6 +3,7 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { DataPointValue, MindConnectAgent, MindSphereSdk, TimeStampedDataPoint } from "../..";
+import { DataSourceConfiguration } from "../../../dist/src";
 import { getAgentDir, retry, throwError } from "../../api/utils";
 import {
     adjustColor,
@@ -24,10 +25,15 @@ export default (program: CommanderStatic) => {
         .command("configure-agent")
         .alias("co")
         .option("-c, --config <agentconfig>", "config file with agent configuration")
-        .option("-m, --mode [config | map | print | delete | test | func | maptemplate]", "command mode", "config")
+        .option(
+            "-m, --mode [mode]",
+            "command mode [config | map | print | delete | test | func | maptemplate]",
+            "config"
+        )
         .option("-a, --agentid <agentid>", "agentid")
         .option("-i, --assetid <assetid>", "target assetid for mapping")
         .option("-t, --typeid <typeid>", "asset type for configuration")
+        .option("-l, --language [js|python]", "target language for conversion function", "js")
         .option("-s, --timespan <timespan>", "timespan between generated timestamps (in ms)", "1000")
         .option("-c, --count <count>", "Number of generated records", "10")
         .option("-k, --passkey <passkey>", "passkey")
@@ -95,20 +101,22 @@ export default (program: CommanderStatic) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc configure-agent --config agent.json -assetid 1234567...89 \t\tconfigures agent automatically for specified assetid`
+                `    mc configure-agent --config agent.json -assetid 1234567...89 \tconfigures agent for specified assetid`
             );
             log(
-                `    mc configure-agent --config agent.json --mode print \t\t\tprints data source configuration and mappings`
+                `    mc configure-agent --config agent.json --mode print \t\tprints data source configuration and mappings`
             );
             log(
-                `    mc configure-agent --agentid 12345..ef --typeid <tenant>.Engine  \t\tcreates the data source configuration`
+                `    mc configure-agent --agentid 12345..ef --typeid <tenant>.Engine  \tcreates the data source configuration`
             );
             log(
-                `    mc configure-agent --mode map --agentid 12345..ef --assetid 1234567 \tcreates the mappings for assetid`
+                `    mc configure-agent --mode map --agentid 12345..ef --assetid 1234567 creates the mappings for assetid`
             );
 
             log(`    mc configure-agent --mode delete --agentid 12345..ef \t\tdeletes the mappings for agentid`);
-            log(`    mc configure-agent --config agent.json --mode test \t\t\t\tsends test data to mindsphere`);
+            log(`    mc configure-agent --config agent.json --mode test \t\t\tsends test data to mindsphere`);
+            log(`    mc configure-agent --mode maptemplate \\`);
+            log(`    \t--typeid castidev.Pump --language python \t\t\tcreate mapping template and function in python`);
         });
 };
 
@@ -121,7 +129,7 @@ async function maptemplate(sdk: MindSphereSdk, agentid: any, color: any, options
         .GenerateMappings(dataSourceConfig, options.agentid || "<externalid>", options.assetid || "<assetid>");
 
     fs.writeFileSync(`${options.typeid}.mapping.mdsp.json`, JSON.stringify(dataSourceMappings, null, 2));
-    console.log(`The file ${color(`${options.typeid}.maping.mdsp.json`)} with mapping template.`);
+    console.log(`The file ${color(`${options.typeid}.mapping.mdsp.json`)} with mapping template was created.`);
 
     printFunc(sdk, dataSourceConfig, color, options);
 }
@@ -202,13 +210,26 @@ async function printFunc(sdk: MindSphereSdk, agentOrConfig: any, color: any, opt
         configuration = await sdk.GetAgentManagementClient().GetDataSourceConfiguration(agentOrConfig);
     }
 
+    switch (options.language) {
+        case "js":
+            await printFuncJs(sdk, configuration, color, options);
+            break;
+        case "python":
+            await printFuncPython(sdk, configuration, color, options);
+            break;
+
+        default:
+            throwError(`invalid language ${options.language}`);
+    }
+}
+async function printFuncJs(sdk: MindSphereSdk, configuration: DataSourceConfiguration, color: any, options: any) {
     let result = "";
     result += "\nfunction convertToDataPoint (rawVariable, aspect) {";
 
     result += "\n  let variable = rawVariable;";
     result += "\n  variable = variable.replace(' ', '_');";
     result += "\n  variable = variable.replace('-', '_');";
-    result += "\n  variable = variable.replace(/[W_]/g, '_');";
+    result += "\n  variable = variable.replace(/[\\W_]/g, '_');";
     result += "\n  variable = variable.trim();";
     result += "\n  variable = variable.replace(/^[_]/, '');";
 
@@ -233,6 +254,40 @@ async function printFunc(sdk: MindSphereSdk, agentOrConfig: any, color: any, opt
 
     fs.writeFileSync(`${options.typeid}.map.mdsp.js`, result);
     console.log(`The file ${color(`${options.typeid}.map.mdsp.js`)} with mapping function was created.`);
+    verboseLog(result, options.verbose);
+}
+
+async function printFuncPython(sdk: MindSphereSdk, configuration: DataSourceConfiguration, color: any, options: any) {
+    let result = "import re\n";
+    result += "\ndef convertToDataPoint (rawVariable, aspect):";
+    result += "\n\tvariable = rawVariable";
+    result += "\n\tvariable = variable.replace(' ', '_')";
+    result += "\n\tvariable = variable.replace('-', '_')";
+    result += "\n\tvariable = re.sub(r'[\\W_]', '_', variable)";
+    result += "\n\tvariable = variable.strip()";
+    result += "\n\tvariable = re.sub(r'^[_]', '', variable)";
+
+    configuration.dataSources.forEach((element: any) => {
+        if (!element.customData) {
+            throw Error("cant create function there is no custom data avaiable, the config was not done via CLI");
+        }
+        result += `\n\tif aspect == '${element.customData!.aspect}': `;
+        element.dataPoints.forEach((dataPoint: any) => {
+            if (!dataPoint.customData) {
+                throw Error("cant create function there is no custom data avaiable, the config was not done via CLI");
+            }
+            if (dataPoint.id !== `DP-${dataPoint.customData!.variable}`) {
+                result += `\n\t\tif variable == '${dataPoint.customData!.variable}': return '${dataPoint.id}'`;
+            }
+        });
+        result += `\n\t\treturn "DP-" + variable`;
+        result += `\n`;
+    });
+
+    result += "\n";
+
+    fs.writeFileSync(`${options.typeid}.map.mdsp.py`, result);
+    console.log(`The file ${color(`${options.typeid}.map.mdsp.py`)} with mapping function was created.`);
     verboseLog(result, options.verbose);
 }
 
@@ -276,6 +331,10 @@ function checkParameters(options: any) {
     options.mode === "maptemplate" &&
         !options.typeid &&
         throwError("you have to specify the typeid to generate mapping templates");
+
+    (options.mode === "maptemplate" || options.mode === "func") &&
+        ["js", "python"].indexOf(options.language) < 0 &&
+        throwError("the language has to be either js or python");
     ["map"].indexOf(options.mode) >= 0 &&
         !options.assetid &&
         throwError(`you have to specify assetid for ${options.mode}`);
