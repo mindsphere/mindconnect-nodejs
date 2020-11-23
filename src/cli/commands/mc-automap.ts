@@ -2,7 +2,7 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
-import { DataPointValue, MindConnectAgent, MindSphereSdk, TimeStampedDataPoint } from "../..";
+import { DataPointValue, DataSourceConfiguration, MindConnectAgent, MindSphereSdk, TimeStampedDataPoint } from "../..";
 import { getAgentDir, retry, throwError } from "../../api/utils";
 import {
     adjustColor,
@@ -24,10 +24,11 @@ export default (program: CommanderStatic) => {
         .command("configure-agent")
         .alias("co")
         .option("-c, --config <agentconfig>", "config file with agent configuration")
-        .option("-m, --mode [config | map | print | delete | test | func]", "command mode", "config")
+        .option("-m, --mode [mode]", "command mode [config|map|print|delete|test|func|template]", "config")
         .option("-a, --agentid <agentid>", "agentid")
         .option("-i, --assetid <assetid>", "target assetid for mapping")
         .option("-t, --typeid <typeid>", "asset type for configuration")
+        .option("-l, --language [js|python]", "target language for conversion function", "js")
         .option("-s, --timespan <timespan>", "timespan between generated timestamps (in ms)", "1000")
         .option("-c, --count <count>", "Number of generated records", "10")
         .option("-k, --passkey <passkey>", "passkey")
@@ -74,6 +75,8 @@ export default (program: CommanderStatic) => {
                     options.mode === "config" && (await config(sdk, agentid, color, options));
                     options.mode === "delete" && (await deleteMappings(sdk, agentid, color, options));
                     options.mode === "map" && (await map(sdk, agentid, color, options));
+                    options.mode === "template" && (await template(sdk, agentid, color, options));
+                    options.mode === "template" && process.exit(0);
                     options.mode === "test" && (await inject(agent!, color, options));
 
                     options.mode !== "test" && (await print(sdk, agentid, color, options));
@@ -93,22 +96,38 @@ export default (program: CommanderStatic) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc configure-agent --config agent.json -assetid 1234567...89 \t\tconfigures agent automatically for specified assetid`
+                `    mc configure-agent --config agent.json -assetid 1234567...89 \tconfigures agent for specified assetid`
             );
             log(
-                `    mc configure-agent --config agent.json --mode print \t\t\tprints data source configuration and mappings`
+                `    mc configure-agent --config agent.json --mode print \t\tprints data source configuration and mappings`
             );
             log(
-                `    mc configure-agent --agentid 12345..ef --typeid <tenant>.Engine  \t\tcreates the data source configuration`
+                `    mc configure-agent --agentid 12345..ef --typeid <tenant>.Engine  \tcreates the data source configuration`
             );
             log(
-                `    mc configure-agent --mode map --agentid 12345..ef --assetid 1234567 \tcreates the mappings for assetid`
+                `    mc configure-agent --mode map --agentid 12345..ef --assetid 1234567 creates the mappings for assetid`
             );
 
             log(`    mc configure-agent --mode delete --agentid 12345..ef \t\tdeletes the mappings for agentid`);
-            log(`    mc configure-agent --config agent.json --mode test \t\t\t\tsends test data to mindsphere`);
+            log(`    mc configure-agent --config agent.json --mode test \t\t\tsends test data to mindsphere`);
+            log(`    mc configure-agent --mode template \\`);
+            log(`    \t--typeid castidev.Pump --language python \t\t\tcreate mapping template and function in python`);
         });
 };
+
+async function template(sdk: MindSphereSdk, agentid: any, color: any, options: any) {
+    const assetType = await sdk.GetAssetManagementClient().GetAssetType(options.typeid);
+    const dataSourceConfig = await sdk.GetMindConnectApiClient().GenerateDataSourceConfiguration(assetType);
+
+    const dataSourceMappings = await sdk
+        .GetMindConnectApiClient()
+        .GenerateMappings(dataSourceConfig, options.agentid || "<externalid>", options.assetid || "<assetid>");
+
+    fs.writeFileSync(`${options.typeid}.mapping.mdsp.json`, JSON.stringify(dataSourceMappings, null, 2));
+    console.log(`The file ${color(`${options.typeid}.mapping.mdsp.json`)} with mapping template was created.`);
+
+    printFunc(sdk, dataSourceConfig, color, options);
+}
 
 async function map(sdk: MindSphereSdk, agentid: any, color: any, options: any) {
     const spinner = ora(color("Creating mappings..."));
@@ -180,25 +199,41 @@ async function print(sdk: MindSphereSdk, agentid: any, color: any, options: any)
     verboseLog(JSON.stringify(mappings, null, 2), options.verbose);
 }
 
-async function printFunc(sdk: MindSphereSdk, agentid: any, color: any, options: any) {
-    const configuration = await sdk.GetAgentManagementClient().GetDataSourceConfiguration(agentid);
+async function printFunc(sdk: MindSphereSdk, agentOrConfig: any, color: any, options: any) {
+    let configuration = agentOrConfig;
+    if (typeof agentOrConfig === "string") {
+        configuration = await sdk.GetAgentManagementClient().GetDataSourceConfiguration(agentOrConfig);
+    }
 
+    switch (options.language) {
+        case "js":
+            await printFuncJs(sdk, configuration, color, options);
+            break;
+        case "python":
+            await printFuncPython(sdk, configuration, color, options);
+            break;
+
+        default:
+            throwError(`invalid language ${options.language}`);
+    }
+}
+async function printFuncJs(sdk: MindSphereSdk, configuration: DataSourceConfiguration, color: any, options: any) {
     let result = "";
     result += "\nfunction convertToDataPoint (rawVariable, aspect) {";
 
     result += "\n  let variable = rawVariable;";
     result += "\n  variable = variable.replace(' ', '_');";
     result += "\n  variable = variable.replace('-', '_');";
-    result += "\n  variable = variable.replace(/[W_]/g, '_');";
+    result += "\n  variable = variable.replace(/[\\W_]/g, '_');";
     result += "\n  variable = variable.trim();";
     result += "\n  variable = variable.replace(/^[_]/, '');";
 
-    configuration.dataSources.forEach((element) => {
+    configuration.dataSources.forEach((element: any) => {
         if (!element.customData) {
             throw Error("cant create function there is no custom data avaiable, the config was not done via CLI");
         }
         result += `\n   if (aspect === '${element.customData!.aspect}') { `;
-        element.dataPoints.forEach((dataPoint) => {
+        element.dataPoints.forEach((dataPoint: any) => {
             if (!dataPoint.customData) {
                 throw Error("cant create function there is no custom data avaiable, the config was not done via CLI");
             }
@@ -212,8 +247,42 @@ async function printFunc(sdk: MindSphereSdk, agentid: any, color: any, options: 
 
     result += "\n}";
 
-    fs.writeFileSync("mappingfuntion.mdsp.js", result);
-    console.log(`The file ${color("mappingfuntion.mdsp.js")} with mapping function was created.`);
+    fs.writeFileSync(`${options.typeid}.map.mdsp.js`, result);
+    console.log(`The file ${color(`${options.typeid}.map.mdsp.js`)} with mapping function was created.`);
+    verboseLog(result, options.verbose);
+}
+
+async function printFuncPython(sdk: MindSphereSdk, configuration: DataSourceConfiguration, color: any, options: any) {
+    let result = "import re\n";
+    result += "\ndef convertToDataPoint (rawVariable, aspect):";
+    result += "\n\tvariable = rawVariable";
+    result += "\n\tvariable = variable.replace(' ', '_')";
+    result += "\n\tvariable = variable.replace('-', '_')";
+    result += "\n\tvariable = re.sub(r'[\\W_]', '_', variable)";
+    result += "\n\tvariable = variable.strip()";
+    result += "\n\tvariable = re.sub(r'^[_]', '', variable)";
+
+    configuration.dataSources.forEach((element: any) => {
+        if (!element.customData) {
+            throw Error("cant create function there is no custom data avaiable, the config was not done via CLI");
+        }
+        result += `\n\tif aspect == '${element.customData!.aspect}': `;
+        element.dataPoints.forEach((dataPoint: any) => {
+            if (!dataPoint.customData) {
+                throw Error("cant create function there is no custom data avaiable, the config was not done via CLI");
+            }
+            if (dataPoint.id !== `DP-${dataPoint.customData!.variable}`) {
+                result += `\n\t\tif variable == '${dataPoint.customData!.variable}': return '${dataPoint.id}'`;
+            }
+        });
+        result += `\n\t\treturn "DP-" + variable`;
+        result += `\n`;
+    });
+
+    result += "\n";
+
+    fs.writeFileSync(`${options.typeid}.map.mdsp.py`, result);
+    console.log(`The file ${color(`${options.typeid}.map.mdsp.py`)} with mapping function was created.`);
     verboseLog(result, options.verbose);
 }
 
@@ -239,8 +308,8 @@ async function config(sdk: MindSphereSdk, agentid: any, color: any, options: any
 }
 
 function checkParameters(options: any) {
-    ["map", "config", "print", "delete", "test", "func"].indexOf(options.mode) < 0 &&
-        throwError("The mode must be map | configure | print | delete | test | func");
+    ["map", "config", "print", "delete", "test", "func", "template"].indexOf(options.mode) < 0 &&
+        throwError("The mode must be map | configure | print | delete | test | func | template");
 
     options.passkey &&
         options.mode === "test" &&
@@ -254,6 +323,13 @@ function checkParameters(options: any) {
         !(options.timespan && options.count) &&
         throwError("you have to specify the timespan and the count");
 
+    options.mode === "template" &&
+        !options.typeid &&
+        throwError("you have to specify the typeid to generate mapping templates");
+
+    (options.mode === "template" || options.mode === "func") &&
+        ["js", "python"].indexOf(options.language) < 0 &&
+        throwError("the language has to be either js or python");
     ["map"].indexOf(options.mode) >= 0 &&
         !options.assetid &&
         throwError(`you have to specify assetid for ${options.mode}`);
