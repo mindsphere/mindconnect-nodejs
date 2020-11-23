@@ -24,7 +24,7 @@ export default (program: CommanderStatic) => {
         .command("configure-agent")
         .alias("co")
         .option("-c, --config <agentconfig>", "config file with agent configuration")
-        .option("-m, --mode [config | map | print | delete | test | func]", "command mode", "config")
+        .option("-m, --mode [config | map | print | delete | test | func | maptemplate]", "command mode", "config")
         .option("-a, --agentid <agentid>", "agentid")
         .option("-i, --assetid <assetid>", "target assetid for mapping")
         .option("-t, --typeid <typeid>", "asset type for configuration")
@@ -74,6 +74,8 @@ export default (program: CommanderStatic) => {
                     options.mode === "config" && (await config(sdk, agentid, color, options));
                     options.mode === "delete" && (await deleteMappings(sdk, agentid, color, options));
                     options.mode === "map" && (await map(sdk, agentid, color, options));
+                    options.mode === "maptemplate" && (await maptemplate(sdk, agentid, color, options));
+                    options.mode === "maptemplate" && process.exit(0);
                     options.mode === "test" && (await inject(agent!, color, options));
 
                     options.mode !== "test" && (await print(sdk, agentid, color, options));
@@ -109,6 +111,20 @@ export default (program: CommanderStatic) => {
             log(`    mc configure-agent --config agent.json --mode test \t\t\t\tsends test data to mindsphere`);
         });
 };
+
+async function maptemplate(sdk: MindSphereSdk, agentid: any, color: any, options: any) {
+    const assetType = await sdk.GetAssetManagementClient().GetAssetType(options.typeid);
+    const dataSourceConfig = await sdk.GetMindConnectApiClient().GenerateDataSourceConfiguration(assetType);
+
+    const dataSourceMappings = await sdk
+        .GetMindConnectApiClient()
+        .GenerateMappings(dataSourceConfig, options.agentid || "<externalid>", options.assetid || "<assetid>");
+
+    fs.writeFileSync(`${options.typeid}.mapping.mdsp.json`, JSON.stringify(dataSourceMappings, null, 2));
+    console.log(`The file ${color(`${options.typeid}.maping.mdsp.json`)} with mapping template.`);
+
+    printFunc(sdk, dataSourceConfig, color, options);
+}
 
 async function map(sdk: MindSphereSdk, agentid: any, color: any, options: any) {
     const spinner = ora(color("Creating mappings..."));
@@ -180,8 +196,11 @@ async function print(sdk: MindSphereSdk, agentid: any, color: any, options: any)
     verboseLog(JSON.stringify(mappings, null, 2), options.verbose);
 }
 
-async function printFunc(sdk: MindSphereSdk, agentid: any, color: any, options: any) {
-    const configuration = await sdk.GetAgentManagementClient().GetDataSourceConfiguration(agentid);
+async function printFunc(sdk: MindSphereSdk, agentOrConfig: any, color: any, options: any) {
+    let configuration = agentOrConfig;
+    if (typeof agentOrConfig === "string") {
+        configuration = await sdk.GetAgentManagementClient().GetDataSourceConfiguration(agentOrConfig);
+    }
 
     let result = "";
     result += "\nfunction convertToDataPoint (rawVariable, aspect) {";
@@ -193,12 +212,12 @@ async function printFunc(sdk: MindSphereSdk, agentid: any, color: any, options: 
     result += "\n  variable = variable.trim();";
     result += "\n  variable = variable.replace(/^[_]/, '');";
 
-    configuration.dataSources.forEach((element) => {
+    configuration.dataSources.forEach((element: any) => {
         if (!element.customData) {
             throw Error("cant create function there is no custom data avaiable, the config was not done via CLI");
         }
         result += `\n   if (aspect === '${element.customData!.aspect}') { `;
-        element.dataPoints.forEach((dataPoint) => {
+        element.dataPoints.forEach((dataPoint: any) => {
             if (!dataPoint.customData) {
                 throw Error("cant create function there is no custom data avaiable, the config was not done via CLI");
             }
@@ -212,8 +231,8 @@ async function printFunc(sdk: MindSphereSdk, agentid: any, color: any, options: 
 
     result += "\n}";
 
-    fs.writeFileSync("mappingfuntion.mdsp.js", result);
-    console.log(`The file ${color("mappingfuntion.mdsp.js")} with mapping function was created.`);
+    fs.writeFileSync(`${options.typeid}.map.mdsp.js`, result);
+    console.log(`The file ${color(`${options.typeid}.map.mdsp.js`)} with mapping function was created.`);
     verboseLog(result, options.verbose);
 }
 
@@ -239,8 +258,8 @@ async function config(sdk: MindSphereSdk, agentid: any, color: any, options: any
 }
 
 function checkParameters(options: any) {
-    ["map", "config", "print", "delete", "test", "func"].indexOf(options.mode) < 0 &&
-        throwError("The mode must be map | configure | print | delete | test | func");
+    ["map", "config", "print", "delete", "test", "func", "maptemplate"].indexOf(options.mode) < 0 &&
+        throwError("The mode must be map | configure | print | delete | test | func | maptemplate");
 
     options.passkey &&
         options.mode === "test" &&
@@ -254,6 +273,9 @@ function checkParameters(options: any) {
         !(options.timespan && options.count) &&
         throwError("you have to specify the timespan and the count");
 
+    options.mode === "maptemplate" &&
+        !options.typeid &&
+        throwError("you have to specify the typeid to generate mapping templates");
     ["map"].indexOf(options.mode) >= 0 &&
         !options.assetid &&
         throwError(`you have to specify assetid for ${options.mode}`);
