@@ -25,11 +25,7 @@ export default (program: CommanderStatic) => {
         .command("configure-agent")
         .alias("co")
         .option("-c, --config <agentconfig>", "config file with agent configuration")
-        .option(
-            "-m, --mode [mode]",
-            "command mode [config | map | print | delete | test | func | maptemplate]",
-            "config"
-        )
+        .option("-m, --mode [mode]", "command mode [config|map|print|delete|test|func|template]", "config")
         .option("-a, --agentid <agentid>", "agentid")
         .option("-i, --assetid <assetid>", "target assetid for mapping")
         .option("-t, --typeid <typeid>", "asset type for configuration")
@@ -80,8 +76,8 @@ export default (program: CommanderStatic) => {
                     options.mode === "config" && (await config(sdk, agentid, color, options));
                     options.mode === "delete" && (await deleteMappings(sdk, agentid, color, options));
                     options.mode === "map" && (await map(sdk, agentid, color, options));
-                    options.mode === "maptemplate" && (await maptemplate(sdk, agentid, color, options));
-                    options.mode === "maptemplate" && process.exit(0);
+                    options.mode === "template" && (await template(sdk, agentid, color, options));
+                    options.mode === "template" && process.exit(0);
                     options.mode === "test" && (await inject(agent!, color, options));
 
                     options.mode !== "test" && (await print(sdk, agentid, color, options));
@@ -115,12 +111,12 @@ export default (program: CommanderStatic) => {
 
             log(`    mc configure-agent --mode delete --agentid 12345..ef \t\tdeletes the mappings for agentid`);
             log(`    mc configure-agent --config agent.json --mode test \t\t\tsends test data to mindsphere`);
-            log(`    mc configure-agent --mode maptemplate \\`);
+            log(`    mc configure-agent --mode template \\`);
             log(`    \t--typeid castidev.Pump --language python \t\t\tcreate mapping template and function in python`);
         });
 };
 
-async function maptemplate(sdk: MindSphereSdk, agentid: any, color: any, options: any) {
+async function template(sdk: MindSphereSdk, agentid: any, color: any, options: any) {
     const assetType = await sdk.GetAssetManagementClient().GetAssetType(options.typeid);
     const dataSourceConfig = await sdk.GetMindConnectApiClient().GenerateDataSourceConfiguration(assetType);
 
@@ -313,8 +309,8 @@ async function config(sdk: MindSphereSdk, agentid: any, color: any, options: any
 }
 
 function checkParameters(options: any) {
-    ["map", "config", "print", "delete", "test", "func", "maptemplate"].indexOf(options.mode) < 0 &&
-        throwError("The mode must be map | configure | print | delete | test | func | maptemplate");
+    ["map", "config", "print", "delete", "test", "func", "template"].indexOf(options.mode) < 0 &&
+        throwError("The mode must be map | configure | print | delete | test | func | template");
 
     options.passkey &&
         options.mode === "test" &&
@@ -328,11 +324,11 @@ function checkParameters(options: any) {
         !(options.timespan && options.count) &&
         throwError("you have to specify the timespan and the count");
 
-    options.mode === "maptemplate" &&
+    options.mode === "template" &&
         !options.typeid &&
         throwError("you have to specify the typeid to generate mapping templates");
 
-    (options.mode === "maptemplate" || options.mode === "func") &&
+    (options.mode === "template" || options.mode === "func") &&
         ["js", "python"].indexOf(options.language) < 0 &&
         throwError("the language has to be either js or python");
     ["map"].indexOf(options.mode) >= 0 &&
