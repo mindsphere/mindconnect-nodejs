@@ -2,8 +2,7 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
-import { DataPointValue, MindConnectAgent, MindSphereSdk, TimeStampedDataPoint } from "../..";
-import { DataSourceConfiguration } from "../../../dist/src";
+import { DataPointValue, DataSourceConfiguration, MindConnectAgent, MindSphereSdk, TimeStampedDataPoint } from "../..";
 import { getAgentDir, retry, throwError } from "../../api/utils";
 import {
     adjustColor,
