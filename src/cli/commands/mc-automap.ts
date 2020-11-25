@@ -28,7 +28,7 @@ export default (program: CommanderStatic) => {
         .option("-a, --agentid <agentid>", "agentid")
         .option("-i, --assetid <assetid>", "target assetid for mapping")
         .option("-t, --typeid <typeid>", "asset type for configuration")
-        .option("-l, --language [js|python]", "target language for conversion function", "js")
+        .option("-l, --language [js|python|json]", "target language for conversion function", "js")
         .option("-s, --timespan <timespan>", "timespan between generated timestamps (in ms)", "1000")
         .option("-c, --count <count>", "Number of generated records", "10")
         .option("-k, --passkey <passkey>", "passkey")
@@ -207,17 +207,50 @@ async function printFunc(sdk: MindSphereSdk, agentOrConfig: any, color: any, opt
 
     switch (options.language) {
         case "js":
-            await printFuncJs(sdk, configuration, color, options);
+            await printFuncJs(configuration, color, options);
             break;
         case "python":
-            await printFuncPython(sdk, configuration, color, options);
+            await printFuncPython(configuration, color, options);
+            break;
+        case "json":
+            await printFuncJson(configuration, color, options);
             break;
 
         default:
             throwError(`invalid language ${options.language}`);
     }
 }
-async function printFuncJs(sdk: MindSphereSdk, configuration: DataSourceConfiguration, color: any, options: any) {
+
+async function printFuncJson(configuration: DataSourceConfiguration, color: any, options: any) {
+    const result: {
+        mappings: any[];
+    } = {
+        mappings: [],
+    };
+
+    configuration.dataSources.forEach((element: any) => {
+        if (!element.customData) {
+            throw Error("cant create function there is no custom data avaiable, the config was not done via CLI");
+        }
+
+        element.dataPoints.forEach((dataPoint: any) => {
+            if (!dataPoint.customData) {
+                throw Error("cant create function there is no custom data avaiable, the config was not done via CLI");
+            }
+            result.mappings.push({
+                aspect: `${element.customData!.aspect}`,
+                variable: `${dataPoint.customData!.variable}`,
+                dataPointId: `${dataPoint.id}`,
+            });
+        });
+    });
+
+    fs.writeFileSync(`${options.typeid}.fulltable.mdsp.json`, JSON.stringify(result, null, 2));
+    console.log(`The file ${color(`${options.typeid}.fulltable.mdsp.json`)} with full JSON mapping table was created.`);
+    verboseLog(result, options.verbose);
+}
+
+async function printFuncJs(configuration: DataSourceConfiguration, color: any, options: any) {
     let result = "";
     result += "\nfunction convertToDataPoint (rawVariable, aspect) {";
 
@@ -252,7 +285,7 @@ async function printFuncJs(sdk: MindSphereSdk, configuration: DataSourceConfigur
     verboseLog(result, options.verbose);
 }
 
-async function printFuncPython(sdk: MindSphereSdk, configuration: DataSourceConfiguration, color: any, options: any) {
+async function printFuncPython(configuration: DataSourceConfiguration, color: any, options: any) {
     let result = "import re\n";
     result += "\ndef convertToDataPoint (rawVariable, aspect):";
     result += "\n\tvariable = rawVariable";
@@ -328,8 +361,8 @@ function checkParameters(options: any) {
         throwError("you have to specify the typeid to generate mapping templates");
 
     (options.mode === "template" || options.mode === "func") &&
-        ["js", "python"].indexOf(options.language) < 0 &&
-        throwError("the language has to be either js or python");
+        ["js", "json", "python"].indexOf(options.language) < 0 &&
+        throwError("the language has to be either js, json or python");
     ["map"].indexOf(options.mode) >= 0 &&
         !options.assetid &&
         throwError(`you have to specify assetid for ${options.mode}`);
