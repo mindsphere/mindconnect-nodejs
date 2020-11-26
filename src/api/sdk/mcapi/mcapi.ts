@@ -258,13 +258,19 @@ export class MindConnectApiClient extends SdkClient {
      *
      * @memberOf MindConnectApiClient
      */
-    public async PostDataPointMapping(mapping: MindConnectApiModels.Mapping, optional?: { ignoreCodes: number[] }) {
+    public async PostDataPointMapping(
+        mapping: MindConnectApiModels.Mapping,
+        optional?: { ignoreCodes?: number[]; noAgentValidation?: boolean }
+    ) {
         const body = mapping;
+        const parameters = optional || {};
+        const { noAgentValidation } = parameters;
+
         return await this.HttpAction({
             verb: "POST",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/dataPointMappings`,
+            baseUrl: `${this._baseUrl}/dataPointMappings?${toQueryString({ noAgentValidation })}`,
             body: body,
             message: "PostDataPointMapping",
             noResponse: true,
