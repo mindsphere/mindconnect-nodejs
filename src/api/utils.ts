@@ -346,3 +346,58 @@ export function checkList(list: any[]) {
         }
     }
 }
+
+/**
+ * Iterates over all properties of an object and returns it serialized as data points
+ *
+ * @export
+ * @param {{ [x: string]: any }} obj Object to iterate over
+ * @param {string} aspect aspect name in mindsphere
+ * @param {((propertyName: string, aspect: string) => string | undefined)} dataPointFunction find id in the object
+ * @param {((propertyName: string, aspect: string) => string | undefined)} qualityCodeFunction find quality code in the object
+ * @param {(propertyName: string, aspect: string) => void} invalidDataFunction what to do if the data is not available
+ * @returns
+ */
+export function convertToDataPoints(
+    obj: { [x: string]: any },
+    aspect: string,
+    dataPointFunction: (propertyName: string, aspect: string) => string | undefined,
+    qualityCodeFunction: (propertyName: string, aspect: string) => string | undefined,
+    invalidDataFunction: (propertyName: string, aspect: string) => void
+): { dataPointId: string; qualityCode: string; value: string }[] {
+    const res: { dataPointId: string; qualityCode: string; value: string }[] = [];
+    function recurse(obj: { [x: string]: any }) {
+        for (const propertyName in obj) {
+            const value = obj[propertyName];
+            if (value) {
+                if (Array.isArray(value)) {
+                    const dataPointId = dataPointFunction(propertyName, aspect);
+                    const qualityCode = qualityCodeFunction(propertyName, aspect);
+                    if (!dataPointId || !qualityCode) {
+                        invalidDataFunction(propertyName, aspect);
+                    }
+                    res.push({
+                        dataPointId: `${dataPointId}`,
+                        qualityCode: `${qualityCode}`,
+                        value: `${JSON.stringify(value)}`,
+                    });
+                } else if (value && typeof value === "object") {
+                    recurse(value);
+                } else {
+                    const dataPointId = dataPointFunction(propertyName, aspect);
+                    const qualityCode = qualityCodeFunction(propertyName, aspect);
+                    if (!dataPointId || !qualityCode) {
+                        invalidDataFunction(propertyName, aspect);
+                    }
+                    res.push({
+                        dataPointId: `${dataPointId}`,
+                        qualityCode: `${qualityCode}`,
+                        value: `${value}`,
+                    });
+                }
+            }
+        }
+    }
+    recurse(obj);
+    return res;
+}
