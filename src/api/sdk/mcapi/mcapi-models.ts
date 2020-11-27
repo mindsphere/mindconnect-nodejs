@@ -16,6 +16,52 @@ export namespace MindConnectApiModels {
     /**
      *
      * @export
+     * @interface IngestionTimeseries
+     */
+    export interface IngestionTimeseries {
+        /**
+         * Timestamp of the data point
+         * @type {string}
+         * @memberof IngestionTimeseries
+         */
+        timestamp: string;
+        /**
+         * List of datapoint(s)
+         * @type {Array<IngestionValues>}
+         * @memberof IngestionTimeseries
+         */
+        values: Array<IngestionValues>;
+    }
+
+    /**
+     *
+     * @export
+     * @interface IngestionValues
+     */
+    export interface IngestionValues {
+        /**
+         * Unique identifier of the data point
+         * @type {string}
+         * @memberof IngestionValues
+         */
+        dataPointId: string;
+        /**
+         * Timeseries data value for a given data point id
+         * @type {string}
+         * @memberof IngestionValues
+         */
+        value: string;
+        /**
+         * Data Quality Code
+         * @type {string}
+         * @memberof IngestionValues
+         */
+        qualityCode: string;
+    }
+
+    /**
+     *
+     * @export
      * @interface Badrequest
      */
     export interface Badrequest {

@@ -507,4 +507,26 @@ export class MindConnectApiClient extends SdkClient {
         }
         return mappings;
     }
+
+    /**
+     *
+     * Ingest data to mindsphere
+     * ! this is not public in all mindsphere regions yet.
+     *
+     * @param {string} senderId
+     * @param {MindConnectApiModels.IngestionTimeseries} message
+     * @returns {Promise<Response>}
+     *
+     * @memberOf MindConnectApiClient
+     */
+    public async Ingest(senderId: string, message: MindConnectApiModels.IngestionTimeseries): Promise<Response> {
+        return (await (this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            body: message,
+            baseUrl: `/api/mindconnect/v3/ingest?${toQueryString({ senderId: senderId })}`,
+            rawResponse: true,
+        }) as unknown)) as Response;
+    }
 }
