@@ -16,6 +16,20 @@ export namespace MindConnectApiModels {
     /**
      *
      * @export
+     * @interface Ingestion
+     */
+    export interface Ingestion {
+        /**
+         * Timeseries data for each timestamp
+         * @type {Array<IngestionTimeseries>}
+         * @memberof Ingestion
+         */
+        timeseries?: Array<IngestionTimeseries>;
+    }
+
+    /**
+     *
+     * @export
      * @interface IngestionTimeseries
      */
     export interface IngestionTimeseries {

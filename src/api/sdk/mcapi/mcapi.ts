@@ -519,7 +519,7 @@ export class MindConnectApiClient extends SdkClient {
      *
      * @memberOf MindConnectApiClient
      */
-    public async Ingest(senderId: string, message: MindConnectApiModels.IngestionTimeseries): Promise<Response> {
+    public async Ingest(senderId: string, message: MindConnectApiModels.Ingestion): Promise<Response> {
         return (await (this.HttpAction({
             verb: "POST",
             gateway: this.GetGateway(),
