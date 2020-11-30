@@ -23,7 +23,7 @@ export default (program: CommanderStatic) => {
         .alias("dlk")
         .option(
             "-m, --mode [...]",
-            "mode: list | read | write | delete | readtoken | writetoken | uploadurl | downloadurl | upload",
+            "mode: list | read | write | delete | readtoken | writetoken | uploadurl | downloadurl | upload | meta",
             "list"
         )
         .option("-f, --file <file>", "file to upload")
@@ -48,6 +48,9 @@ export default (program: CommanderStatic) => {
                     switch (options.mode) {
                         case "list":
                             await listPermissions(options, sdk);
+                            break;
+                        case "meta":
+                            await getMetadata(sdk, options);
                             break;
                         case "write":
                             await allowWrite(sdk, options);
@@ -83,6 +86,7 @@ export default (program: CommanderStatic) => {
             log(`    mc data-lake --mode list \t\t\tlists all configured permissions for data lake`);
             log(`    mc data-lake --mode write \t\t\tallow writing to the data lake`);
             log(`    mc data-lake --mode write --path data/ \tallow writing to the data lake from data/ folder`);
+            log(`    mc data-lake --mode meta --path data/ \tget metadata for path`);
             log(`    mc data-lake --mode readtoken \t\tcreate AWS STS Token with read rights`);
             log(`    mc data-lake --mode writetoken \t\tcreate AWS STS Token with write rights from data lake root`);
             log(
@@ -149,6 +153,19 @@ async function uploadFile(sdk: MindSphereSdk, options: any) {
     const result = await sdk.GetDataLakeClient().PutFile(fullPath, url.objectUrls![0].signedUrl!);
     verboseLog(JSON.stringify(result, null, 2), options.verbose);
     spinner.succeed(`Uploaded file ${color(fullPath)} as ${color(url.objectUrls![0].path)} to data lake`);
+}
+
+async function getMetadata(sdk: MindSphereSdk, options: any) {
+    const metadata = await sdk
+        .GetDataLakeClient()
+        .GetObjectMetaData(`${options.path}`, { subtenantid: options.subtenantid });
+    verboseLog(JSON.stringify(metadata, null, 2), options.verbose);
+    console.log(`path size lastModified, subtenantid tags `);
+    console.log(
+        `${color(metadata.path || (metadata as any).location)} ${metadata.size} ${metadata.lastModified} ${
+            metadata.subtenantId || ``
+        } ${JSON.stringify(metadata.tags)} `
+    );
 }
 
 async function uploadUrl(sdk: MindSphereSdk, options: any) {
@@ -260,7 +277,7 @@ export async function listPermissions(options: any, sdk: MindSphereSdk) {
 }
 
 function checkRequiredParameters(options: any) {
-    ["upload", "uploadurl", "downloadurl"].includes(options.mode) &&
+    ["upload", "uploadurl", "downloadurl", "meta"].includes(options.mode) &&
         !options.path &&
         errorLog(`You have to specify --path for mc data-lake --mode ${options.mode} command.`, true);
 

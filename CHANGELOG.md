@@ -4,6 +4,7 @@
 
 ### Bugfixes and Improvements 3.11.0
 
+- CLI: `mc data-lake` added `--mode meta` which prints out the metadata of a path
 - CLI: `mc configure-agent --mode template` can now generate a template for JSON schema to MindSphere conversion see [medium](https://medium.com/@sn0wcat_92713/how-to-create-mindsphere-artefacts-from-json-schema-definitions-1b2f3e446f6a) for more
 - CLI: new `--mode template` parameter on `mc configure-agent`  command
 - CLI: new `--mode info` parameter on `mc asset-types` and `mc aspects` commands (#211)
