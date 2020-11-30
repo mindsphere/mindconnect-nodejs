@@ -13,6 +13,7 @@ import { MindConnectApiClient } from "../mcapi/mcapi";
 import { SignalValidationClient } from "../signal-validation/signal-validation";
 import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
 import { TrendPredictionClient } from "../trend/trend-prediction";
+import { UsageTransparencyClient } from "../utc/utc";
 import { SdkClient } from "./sdk-client";
 /**
  *
@@ -235,5 +236,20 @@ export class MindSphereSdk extends SdkClient {
     public GetDataLakeClient(): DataLakeClient {
         this._dataLakeClient = this._dataLakeClient || new DataLakeClient(this._authenticator);
         return this._dataLakeClient;
+    }
+
+    private _usageTransparencyClient?: UsageTransparencyClient;
+
+    /**
+     * Usage Transparency Client
+     *
+     * @returns {UsageTransparencyClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetUsageTransparencyClient(): UsageTransparencyClient {
+        this._usageTransparencyClient =
+            this._usageTransparencyClient || new UsageTransparencyClient(this._authenticator);
+        return this._usageTransparencyClient;
     }
 }
