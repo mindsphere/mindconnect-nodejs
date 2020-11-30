@@ -28,3 +28,5 @@ export * from "./signal-validation/signal-validation";
 export * from "./signal-validation/signal-validation-models";
 export * from "./trend/trend-prediction";
 export * from "./trend/trend-prediction-models";
+export * from "./utc/utc";
+export * from "./utc/utc-models";
