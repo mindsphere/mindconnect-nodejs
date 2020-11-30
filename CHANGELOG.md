@@ -12,6 +12,7 @@
 - CLI: updated `mc asset-types` with new `--includeshared` parameter - support for cross-tenancy (#170)
 - CLI: updated `mc aspects` with new `--includeshared` parameter - support for cross-tenancy (#170)
 - CLI: updated `mc list-assets` with new `--includeshared` parameter - support for cross-tenancy (#170)
+- SDK: `DataLakeClient` - full data lake client (#199)
 - SDK: `UsageTransparencyClient` - added support for usage transparecy client to SDK (#200)
 - SDK: `EventManagementClient` support for cross-tenancy (#170)
 - SDK: `AssetManagementClient` support for cross-tenancy (#170)

@@ -1038,6 +1038,62 @@ export namespace DataLakeModels {
     /**
      *
      * @export
+     * @interface ObjectMetadata
+     */
+    export interface ObjectMetadata {
+        /**
+         * Object Name
+         * @type {string}
+         * @memberof ObjectMetadata
+         */
+        name?: string;
+        /**
+         * Object Location in Data Lake
+         * @type {string}
+         * @memberof ObjectMetadata
+         */
+        location?: string;
+        /**
+         * Last Modified Time of the Object
+         * @type {Date}
+         * @memberof ObjectMetadata
+         */
+        lastModified?: Date;
+        /**
+         * Size of the Object
+         * @type {number}
+         * @memberof ObjectMetadata
+         */
+        size?: number;
+        /**
+         * Size of the Object
+         * @type {Array<string>}
+         * @memberof ObjectMetadata
+         */
+        tags?: Array<string>;
+        /**
+         * Name of the storage account, in case of AWS S3, it will be S3 bucket name
+         * @type {string}
+         * @memberof ObjectMetadata
+         */
+        storageAccount?: string;
+        /**
+         * Path on which the subscription is created (upto folder level). Path should be absolute path excluding storage endpoint URL.
+         * @type {string}
+         * @memberof ObjectMetadata
+         */
+        storagePath?: string;
+        /**
+         * Optional, subtenant Id, if the object metadata belongs to subtenant
+         * @type {string}
+         * @memberof ObjectMetadata
+         */
+        subtenantId?: string;
+    }
+
+    /**
+     *
+     * @export
      * @interface ObjectUrls
      */
     export interface ObjectUrls extends Array<ObjectUrlsInner> {}
@@ -1122,8 +1178,27 @@ export namespace DataLakeModels {
      */
     export enum Permission {
         READ = <any>"READ",
-        WRITE = <any>"WRITE",
         DELETE = <any>"DELETE",
+    }
+
+    /**
+     *
+     * @export
+     * @interface SearchResponse
+     */
+    export interface SearchResponse {
+        /**
+         *
+         * @type {Array<ObjectMetadata>}
+         * @memberof SearchResponse
+         */
+        objectMetadata?: Array<ObjectMetadata>;
+        /**
+         *
+         * @type {Page}
+         * @memberof SearchResponse
+         */
+        page?: Page;
     }
 
     /**
@@ -1144,6 +1219,58 @@ export namespace DataLakeModels {
          * @memberof SignedUrlResponse
          */
         subtenantId?: string;
+    }
+
+    /**
+     * Sort Request defined as array. Defined using Sort criteria object.
+     * @export
+     * @interface Sort
+     */
+    export interface Sort extends Array<SortCriteria> {}
+
+    /**
+     *
+     * @export
+     * @interface SortCriteria
+     */
+    export interface SortCriteria {
+        /**
+         * Sort Criteria requested by User(name or location or lastModified or size).
+         * @type {string}
+         * @memberof SortCriteria
+         */
+        field?: SortCriteria.FieldEnum;
+        /**
+         * Sort Order
+         * @type {string}
+         * @memberof SortCriteria
+         */
+        order?: SortCriteria.OrderEnum;
+    }
+
+    /**
+     * @export
+     * @namespace SortCriteria
+     */
+    export namespace SortCriteria {
+        /**
+         * @export
+         * @enum {string}
+         */
+        export enum FieldEnum {
+            Name = <any>"name",
+            Location = <any>"location",
+            LastModified = <any>"lastModified",
+            Size = <any>"size",
+        }
+        /**
+         * @export
+         * @enum {string}
+         */
+        export enum OrderEnum {
+            DESC = <any>"DESC",
+            ASC = <any>"ASC",
+        }
     }
 
     /**
@@ -1234,6 +1361,12 @@ export namespace DataLakeModels {
          * @memberof SubscriptionResponse
          */
         subtenantId?: string;
+        /**
+         * Status of the destination endpoint. By default, status will be active. But, if destination is not reachable then it will be changed to inactive. Patch API can be used to make it Active again. Possible values are \"ACTIVE\" or \"INACTIVE\"
+         * @type {string}
+         * @memberof SubscriptionResponse
+         */
+        status: string;
     }
 
     /**
@@ -1254,6 +1387,12 @@ export namespace DataLakeModels {
          * @memberof SubscriptionUpdate
          */
         destination?: string;
+        /**
+         * status for endpoint destination. \"ACTIVE\" is the only valid value
+         * @type {string}
+         * @memberof SubscriptionUpdate
+         */
+        status?: string;
     }
 
     /**
