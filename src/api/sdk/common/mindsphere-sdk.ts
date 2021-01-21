@@ -15,6 +15,7 @@ import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
 import { TrendPredictionClient } from "../trend/trend-prediction";
 import { UsageTransparencyClient } from "../utc/utc";
 import { SdkClient } from "./sdk-client";
+import { AssetManagementSharingClient } from "../sharing/asset-management-sharing";
 /**
  *
  * MindSphere typescript SDK - BETA
@@ -252,4 +253,21 @@ export class MindSphereSdk extends SdkClient {
             this._usageTransparencyClient || new UsageTransparencyClient(this._authenticator);
         return this._usageTransparencyClient;
     }
+
+    
+    private _assetManagementSharingClient?: AssetManagementSharingClient;
+
+      /**
+     * Asset Management Sharing client
+     *
+     * @returns {AssetManagementSharingClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetAssetManagementSharingClient(): AssetManagementSharingClient {
+        this._assetManagementSharingClient =
+            this._assetManagementSharingClient || new AssetManagementSharingClient(this._authenticator);
+        return this._assetManagementSharingClient;
+    }
+
 }
