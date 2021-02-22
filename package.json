@@ -52,7 +52,7 @@
         "https-proxy-agent": "^5.0.0",
         "json-groupby": "^1.1.0",
         "jsonwebtoken": "^8.5.1",
-        "lodash": "^4.17.20",
+        "lodash": "^4.17.21",
         "mime-types": "^2.1.27",
         "ora": "^5.1.0",
         "rsa-pem-to-jwk": "^1.1.3",
