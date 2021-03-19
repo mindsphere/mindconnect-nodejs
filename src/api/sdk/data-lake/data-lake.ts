@@ -149,7 +149,8 @@ export class DataLakeClient extends SdkClient {
         const proxy = process.env.http_proxy || process.env.HTTP_PROXY;
         const proxyHttpAgent: any = proxy ? new HttpsProxyAgent(proxy) : null;
 
-        const request: any = { method: "PUT", headers: {}, agent: proxyHttpAgent };
+        // x-ms-blob is necessary on eu2 and is ignored on eu1
+        const request: any = { method: "PUT", headers: { "x-ms-blob-type": "BlockBlob" }, agent: proxyHttpAgent };
         request.body = myBuffer;
         const response = await fetch(signedUrl, request);
         return response.headers;
