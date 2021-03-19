@@ -30,7 +30,7 @@ describe("[SDK] Credential Auth", () => {
         token.should.not.be.undefined;
     });
 
-    it(
+    it.only(
         "should validate token during key rotation",
         mochaAsync(async () => {
             const sdk = new MindSphereSdk({
@@ -53,9 +53,9 @@ describe("[SDK] Credential Auth", () => {
                             kid: "key-id-3",
                             alg: "RS256",
                             value:
-                                "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyHR/ozntSL7UvB0B2zlV\nfj1DoO5IlFLc9Mn9g73DElwSNcWf2cjlSPfjaDj9J602Wm4tI/aqm1CdbhvYzHd8\n9yHdDlQWmFjdsTeA8um6E3e3xIaYBa/RKbbGdSxEC33boAWXdFWsxPGyHkGyKxqv\n8H0Lj2xZSv/LsMO5XCro/+DNl4y/KDUL+gJF6JkSklmVwcnFeCMHi93SD3Bxbqsq\njLUxpypYII2X1AtIjK1HvWeJPiQEYnCxbfYMZsDmCg80HKfc+PTcZD5ZZu30YwhE\nBUFCbmH/GUsbIkIXBb9+GpfecVagHYGPpW3eBzn9cWeqA/CHXafpZfk3yw/RMPAe\nOQIDAQAB\n-----END PUBLIC KEY-----",
+                                "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy2HAjZ9NX9EwatR7QgUk\nomMSUK/zhdKBkU1VwJUUDFNAhtUILd0yULVczPCa+gjfnW+xSpXOigfn5lw4bEiR\nFA7Xly8I0hPD0hUK0Dgl2nwkHi8J61p+q8uAHq9AQQmV1lS+rNH6u64V2gu6QIED\ndeQ3CcfFkROkus66rxfp9w9CiM7WudJKrSBRoYeA2pnP2axh1jLZJni6JA3/NhDR\nqvKLUsfMyukaBzB0FcJE++iyh0i+3Rl1hkq5/H3BECF2PHTfK2afZlN6Kg1+3u5v\nVXZZ0cun4JttxtkEMqBau3sdx5LtoHRaGIO0EYgmzHk4+sLC8mweSruuSnUK7ZVg\nRQIDAQAB\n-----END PUBLIC KEY-----",
                             n:
-                                "AMh0f6M57Ui-1LwdAds5VX49Q6DuSJRS3PTJ_YO9wxJcEjXFn9nI5Uj342g4_SetNlpuLSP2qptQnW4b2Mx3fPch3Q5UFphY3bE3gPLpuhN3t8SGmAWv0Sm2xnUsRAt926AFl3RVrMTxsh5Bsisar_B9C49sWUr_y7DDuVwq6P_gzZeMvyg1C_oCReiZEpJZlcHJxXgjB4vd0g9wcW6rKoy1MacqWCCNl9QLSIytR71niT4kBGJwsW32DGbA5goPNByn3Pj03GQ-WWbt9GMIRAVBQm5h_xlLGyJCFwW_fhqX3nFWoB2Bj6Vt3gc5_XFnqgPwh12n6WX5N8sP0TDwHjk",
+                                "AMthwI2fTV_RMGrUe0IFJKJjElCv84XSgZFNVcCVFAxTQIbVCC3dMlC1XMzwmvoI351vsUqVzooH5-ZcOGxIkRQO15cvCNITw9IVCtA4Jdp8JB4vCetafqvLgB6vQEEJldZUvqzR-ruuFdoLukCBA3XkNwnHxZETpLrOuq8X6fcPQojO1rnSSq0gUaGHgNqZz9msYdYy2SZ4uiQN_zYQ0aryi1LHzMrpGgcwdBXCRPvosodIvt0ZdYZKufx9wRAhdjx03ytmn2ZTeioNft7ub1V2WdHLp-CbbcbZBDKgWrt7HceS7aB0WhiDtBGIJsx5OPrCwvJsHkq7rkp1Cu2VYEU",
                         },
                         {
                             kty: "RSA",
