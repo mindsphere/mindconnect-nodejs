@@ -30,7 +30,7 @@ describe("[SDK] Credential Auth", () => {
         token.should.not.be.undefined;
     });
 
-    it.only(
+    it(
         "should validate token during key rotation",
         mochaAsync(async () => {
             const sdk = new MindSphereSdk({
