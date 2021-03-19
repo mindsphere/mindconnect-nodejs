@@ -370,7 +370,8 @@ export interface DataPoint {
      * @type {string}
      * @memberof DataPoint
      */
-    unit: string;
+    // ! this had to be manually patched due to unitless mapping
+    unit?: string;
     /**
      * A list of string tuples. Max 5 tuples allowed.
      * @type {{ [key: string]: string; }}
