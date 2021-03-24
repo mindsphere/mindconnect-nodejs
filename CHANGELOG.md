@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.12.0 - (Frost Vienna) - April 2021
+
+### Bugfixes and Improvements 3.12.0
+
+- TODO: bump AJV and nock
+- Bumped all dependencies
+
 ## 3.11.2 - (Sandcastle Vienna) - March 2021
 
 ### Bugfixes and Improvements 3.11.2

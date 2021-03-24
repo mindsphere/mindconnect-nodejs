@@ -45,10 +45,10 @@ describe("Agent Auth Rotation", () => {
     it("onboarding should be able to handle internet connection problems @sanity", async () => {
         // respond 3 times with internal server error before returning the correct response
         let errors = 0;
-        const scope = nock(`${southgateUrl}:443`, {
+        const scope = (nock(`${southgateUrl}:443`, {
             encodedQueryParams: true,
             allowUnmocked: true,
-        })
+        }) as any)
             .post("/api/agentmanagement/v3/register", {})
             .thrice()
             .reply(500, "Internal Server Error")
@@ -123,10 +123,10 @@ describe("Agent Auth Rotation", () => {
         (agent as any)._configuration.recovery.length.should.be.greaterThan(1);
 
         let error = 0;
-        const scope = nock(`${southgateUrl}:443`, {
+        const scope = (nock(`${southgateUrl}:443`, {
             encodedQueryParams: true,
             allowUnmocked: true,
-        })
+        }) as any)
             .put(`/api/agentmanagement/v3/register/${agent.ClientId()}`, {
                 client_id: `${agent.ClientId()}`,
             })
@@ -172,10 +172,10 @@ describe("Agent Auth Rotation", () => {
         if (!agent.IsOnBoarded()) await retry(5, () => agent.OnBoard());
 
         let error = 0;
-        const scope = nock(`${southgateUrl}:443`, {
+        const scope = (nock(`${southgateUrl}:443`, {
             encodedQueryParams: true,
             allowUnmocked: true,
-        })
+        }) as any)
             .get(`/api/agentmanagement/v3/oauth/token_key`)
             .times(4)
             .reply(500, "Internal Server error")
