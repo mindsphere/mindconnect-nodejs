@@ -100,7 +100,7 @@ export namespace AgentManagementModels {
          */
         export enum SecurityProfileEnum {
             SHAREDSECRET = <any>"SHARED_SECRET",
-            RSA3072 = <any>"RSA_3072"
+            RSA3072 = <any>"RSA_3072",
         }
     }
 
@@ -218,7 +218,7 @@ export namespace AgentManagementModels {
          */
         export enum GrantTypesEnum {
             SHAREDSECRET = <any>"SHARED_SECRET",
-            RSA3072 = <any>"RSA_3072"
+            RSA3072 = <any>"RSA_3072",
         }
         /**
          * @export
@@ -226,7 +226,7 @@ export namespace AgentManagementModels {
          */
         export enum TokenEndpointAuthMethodEnum {
             ClientSecretJwt = <any>"client_secret_jwt",
-            PrivateKeyJwt = <any>"private_key_jwt"
+            PrivateKeyJwt = <any>"private_key_jwt",
         }
     }
 
@@ -305,7 +305,8 @@ export namespace AgentManagementModels {
          * @type {string}
          * @memberof DataPoint
          */
-        unit: string;
+        // ! this had to be manually patched because of unitless mapping
+        unit?: string;
         /**
          * A list of string tuples. Max 5 tuples allowed.
          * @type {{ [key: string]: string; }}
@@ -328,7 +329,7 @@ export namespace AgentManagementModels {
             LONG = <any>"LONG",
             DOUBLE = <any>"DOUBLE",
             BOOLEAN = <any>"BOOLEAN",
-            STRING = <any>"STRING"
+            STRING = <any>"STRING",
         }
     }
 
@@ -587,7 +588,7 @@ export namespace AgentManagementModels {
         export enum StatusEnum {
             NOTONBOARDED = <any>"NOT_ONBOARDED",
             ONBOARDING = <any>"ONBOARDING",
-            ONBOARDED = <any>"ONBOARDED"
+            ONBOARDED = <any>"ONBOARDED",
         }
     }
 
@@ -622,7 +623,7 @@ export namespace AgentManagementModels {
          */
         export enum StatusEnum {
             ONLINE = <any>"ONLINE",
-            OFFLINE = <any>"OFFLINE"
+            OFFLINE = <any>"OFFLINE",
         }
     }
 
@@ -681,7 +682,7 @@ export namespace AgentManagementModels {
          */
         export enum DirectionEnum {
             ASC = <any>"ASC",
-            DESC = <any>"DESC"
+            DESC = <any>"DESC",
         }
         /**
          * @export
@@ -690,7 +691,7 @@ export namespace AgentManagementModels {
         export enum NullHandlingEnum {
             NATIVE = <any>"NATIVE",
             NULLSFIRST = <any>"NULLS_FIRST",
-            NULLSLAST = <any>"NULLS_LAST"
+            NULLSLAST = <any>"NULLS_LAST",
         }
     }
 
