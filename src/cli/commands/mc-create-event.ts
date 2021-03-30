@@ -22,7 +22,7 @@ export default (program: CommanderStatic) => {
             "-r, --cert [privatekey]",
             "required for agents with RSA_3072 profile. create with: openssl genrsa -out private.key 3072"
         )
-        .option("-i, --assetid <assetid>", "asset id from the mindsphere  (default: send event to the agent)")
+        .option("-i, --assetid <assetid>", "mindsphere asset id  (default: send event to the agent)")
         .option("-y, --sourceType <sourceType>", "Source Type", "MindConnect-Agent")
         .option("-S, --sourceId <sourceId>", "Source Id", os.hostname() || "")
         .option("-O, --source <source>", "Source", "MindConnect-NodeJs CLI")

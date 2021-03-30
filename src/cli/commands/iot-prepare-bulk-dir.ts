@@ -25,7 +25,7 @@ export default (program: CommanderStatic) => {
         .alias("pb")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
         .option("-w, --twintype <mode>", "twintype of asset [performance|simulation]")
-        .option("-i, --assetid <assetid>", "asset id from the mindsphere ")
+        .option("-i, --assetid <assetid>", "mindsphere asset id ")
         .option("-t, --typeid <typeid>", "typeid e.g. castidev.Engine ")
         .option("-s, --size <size>", "entries per file ", "100")
         .option("-f, --files <files>", "generated files ", "2")
