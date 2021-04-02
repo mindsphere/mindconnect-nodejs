@@ -3,7 +3,7 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { sleep } from "../../../test/test-utils";
-import { MindSphereSdk } from "../../api/sdk";
+import { EventManagementModels, MindSphereSdk } from "../../api/sdk";
 import { retry } from "../../api/utils";
 import {
     adjustColor,
@@ -21,11 +21,17 @@ let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
-        .command("download-events")
+        .command("events-bulk")
         .alias("dn")
-        .option("-m, --mode [download|template]", "mode [download | template]", "download")
-        .option("-d, --dir <directoryname>", "directory for the download (shouldn't exist)", "eventdownload")
-        .option("-i, --assetid <assetid>", "asset id from the mindsphere ")
+        .alias("download-events")
+        .option(
+            "-m, --mode [download|template|delete|check]",
+            "mode [download | template | delete | check]",
+            "download"
+        )
+        .option("-d, --dir <dir>", "download folder", "eventdownload")
+        .option("-i, --assetid <assetid>", "mindsphere asset id ")
+        .option("-j, --jobid <jobid>", "check deletion process of jobs with jobid")
         .option(
             "-f, --filter [filter]",
             `JSON file with filter (see: ${color(
@@ -37,7 +43,7 @@ export default (program: CommanderStatic) => {
         .option("-p, --passkey <passkey>", `passkey`)
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(`${color("download the events from mindsphere *")}`)
+        .description(`${color("download or delete the events in bulk *")}`)
         .action((options) => {
             (async () => {
                 try {
@@ -56,6 +62,14 @@ export default (program: CommanderStatic) => {
                             createFilter(options);
                             break;
 
+                        case "delete":
+                            await deleteEvents(options, sdk);
+                            break;
+
+                        case "check":
+                            await checkDeleteJob(options, sdk);
+                            break;
+
                         default:
                             throw Error(`no such option: ${options.mode}`);
                     }
@@ -66,12 +80,18 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc download-events --asssetid 1234567..ef  \t\t\t download events from specified asset`);
-            log(`    mc download-events --dir newdir  \t\t\t\t download last 7 days of events to directory <dir>`);
+            log(`    mc events-bulk --mode download  --asssetid 1234567..ef  \t download events from specified asset`);
+            log(`    mc events-bulk --mode download --dir newdir  \t\t download last 7 days of events to <dir> folder`);
             log(
-                `    mc download-events --mode template --assetid 1234576..ef  \t create template file event.filter.mdsp.json for specified asset`
+                `    mc events-bulk --mode template --assetid 1234576..ef  \t create template file event.filter.mdsp.json`
             );
-            log(`    mc download-events --filter event.filter.mdsp.json \t\t download events using configured filter`);
+            log(
+                `    mc events-bulk --mode download --filter event.filter.mdsp.json \t\t download events using configured filter`
+            );
+            log(
+                `    mc events-bulk --mode delete --filter event.filter.mdsp.json \t\t delete events using configured filter`
+            );
+            log(`    mc events-bulk --mode check --jobid <jobid> \t\t check the state of bulk deleting job`);
             serviceCredentialLog();
         });
 };
@@ -115,7 +135,37 @@ async function downloadEvents(options: any, sdk: MindSphereSdk) {
     console.log(`Files with event data are in ${color(path.resolve(options.dir))} directory`);
 }
 
-function createFilter(options: any) {
+async function deleteEvents(options: any, sdk: MindSphereSdk) {
+    const eventManagement = sdk.GetEventManagementClient();
+
+    let filter: object;
+
+    if (options.filter) {
+        const filterPath = path.resolve(options.filter);
+        filter = JSON.parse(fs.readFileSync(filterPath).toString());
+    }
+
+    if (!options.filter && options.assetid) {
+        filter = { entityId: options.assetid };
+    }
+
+    const result = await retry(options.retry, () => eventManagement.PostDeleteEventsJob({ filter: filter }));
+    console.log(`Deletion job with id ${color(result.id)} is in state ${color(result.state)}.`);
+    result.details && console.log(`Details: ${JSON.stringify(result.details)}.`);
+    console.log(`Run\n\n\tmc events-bulk --mode check --jobid ${result.id}\n\nto check the state of the job.\n `);
+}
+
+async function checkDeleteJob(options: any, sdk: MindSphereSdk) {
+    const eventManagement = sdk.GetEventManagementClient();
+
+    const result = (await retry(options.retry, () =>
+        eventManagement.GetDeleteEventsJob(options.jobid)
+    )) as EventManagementModels.DeleteJobResource;
+    console.log(`Deletion job with id ${color(result.id)} is in state ${color(result.state)}.`);
+    result.details && console.log(`Details: ${JSON.stringify(result.details)}.\n`);
+}
+
+export function createFilter(options: any) {
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const template = {
@@ -123,8 +173,7 @@ function createFilter(options: any) {
             between: `[${sevenDaysAgo.toISOString()},${now.toISOString()})`,
         },
         entityId: options.assetid || "<enter asset id>",
-        acknowledged: false,
-        typeId: "com.siemens.mindsphere.eventmgmt.event.type.MindSphereStandardEvent",
+        typeId: options.eventtype || "com.siemens.mindsphere.eventmgmt.event.type.MindSphereStandardEvent",
     };
 
     const pathString = options.filter || `event.filter.mdsp.json`;
@@ -135,14 +184,25 @@ function createFilter(options: any) {
     console.log(
         `The filter was written into ${color(
             resolvedPath
-        )} run \n\n\tmc download-events --mode download --filter ${pathString} \n\nto download events using this filter`
+        )} run \n\n\tmc events-bulk --mode download --filter ${pathString} \t ${color(" to download events")}`
     );
-    console.log("Edit the filter before downloading the events.");
+    console.log(`\tmc events-bulk --mode delete --filter ${pathString} \t ${color(" to delete events")}`);
+    console.log(`\tmc events --mode list --filter ${pathString} \t\t ${color(" to list events")}`);
+    console.log("\nEdit the filter before downloading or deleting the events.");
 }
 
 function checkParameters(options: any) {
     !options.dir &&
-        errorLog("Missing dir name for download-events command. Run mc dn --help for full syntax and examples.", true);
+        errorLog("Missing dir name for events-bulk command. Run mc dn --help for full syntax and examples.", true);
 
-    // errorLog("Please use either the filter or the from, to and typeid parameters but not both.", true);
+    options.mode === "delete" &&
+        !options.filter &&
+        errorLog(
+            "You must specifify a filter when deleting the events. Create one with  mc events-bulk --mode template.",
+            true
+        );
+
+    options.mode === "check" &&
+        !options.jobid &&
+        errorLog("You have to specify the jobid for the delete command", true);
 }

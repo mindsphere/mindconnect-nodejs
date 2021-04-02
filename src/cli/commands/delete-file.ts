@@ -23,7 +23,7 @@ export default (program: CommanderStatic) => {
         .alias("de")
         .option("-f, --file <fileToDelete>", "file to delete from the file service")
         .option("-h, --filepath [filepath]", "file path in the mindsphere", "")
-        .option("-i, --assetid <assetid>", "asset id from the mindsphere")
+        .option("-i, --assetid <assetid>", "mindsphere asset id")
         .option("-p, --passkey <passkey>", `passkey`)
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")

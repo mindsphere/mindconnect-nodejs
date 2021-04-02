@@ -26,7 +26,7 @@ export default (program: CommanderStatic) => {
         .option("-n, --assetname <assetname>", "assetname")
         .option("-p, --parentid <parentid>", "parentid")
         .option("-e, --externalid <externalid>", "externalid")
-        .option("-i, --assetid <assetid>", "asset id from the mindsphere ")
+        .option("-i, --assetid <assetid>", "mindsphere asset id ")
         .option("-t, --typeid <typeid>", "typeid")
         .option("-d, --desc <desc>", "description", "created with mindsphere CLI")
         .option("-w, --twintype <twintype>", "digital twin type [performance|simulation]")

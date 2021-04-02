@@ -24,7 +24,7 @@ export default (program: CommanderStatic) => {
         .command("download-bulk")
         .alias("db")
         .option("-d, --dir <directoryname>", "directory for the download (shouldn't exist)", "bulkdownload")
-        .option("-i, --assetid <assetid>", "asset id from the mindsphere")
+        .option("-i, --assetid <assetid>", "mindsphere asset id")
         .option("-a, --aspectname <aspectname>", "aspectname")
         .option("-f, --from <from>", "from date")
         .option("-t, --to <to>", "to date")

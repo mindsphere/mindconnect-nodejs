@@ -20,7 +20,7 @@ export default (program: CommanderStatic) => {
     program
         .command("list-files")
         .alias("ls")
-        .option("-i, --assetid <assetid>", "asset id from the mindsphere ")
+        .option("-i, --assetid <assetid>", "mindsphere asset id ")
         .option(
             "-f, --filter [filter]",
             `filter (see: ${color(

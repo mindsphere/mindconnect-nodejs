@@ -10,7 +10,7 @@ export default (program: CommanderStatic) => {
     program
         .command("asset-info")
         .alias("ai")
-        .option("-i, --assetid <assetid>", "asset id from the mindsphere ")
+        .option("-i, --assetid <assetid>", "mindsphere asset id ")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")

@@ -10,6 +10,7 @@ import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
 import downloadEventsCommand from "./commands/download-events";
 import eventTypesCommand from "./commands/event-types";
+import eventsCommand from "./commands/events";
 import identityCommand from "./commands/identity";
 import iotCheckBulkComand from "./commands/iot-bulk-check";
 import iotBulkRunCommand from "./commands/iot-bulk-run";
@@ -80,6 +81,7 @@ assetsCommand(program);
 assetTypeCommand(program);
 aspectCommands(program);
 eventTypesCommand(program);
+eventsCommand(program);
 
 downloadEventsCommand(program);
 
