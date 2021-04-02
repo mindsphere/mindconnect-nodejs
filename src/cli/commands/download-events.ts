@@ -152,7 +152,7 @@ async function deleteEvents(options: any, sdk: MindSphereSdk) {
     const result = await retry(options.retry, () => eventManagement.PostDeleteEventsJob({ filter: filter }));
     console.log(`Deletion job with id ${color(result.id)} is in state ${color(result.state)}.`);
     result.details && console.log(`Details: ${JSON.stringify(result.details)}.`);
-    console.log(`Run\n\tmc events-bulk --mode check --jobid ${result.id}\n to check the state of the job. `);
+    console.log(`Run\n\n\tmc events-bulk --mode check --jobid ${result.id}\n\nto check the state of the job.\n `);
 }
 
 async function checkDeleteJob(options: any, sdk: MindSphereSdk) {
@@ -162,7 +162,7 @@ async function checkDeleteJob(options: any, sdk: MindSphereSdk) {
         eventManagement.GetDeleteEventsJob(options.jobid)
     )) as EventManagementModels.DeleteJobResource;
     console.log(`Deletion job with id ${color(result.id)} is in state ${color(result.state)}.`);
-    result.details && console.log(`Details: ${JSON.stringify(result.details)}.`);
+    result.details && console.log(`Details: ${JSON.stringify(result.details)}.\n`);
 }
 
 export function createFilter(options: any) {
@@ -173,7 +173,7 @@ export function createFilter(options: any) {
             between: `[${sevenDaysAgo.toISOString()},${now.toISOString()})`,
         },
         entityId: options.assetid || "<enter asset id>",
-        typeId: "com.siemens.mindsphere.eventmgmt.event.type.MindSphereStandardEvent",
+        typeId: options.eventtype || "com.siemens.mindsphere.eventmgmt.event.type.MindSphereStandardEvent",
     };
 
     const pathString = options.filter || `event.filter.mdsp.json`;
@@ -187,6 +187,7 @@ export function createFilter(options: any) {
         )} run \n\n\tmc events-bulk --mode download --filter ${pathString} \t ${color(" to download events")}`
     );
     console.log(`\tmc events-bulk --mode delete --filter ${pathString} \t ${color(" to delete events")}`);
+    console.log(`\tmc events --mode list --filter ${pathString} \t\t ${color(" to list events")}`);
     console.log("\nEdit the filter before downloading or deleting the events.");
 }
 
