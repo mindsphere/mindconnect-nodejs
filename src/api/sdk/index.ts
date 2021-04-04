@@ -26,6 +26,8 @@ export * from "./mcapi/mcapi";
 export * from "./mcapi/mcapi-models";
 export * from "./signal-validation/signal-validation";
 export * from "./signal-validation/signal-validation-models";
+export * from "./tenant/tenant-management";
+export * from "./tenant/tenant-management-models";
 export * from "./trend/trend-prediction";
 export * from "./trend/trend-prediction-models";
 export * from "./utc/utc";
