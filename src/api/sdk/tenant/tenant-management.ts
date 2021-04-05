@@ -173,6 +173,79 @@ export class TenantManagementClient extends SdkClient {
     }
 
     /**
+     * Patch tenant info
+     *
+     * @param {TenantManagementModels.TenantInfoUpdateProperties} tenantInfoUpdateProperties
+     * @param {{ ifMatch: string }} params
+     *
+     * @memberOf TenantManagementClient
+     */
+    public async PatchTenantInfo(
+        tenantInfoUpdateProperties: TenantManagementModels.TenantInfoUpdateProperties,
+        params: { ifMatch: string }
+    ) {
+        const parameters = params || {};
+        const { ifMatch } = parameters;
+
+        await this.HttpAction({
+            verb: "PATCH",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/tenantInfo`,
+            body: tenantInfoUpdateProperties,
+            additionalHeaders: { "If-Match": ifMatch },
+        });
+    }
+
+    /**
+     * Get tenant logo
+     *
+     * @returns {Promise<Response>}
+     *
+     * @memberOf TenantManagementClient
+     */
+    public async GetTenantInfoLogo(): Promise<Response> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/tenantInfo/logo`,
+            rawResponse: true,
+        });
+        return result as Response;
+    }
+
+    /**
+     * Upload tenant logo
+     *
+     * @param {Buffer} file
+     * @param {string} [name]
+     * @param {string} [mimeType]
+     * @returns {Promise<Response>}
+     *
+     * @memberOf TenantManagementClient
+     */
+    public async PostTenantInfoLogo(file: Buffer, name?: string, mimeType?: string): Promise<Response> {
+        const template = `----mindsphere\r\nContent-Disposition: form-data; name="file"; filename="${name}"\r\nContent-Type: ${
+            mimeType || "application/octet-stream"
+        }\r\n\r\n`;
+
+        const body = Buffer.concat([Buffer.from(template), file, Buffer.from("\r\n----mindsphere--")]);
+
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/tenantInfo/logo`,
+            body: body,
+            multiPartFormData: true,
+            rawResponse: true,
+            additionalHeaders: { enctype: "multipart/form-data" },
+        });
+        return result as Response;
+    }
+
+    /**
      * Get tenant logo metadata
      *
      * @returns {Promise<TenantManagementModels.UploadedFileResource>}
