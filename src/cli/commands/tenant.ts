@@ -3,10 +3,18 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import * as uuid from "uuid";
-import { verboseLog } from "../../../dist/src/cli/commands/command-utils";
 import { MindSphereSdk, TenantManagementModels } from "../../api/sdk";
 import { retry } from "../../api/utils";
-import { adjustColor, errorLog, getColor, getSdk, homeDirLog, proxyLog, serviceCredentialLog } from "./command-utils";
+import {
+    adjustColor,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    proxyLog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
 
 const mime = require("mime-types");
 
