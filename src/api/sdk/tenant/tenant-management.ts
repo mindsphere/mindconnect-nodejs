@@ -261,4 +261,105 @@ export class TenantManagementClient extends SdkClient {
         });
         return result as TenantManagementModels.UploadedFileResource;
     }
+
+    /**
+     * Get subtenants
+     *
+     * @returns {Promise<TenantManagementModels.PageSubtenantResource>}
+     *
+     * @memberOf TenantManagementClient
+     */
+    public async GetSubtenants(): Promise<TenantManagementModels.PageSubtenantResource> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/subtenants`,
+        });
+        return result as TenantManagementModels.PageSubtenantResource;
+    }
+
+    /**
+     * Create a subtenant
+     *
+     * @param {TenantManagementModels.Subtenant} subtenant
+     * @returns {Promise<TenantManagementModels.SubtenantResource>}
+     *
+     * @memberOf TenantManagementClient
+     */
+    public async PostSubtenant(
+        subtenant: TenantManagementModels.Subtenant
+    ): Promise<TenantManagementModels.SubtenantResource> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/subtenants`,
+            body: subtenant,
+        });
+        return result as TenantManagementModels.SubtenantResource;
+    }
+
+    /**
+     * Get a subtenant by id.
+     *
+     * @param {string} id
+     * @returns {Promise<TenantManagementModels.SubtenantResource>}
+     *
+     * @memberOf TenantManagementClient
+     */
+    public async GetSubtenant(id: string): Promise<TenantManagementModels.SubtenantResource> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/subtenants/${id}`,
+        });
+        return result as TenantManagementModels.SubtenantResource;
+    }
+
+    /**
+     * Update a subtenant by id
+     *
+     * @param {string} id
+     * @param {TenantManagementModels.SubtenantUpdateProperties} subtenantUpdateProperties
+     * @param {{ ifMatch: string }} params
+     * @returns {Promise<TenantManagementModels.SubtenantResource>}
+     *
+     * @memberOf TenantManagementClient
+     */
+    public async PutSubtenant(
+        id: string,
+        subtenantUpdateProperties: TenantManagementModels.SubtenantUpdateProperties,
+        params: { ifMatch: string }
+    ): Promise<TenantManagementModels.SubtenantResource> {
+        const parameters = params || {};
+        const { ifMatch } = parameters;
+        const result = await this.HttpAction({
+            verb: "PUT",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/subtenants/${id}`,
+            body: subtenantUpdateProperties,
+            additionalHeaders: { "If-Match": ifMatch },
+        });
+        return result as TenantManagementModels.SubtenantResource;
+    }
+
+    /**
+     * Delete a subtenant by id
+     *
+     * @param {string} id
+     *
+     * @memberOf TenantManagementClient
+     */
+    public async DeleteSubtenant(id: string) {
+        await this.HttpAction({
+            verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/subtenants/${id}`,
+            noResponse: true,
+        });
+    }
 }
