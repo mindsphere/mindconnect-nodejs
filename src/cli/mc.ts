@@ -42,8 +42,9 @@ import versionAndHelp from "./commands/mc-version-help";
 import mqttCreateCommand from "./commands/mqtt-create-jwt";
 import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
+import subtenantCommand from "./commands/subtenant";
+import tenantCommand from "./commands/tenant";
 import trendPredictionCommand from "./commands/trend-prediction";
-
 // * generic commands
 
 versionAndHelp(program);
@@ -82,8 +83,12 @@ assetTypeCommand(program);
 aspectCommands(program);
 eventTypesCommand(program);
 eventsCommand(program);
-
 downloadEventsCommand(program);
+
+// * tenant commands
+
+tenantCommand(program);
+subtenantCommand(program);
 
 // * deprecated commands for 4.0.0
 

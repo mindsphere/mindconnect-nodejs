@@ -12,14 +12,17 @@ import { KPICalculationClient } from "../kpi/kpi";
 import { MindConnectApiClient } from "../mcapi/mcapi";
 import { SignalValidationClient } from "../signal-validation/signal-validation";
 import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
+import { TenantManagementClient } from "../tenant/tenant-management";
 import { TrendPredictionClient } from "../trend/trend-prediction";
 import { UsageTransparencyClient } from "../utc/utc";
 import { SdkClient } from "./sdk-client";
 /**
  *
- * MindSphere typescript SDK - BETA
+ * MindSphere typescript SDK
  *
- * Runs in Browser and in Node using User Credentials, App Credentials and ServiceCredentials.
+ * Runs in browser and in NodeJs.
+ *
+ * The SDK uses all 4 types of MindSphere Credentials (Agent Credentials, User Credentials, App Credentials,ServiceCredentials).
  *
  * @export
  * @class MindSphereSdk
@@ -251,5 +254,19 @@ export class MindSphereSdk extends SdkClient {
         this._usageTransparencyClient =
             this._usageTransparencyClient || new UsageTransparencyClient(this._authenticator);
         return this._usageTransparencyClient;
+    }
+
+    private _tenantManagementClient?: TenantManagementClient;
+
+    /**
+     * Tenant Management Client
+     *
+     * @returns {TenantManagementClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetTenantManagementClient(): TenantManagementClient {
+        this._tenantManagementClient = this._tenantManagementClient || new TenantManagementClient(this._authenticator);
+        return this._tenantManagementClient;
     }
 }
