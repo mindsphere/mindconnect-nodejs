@@ -16,16 +16,17 @@ import {
 } from "./command-utils";
 const mime = require("mime-types");
 
-let color = getColor("magenta");
+let color = getColor("blue");
 
 export default (program: CommanderStatic) => {
     program
         .command("models")
         .alias("ml")
-        .option("-m, --mode [list|create|delete|update]", "mode [list | create | delete | update]", "list")
+        .option("-m, --mode [list|create|delete|update|info]", "mode [list | create | delete | update | info]", "list")
         .option("-n, --modelname <modelname>", "modelname")
         .option("-t, --modeltype <modeltype>", "modeltype")
         .option("-d, --modeldesc <modeldesc>", "modeldesc", "created with mindsphere CLI")
+        .option("-i, --modelid <modelid>", "mindsphere model id ")
         .option("-f, --modelfile <modelfile>", ".mdsp.json modelfile with model definition")
         .option("-p, --payload <modelpayload>", "model payload to upload")
         .option("-i, --modelid <modelid>", "mindsphere model id ")
@@ -39,10 +40,9 @@ export default (program: CommanderStatic) => {
                 try {
                     checkRequiredParameters(options);
                     const sdk = getSdk(options);
-                    color = adjustColor(color, options);
+                    color = adjustColor(color, options, true);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
-
                     switch (options.mode) {
                         case "create":
                             await createModel(options, sdk);
@@ -56,7 +56,9 @@ export default (program: CommanderStatic) => {
                         case "update":
                             await updateModel(options, sdk);
                             break;
-
+                        case "info":
+                            await modelInfo(options, sdk);
+                            break;
                         default:
                             throw Error(`no such option: ${options.mode}`);
                     }
@@ -82,14 +84,12 @@ function printHelp() {
         `    mc models --mode update --modelid 1234567..ef --modeltype core.basicmodel --modelname MyModel \t patches the name and the type of a model with specified id from mindsphere`
     );
     log(`    mc models --mode delete --modelid 1234567..ef \t\t\t deletes model with specified id from mindsphere`);
-
+    log(`    mc models --mode info --modelid 123456...ef \t print out infos about model with id 132456...ef`);
     serviceCredentialLog();
 }
 
 export async function listModels(options: any, sdk: MindSphereSdk) {
     const modelMgmt = sdk.GetModelManagementClient();
-
-    color = adjustColor(color, options);
 
     let page = 0;
     let models;
@@ -207,7 +207,7 @@ function buildFilter(options: any) {
     return filter;
 }
 
-export async function deleteModel(options: any, sdk: MindSphereSdk) {
+async function deleteModel(options: any, sdk: MindSphereSdk) {
     const modelMgmt = sdk.GetModelManagementClient();
     const model = await retry(options.retry, () => modelMgmt.GetModel(options.modelid));
     verboseLog(JSON.stringify(model, null, 2), options.verbose);
@@ -215,6 +215,19 @@ export async function deleteModel(options: any, sdk: MindSphereSdk) {
     await retry(options.retry, () => modelMgmt.DeleteModel(options.modelid));
 
     console.log(`Model with modelid ${color(model.id)} (${color(model.name)}) was deleted.`);
+}
+
+async function modelInfo(options: any, sdk: MindSphereSdk) {
+    const model = (await retry(options.retry, () =>
+        sdk.GetModelManagementClient().GetModel(options.modelid)
+    )) as ModelManagementModels.Model;
+
+    const versions = (await retry(options.retry, () =>
+        sdk.GetModelManagementClient().GetModelVersions({ modelId: model.id, pageNumber: 0, pageSize: 100 })
+    )) as ModelManagementModels.VersionArray;
+
+    printModel(model);
+    printLatestModelVersions(versions);
 }
 
 function checkRequiredParameters(options: any) {
@@ -230,10 +243,32 @@ function checkRequiredParameters(options: any) {
     options.mode === "update" &&
         !options.modelname &&
         errorLog("you have to specify at least the model name before patching the model", true);
+
+    options.mode === "info" && !options.modelid && errorLog("you have to provide a modelid", true);
 }
 
 function getFileType(modelfile: string | Buffer) {
     return modelfile instanceof Buffer
         ? "application/octet-stream"
         : `${mime.lookup(modelfile)}` || "application/octet-stream";
+}
+
+function printModel(model: ModelManagementModels.Model) {
+    console.log(`\nModel Information for Model with Model Id: ${color(model.id)}\n`);
+    console.log(`Id: ${color(model.id)}`);
+    console.log(`Name: ${color(model.name)}`);
+    console.log(`Type: ${color(model.type)} ${color(":")} ${color(model.lastVersion?.number)}`);
+    console.log(`Author: ${color(model.author)}`);
+    console.log(`Description: ${color(model.description)}`);
+    console.log("Last version:");
+    console.log(`- Id: ${color(model.lastVersion?.id)}`);
+    console.log(`- Version nummer: ${color(model.lastVersion?.number)}`);
+    console.log(`- Author: ${color(model.lastVersion?.author)}`);
+    console.log(`- Creation date: ${color(model.lastVersion?.creationDate)}`);
+    console.log(`- Expiation date: ${color(model.lastVersion?.expirationDate)}`);
+}
+
+function printLatestModelVersions(versions: ModelManagementModels.VersionArray) {
+    console.log("\nLastest version entries:");
+    console.table(versions.versions?.slice(0, 5) || [], ["number", "author", "creationDate", "expirationDate"]);
 }

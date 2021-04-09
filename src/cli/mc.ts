@@ -39,14 +39,13 @@ import unregisterDiagnoticCommand from "./commands/mc-unregister-diagnostic";
 import uploadFileCommand from "./commands/mc-upload-file";
 import uploadTimeSeriesCommand from "./commands/mc-upload-timeseries";
 import versionAndHelp from "./commands/mc-version-help";
+import modelsCommand from "./commands/models";
 import mqttCreateCommand from "./commands/mqtt-create-jwt";
 import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
 import subtenantCommand from "./commands/subtenant";
 import tenantCommand from "./commands/tenant";
 import trendPredictionCommand from "./commands/trend-prediction";
-import modelInfoCommand from "./commands/model-info";
-import modelsCommand from "./commands/models";
 // * generic commands
 
 versionAndHelp(program);
@@ -114,6 +113,8 @@ signalValidationCommand(program);
 trendPredictionCommand(program);
 kpicalculationCommand(program);
 eventAnalyticsCommand(program);
+// * models commnds
+modelsCommand(program);
 
 // * dev proxy command
 devProxyCommand(program);
@@ -124,10 +125,6 @@ mqttCreateCommand(program);
 // * cli for starter projects
 starterTsCommand(program);
 starterJsCommand(program);
-
-// * models commnds
-modelInfoCommand(program);
-modelsCommand(program);
 
 program.on("command:*", function () {
     console.error("Invalid command: %s\nSee --help for a list of available commands.", program.args.join(" "));
