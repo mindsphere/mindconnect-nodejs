@@ -1,6 +1,6 @@
 {
     "name": "@mindconnect/mindconnect-nodejs",
-    "version": "3.12.0-2",
+    "version": "3.12.0-3",
     "description": "MindConnect Library for NodeJS (community based)",
     "main": "./dist/src/index.js",
     "browser": "./dist/src/index.bundle.js",
