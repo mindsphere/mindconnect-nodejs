@@ -4,7 +4,7 @@
 
 ### Bugfixes and Improvements 3.12.0
 
-- TODO: bump AJV and nock 
+- TODO: bump AJV and nock
 - SDK: ModelManagementClient [#202]
 - SDK: TenantManagementClient
 - CLI: new `mc models` command for ML Modelmanagement [#202]
@@ -17,7 +17,6 @@
 ### Contributions 3.12.0
 
 - Thanks to @jupiterbak for his ModelManagement contribution. <3 :heart:
-
 
 ## 3.11.2 - (Sandcastle Vienna) - March 2021
 
