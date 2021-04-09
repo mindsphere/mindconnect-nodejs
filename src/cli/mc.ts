@@ -39,6 +39,7 @@ import unregisterDiagnoticCommand from "./commands/mc-unregister-diagnostic";
 import uploadFileCommand from "./commands/mc-upload-file";
 import uploadTimeSeriesCommand from "./commands/mc-upload-timeseries";
 import versionAndHelp from "./commands/mc-version-help";
+import modelsCommand from "./commands/models";
 import mqttCreateCommand from "./commands/mqtt-create-jwt";
 import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
@@ -112,6 +113,8 @@ signalValidationCommand(program);
 trendPredictionCommand(program);
 kpicalculationCommand(program);
 eventAnalyticsCommand(program);
+// * models commnds
+modelsCommand(program);
 
 // * dev proxy command
 devProxyCommand(program);

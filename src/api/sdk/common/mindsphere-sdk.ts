@@ -15,6 +15,7 @@ import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
 import { TenantManagementClient } from "../tenant/tenant-management";
 import { TrendPredictionClient } from "../trend/trend-prediction";
 import { UsageTransparencyClient } from "../utc/utc";
+import { ModelManagementClient } from "../model/model-management";
 import { SdkClient } from "./sdk-client";
 /**
  *
@@ -268,5 +269,18 @@ export class MindSphereSdk extends SdkClient {
     public GetTenantManagementClient(): TenantManagementClient {
         this._tenantManagementClient = this._tenantManagementClient || new TenantManagementClient(this._authenticator);
         return this._tenantManagementClient;
+    }
+
+    private _modelManagementClient?: ModelManagementClient;
+    /**
+     * * Model Management
+     *
+     * @returns {ModelManagementClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetModelManagementClient(): ModelManagementClient {
+        this._modelManagementClient = this._modelManagementClient || new ModelManagementClient(this._authenticator);
+        return this._modelManagementClient;
     }
 }

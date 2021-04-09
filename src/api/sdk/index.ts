@@ -32,3 +32,5 @@ export * from "./trend/trend-prediction";
 export * from "./trend/trend-prediction-models";
 export * from "./utc/utc";
 export * from "./utc/utc-models";
+export * from "./model/model-management";
+export * from "./model/model-models";
