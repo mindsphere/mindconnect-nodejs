@@ -4,13 +4,20 @@
 
 ### Bugfixes and Improvements 3.12.0
 
-- TODO: bump AJV and nock
+- TODO: bump AJV and nock 
+- SDK: ModelManagementClient [#202]
 - SDK: TenantManagementClient
+- CLI: new `mc models` command for ML Modelmanagement [#202]
 - CLI: new `mc subtenants` command for subtenant management [#246]
 - CLI: new `mc tenant` command for tenant management [#246]
 - CLI: new `mc events` command for event management [#241]
 - CLI: renamed and extended `mc download-events` to `mc events-bulk` command with `--mode download` and  `--mode delete` [#240]
 - Bumped all dependencies
+
+### Contributions 3.12.0
+
+- Thanks to @jupiterbak for his ModelManagement contribution. <3 :heart:
+
 
 ## 3.11.2 - (Sandcastle Vienna) - March 2021
 
