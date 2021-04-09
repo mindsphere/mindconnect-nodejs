@@ -29,14 +29,14 @@ export default (program: CommanderStatic) => {
                         modelMgmt.GetModel(options.modelid)
                     )) as ModelManagementModels.Model;
 
-                    const versions = await retry(options.retry, () =>
+                    const versions = (await retry(options.retry, () =>
                         sdk
                             .GetModelManagementClient()
-                            .GetModelVersions({ modelId:model.id, pageNumber: 0, pageSize:100 })
-                    ) as ModelManagementModels.VersionArray;
+                            .GetModelVersions({ modelId: model.id, pageNumber: 0, pageSize: 100 })
+                    )) as ModelManagementModels.VersionArray;
 
                     printModel(model);
-                    printLatestModelVersions(versions);                    
+                    printLatestModelVersions(versions);
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
@@ -53,7 +53,7 @@ function checkRequiredParameters(options: any) {
     !options.modelid && errorLog("you have to provide a modelid", true);
 }
 
-function printModel(model: ModelManagementModels.Model){
+function printModel(model: ModelManagementModels.Model) {
     console.log(`\nModel Information for Model with Model Id: ${color(model.id)}\n`);
     console.log(`Id: ${color(model.id)}`);
     console.log(`Name: ${color(model.name)}`);
@@ -68,12 +68,7 @@ function printModel(model: ModelManagementModels.Model){
     console.log(`- Expiation date: ${color(model.lastVersion?.expirationDate)}`);
 }
 
-function printLatestModelVersions(versions: ModelManagementModels.VersionArray){
-    console.log("\nLastest version entries:");                    
-    console.table(versions.versions?.slice(0, 5) || [], [
-        "number",
-        "author",
-        "creationDate",
-        "expirationDate"
-    ]);
+function printLatestModelVersions(versions: ModelManagementModels.VersionArray) {
+    console.log("\nLastest version entries:");
+    console.table(versions.versions?.slice(0, 5) || [], ["number", "author", "creationDate", "expirationDate"]);
 }

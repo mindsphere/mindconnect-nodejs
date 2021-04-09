@@ -1,12 +1,12 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
-import { ModelManagementClient, ModelManagementModels, MindSphereSdk } from "../src/api/sdk";
+import { MindSphereSdk, ModelManagementClient, ModelManagementModels } from "../src/api/sdk";
 import { decrypt, loadAuth } from "../src/api/utils";
 import { getPasskeyForUnitTest, sleep } from "./test-utils";
 chai.should();
 
 const timeOffset = new Date().getTime();
-const futureTimeOffset = new Date( timeOffset + ( 1000 * 60 * 60 * 24));
+const futureTimeOffset = new Date(timeOffset + 1000 * 60 * 60 * 24);
 
 describe("[SDK] ModelManagementClient.Models.Version", () => {
     const auth = loadAuth();
@@ -24,79 +24,99 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
         lastVersion: {
             number: 1.0,
             expirationDate: "2099-10-01T12:00:00.001",
-            dependencies: [{
-              name: "sklearn-theano",
-              type: "Python",
-              version: "2.7"
-            }],
+            dependencies: [
+                {
+                    name: "sklearn-theano",
+                    type: "Python",
+                    version: "2.7",
+                },
+            ],
             io: {
-              consumes: "CSV",
-              input: [{
-                name: "variablename1",
-                type: "integer",
-                description: "description for variablename1",
-                value: 5
-              }],
-              output: [{
-                name: "outputname1",
-                type: "integer",
-                description: "description for outputname1",
-                value: 1
-              }],
-              optionalParameters: {
-                freeFormParams: "for the author to use",
-                param1: "value1"
-              }
+                consumes: "CSV",
+                input: [
+                    {
+                        name: "variablename1",
+                        type: "integer",
+                        description: "description for variablename1",
+                        value: 5,
+                    },
+                ],
+                output: [
+                    {
+                        name: "outputname1",
+                        type: "integer",
+                        description: "description for outputname1",
+                        value: 1,
+                    },
+                ],
+                optionalParameters: {
+                    freeFormParams: "for the author to use",
+                    param1: "value1",
+                },
             },
-            kpi: [{
-              name: "error rate",
-              value: "0.9"
-            }]
-          }
+            kpi: [
+                {
+                    name: "error rate",
+                    value: "0.9",
+                },
+            ],
+        },
     };
 
     const testModelVersionDefinition: ModelManagementModels.VersionDefinition = {
         number: 2.0,
         expirationDate: "2021-10-01T12:00:00.001",
-        dependencies: [{
-          name: "sklearn-theano",
-          type: "Python",
-          version: "2.7"
-        }],
+        dependencies: [
+            {
+                name: "sklearn-theano",
+                type: "Python",
+                version: "2.7",
+            },
+        ],
         io: {
-          consumes: "CSV",
-          input: [{
-            name: "variablename1",
-            type: "integer",
-            description: "description for variablename1",
-            value: 0
-          }],
-          output: [{
-            name: "outputname1",
-            type: "integer",
-            description: "description for outputname1",
-            value: 0
-          }],
-          optionalParameters: {
-            freeFormParams: "for the author to use",
-            param1: "value1"
-          }
+            consumes: "CSV",
+            input: [
+                {
+                    name: "variablename1",
+                    type: "integer",
+                    description: "description for variablename1",
+                    value: 0,
+                },
+            ],
+            output: [
+                {
+                    name: "outputname1",
+                    type: "integer",
+                    description: "description for outputname1",
+                    value: 0,
+                },
+            ],
+            optionalParameters: {
+                freeFormParams: "for the author to use",
+                param1: "value1",
+            },
         },
-        kpi: [{
-          name: "error rate",
-          value: "0.9"
-        },
-        {
-            name: "mse",
-            value: "0.01"
-        }]
-      };
+        kpi: [
+            {
+                name: "error rate",
+                value: "0.9",
+            },
+            {
+                name: "mse",
+                value: "0.01",
+            },
+        ],
+    };
 
     before(async () => {
         await deleteModels(modelManagement);
         testModelDefinition.name = `xyz_${timeOffset}_mm_A`;
-        const result = await modelManagement.postModel(testModelDefinition,{buffer: Buffer.from("xyz"), fileName:`xyz${timeOffset}_mm_A.txt`, mimeType:'text/plain'} );
-        mmModelId = `${result.id}`
+        const result = await modelManagement.postModel(testModelDefinition, {
+            buffer: Buffer.from("xyz"),
+            fileName: `xyz${timeOffset}_mm_A.txt`,
+            mimeType: "text/plain",
+        });
+        mmModelId = `${result.id}`;
     });
 
     after(async () => {
@@ -126,12 +146,15 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
     it("should GET all versions of a model", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_mm_version_A`;
-        const model = await modelManagement.postModel(testModelDefinition,{buffer: Buffer.from("xyz"), fileName:`xyz${timeOffset}_mm_version_A.txt`, mimeType:'text/plain'} );
+        const model = await modelManagement.postModel(testModelDefinition, {
+            buffer: Buffer.from("xyz"),
+            fileName: `xyz${timeOffset}_mm_version_A.txt`,
+            mimeType: "text/plain",
+        });
         model.should.not.be.undefined;
         model.should.not.be.null;
 
-
-        const versions = await modelManagement.GetModelVersions({            
+        const versions = await modelManagement.GetModelVersions({
             modelId: `${model.id}`,
             pageNumber: 0,
             pageSize: 100,
@@ -156,38 +179,50 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
         sVersion.should.not.be.undefined;
         sVersion.should.not.be.null;
 
-        (sVersion as any).number.should.be.equals((oVersion as any).number)
+        (sVersion as any).number.should.be.equals((oVersion as any).number);
     });
 
     it("should POST new version of a model", async () => {
         modelManagement.should.not.be.undefined;
         testModelVersionDefinition.expirationDate = futureTimeOffset.toISOString();
 
-        const lastVersion = await modelManagement.postModelVersion(`${mmModelId}`,testModelVersionDefinition,{buffer: Buffer.from("xyz"), fileName:`xyz${timeOffset}_mm_version_B.txt`, mimeType:'text/plain'} );
+        const lastVersion = await modelManagement.postModelVersion(`${mmModelId}`, testModelVersionDefinition, {
+            buffer: Buffer.from("xyz"),
+            fileName: `xyz${timeOffset}_mm_version_B.txt`,
+            mimeType: "text/plain",
+        });
         lastVersion.should.not.be.undefined;
         lastVersion.should.not.be.null;
         (lastVersion as any).id.should.not.be.undefined;
         (lastVersion as any).id.should.not.be.null;
         (lastVersion as any).number.should.not.be.undefined;
         (lastVersion as any).number.should.not.be.null;
-        
+
         await modelManagement.DeleteModelVersion(`${mmModelId}`, `${(lastVersion as any).id}`);
     });
 
     it("should DELETE last version of a model", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_mm_version_C`;
-        const model = await modelManagement.postModel(testModelDefinition,{buffer: Buffer.from("xyz"), fileName:`xyz${timeOffset}_mm_version_C.txt`, mimeType:'text/plain'} );
-        
+        const model = await modelManagement.postModel(testModelDefinition, {
+            buffer: Buffer.from("xyz"),
+            fileName: `xyz${timeOffset}_mm_version_C.txt`,
+            mimeType: "text/plain",
+        });
+
         model.should.not.be.undefined;
         model.should.not.be.null;
 
         testModelVersionDefinition.expirationDate = futureTimeOffset.toISOString();
-        const lastVersion = await modelManagement.postModelVersion(`${model.id}`,testModelVersionDefinition,{buffer: Buffer.from("xyz"), fileName:`xyz${timeOffset}_mm_version_D.txt`, mimeType:'text/plain'} );
+        const lastVersion = await modelManagement.postModelVersion(`${model.id}`, testModelVersionDefinition, {
+            buffer: Buffer.from("xyz"),
+            fileName: `xyz${timeOffset}_mm_version_D.txt`,
+            mimeType: "text/plain",
+        });
         lastVersion.should.not.be.undefined;
         lastVersion.should.not.be.null;
 
-        const modelVersions = await modelManagement.GetModelVersions({            
+        const modelVersions = await modelManagement.GetModelVersions({
             modelId: `${model.id}`,
             pageNumber: 0,
             pageSize: 100,
@@ -197,7 +232,7 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
 
         await modelManagement.DeleteModelLastVersion(`${model.id}`);
 
-        const newmodelVersions = await modelManagement.GetModelVersions({            
+        const newmodelVersions = await modelManagement.GetModelVersions({
             modelId: `${model.id}`,
             pageNumber: 0,
             pageSize: 100,
@@ -212,8 +247,12 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
     it("should DELETE a specific version of a model", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_mm_version_E`;
-        const model = await modelManagement.postModel(testModelDefinition,{buffer: Buffer.from("xyz"), fileName:`xyz${timeOffset}_mm_version_E.txt`, mimeType:'text/plain'} );
-        
+        const model = await modelManagement.postModel(testModelDefinition, {
+            buffer: Buffer.from("xyz"),
+            fileName: `xyz${timeOffset}_mm_version_E.txt`,
+            mimeType: "text/plain",
+        });
+
         model.should.not.be.undefined;
         model.should.not.be.null;
 
@@ -222,11 +261,15 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
         oVersion.should.not.be.null;
 
         testModelVersionDefinition.expirationDate = futureTimeOffset.toISOString();
-        const lastVersion = await modelManagement.postModelVersion(`${model.id}`,testModelVersionDefinition,{buffer: Buffer.from("xyz"), fileName:`xyz${timeOffset}_mm_version_F.txt`, mimeType:'text/plain'} );
+        const lastVersion = await modelManagement.postModelVersion(`${model.id}`, testModelVersionDefinition, {
+            buffer: Buffer.from("xyz"),
+            fileName: `xyz${timeOffset}_mm_version_F.txt`,
+            mimeType: "text/plain",
+        });
         lastVersion.should.not.be.undefined;
         lastVersion.should.not.be.null;
 
-        await modelManagement.DeleteModelVersion(`${model.id}`,`${oVersion.id}`);
+        await modelManagement.DeleteModelVersion(`${model.id}`, `${oVersion.id}`);
 
         const nVersion = await modelManagement.GetModelLastVersion(`${model.id}`);
         nVersion.should.not.be.undefined;
@@ -240,8 +283,12 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
         modelManagement.should.not.be.undefined;
 
         testModelDefinition.name = `xyz_${timeOffset}_mm_version_G`;
-        const oModel = await modelManagement.postModel(testModelDefinition,{buffer: Buffer.from("xyz"), fileName:`xyz${timeOffset}_mm_version_G.txt`, mimeType:'text/plain'} );
-        
+        const oModel = await modelManagement.postModel(testModelDefinition, {
+            buffer: Buffer.from("xyz"),
+            fileName: `xyz${timeOffset}_mm_version_G.txt`,
+            mimeType: "text/plain",
+        });
+
         oModel.should.not.be.undefined;
         oModel.should.not.be.null;
 
@@ -250,7 +297,7 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
         oVersion.should.not.be.null;
 
         testModelVersionDefinition.expirationDate = futureTimeOffset.toISOString();
-        const lastVersion = await modelManagement.PatchLastModelVersion(`${oModel.id}`,testModelVersionDefinition);
+        const lastVersion = await modelManagement.PatchLastModelVersion(`${oModel.id}`, testModelVersionDefinition);
         lastVersion.should.not.be.undefined;
         lastVersion.should.not.be.null;
 
@@ -270,14 +317,14 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
         (nModel as any).description.should.be.equals((oModel as any).description);
 
         await modelManagement.DeleteModel(`${oModel.id}`);
-    });    
+    });
 });
 
 async function deleteModels(mm: ModelManagementClient) {
     await sleep(2000);
     const models = (await mm.GetModels({
         filter: JSON.stringify({
-            name: "xyz\*",
+            name: "xyz*",
         }),
         sort: "desc",
         pageNumber: 0,

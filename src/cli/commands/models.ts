@@ -1,8 +1,8 @@
-import { CommanderStatic, help } from "commander";
+import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
-import { ModelManagementModels, MindSphereSdk } from "../../api/sdk";
+import { MindSphereSdk, ModelManagementModels } from "../../api/sdk";
 import { retry } from "../../api/utils";
 import {
     adjustColor,
@@ -42,7 +42,7 @@ export default (program: CommanderStatic) => {
                     color = adjustColor(color, options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
-                    
+
                     switch (options.mode) {
                         case "create":
                             await createModel(options, sdk);
@@ -68,7 +68,7 @@ export default (program: CommanderStatic) => {
         .on("--help", () => printHelp());
 };
 
-function printHelp(){
+function printHelp() {
     log("\n  Examples:\n");
     log(
         `    mc models --mode create --modeltype core.basicmodel --modelname MyModel \t creates a model in mindsphere of type basicmodel`
@@ -81,9 +81,7 @@ function printHelp(){
     log(
         `    mc models --mode update --modelid 1234567..ef --modeltype core.basicmodel --modelname MyModel \t patches the name and the type of a model with specified id from mindsphere`
     );
-    log(
-        `    mc models --mode delete --modelid 1234567..ef \t\t\t deletes model with specified id from mindsphere`
-    );
+    log(`    mc models --mode delete --modelid 1234567..ef \t\t\t deletes model with specified id from mindsphere`);
 
     serviceCredentialLog();
 }
@@ -109,19 +107,17 @@ export async function listModels(options: any, sdk: MindSphereSdk) {
                 pageNumber: page,
                 pageSize: 100,
                 filter: Object.keys(filter).length === 0 ? undefined : JSON.stringify(filter),
-                sort: "asc"
+                sort: "asc",
             })
         )) as ModelManagementModels.ModelArray;
 
-        models.models = models.models ||  [];
+        models.models = models.models || [];
         models.page = models.page || { totalPages: 0 };
 
         for (const model of models.models || []) {
             modelCount++;
             console.log(
-                `${model.id}  ${color(model.name)}\t${model.type}\t[${model.author}]\t${
-                    model.lastVersion?.number
-                }`
+                `${model.id}  ${color(model.name)}\t${model.type}\t[${model.author}]\t${model.lastVersion?.number}`
             );
 
             verboseLog(JSON.stringify(model, null, 2), options.verbose);
@@ -134,7 +130,9 @@ export async function listModels(options: any, sdk: MindSphereSdk) {
 async function updateModel(options: any, sdk: MindSphereSdk) {
     const tenant = sdk.GetTenant();
     const modelMgmt = sdk.GetModelManagementClient();
-    const oModel = (await retry(options.retry, () => modelMgmt.GetModel(options.modelid))) as ModelManagementModels.Model;
+    const oModel = (await retry(options.retry, () =>
+        modelMgmt.GetModel(options.modelid)
+    )) as ModelManagementModels.Model;
     verboseLog(JSON.stringify(oModel, null, 2), options.verbose);
 
     const type = options.modeltype ? options.modeltype : oModel.type || `${tenant}.CLI`;
@@ -142,10 +140,12 @@ async function updateModel(options: any, sdk: MindSphereSdk) {
     const patch = {
         name: options.modelname || oModel.name,
         type: type,
-        description: options.modeldesc|| oModel.description
+        description: options.modeldesc || oModel.description,
     };
 
-    const nextModel = (await retry(options.retry, () => modelMgmt.PatchModel(`${oModel.id}`, patch))) as ModelManagementModels.Model;
+    const nextModel = (await retry(options.retry, () =>
+        modelMgmt.PatchModel(`${oModel.id}`, patch)
+    )) as ModelManagementModels.Model;
     console.log(`Model with modelid ${color(nextModel.id)} (${color(nextModel.name)}) have been patched.`);
 }
 
@@ -155,41 +155,41 @@ async function createModel(options: any, sdk: MindSphereSdk) {
         name: options.modelname || "unnamed",
         type: options.modeltype || "please enter type",
         description: options.modeldesc || "created with mindsphere CLI",
-        author:options.modelauthor || "created by mindsphere CLI",
+        author: options.modelauthor || "created by mindsphere CLI",
         lastVersion: {
             number: 0.0,
             expirationDate: "2021-10-01T12:00:00.001",
             dependencies: [],
             io: {},
-            kpi: []
-        }
+            kpi: [],
+        },
     };
     if (options.modelfile) {
         const filePath = path.resolve(options.modelfile);
         const filecontent = fs.readFileSync(filePath);
-        let filedata = JSON.parse(filecontent.toString());
+        const filedata = JSON.parse(filecontent.toString());
 
         filedata.name = options.modelname || filedata.name;
         filedata.type = options.modeltype || filedata.type;
-        filedata.description = options.modeldesc || filedata.description;        
+        filedata.description = options.modeldesc || filedata.description;
         filedata.author = options.modelauthor || filedata.author;
 
         data = filedata;
     }
 
     let buff = Buffer.alloc(0);
-    let filename ="empty_payload.txt";
+    let filename = "empty_payload.txt";
     let mimetype = "application/octet-stream";
 
     if (options.modelpayload) {
-        let payloadFullPath = path.resolve(options.payload);
+        const payloadFullPath = path.resolve(options.payload);
         filename = path.basename(payloadFullPath);
         buff = fs.readFileSync(payloadFullPath);
         mimetype = getFileType(options.payload);
     }
 
     const result = (await retry(options.retry, async () =>
-        modelMgmt.postModel(data,{buffer: buff, fileName:filename, mimeType:mimetype})        
+        modelMgmt.postModel(data, { buffer: buff, fileName: filename, mimeType: mimetype })
     )) as ModelManagementModels.Model;
 
     console.log(`Model with modelid ${color(result.id)} and name ${color(result.name)} was created.`);
@@ -197,7 +197,7 @@ async function createModel(options: any, sdk: MindSphereSdk) {
 
 function buildFilter(options: any) {
     const filter = (options.filter && JSON.parse(options.filter)) || {};
-    let pointer = filter;
+    const pointer = filter;
     if (options.modelname) {
         pointer.name = `${options.modelname}`;
     }
@@ -212,9 +212,7 @@ export async function deleteModel(options: any, sdk: MindSphereSdk) {
     const model = await retry(options.retry, () => modelMgmt.GetModel(options.modelid));
     verboseLog(JSON.stringify(model, null, 2), options.verbose);
 
-    await retry(options.retry, () =>
-        modelMgmt.DeleteModel(options.modelid)
-    );
+    await retry(options.retry, () => modelMgmt.DeleteModel(options.modelid));
 
     console.log(`Model with modelid ${color(model.id)} (${color(model.name)}) was deleted.`);
 }
@@ -230,12 +228,12 @@ function checkRequiredParameters(options: any) {
         errorLog("you have to specify the id of the model", true);
 
     options.mode === "update" &&
-        !(options.modelname) &&
+        !options.modelname &&
         errorLog("you have to specify at least the model name before patching the model", true);
 }
 
 function getFileType(modelfile: string | Buffer) {
-    return (
-        (modelfile instanceof Buffer ? "application/octet-stream" : `${mime.lookup(modelfile)}` || "application/octet-stream")
-    );
+    return modelfile instanceof Buffer
+        ? "application/octet-stream"
+        : `${mime.lookup(modelfile)}` || "application/octet-stream";
 }

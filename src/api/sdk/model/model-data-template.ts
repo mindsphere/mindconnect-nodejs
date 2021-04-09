@@ -14,5 +14,5 @@ Content-Disposition: form-data; name="metadata"\
 \r\n\
 Content-Type: application/json\
 \r\n\r\n\
-${JSON.stringify(metadata,null, 2)}\r\n\
+${JSON.stringify(metadata, null, 2)}\r\n\
 \r\n----mindsphere--`;
