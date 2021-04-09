@@ -410,4 +410,30 @@ export namespace ModelManagementModels {
          */
         logref?: string;
     }
+
+    /**
+     * 
+     * @export
+     * @interface ModelPayload
+     */
+     export interface ModelPayload {
+        /**
+         * 
+         * @type {string}
+         * @memberof ModelPayload
+         */
+        fileName?: string;
+        /**
+         * 
+         * @type {string}
+         * @memberof ModelPayload
+         */
+        mimeType?: string;
+        /**
+         * 
+         * @type {Buffer}
+         * @memberof ModelPayload
+         */
+        buffer?: Buffer;
+    }
 }

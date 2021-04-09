@@ -160,23 +160,19 @@ export class ModelManagementClient extends SdkClient {
      *
      * @memberOf ModelManagementClient
      */
-    public async postModel( 
-        file: Buffer, 
+    public async postModel(
         metadata: ModelManagementModels.ModelDefinition,
-        params?: { filename?: string; mimetype?: string }
+        payload: ModelManagementModels.ModelPayload
     ): Promise<ModelManagementModels.Model> {
         // verify required parameter 'file' is not null or undefined
-        if (file === null || file === undefined) {
+        if (payload === null || payload === undefined) {
             throw new ModelManagementModels.RequiredError('file','Required parameter file was null or undefined when calling postModel.');
         }
         // verify required parameter 'metadata' is not null or undefined
         if (metadata === null || metadata === undefined) {
             throw new ModelManagementModels.RequiredError('metadata','Required parameter metadata was null or undefined when calling postModel.');
         }
-
-        const parameters = params || {};
-        const { filename, mimetype } = parameters;
-        const body = modelDataTemplate(file, filename, JSON.stringify(metadata,null, 2), mimetype);
+        const body = modelDataTemplate(metadata, payload);
 
         const result = await this.HttpAction({
             verb: "POST",
@@ -408,16 +404,15 @@ export class ModelManagementClient extends SdkClient {
      */
      public async postModelVersion(
         modelId: string,
-        file: Buffer, 
         metadata: ModelManagementModels.VersionDefinition,
-        params?: { filename?: string; mimetype?: string }
+        payload: ModelManagementModels.ModelPayload
     ): Promise<ModelManagementModels.Version> {
         // verify required parameter 'modelId' is not null or undefined
         if (modelId === null || modelId === undefined) {
             throw new ModelManagementModels.RequiredError('modelId','Required parameter modelId was null or undefined when calling postModelVersion.');
         }
         // verify required parameter 'file' is not null or undefined
-        if (file === null || file === undefined) {
+        if (payload === null || payload === undefined) {
             throw new ModelManagementModels.RequiredError('file','Required parameter file was null or undefined when calling postModelVersion.');
         }
         // verify required parameter 'metadata' is not null or undefined
@@ -425,10 +420,7 @@ export class ModelManagementClient extends SdkClient {
             throw new ModelManagementModels.RequiredError('metadata','Required parameter metadata was null or undefined when calling postModelVersion.');
         }
 
-        const parameters = params || {};
-        const { filename, mimetype } = parameters;
-
-        const body = modelDataTemplate(file, filename, JSON.stringify(metadata,null, 2), mimetype);
+        const body = modelDataTemplate(metadata, payload);
 
         const result = await this.HttpAction({
             verb: "POST",

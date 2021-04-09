@@ -29,35 +29,14 @@ export default (program: CommanderStatic) => {
                         modelMgmt.GetModel(options.modelid)
                     )) as ModelManagementModels.Model;
 
-                    const modelVersion = (await retry(options.retry, () =>
-                        modelMgmt.GetModelLastVersion(`${model.id}`)
-                    )) as ModelManagementModels.Version;
-
-                    console.log(`\nModel Information for Model with Model Id: ${color(model.id)}\n`);
-                    console.log(`Id: ${color(model.id)}`);
-                    console.log(`Name: ${color(model.name)}`);
-                    console.log(`Type: ${color(model.type)} ${color(":")} ${color(modelVersion.number)}`);
-                    console.log(`Author: ${color(model.author)}`);
-                    console.log(`Description: ${color(model.description)}`);
-                    console.log("Last version:");
-                    console.log(`- Id: ${color(model.lastVersion?.id)}`);
-                    console.log(`- Version nummer: ${color(model.lastVersion?.number)}`);
-                    console.log(`- Author: ${color(model.lastVersion?.author)}`);
-                    console.log(`- Creation date: ${color(model.lastVersion?.creationDate)}`);
-                    console.log(`- Expiation date: ${color(model.lastVersion?.expirationDate)}`);
-
-                    console.log("\nLastest version entries:");
                     const versions = await retry(options.retry, () =>
                         sdk
                             .GetModelManagementClient()
                             .GetModelVersions({ modelId:model.id, pageNumber: 0, pageSize:100 })
                     ) as ModelManagementModels.VersionArray;
-                    console.table(versions.versions?.slice(0, 5) || [], [
-                        "number",
-                        "author",
-                        "creationDate",
-                        "expirationDate"
-                    ]);
+
+                    printModel(model);
+                    printLatestModelVersions(versions);                    
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
@@ -72,4 +51,29 @@ export default (program: CommanderStatic) => {
 
 function checkRequiredParameters(options: any) {
     !options.modelid && errorLog("you have to provide a modelid", true);
+}
+
+function printModel(model: ModelManagementModels.Model){
+    console.log(`\nModel Information for Model with Model Id: ${color(model.id)}\n`);
+    console.log(`Id: ${color(model.id)}`);
+    console.log(`Name: ${color(model.name)}`);
+    console.log(`Type: ${color(model.type)} ${color(":")} ${color(model.lastVersion?.number)}`);
+    console.log(`Author: ${color(model.author)}`);
+    console.log(`Description: ${color(model.description)}`);
+    console.log("Last version:");
+    console.log(`- Id: ${color(model.lastVersion?.id)}`);
+    console.log(`- Version nummer: ${color(model.lastVersion?.number)}`);
+    console.log(`- Author: ${color(model.lastVersion?.author)}`);
+    console.log(`- Creation date: ${color(model.lastVersion?.creationDate)}`);
+    console.log(`- Expiation date: ${color(model.lastVersion?.expirationDate)}`);
+}
+
+function printLatestModelVersions(versions: ModelManagementModels.VersionArray){
+    console.log("\nLastest version entries:");                    
+    console.table(versions.versions?.slice(0, 5) || [], [
+        "number",
+        "author",
+        "creationDate",
+        "expirationDate"
+    ]);
 }

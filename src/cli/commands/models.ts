@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { CommanderStatic, help } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
@@ -42,8 +42,6 @@ export default (program: CommanderStatic) => {
                     color = adjustColor(color, options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
-
-                    const modelMgmt = sdk.GetModelManagementClient();
                     
                     switch (options.mode) {
                         case "create":
@@ -67,26 +65,28 @@ export default (program: CommanderStatic) => {
                 }
             })();
         })
-        .on("--help", () => {
-            log("\n  Examples:\n");
-            log(
-                `    mc models --mode create --modeltype core.basicmodel --modelname MyModel \t creates a model in mindsphere of type basicmodel`
-            );
-            log(
-                `    mc models --mode create --modelfile MyPump.model.mdsp.json \t\t creates a model from specified modelfile template`
-            );
-            log(`    mc models --mode list \t\t\t\t\t\t lists all models in mindsphere`);
-            log(`    mc models --mode list --modeltype mclib\t\t\t\t lists all models in mindsphere of type core.mclib`);
-            log(
-                `    mc models --mode update --modelid 1234567..ef --modeltype core.basicmodel --modelname MyModel \t patches the name and the type of a model with specified id from mindsphere`
-            );
-            log(
-                `    mc models --mode delete --modelid 1234567..ef \t\t\t deletes model with specified id from mindsphere`
-            );
-
-            serviceCredentialLog();
-        });
+        .on("--help", () => printHelp());
 };
+
+function printHelp(){
+    log("\n  Examples:\n");
+    log(
+        `    mc models --mode create --modeltype core.basicmodel --modelname MyModel \t creates a model in mindsphere of type basicmodel`
+    );
+    log(
+        `    mc models --mode create --modelfile MyPump.model.mdsp.json \t\t creates a model from specified modelfile template`
+    );
+    log(`    mc models --mode list \t\t\t\t\t\t lists all models in mindsphere`);
+    log(`    mc models --mode list --modeltype mclib\t\t\t\t lists all models in mindsphere of type core.mclib`);
+    log(
+        `    mc models --mode update --modelid 1234567..ef --modeltype core.basicmodel --modelname MyModel \t patches the name and the type of a model with specified id from mindsphere`
+    );
+    log(
+        `    mc models --mode delete --modelid 1234567..ef \t\t\t deletes model with specified id from mindsphere`
+    );
+
+    serviceCredentialLog();
+}
 
 export async function listModels(options: any, sdk: MindSphereSdk) {
     const modelMgmt = sdk.GetModelManagementClient();
@@ -177,19 +177,19 @@ async function createModel(options: any, sdk: MindSphereSdk) {
         data = filedata;
     }
 
-    let payload = Buffer.alloc(0);
-    let payloadpath ="empty_payload.txt";
+    let buff = Buffer.alloc(0);
+    let filename ="empty_payload.txt";
     let mimetype = "application/octet-stream";
 
     if (options.modelpayload) {
         let payloadFullPath = path.resolve(options.payload);
-        payloadpath = path.basename(payloadFullPath);
-        payload = fs.readFileSync(payloadFullPath);
+        filename = path.basename(payloadFullPath);
+        buff = fs.readFileSync(payloadFullPath);
         mimetype = getFileType(options.payload);
     }
 
     const result = (await retry(options.retry, async () =>
-        modelMgmt.postModel(payload, data, {filename:payloadpath, mimetype:mimetype})
+        modelMgmt.postModel(data,{buffer: buff, fileName:filename, mimeType:mimetype})        
     )) as ModelManagementModels.Model;
 
     console.log(`Model with modelid ${color(result.id)} and name ${color(result.name)} was created.`);

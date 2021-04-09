@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
 import { ModelManagementClient, ModelManagementModels, MindSphereSdk } from "../src/api/sdk";
-import { decrypt, loadAuth, throwError } from "../src/api/utils";
+import { decrypt, loadAuth} from "../src/api/utils";
 import { getPasskeyForUnitTest, sleep } from "./test-utils";
 chai.should();
 
@@ -14,12 +14,11 @@ describe("[SDK] ModelManagementClient.Models", () => {
         basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
     const modelManagement = sdk.GetModelManagementClient();
-    const tenant = sdk.GetTenant();
     let mmModelId = "";
 
     const testModelDefinition: ModelManagementModels.Model = {
         name: "NN - Quasi Newton",
-        description: "Newton using variable metrix methods",
+        description: "[Model] Newton using variable metrix methods",
         type: "Zeppelin notebook",
         lastVersion: {
             number: 1.0,
@@ -58,12 +57,12 @@ describe("[SDK] ModelManagementClient.Models", () => {
     before(async () => {
         await deleteModels(modelManagement);
         testModelDefinition.name = `xyz_${timeOffset}_mm_A`;
-        const result = await modelManagement.postModel(Buffer.from("xyz"), testModelDefinition,{filename:`xyz${timeOffset}_mm_A.txt`,mimetype:'text/plain'});
+        const result = await modelManagement.postModel(testModelDefinition,{buffer: Buffer.from("xyz"), fileName:`xyz${timeOffset}_mm_A.txt`, mimeType:'text/plain'} );
         mmModelId = `${result.id}`
         testModelDefinition.name = `xyz_${timeOffset}_mm_B`;
-        await modelManagement.postModel(Buffer.from("xyz"), testModelDefinition,{filename:`xyz${timeOffset}_mm_B.txt`,mimetype:'text/plain'});
+        await modelManagement.postModel(testModelDefinition,{buffer: Buffer.from("xyz"), fileName:`xyz${timeOffset}_mm_B.txt`, mimeType:'text/plain'} );
         testModelDefinition.name = `xyz_${timeOffset}_mm_C`;
-        await modelManagement.postModel(Buffer.from("xyz"), testModelDefinition,{filename:`xyz${timeOffset}_mm_C.txt`,mimetype:'text/plain'});
+        await modelManagement.postModel(testModelDefinition,{buffer: Buffer.from("xyz"), fileName:`xyz${timeOffset}_mm_C.txt`, mimeType:'text/plain'} );
     });
 
     after(async () => {
@@ -93,7 +92,7 @@ describe("[SDK] ModelManagementClient.Models", () => {
     it("should POST specific model", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_mm_D`;
-        const model = await modelManagement.postModel(Buffer.from("xyz"), testModelDefinition,{filename:`xyz${timeOffset}_mm_D.txt`,mimetype:'text/plain'});
+        const model = await modelManagement.postModel(testModelDefinition,{buffer: Buffer.from("xyz"), fileName:`xyz${timeOffset}_mm_D.txt`, mimeType:'text/plain'} );
         model.should.not.be.null;
         await modelManagement.DeleteModel(`${model.id}`);
     });
@@ -101,7 +100,7 @@ describe("[SDK] ModelManagementClient.Models", () => {
     it("should POST specific model of 8 mb 1byte large file", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_8mb_D`;
-        const model = await modelManagement.postModel(Buffer.alloc(8 * 1024 * 1024 + 1), testModelDefinition,{filename:`xyz${timeOffset}_mm_8mb_D.txt`,mimetype:'text/plain'});
+        const model = await modelManagement.postModel(testModelDefinition,{buffer: Buffer.alloc(8 * 1024 * 1024 + 1), fileName:`xyz${timeOffset}_mm_8mb_D.txt`, mimeType:'text/plain'} );
         model.should.not.be.null;
         await modelManagement.DeleteModel(`${model.id}`);
     });
@@ -109,7 +108,7 @@ describe("[SDK] ModelManagementClient.Models", () => {
     it("should POST specific model of 16 mb 1byte large file", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_16mb_D`;
-        const model = await modelManagement.postModel(Buffer.alloc(16 * 1024 * 1024 + 1), testModelDefinition,{filename:`xyz${timeOffset}_mm_16mb_D.txt`,mimetype:'text/plain'});
+        const model = await modelManagement.postModel(testModelDefinition,{buffer: Buffer.alloc(16 * 1024 * 1024 + 1), fileName:`xyz${timeOffset}_mm_16mb_D.txt`, mimeType:'text/plain'} );
         model.should.not.be.null;
         await modelManagement.DeleteModel(`${model.id}`);
     });
@@ -117,7 +116,7 @@ describe("[SDK] ModelManagementClient.Models", () => {
     it("should POST specific model of 0 byte large file", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_0b_D`;
-        const model = await modelManagement.postModel(Buffer.alloc(0), testModelDefinition,{filename:`xyz${timeOffset}_mm_0b_D.txt`,mimetype:'text/plain'});
+        const model = await modelManagement.postModel(testModelDefinition,{buffer: Buffer.alloc(0), fileName:`xyz${timeOffset}_mm_0b_D.txt`, mimeType:'text/plain'} );
         model.should.not.be.null;
         await modelManagement.DeleteModel(`${model.id}`);
     });
@@ -132,7 +131,7 @@ describe("[SDK] ModelManagementClient.Models", () => {
     it("should PATCH specific model", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_mm_E`;
-        const model = await modelManagement.postModel(Buffer.from("xyz"), testModelDefinition,{filename:`xyz${timeOffset}_mm_E.txt`,mimetype:'text/plain'});
+        const model = await modelManagement.postModel(testModelDefinition,{buffer: Buffer.from("xyz"), fileName:`xyz${timeOffset}_mm_E.txt`, mimeType:'text/plain'} );
         
         model.description = "Newton using variable metrix methods - Autotest update."
         const patchedModel = await modelManagement.PatchModel(
@@ -151,7 +150,7 @@ describe("[SDK] ModelManagementClient.Models", () => {
     it("should DELETE specific model", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_mm_F`;
-        const model = await modelManagement.postModel(Buffer.from("xyz"), testModelDefinition,{filename:`xyz${timeOffset}_mm_F.txt`,mimetype:'text/plain'});
+        const model = await modelManagement.postModel(testModelDefinition,{buffer: Buffer.from("xyz"), fileName:`xyz${timeOffset}_mm_F.txt`, mimeType:'text/plain'} );
 
         model.should.not.be.null;
         await modelManagement.DeleteModel(`${model.id}`);
@@ -164,13 +163,13 @@ async function deleteModels(mm: ModelManagementClient) {
     await sleep(2000);
     const models = (await mm.GetModels({
         filter: JSON.stringify({
-            name: "xyz_\*",
+            name: "xyz\*",
         }),
         sort: "desc",
         pageNumber: 0,
         pageSize: 1,
     })) as any;
-    await sleep(2000);
+    await sleep(3000);
     for (const x of models.models) {
         await mm.DeleteModel(x.id);
     }
