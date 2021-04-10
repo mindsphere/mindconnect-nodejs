@@ -22,15 +22,20 @@ export default (program: CommanderStatic) => {
     program
         .command("models")
         .alias("ml")
-        .option("-m, --mode [list|create|delete|update|info]", "mode [list | create | delete | update | info]", "list")
+        .option(
+            "-m, --mode [list|create|delete|update|info|download]",
+            "mode [list | create | delete | update | info | download]",
+            "list"
+        )
         .option("-n, --modelname <modelname>", "modelname")
         .option("-t, --modeltype <modeltype>", "modeltype")
         .option("-d, --modeldesc <modeldesc>", "modeldesc", "created with mindsphere CLI")
         .option("-i, --modelid <modelid>", "mindsphere model id ")
-        .option("-f, --modelfile <modelfile>", ".mdsp.json modelfile with model definition")
+        .option("-f, --modelfile <modelfile>", "file with model definition", "model.mdsp.json")
+        .option("-r, --version <version>", "model version for download")
         .option("-p, --payload <modelpayload>", "model payload to upload")
         .option("-i, --modelid <modelid>", "mindsphere model id ")
-        .option("-a, --modelauthor <modelauthor>", "created by mindsphere CLI")
+        .option("-a, --modelauthor <modelauthor>", "model author", "created by mindsphere CLI")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
@@ -59,6 +64,9 @@ export default (program: CommanderStatic) => {
                         case "info":
                             await modelInfo(options, sdk);
                             break;
+                        case "download":
+                            await downloadModel(options, sdk);
+                            break;
                         default:
                             throw Error(`no such option: ${options.mode}`);
                     }
@@ -72,19 +80,12 @@ export default (program: CommanderStatic) => {
 
 function printHelp() {
     log("\n  Examples:\n");
-    log(
-        `    mc models --mode create --modeltype core.basicmodel --modelname MyModel \t creates a model in mindsphere of type basicmodel`
-    );
-    log(
-        `    mc models --mode create --modelfile MyPump.model.mdsp.json \t\t creates a model from specified modelfile template`
-    );
-    log(`    mc models --mode list \t\t\t\t\t\t lists all models in mindsphere`);
-    log(`    mc models --mode list --modeltype mclib\t\t\t\t lists all models in mindsphere of type core.mclib`);
-    log(
-        `    mc models --mode update --modelid 1234567..ef --modeltype core.basicmodel --modelname MyModel \t patches the name and the type of a model with specified id from mindsphere`
-    );
-    log(`    mc models --mode delete --modelid 1234567..ef \t\t\t deletes model with specified id from mindsphere`);
+    log(`    mc models --mode create --modeltype core.basicmodel --modelname MyModel \t creates a basic model`);
+    log(`    mc models --mode create --modelfile prediction.model.mdsp.json \t\t creates a model from specified file`);
+    log(`    mc models --mode list \t\t\t\t lists all models in mindsphere`);
+    log(`    mc models --mode delete --modelid 1234567..ef \t deletes model with specified id`);
     log(`    mc models --mode info --modelid 123456...ef \t print out infos about model with id 132456...ef`);
+    log(`    mc models --mode download --modelid 123456...ef \t download model with id 132456...ef`);
     serviceCredentialLog();
 }
 
@@ -93,9 +94,6 @@ export async function listModels(options: any, sdk: MindSphereSdk) {
 
     let page = 0;
     let models;
-
-    const filter = buildFilter(options);
-    verboseLog(JSON.stringify(filter, null, 2), options.verbose);
 
     console.log(`modelid  name  [type]  author  version`);
 
@@ -106,7 +104,6 @@ export async function listModels(options: any, sdk: MindSphereSdk) {
             modelMgmt.GetModels({
                 pageNumber: page,
                 pageSize: 100,
-                filter: Object.keys(filter).length === 0 ? undefined : JSON.stringify(filter),
                 sort: "asc",
             })
         )) as ModelManagementModels.ModelArray;
@@ -195,18 +192,6 @@ async function createModel(options: any, sdk: MindSphereSdk) {
     console.log(`Model with modelid ${color(result.id)} and name ${color(result.name)} was created.`);
 }
 
-function buildFilter(options: any) {
-    const filter = (options.filter && JSON.parse(options.filter)) || {};
-    const pointer = filter;
-    if (options.modelname) {
-        pointer.name = `${options.modelname}`;
-    }
-    if (options.modeltype) {
-        pointer.type = `${options.modeltype}`;
-    }
-    return filter;
-}
-
 async function deleteModel(options: any, sdk: MindSphereSdk) {
     const modelMgmt = sdk.GetModelManagementClient();
     const model = await retry(options.retry, () => modelMgmt.GetModel(options.modelid));
@@ -222,12 +207,28 @@ async function modelInfo(options: any, sdk: MindSphereSdk) {
         sdk.GetModelManagementClient().GetModel(options.modelid)
     )) as ModelManagementModels.Model;
 
+    verboseLog(JSON.stringify(model, null, 2), options.verbose);
     const versions = (await retry(options.retry, () =>
         sdk.GetModelManagementClient().GetModelVersions({ modelId: model.id, pageNumber: 0, pageSize: 100 })
     )) as ModelManagementModels.VersionArray;
 
     printModel(model);
     printLatestModelVersions(versions);
+}
+
+async function downloadModel(options: any, sdk: MindSphereSdk) {
+    const modelPath = path.resolve(options.modelfile);
+    fs.existsSync(modelPath) && errorLog(`the file ${modelPath} already exists!`, true);
+
+    const version = options.version || "last";
+
+    const model = (await retry(options.retry, () =>
+        sdk.GetModelManagementClient().GetModelVersion(options.modelid, version)
+    )) as ModelManagementModels.Version;
+
+    verboseLog(JSON.stringify(model, null, 2), options.verbose);
+    fs.writeFileSync(modelPath, JSON.stringify(model, null, 2));
+    console.log(`Model file ${color(modelPath)} was written successfully.`);
 }
 
 function checkRequiredParameters(options: any) {
@@ -245,6 +246,10 @@ function checkRequiredParameters(options: any) {
         errorLog("you have to specify at least the model name before patching the model", true);
 
     options.mode === "info" && !options.modelid && errorLog("you have to provide a modelid", true);
+
+    options.mode === "download" &&
+        (!options.modelid || !options.modelfile) &&
+        errorLog("you have to provide a modelid and modelfile for download command", true);
 }
 
 function getFileType(modelfile: string | Buffer) {
