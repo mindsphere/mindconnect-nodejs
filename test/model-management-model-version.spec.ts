@@ -111,7 +111,7 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
     before(async () => {
         await deleteModels(modelManagement);
         testModelDefinition.name = `xyz_${timeOffset}_mm_A`;
-        const result = await modelManagement.postModel(testModelDefinition, {
+        const result = await modelManagement.PostModel(testModelDefinition, {
             buffer: Buffer.from("xyz"),
             fileName: `xyz${timeOffset}_mm_A.txt`,
             mimeType: "text/plain",
@@ -146,7 +146,7 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
     it("should GET all versions of a model", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_mm_version_A`;
-        const model = await modelManagement.postModel(testModelDefinition, {
+        const model = await modelManagement.PostModel(testModelDefinition, {
             buffer: Buffer.from("xyz"),
             fileName: `xyz${timeOffset}_mm_version_A.txt`,
             mimeType: "text/plain",
@@ -186,7 +186,7 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
         modelManagement.should.not.be.undefined;
         testModelVersionDefinition.expirationDate = futureTimeOffset.toISOString();
 
-        const lastVersion = await modelManagement.postModelVersion(`${mmModelId}`, testModelVersionDefinition, {
+        const lastVersion = await modelManagement.PostModelVersion(`${mmModelId}`, testModelVersionDefinition, {
             buffer: Buffer.from("xyz"),
             fileName: `xyz${timeOffset}_mm_version_B.txt`,
             mimeType: "text/plain",
@@ -204,7 +204,7 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
     it("should DELETE last version of a model", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_mm_version_C`;
-        const model = await modelManagement.postModel(testModelDefinition, {
+        const model = await modelManagement.PostModel(testModelDefinition, {
             buffer: Buffer.from("xyz"),
             fileName: `xyz${timeOffset}_mm_version_C.txt`,
             mimeType: "text/plain",
@@ -214,7 +214,7 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
         model.should.not.be.null;
 
         testModelVersionDefinition.expirationDate = futureTimeOffset.toISOString();
-        const lastVersion = await modelManagement.postModelVersion(`${model.id}`, testModelVersionDefinition, {
+        const lastVersion = await modelManagement.PostModelVersion(`${model.id}`, testModelVersionDefinition, {
             buffer: Buffer.from("xyz"),
             fileName: `xyz${timeOffset}_mm_version_D.txt`,
             mimeType: "text/plain",
@@ -247,7 +247,7 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
     it("should DELETE a specific version of a model", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_mm_version_E`;
-        const model = await modelManagement.postModel(testModelDefinition, {
+        const model = await modelManagement.PostModel(testModelDefinition, {
             buffer: Buffer.from("xyz"),
             fileName: `xyz${timeOffset}_mm_version_E.txt`,
             mimeType: "text/plain",
@@ -261,7 +261,7 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
         oVersion.should.not.be.null;
 
         testModelVersionDefinition.expirationDate = futureTimeOffset.toISOString();
-        const lastVersion = await modelManagement.postModelVersion(`${model.id}`, testModelVersionDefinition, {
+        const lastVersion = await modelManagement.PostModelVersion(`${model.id}`, testModelVersionDefinition, {
             buffer: Buffer.from("xyz"),
             fileName: `xyz${timeOffset}_mm_version_F.txt`,
             mimeType: "text/plain",
@@ -283,7 +283,7 @@ describe("[SDK] ModelManagementClient.Models.Version", () => {
         modelManagement.should.not.be.undefined;
 
         testModelDefinition.name = `xyz_${timeOffset}_mm_version_G`;
-        const oModel = await modelManagement.postModel(testModelDefinition, {
+        const oModel = await modelManagement.PostModel(testModelDefinition, {
             buffer: Buffer.from("xyz"),
             fileName: `xyz${timeOffset}_mm_version_G.txt`,
             mimeType: "text/plain",

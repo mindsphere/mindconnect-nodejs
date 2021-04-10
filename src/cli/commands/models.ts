@@ -189,7 +189,7 @@ async function createModel(options: any, sdk: MindSphereSdk) {
     }
 
     const result = (await retry(options.retry, async () =>
-        modelMgmt.postModel(data, { buffer: buff, fileName: filename, mimeType: mimetype })
+        modelMgmt.PostModel(data, { buffer: buff, fileName: filename, mimeType: mimetype })
     )) as ModelManagementModels.Model;
 
     console.log(`Model with modelid ${color(result.id)} and name ${color(result.name)} was created.`);
@@ -265,7 +265,7 @@ function printModel(model: ModelManagementModels.Model) {
     console.log(`- Version nummer: ${color(model.lastVersion?.number)}`);
     console.log(`- Author: ${color(model.lastVersion?.author)}`);
     console.log(`- Creation date: ${color(model.lastVersion?.creationDate)}`);
-    console.log(`- Expiation date: ${color(model.lastVersion?.expirationDate)}`);
+    console.log(`- Expiration date: ${color(model.lastVersion?.expirationDate)}`);
 }
 
 function printLatestModelVersions(versions: ModelManagementModels.VersionArray) {

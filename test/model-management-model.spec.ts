@@ -65,20 +65,20 @@ describe("[SDK] ModelManagementClient.Models", () => {
     before(async () => {
         await deleteModels(modelManagement);
         testModelDefinition.name = `xyz_${timeOffset}_mm_A`;
-        const result = await modelManagement.postModel(testModelDefinition, {
+        const result = await modelManagement.PostModel(testModelDefinition, {
             buffer: Buffer.from("xyz"),
             fileName: `xyz${timeOffset}_mm_A.txt`,
             mimeType: "text/plain",
         });
         mmModelId = `${result.id}`;
         testModelDefinition.name = `xyz_${timeOffset}_mm_B`;
-        await modelManagement.postModel(testModelDefinition, {
+        await modelManagement.PostModel(testModelDefinition, {
             buffer: Buffer.from("xyz"),
             fileName: `xyz${timeOffset}_mm_B.txt`,
             mimeType: "text/plain",
         });
         testModelDefinition.name = `xyz_${timeOffset}_mm_C`;
-        await modelManagement.postModel(testModelDefinition, {
+        await modelManagement.PostModel(testModelDefinition, {
             buffer: Buffer.from("xyz"),
             fileName: `xyz${timeOffset}_mm_C.txt`,
             mimeType: "text/plain",
@@ -112,7 +112,7 @@ describe("[SDK] ModelManagementClient.Models", () => {
     it("should POST specific model", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_mm_D`;
-        const model = await modelManagement.postModel(testModelDefinition, {
+        const model = await modelManagement.PostModel(testModelDefinition, {
             buffer: Buffer.from("xyz"),
             fileName: `xyz${timeOffset}_mm_D.txt`,
             mimeType: "text/plain",
@@ -124,7 +124,7 @@ describe("[SDK] ModelManagementClient.Models", () => {
     it("should POST specific model of 8 mb 1byte large file", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_8mb_D`;
-        const model = await modelManagement.postModel(testModelDefinition, {
+        const model = await modelManagement.PostModel(testModelDefinition, {
             buffer: Buffer.alloc(8 * 1024 * 1024 + 1),
             fileName: `xyz${timeOffset}_mm_8mb_D.txt`,
             mimeType: "text/plain",
@@ -136,7 +136,7 @@ describe("[SDK] ModelManagementClient.Models", () => {
     it("should POST specific model of 16 mb 1byte large file", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_16mb_D`;
-        const model = await modelManagement.postModel(testModelDefinition, {
+        const model = await modelManagement.PostModel(testModelDefinition, {
             buffer: Buffer.alloc(16 * 1024 * 1024 + 1),
             fileName: `xyz${timeOffset}_mm_16mb_D.txt`,
             mimeType: "text/plain",
@@ -148,7 +148,7 @@ describe("[SDK] ModelManagementClient.Models", () => {
     it("should POST specific model of 0 byte large file", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_0b_D`;
-        const model = await modelManagement.postModel(testModelDefinition, {
+        const model = await modelManagement.PostModel(testModelDefinition, {
             buffer: Buffer.alloc(0),
             fileName: `xyz${timeOffset}_mm_0b_D.txt`,
             mimeType: "text/plain",
@@ -167,7 +167,7 @@ describe("[SDK] ModelManagementClient.Models", () => {
     it("should PATCH specific model", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_mm_E`;
-        const model = await modelManagement.postModel(testModelDefinition, {
+        const model = await modelManagement.PostModel(testModelDefinition, {
             buffer: Buffer.from("xyz"),
             fileName: `xyz${timeOffset}_mm_E.txt`,
             mimeType: "text/plain",
@@ -188,7 +188,7 @@ describe("[SDK] ModelManagementClient.Models", () => {
     it("should DELETE specific model", async () => {
         modelManagement.should.not.be.undefined;
         testModelDefinition.name = `xyz_${timeOffset}_mm_F`;
-        const model = await modelManagement.postModel(testModelDefinition, {
+        const model = await modelManagement.PostModel(testModelDefinition, {
             buffer: Buffer.from("xyz"),
             fileName: `xyz${timeOffset}_mm_F.txt`,
             mimeType: "text/plain",

@@ -172,7 +172,7 @@ export class ModelManagementClient extends SdkClient {
      *
      * @memberOf ModelManagementClient
      */
-    public async postModel(
+    public async PostModel(
         metadata: ModelManagementModels.ModelDefinition,
         payload: ModelManagementModels.ModelPayload
     ): Promise<ModelManagementModels.Model> {
@@ -447,7 +447,7 @@ export class ModelManagementClient extends SdkClient {
      *
      * @memberOf ModelManagementClient
      */
-    public async postModelVersion(
+    public async PostModelVersion(
         modelId: string,
         metadata: ModelManagementModels.VersionDefinition,
         payload: ModelManagementModels.ModelPayload
