@@ -4,7 +4,6 @@
 
 ### Bugfixes and Improvements 3.12.0
 
-- TODO: bump AJV and nock
 - SDK: ModelManagementClient [#202]
 - SDK: TenantManagementClient
 - CLI: new `mc models` command for ML Modelmanagement [#202]
