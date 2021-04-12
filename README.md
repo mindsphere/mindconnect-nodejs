@@ -319,23 +319,78 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
     - ServiceCredentials
     - MindSphere Agents
 
-and Clients for following APIs
+### Platform Core APIs
 
-- AgentManagementClient
-- AssetManagementClient
-- EventManagementClient
-- DataLakeClient
-- EventAnalyticsClient
-- IotFileClient
-- IdentityManagementClient
-- KPICalculationClient
-- MindConnectAPIClient
-- SignalValidationClient
-- SpectumAnalysisClient
-- TimeSeriesAggregateClient
-- TimeSeriesBulkClient
-- TimeSeriesClient
-- TrendPredictionClient
+| Name |SDK - Client | Command |
+| --- | --- | --- |
+| Identity Management  | :heavy_check_mark: | :heavy_check_mark: |
+| Oauth Authorization  | :heavy_check_mark: | :heavy_check_mark: |
+| Tenant Management  | :heavy_check_mark: | :heavy_check_mark: |
+| Token Management  | :heavy_check_mark: | :heavy_check_mark: |
+| Usage Transparency  | :heavy_check_mark: |  |
+
+### IoT and Storage
+
+| Name |SDK - Client | Command |
+| --- | --- | --- |
+| IoT File   | :heavy_check_mark: | :heavy_check_mark: |
+| IoT Time Series  | :heavy_check_mark: | :heavy_check_mark: |
+| IoT TS Aggregates  | :heavy_check_mark: |  |
+| IoT TS Bulk  | :heavy_check_mark: | :heavy_check_mark: |
+| Integrated Data Lake  | :heavy_check_mark: | :heavy_check_mark: |
+
+### Connectivity
+
+| Name |SDK - Client | Command |
+| --- | --- | --- |
+| Agent Management   | :heavy_check_mark: | :heavy_check_mark: |
+| MindConnect API   | :heavy_check_mark: | :heavy_check_mark: |
+| OPC UA PubSub    |  | :heavy_check_mark: |
+
+### Advanced Services
+
+| Name |SDK - Client | Command |
+| --- | --- | --- |
+| Asset Management   | :heavy_check_mark: | :heavy_check_mark: |
+| Event Management   | :heavy_check_mark: | :heavy_check_mark: |
+| Notification   |  |  |
+
+### Analytics Services
+
+| Name |SDK - Client | Command |
+| --- | --- | --- |
+| Anomaly Detection   |  |  |
+| Data Exchange   | |  |
+| Event Analytics   | :heavy_check_mark: | :heavy_check_mark: |
+| Job Manager   | |  |
+| KPI Calculation   | :heavy_check_mark: | :heavy_check_mark: |
+| Model Management   | :heavy_check_mark: | :heavy_check_mark: |
+| Signal Calculation   |  |  |
+| Signal Validation   | :heavy_check_mark: | :heavy_check_mark: |
+| Spectrum Analysis   | :heavy_check_mark: | :heavy_check_mark: |
+| Trend Prediction   | :heavy_check_mark: | :heavy_check_mark: |
+
+### MindConnect Open Edge
+
+| Name |SDK - Client | Command |
+| --- | --- | --- |
+| Deployment Workflow   |  |  |
+| Device Configuration   |  |  |
+| Device Management   |  |  |
+| Device Status   |  |  |
+| Edge App Deployment   |  |  |
+| Edge App Instance Management   |  |  |
+| Firmware Deployment   |  |  |
+
+### Semantic Data Interconnect
+
+| Name |SDK - Client | Command |
+| --- | --- | --- |
+| SDI Data Management   |  |  |
+| SDI Data Query   |  |  |
+| SDI Semantic Modelling   |  |  |
+
+### Example
 
 The example below shows how to use the sdk.
 
