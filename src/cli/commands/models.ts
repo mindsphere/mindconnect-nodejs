@@ -2,6 +2,8 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
+import * as util from "util";
+import * as uuid from "uuid";
 import { MindSphereSdk, ModelManagementModels } from "../../api/sdk";
 import { retry } from "../../api/utils";
 import {
@@ -15,7 +17,7 @@ import {
     verboseLog,
 } from "./command-utils";
 const mime = require("mime-types");
-
+const streamPipeline = util.promisify(require("stream").pipeline);
 let color = getColor("blue");
 
 export default (program: CommanderStatic) => {
@@ -23,17 +25,17 @@ export default (program: CommanderStatic) => {
         .command("models")
         .alias("ml")
         .option(
-            "-m, --mode [list|create|delete|update|info|download]",
-            "mode [list | create | delete | update | info | download]",
+            "-m, --mode [list|create|delete|update|info|download|template]",
+            "mode [list | create | delete | update | info | download| template]",
             "list"
         )
         .option("-n, --modelname <modelname>", "modelname")
         .option("-t, --modeltype <modeltype>", "modeltype")
         .option("-d, --modeldesc <modeldesc>", "modeldesc", "created with mindsphere CLI")
         .option("-i, --modelid <modelid>", "mindsphere model id ")
-        .option("-f, --modelfile <modelfile>", "file with model definition", "model.mdsp.json")
-        .option("-r, --version <version>", "model version for download")
-        .option("-p, --payload <modelpayload>", "model payload to upload")
+        .option("-f, --metadata <metadata>", "model metadata file", "model.metadata.mdsp.json")
+        .option("-r, --version <version>", "model version for download", "last")
+        .option("-p, --payload <payload>", "model payload file", "model.payload.mdsp.json")
         .option("-i, --modelid <modelid>", "mindsphere model id ")
         .option("-a, --modelauthor <modelauthor>", "model author", "created by mindsphere CLI")
         .option("-k, --passkey <passkey>", "passkey")
@@ -49,6 +51,10 @@ export default (program: CommanderStatic) => {
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
                     switch (options.mode) {
+                        case "template":
+                            await createTemplate(options, sdk);
+                            console.log("Edit the files before submitting them to mindsphere.");
+                            break;
                         case "create":
                             await createModel(options, sdk);
                             break;
@@ -80,8 +86,12 @@ export default (program: CommanderStatic) => {
 
 function printHelp() {
     log("\n  Examples:\n");
-    log(`    mc models --mode create --modeltype core.basicmodel --modelname MyModel \t creates a basic model`);
-    log(`    mc models --mode create --modelfile prediction.model.mdsp.json \t\t creates a model from specified file`);
+    log(
+        `    mc models --mode template --modeltype core.basicmodel --modelname MyModel \t creates a template for model`
+    );
+    log(
+        `    mc models --mode create --metadata model.metadata.mdsp.json --payload model.payload.mdsp.json \n\t\t\t\t\t\t\t creates a model from specified files`
+    );
     log(`    mc models --mode list \t\t\t\t lists all models in mindsphere`);
     log(`    mc models --mode delete --modelid 1234567..ef \t deletes model with specified id`);
     log(`    mc models --mode info --modelid 123456...ef \t print out infos about model with id 132456...ef`);
@@ -146,47 +156,80 @@ async function updateModel(options: any, sdk: MindSphereSdk) {
     console.log(`Model with modelid ${color(nextModel.id)} (${color(nextModel.name)}) have been patched.`);
 }
 
-async function createModel(options: any, sdk: MindSphereSdk) {
-    const modelMgmt = sdk.GetModelManagementClient();
-    let data = {
-        name: options.modelname || "unnamed",
-        type: options.modeltype || "please enter type",
+async function createTemplate(options: any, sdk: MindSphereSdk) {
+    const metadata = {
+        name: options.modelname || `unnamed model (${uuid.v4()})`,
+        type: options.modeltype || "core.basicmodel",
         description: options.modeldesc || "created with mindsphere CLI",
-        author: options.modelauthor || "created by mindsphere CLI",
         lastVersion: {
-            number: 0.0,
-            expirationDate: "2021-10-01T12:00:00.001",
-            dependencies: [],
-            io: {},
-            kpi: [],
+            number: 1.0,
+            dependencies: [
+                {
+                    name: "sklearn-theano",
+                    type: "Python",
+                    version: "2.7",
+                },
+            ],
+            io: {
+                consumes: "CSV",
+                input: [
+                    {
+                        name: "variablename1",
+                        type: "integer",
+                        description: "description for variablename1",
+                        value: 5,
+                    },
+                ],
+                output: [
+                    {
+                        name: "outputname1",
+                        type: "integer",
+                        description: "description for outputname1",
+                        value: 3,
+                    },
+                ],
+                optionalParameters: {
+                    freeFormParams: "for the author to use",
+                    param1: "value1",
+                },
+            },
+            producedBy: [],
+            kpi: [
+                {
+                    name: "error rate",
+                    value: 0.9,
+                },
+            ],
         },
     };
-    if (options.modelfile) {
-        const filePath = path.resolve(options.modelfile);
-        const filecontent = fs.readFileSync(filePath);
-        const filedata = JSON.parse(filecontent.toString());
 
-        filedata.name = options.modelname || filedata.name;
-        filedata.type = options.modeltype || filedata.type;
-        filedata.description = options.modeldesc || filedata.description;
-        filedata.author = options.modelauthor || filedata.author;
+    const fileName = options.metadata || "model.metadata.mdsp.json";
+    fs.writeFileSync(fileName, JSON.stringify(metadata, null, 2));
 
-        data = filedata;
-    }
+    const payloadFile = options.payload || "model.payload.mdsp.json";
+    fs.writeFileSync(payloadFile, JSON.stringify({ empty: "model" }, null, 2));
 
-    let buff = Buffer.alloc(0);
-    let filename = "empty_payload.txt";
-    let mimetype = "application/octet-stream";
+    console.log(
+        `The model metadata was written into ${color(fileName)} and empty model file ${color(
+            payloadFile
+        )} was created.\nRun \n\n\tmc models --mode create --metadata ${fileName} --payload ${payloadFile} \n\nto create the model.`
+    );
+}
 
-    if (options.modelpayload) {
-        const payloadFullPath = path.resolve(options.payload);
-        filename = path.basename(payloadFullPath);
-        buff = fs.readFileSync(payloadFullPath);
-        mimetype = getFileType(options.payload);
-    }
+async function createModel(options: any, sdk: MindSphereSdk) {
+    const modelMgmt = sdk.GetModelManagementClient();
+
+    const filePath = path.resolve(options.metadata);
+    const filecontent = fs.readFileSync(filePath);
+    const filedata = JSON.parse(filecontent.toString());
+
+    const payloadFullPath = path.resolve(options.payload);
+    const filename = path.basename(payloadFullPath);
+    const buff = fs.readFileSync(payloadFullPath);
+    const mimetype = getFileType(options.payload);
 
     const result = (await retry(options.retry, async () =>
-        modelMgmt.PostModel(data, { buffer: buff, fileName: filename, mimeType: mimetype })
+        modelMgmt.PostModel(filedata, { buffer: buff, fileName: filename, mimeType: mimetype })
     )) as ModelManagementModels.Model;
 
     console.log(`Model with modelid ${color(result.id)} and name ${color(result.name)} was created.`);
@@ -217,25 +260,37 @@ async function modelInfo(options: any, sdk: MindSphereSdk) {
 }
 
 async function downloadModel(options: any, sdk: MindSphereSdk) {
-    const modelPath = path.resolve(options.modelfile);
-    fs.existsSync(modelPath) && errorLog(`the file ${modelPath} already exists!`, true);
+    const metaDataPath = path.resolve(options.metadata);
+    fs.existsSync(metaDataPath) && errorLog(`the metadata file ${metaDataPath} already exists!`, true);
+
+    const payloadPath = path.resolve(options.payload);
+    fs.existsSync(payloadPath) && errorLog(`the payload file ${payloadPath} already exists!`, true);
 
     const version = options.version || "last";
 
-    const model = (await retry(options.retry, () =>
+    const metadata = (await retry(options.retry, () =>
         sdk.GetModelManagementClient().GetModelVersion(options.modelid, version)
     )) as ModelManagementModels.Version;
 
-    verboseLog(JSON.stringify(model, null, 2), options.verbose);
-    fs.writeFileSync(modelPath, JSON.stringify(model, null, 2));
-    console.log(`Model file ${color(modelPath)} was written successfully.`);
+    verboseLog(JSON.stringify(metadata, null, 2), options.verbose);
+    fs.writeFileSync(metaDataPath, JSON.stringify(metadata, null, 2));
+
+    console.log(`metadata file ${color(metaDataPath)} was written successfully.`);
+
+    const download = (await retry(options.retry, () =>
+        sdk.GetModelManagementClient().DownloadModelVersion(options.modelid, version)
+    )) as Response;
+    !download.ok && errorLog(`Unexpected response ${download.statusText}`, true);
+
+    const file = fs.createWriteStream(payloadPath);
+    await streamPipeline(download.body, file);
+
+    console.log(`payload file ${color(payloadPath)} was written successfully.`);
 }
 
 function checkRequiredParameters(options: any) {
-    options.mode === "create" &&
-        !options.modelfile &&
-        (!options.modelname || !options.modeltype) &&
-        errorLog("you have to specify at least the model name and type if you are not using modelfile template", true);
+    options.mode === "create" && !options.metadata && errorLog("you have to specify the metadata file", true);
+    options.mode === "create" && !options.payload && errorLog("you have to specify the payload file", true);
 
     (options.mode === "delete" || options.mode === "update") &&
         !options.modelid &&
@@ -248,14 +303,14 @@ function checkRequiredParameters(options: any) {
     options.mode === "info" && !options.modelid && errorLog("you have to provide a modelid", true);
 
     options.mode === "download" &&
-        (!options.modelid || !options.modelfile) &&
-        errorLog("you have to provide a modelid and modelfile for download command", true);
+        (!options.modelid || !options.metadata || !options.payload) &&
+        errorLog("you have to provide a modelid, metadata and payload file for download command", true);
 }
 
-function getFileType(modelfile: string | Buffer) {
-    return modelfile instanceof Buffer
+function getFileType(metadata: string | Buffer) {
+    return metadata instanceof Buffer
         ? "application/octet-stream"
-        : `${mime.lookup(modelfile)}` || "application/octet-stream";
+        : `${mime.lookup(metadata)}` || "application/octet-stream";
 }
 
 function printModel(model: ModelManagementModels.Model) {
@@ -267,7 +322,7 @@ function printModel(model: ModelManagementModels.Model) {
     console.log(`Description: ${color(model.description)}`);
     console.log("Last version:");
     console.log(`- Id: ${color(model.lastVersion?.id)}`);
-    console.log(`- Version nummer: ${color(model.lastVersion?.number)}`);
+    console.log(`- Version number: ${color(model.lastVersion?.number)}`);
     console.log(`- Author: ${color(model.lastVersion?.author)}`);
     console.log(`- Creation date: ${color(model.lastVersion?.creationDate)}`);
     console.log(`- Expiration date: ${color(model.lastVersion?.expirationDate)}`);

@@ -252,7 +252,7 @@ export class ModelManagementClient extends SdkClient {
     /**
      * * Model Version
      *
-     * Retrieves the version payload or the version metadata of a model.
+     * Retrieves the metadata of the model with specified version.
      *
      * @param {string} modelId Model ID to get the information for it
      * @param {string} versionId Version ID to get the information for it
@@ -290,6 +290,44 @@ export class ModelManagementClient extends SdkClient {
     /**
      * * Model Version
      *
+     * Retrieves the payload of the model with specified version.
+     *
+     * @param {string} modelId Model ID to get the information for it
+     * @param {string} versionId Version ID to get the information for it
+     *
+     * @memberOf ModelManagementClient
+     */
+    public async DownloadModelVersion(modelId: string, versionId: string): Promise<Response> {
+        // verify required parameter 'modelId' is not null or undefined
+        if (modelId === null || modelId === undefined) {
+            throw new ModelManagementModels.RequiredError(
+                "modelId",
+                "Required parameter modelId was null or undefined when calling GetModelVersion."
+            );
+        }
+        // verify required parameter 'versionId' is not null or undefined
+        if (versionId === null || versionId === undefined) {
+            throw new ModelManagementModels.RequiredError(
+                "versionId",
+                "Required parameter versionId was null or undefined when calling GetModelVersion."
+            );
+        }
+
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/models/${modelId}/versions/${versionId}`,
+            additionalHeaders: { "Content-Type": "application/octet-stream" },
+            rawResponse: true,
+        });
+
+        return result as Response;
+    }
+
+    /**
+     * * Model Version
+     *
      * Downloads the last version payload or description of a model.
      *
      * @param {string} modelId Id of the model
@@ -316,6 +354,37 @@ export class ModelManagementClient extends SdkClient {
         });
 
         return result as ModelManagementModels.Version;
+    }
+
+    /**
+     * * Model Version
+     *
+     * Retrieves the last version of model payload.
+     *
+     * @param {string} modelId Id of the model
+     * @returns {Promise<ModelManagementModels.Version>}
+     *
+     * @memberOf ModelManagementClient
+     */
+    public async DownloadModelLastVersion(modelId: string): Promise<Response> {
+        // verify required parameter 'modelId' is not null or undefined
+        if (modelId === null || modelId === undefined) {
+            throw new ModelManagementModels.RequiredError(
+                "modelId",
+                "Required parameter modelId was null or undefined when calling modelsModelIdGet."
+            );
+        }
+
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/models/${modelId}/versions/last`,
+            additionalHeaders: { "Content-Type": "application/octet-stream" },
+            rawResponse: true,
+        });
+
+        return result as Promise<Response>;
     }
 
     /**
