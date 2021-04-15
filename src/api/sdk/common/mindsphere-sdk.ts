@@ -5,17 +5,18 @@ import { EventAnalyticsClient } from "../event-analytics/eventanalytics";
 import { EventManagementClient } from "../event/event-management";
 import { IdentityManagementClient } from "../identity/identity";
 import { TimeSeriesClient } from "../iot/iot-timeseries";
+import { TimeSeriesAggregateClientV4 } from "../iotaggregate-v4/iot-timeseries-aggregate-v4";
 import { TimeSeriesAggregateClient } from "../iotaggregate/iot-timeseries-aggregate";
 import { TimeSeriesBulkClient } from "../iotbulk/iot-timeseries-bulk";
 import { IotFileClient } from "../iotfile/iot-file";
 import { KPICalculationClient } from "../kpi/kpi";
 import { MindConnectApiClient } from "../mcapi/mcapi";
+import { ModelManagementClient } from "../model/model-management";
 import { SignalValidationClient } from "../signal-validation/signal-validation";
 import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
 import { TenantManagementClient } from "../tenant/tenant-management";
 import { TrendPredictionClient } from "../trend/trend-prediction";
 import { UsageTransparencyClient } from "../utc/utc";
-import { ModelManagementClient } from "../model/model-management";
 import { SdkClient } from "./sdk-client";
 /**
  *
@@ -111,6 +112,22 @@ export class MindSphereSdk extends SdkClient {
         this._timeSeriesAggregateClient =
             this._timeSeriesAggregateClient || new TimeSeriesAggregateClient(this._authenticator);
         return this._timeSeriesAggregateClient;
+    }
+
+    private _timeSeriesAggregateClientV4?: TimeSeriesAggregateClientV4;
+
+    /**
+     * * Time Series Aggregates
+     * * V4 Client
+     *
+     * @returns {TimeSeriesAggregateClientV4}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetTimeSeriesAggregateClientV4(): TimeSeriesAggregateClientV4 {
+        this._timeSeriesAggregateClientV4 =
+            this._timeSeriesAggregateClientV4 || new TimeSeriesAggregateClientV4(this._authenticator);
+        return this._timeSeriesAggregateClientV4;
     }
 
     private _eventManagementClient?: EventManagementClient;

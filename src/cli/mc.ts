@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import * as program from "commander";
+import aggregatesCommand from "./commands/aggregates";
 import eventAnalyticsCommand from "./commands/analyze-events";
 import aspectCommands from "./commands/aspect-commands";
 import assetInfoCommand from "./commands/asset-info";
@@ -85,6 +86,7 @@ aspectCommands(program);
 eventTypesCommand(program);
 eventsCommand(program);
 downloadEventsCommand(program);
+aggregatesCommand(program);
 
 // * tenant commands
 

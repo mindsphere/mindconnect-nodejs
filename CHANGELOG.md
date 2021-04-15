@@ -4,13 +4,15 @@
 
 ### Bugfixes and Improvements 3.12.0
 
-- SDK: ModelManagementClient [#202]
-- SDK: TenantManagementClient
+- CLI: new `mc aggregates` command for IoT TimeSeries Aggregates [#250]
 - CLI: new `mc models` command for ML Modelmanagement [#202]
 - CLI: new `mc subtenants` command for subtenant management [#246]
 - CLI: new `mc tenant` command for tenant management [#246]
 - CLI: new `mc events` command for event management [#241]
 - CLI: renamed and extended `mc download-events` to `mc events-bulk` command with `--mode download` and  `--mode delete` [#240]
+- SDK: IotTimeSeriesAggragetesV4 Client [#250]
+- SDK: ModelManagementClient [#202]
+- SDK: TenantManagementClient
 - Bumped all dependencies
 
 ### Contributions 3.12.0

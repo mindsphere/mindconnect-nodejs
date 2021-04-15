@@ -335,7 +335,7 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 | --- | --- | --- |
 | IoT File   | :heavy_check_mark: | :heavy_check_mark: |
 | IoT Time Series  | :heavy_check_mark: | :heavy_check_mark: |
-| IoT TS Aggregates  | :heavy_check_mark: |  |
+| IoT TS Aggregates (v3, v4)  | :heavy_check_mark: | :heavy_check_mark:  |
 | IoT TS Bulk  | :heavy_check_mark: | :heavy_check_mark: |
 | Integrated Data Lake  | :heavy_check_mark: | :heavy_check_mark: |
 
