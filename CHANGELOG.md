@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.13.0 - (Phlox Vienna) - May 2021
+
+### Bugfixes and Improvements 3.13.0
+
+- CLI fixed bug in `mc aggregates` command with multiple lines of same aggregate
+
 ## 3.12.0 - (Frost Vienna) - April 2021
 
 ### Bugfixes and Improvements 3.12.0
