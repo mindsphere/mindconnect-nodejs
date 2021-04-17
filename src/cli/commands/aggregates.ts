@@ -33,6 +33,7 @@ export default (program: CommanderStatic) => {
         .option("-u, --intervalunit <intervalunit>", "interval duration unit [minute |hour |day |week | month]")
         .option("-s, --select <select>", "comma separated list of variable names")
         .option("-a, --all", "show all aggregates not just average, min, max, sum and sd")
+        .option("-l, --local", "use localtime in aggregate list")
         .option("-c, --count <count>", "number of aggregates in response ")
         .option("-p, --passkey <passkey>", `passkey`)
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
@@ -103,10 +104,21 @@ async function listAggregates(options: any, sdk: MindSphereSdk) {
                     0 + aggregate[key].countgood + aggregate[key].countbad + aggregate[key].countuncertain
                 )} `;
                 options.all &&
-                    console.log(`from: ${aggregate.starttime} to: ${aggregate.endtime} variable: ${color(key)}`);
+                    console.log(
+                        `from: ${
+                            options.local ? new Date(aggregate.starttime).toLocaleString() : aggregate.starttime
+                        } to: ${
+                            options.local ? new Date(aggregate.endtime).toLocaleString() : aggregate.endtime
+                        } variable: ${color(key)}`
+                    );
                 options.all && console.table(aggregate[key]);
+                !options.all &&
+                    console.log(
+                        `[${options.local ? new Date(aggregate.starttime).toLocaleString() : aggregate.starttime} - ${
+                            options.local ? new Date(aggregate.endtime).toLocaleString() : aggregate.endtime
+                        }] ${line}`
+                    );
             }
-            !options.all && console.log(`${aggregate.starttime} ${aggregate.endtime} ${line}`);
         }
 
         verboseLog(JSON.stringify(aggregate, null, 2), options.verbose);
