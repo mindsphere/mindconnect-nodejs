@@ -74,7 +74,7 @@ async function listAggregates(options: any, sdk: MindSphereSdk) {
 
     !options.all &&
         console.log(
-            `from  to  ${color("variable")}  ${green("average")}  ${yellow("sum")}  ${blue("min")}  ${red(
+            `[from - to]  ${color("variable")}  ${green("average")}  ${yellow("sum")}  ${blue("min")}  ${red(
                 "max"
             )}  ${cyan("sd")}  ${magenta("count")}`
         );
