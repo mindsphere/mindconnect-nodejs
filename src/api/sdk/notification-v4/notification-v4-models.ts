@@ -473,7 +473,7 @@ export namespace NotificationModelsV4 {
          * @type {string}
          * @memberof MulticastEmailNotificationJob
          */
-        status?: MulticastEmailNotificationJob.StatusEnum;
+        status?: MulticastEmailNotificationJob.StatusEnum | string;
         /**
          * Time when the job was created.
          * @type {string}
@@ -540,7 +540,7 @@ export namespace NotificationModelsV4 {
          * @type {string}
          * @memberof MulticastEmailNotificationRequestMetadata
          */
-        priority?: MulticastEmailNotificationRequestMetadata.PriorityEnum;
+        priority?: MulticastEmailNotificationRequestMetadata.PriorityEnum | string;
     }
 
     /**
@@ -822,7 +822,7 @@ export namespace NotificationModelsV4 {
          * @type {string}
          * @memberof SendResponse
          */
-        status?: SendResponse.StatusEnum;
+        status?: SendResponse.StatusEnum | string;
         /**
          * The time at which the job started.
          * @type {Date}

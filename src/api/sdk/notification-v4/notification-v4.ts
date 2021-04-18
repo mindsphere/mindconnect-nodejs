@@ -1,3 +1,4 @@
+import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
 import { notificationEmailTemplate } from "./notification-data-template";
 import { NotificationModelsV4 } from "./notification-v4-models";
@@ -78,5 +79,50 @@ export class NotificationClientV4 extends SdkClient {
             additionalHeaders: { enctype: "multipart/form-data" },
         });
         return result as NotificationModelsV4.EmailJobResponse;
+    }
+
+    /**
+     * Shows the status of the triggered multicast email notification job.
+     *
+     * @param {string} id Job ID to fetch the details
+     * @returns {Promise<NotificationModelsV4.MulticastEmailNotificationJob>}
+     *
+     * @memberOf NotificationClientV4
+     */
+    public async GetMulticastEmailNotificationJobs(
+        id: string
+    ): Promise<NotificationModelsV4.MulticastEmailNotificationJob> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/multicastEmailNotificationJobs/${id}`,
+        });
+
+        return result as NotificationModelsV4.MulticastEmailNotificationJob;
+    }
+
+    /**
+     * Shows per recipent status of email dispatch status.
+     *
+     * @param {string} id Job ID to fetch the details
+     * @param {{ page?: number; size?: number }} [params] page: specfies the page index, size: elements in a page (max:50)
+     * @returns {Promise<NotificationModelsV4.NotificationDispatchStatus>}
+     *
+     * @memberOf NotificationClientV4
+     */
+    public async GetMulticastEmailNotificationJobsDeliveries(
+        id: string,
+        params?: { page?: number; size?: number }
+    ): Promise<NotificationModelsV4.NotificationDispatchStatus> {
+        const parameters = params || {};
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/multicastEmailNotificationJobs/${id}/deliveries?${toQueryString(parameters)}`,
+        });
+
+        return result as NotificationModelsV4.NotificationDispatchStatus;
     }
 }

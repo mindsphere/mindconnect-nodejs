@@ -29,12 +29,22 @@ export default (program: CommanderStatic) => {
 
                     const notifications = sdk.GetNotificationClientV4();
 
-                    const result = await notifications.PostMulticastEmailNotificationJobs({
-                        fromApplication: "CLI",
-                        message: "Test message",
-                        subject: "Test subject" + new Date().toLocaleString(),
-                        recipients: ["jiwoni3575@whipjoy.com"],
-                    });
+                    const result = await notifications.PostMulticastEmailNotificationJobs(
+                        {
+                            subject: "[Status] Machine Data Analysis 123",
+                            message: "Machine data analysis completed. Analysis report attached with this email.",
+                            fromApplication: "MachineMonitor",
+                            priority: "Normal",
+                            recipients: ["sn0wcat@mindsphere.io", "igor.milovanovic@siemens.com"],
+                        },
+                        [
+                            {
+                                fileName: "blubb.csv",
+                                buffer: Buffer.from("1,2,3,4,5"),
+                                mimeType: "text/csv",
+                            },
+                        ]
+                    );
 
                     console.log(JSON.stringify(result, null, 2));
                     // switch (options.mode) {

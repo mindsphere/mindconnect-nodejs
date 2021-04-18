@@ -7,17 +7,18 @@ export const notificationEmailTemplate = (
     let attachementString = "";
 
     (attachments || []).forEach((attachement) => {
-        attachementString += `Content-Disposition: form-data; name="file"; filename="${attachement.fileName}"\r\n\
-Content-Type: ${attachement.mimeType}\r\n\r\n${(attachement.buffer as Buffer).toString("ascii")}\r\n\
-----mindsphere\r\n`;
+        attachementString += `\r\n----mindsphere\r\n\
+Content-Disposition: form-data; name="attachment"; filename="${attachement.fileName}"\r\n\
+Content-Type: ${attachement.mimeType}\r\n\r\n${(attachement.buffer as Buffer).toString("ascii")}\r\n`;
     });
 
-    const result = `----mindsphere\r\n${attachementString}\
+    const result = `----mindsphere\r\n\
 Content-Disposition: form-data; name="metadata"\
 \r\n\
 Content-Type: application/json\
 \r\n\r\n\
 ${JSON.stringify(metadata, null, 2)}\
+${attachementString}\
 \r\n----mindsphere--`;
     return result;
 };
