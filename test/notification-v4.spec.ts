@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
 import { MindSphereSdk, NotificationModelsV4 } from "../src/api/sdk";
-import { notificationEmailTemplate } from "../src/api/sdk/notification-v4/notification-data-template";
+import { notificationTemplate } from "../src/api/sdk/notification-v4/notification-data-template";
 import { decrypt, loadAuth } from "../src/api/utils";
 import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
@@ -22,7 +22,7 @@ describe("[SDK] NotificationClient", () => {
     });
 
     it("should create a simple email template @sanity", async () => {
-        const result = notificationEmailTemplate({
+        const result = notificationTemplate({
             subject: "test subject",
             message: "test message",
             fromApplication: "cli",
@@ -35,7 +35,7 @@ describe("[SDK] NotificationClient", () => {
     });
 
     it("should create an email template with attachements @sanity", async () => {
-        const result = notificationEmailTemplate(
+        const result = notificationTemplate(
             {
                 subject: "test subject",
                 message: "test message",

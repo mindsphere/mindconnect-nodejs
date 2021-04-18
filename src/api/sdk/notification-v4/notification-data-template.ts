@@ -1,6 +1,6 @@
 import { NotificationModelsV4 } from "./notification-v4-models";
 
-export const notificationEmailTemplate = (
+export const notificationTemplate = (
     metadata: NotificationModelsV4.MulticastEmailNotificationRequestMetadata,
     attachments?: NotificationModelsV4.Attachment[]
 ) => {

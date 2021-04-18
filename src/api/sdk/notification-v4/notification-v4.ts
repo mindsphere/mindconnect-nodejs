@@ -1,6 +1,6 @@
 import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
-import { notificationEmailTemplate } from "./notification-data-template";
+import { notificationTemplate } from "./notification-data-template";
 import { NotificationModelsV4 } from "./notification-v4-models";
 
 /**
@@ -42,7 +42,7 @@ export class NotificationClientV4 extends SdkClient {
     private _baseUrl: string = "/api/notification/v4";
 
     /**
-     * * Email Notifications
+     * * Email
      *
      * Sends an email notification to specified recipients with an option to attach files.
      *
@@ -67,7 +67,7 @@ export class NotificationClientV4 extends SdkClient {
             );
         }
 
-        const body = notificationEmailTemplate(metadata, attachments);
+        const body = notificationTemplate(metadata, attachments);
 
         const result = await this.HttpAction({
             verb: "POST",
@@ -82,6 +82,8 @@ export class NotificationClientV4 extends SdkClient {
     }
 
     /**
+     * * Email
+     *
      * Shows the status of the triggered multicast email notification job.
      *
      * @param {string} id Job ID to fetch the details
@@ -103,6 +105,8 @@ export class NotificationClientV4 extends SdkClient {
     }
 
     /**
+     * * Email
+     *
      * Shows per recipent status of email dispatch status.
      *
      * @param {string} id Job ID to fetch the details
@@ -124,5 +128,93 @@ export class NotificationClientV4 extends SdkClient {
         });
 
         return result as NotificationModelsV4.NotificationDispatchStatus;
+    }
+
+    /**
+     * SMS
+     *
+     * Sends an SMS notification to specified recipients.
+     *
+     * Publishes the notification via sms to the specified recipients.
+     * The message is scanned for any vulnerabilities before dispatching it to the recipients.
+     * A single SMS message can contain up to 140 bytes of information where-in the character quota
+     * depends on the encoding scheme. For example, an SMS message can contain:
+     * 160 GSM characters
+     * 140 ASCII characters
+     * 70 UCS-2 characters
+     * If the message size exceeds 140 bytes, it will be split into multiple messages and sent.
+     * When message is split into multiple messages, each partial message will be billed as a sinlge unit.
+     * Eg. If a message size is 200 bytes; then this it be billed as 2 units.
+     * Maximum size limit for a message is 1500 bytes.
+     *
+     * @param {NotificationModelsV4.MulticastSMSNotificationJobRequest} metadata
+     * @returns {Promise<NotificationModelsV4.SMSJobResponse>}
+     *
+     * @memberOf NotificationClientV4
+     */
+    public async PostMulticastSMSNotificationJobs(
+        metadata: NotificationModelsV4.MulticastSMSNotificationJobRequest
+    ): Promise<NotificationModelsV4.SMSJobResponse> {
+        if (metadata === null || metadata === undefined) {
+            throw new NotificationModelsV4.RequiredError(
+                "metadata",
+                "Required parameter metadata was null or undefined when calling PostMulticastSMSNotificationJobs."
+            );
+        }
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/multicastSMSNotificationJobs`,
+            body: metadata,
+        });
+        return result as NotificationModelsV4.SMSJobResponse;
+    }
+
+    /**
+     * * SMS
+     *
+     * Shows the status of the triggered multicast sms notification job.
+     *
+     * @param {string} id Job ID to fetch the details
+     * @returns {Promise<NotificationModelsV4.MulticastSMSNotificationJob>}
+     *
+     * @memberOf NotificationClientV4
+     */
+    public async GetMulticastSMSNotificationJobs(
+        id: string
+    ): Promise<NotificationModelsV4.MulticastSMSNotificationJob> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/multicastSMSNotificationJobs/${id}`,
+        });
+
+        return result as NotificationModelsV4.MulticastSMSNotificationJob;
+    }
+
+    /**
+     * Shows detailed delivery information of an sms job.
+     *
+     * @param {string} id Job ID to fetch the details
+     * @param {{ page?: number; size?: number }} [params] page: specfies the page index, size: elements in a page (max:50)
+     * @returns {Promise<NotificationModelsV4.NotificationDispatchStatusSMS>}
+     *
+     * @memberOf NotificationClientV4
+     */
+    public async GetMulticastSMSNotificationJobsDeliveries(
+        id: string,
+        params?: { page?: number; size?: number }
+    ): Promise<NotificationModelsV4.NotificationDispatchStatusSMS> {
+        const parameters = params || {};
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/multicastSMSNotificationJobs/${id}/deliveries?${toQueryString(parameters)}`,
+        });
+
+        return result as NotificationModelsV4.NotificationDispatchStatusSMS;
     }
 }
