@@ -26,15 +26,26 @@ export default (program: CommanderStatic) => {
                     color = adjustColor(color, options, true);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
-                    switch (options.mode) {
-                        case "email":
-                            await createTemplate(options, sdk);
-                            console.log("Edit the files before submitting them to mindsphere.");
-                            break;
 
-                        default:
-                            throw Error(`no such option: ${options.mode}`);
-                    }
+                    const notifications = sdk.GetNotificationClientV4();
+
+                    const result = await notifications.PostMulticastEmailNotificationJobs({
+                        fromApplication: "CLI",
+                        message: "Test message",
+                        subject: "Test subject" + new Date().toLocaleString(),
+                        recipients: ["jiwoni3575@whipjoy.com"],
+                    });
+
+                    console.log(JSON.stringify(result, null, 2));
+                    // switch (options.mode) {
+                    //     case "email":
+                    //         await createTemplate(options, sdk);
+                    //         console.log("Edit the files before submitting them to mindsphere.");
+                    //         break;
+
+                    //     default:
+                    //         throw Error(`no such option: ${options.mode}`);
+                    // }
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
