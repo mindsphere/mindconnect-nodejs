@@ -42,6 +42,7 @@ import uploadTimeSeriesCommand from "./commands/mc-upload-timeseries";
 import versionAndHelp from "./commands/mc-version-help";
 import modelsCommand from "./commands/models";
 import mqttCreateCommand from "./commands/mqtt-create-jwt";
+import notificationCommand from "./commands/notifications";
 import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
 import subtenantCommand from "./commands/subtenant";
@@ -87,6 +88,7 @@ eventTypesCommand(program);
 eventsCommand(program);
 downloadEventsCommand(program);
 aggregatesCommand(program);
+notificationCommand(program);
 
 // * tenant commands
 

@@ -12,6 +12,7 @@ import { IotFileClient } from "../iotfile/iot-file";
 import { KPICalculationClient } from "../kpi/kpi";
 import { MindConnectApiClient } from "../mcapi/mcapi";
 import { ModelManagementClient } from "../model/model-management";
+import { NotificationClientV4 } from "../notification-v4/notification-v4";
 import { SignalValidationClient } from "../signal-validation/signal-validation";
 import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
 import { TenantManagementClient } from "../tenant/tenant-management";
@@ -290,7 +291,7 @@ export class MindSphereSdk extends SdkClient {
 
     private _modelManagementClient?: ModelManagementClient;
     /**
-     * * Model Management
+     * Model Management Client
      *
      * @returns {ModelManagementClient}
      *
@@ -299,5 +300,19 @@ export class MindSphereSdk extends SdkClient {
     public GetModelManagementClient(): ModelManagementClient {
         this._modelManagementClient = this._modelManagementClient || new ModelManagementClient(this._authenticator);
         return this._modelManagementClient;
+    }
+
+    private _notificationClient?: NotificationClientV4;
+
+    /**
+     * Notification Client
+     *
+     * @returns {NotificationClientV4}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetNotificationClientV4(): NotificationClientV4 {
+        this._notificationClient = this._notificationClient || new NotificationClientV4(this._authenticator);
+        return this._notificationClient;
     }
 }

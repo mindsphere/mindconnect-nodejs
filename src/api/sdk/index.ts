@@ -27,6 +27,8 @@ export * from "./mcapi/mcapi";
 export * from "./mcapi/mcapi-models";
 export * from "./model/model-management";
 export * from "./model/model-models";
+export * from "./notification-v4/notification-v4";
+export * from "./notification-v4/notification-v4-models";
 export * from "./signal-validation/signal-validation";
 export * from "./signal-validation/signal-validation-models";
 export * from "./tenant/tenant-management";
