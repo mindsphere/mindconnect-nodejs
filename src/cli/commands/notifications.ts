@@ -28,7 +28,7 @@ export default (program: CommanderStatic) => {
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(color(`send mindsphere email, sms and push notifications *`))
+        .description(color(`send email, sms and push notifications *`))
         .action((options) => {
             (async () => {
                 try {
@@ -38,11 +38,9 @@ export default (program: CommanderStatic) => {
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
 
-                    const notifications = sdk.GetNotificationClientV4();
-
                     switch (options.mode) {
                         case "template":
-                            await createTemplate(options, sdk);
+                            await createTemplate(options);
                             console.log("Edit the file before submitting it to mindsphere.");
                             break;
 
@@ -68,12 +66,12 @@ export default (program: CommanderStatic) => {
 function printHelp() {
     log("\n  Examples:\n");
     log(
-        `    mc notifications --mode send --metadata <[mail|sms|push].metadata.mdsp.json> \t send notifications (mail, sms, push) from template to recipients`
+        `    mc notifications --mode send --metadata <[mail|sms|push].metadata.mdsp.json> --type [mail|sms|push] \t send notifications (mail, sms, push) from template to recipients`
     );
     serviceCredentialLog();
 }
 
-async function createTemplate(options: any, sdk: MindSphereSdk) {
+async function createTemplate(options: any) {
     let metadata:
         | NotificationModelsV4.MulticastEmailNotificationRequestMetadata
         | NotificationModelsV4.MulticastSMSNotificationJobRequest
@@ -134,38 +132,33 @@ async function sendMessage(options: any, sdk: MindSphereSdk) {
 
     const notificationClient = sdk.GetNotificationClientV4();
 
+    let result;
+
     switch (options.type) {
         case "email":
             // TODO: attachments
             {
-                const result = await notificationClient.PostMulticastEmailNotificationJobs(filedata);
-                verboseLog(JSON.stringify(result, null, 2), options.verbose);
-                console.log(`the ${color(options.type)} notification job with id ${result.id} was created`);
-                console.log(
-                    `Run \n\n\t mc notifications --mode status --jobid ${result.id} --type ${
-                        options.type
-                    } \n\nto check the status of the ${color(options.type)} job.`
-                );
+                result = await notificationClient.PostMulticastEmailNotificationJobs(filedata);
             }
             break;
         case "sms":
-            {
-                const result = await notificationClient.PostMulticastSMSNotificationJobs(filedata);
-                verboseLog(JSON.stringify(result, null, 2), options.verbose);
-                console.log(`the ${color(options.type)} notification job with id ${result.id} was created`);
-                console.log(
-                    `Run \n\n\t mc notifications --mode status --jobid ${result.id} --type ${
-                        options.type
-                    } \n\nto check the status of the ${color(options.type)} job.`
-                );
-            }
+            result = await notificationClient.PostMulticastSMSNotificationJobs(filedata);
             break;
 
         case "push":
+            result = await notificationClient.PostMulticastPushNotificationJobs(filedata);
             break;
         default:
             throw Error(`The type ${options.type} is not supported`);
     }
+
+    verboseLog(JSON.stringify(result, null, 2), options.verbose);
+    console.log(`the ${color(options.type)} notification job with id ${result.id} was created`);
+    console.log(
+        `Run \n\n\t mc notifications --mode status --jobid ${result.id} --type ${
+            options.type
+        } \n\nto check the status of the ${color(options.type)} job.`
+    );
 }
 
 async function getStatus(options: any, sdk: MindSphereSdk) {
@@ -195,15 +188,44 @@ async function getStatus(options: any, sdk: MindSphereSdk) {
             break;
 
         case "push":
-            // TODO: check if there is a get for multicast Notification Jobs
-
+            {
+                try {
+                    const result = await notificationClient.GetMulticastPushNotificationJobs(options.jobid);
+                    verboseLog(JSON.stringify(result, null, 2), options.verbose);
+                    console.log(`${color(options.type)} job with id ${options.jobid}:`);
+                    console.log(`\t Status: ${color(result.status)}`);
+                    console.log(`\t Start time: ${color(result.startTime)}`);
+                } catch (err) {
+                    console.log(
+                        "Error occured. In April 2021 there was no method available to get status of the MulticastPushNotificationJob"
+                    );
+                    console.log("This was reported to MindSphere dev team and should eventually start working...");
+                    throw err;
+                }
+            }
             break;
         default:
             throw Error(`The type ${options.type} is not supported`);
     }
 }
 
-function checkRequiredParameters(options: any) {}
+function checkRequiredParameters(options: any) {
+    options.mode === "status" &&
+        !options.jobid &&
+        errorLog("You have to specify the job id for mc nt --mode status command ", true);
+
+    options.mode === "status" &&
+        !options.type &&
+        errorLog("You have to specify the job id for mc nt --mode status command ", true);
+
+    options.mode === "send" &&
+        !options.type &&
+        errorLog("You have to specify the --type [email|sms|push] option for mc nt --mode send command ", true);
+
+    options.mode === "send" &&
+        !options.metadata &&
+        errorLog("You have to specify the template file (--metadata path) for mc nt --mode send command ", true);
+}
 
 function getFileType(metadata: string | Buffer) {
     return metadata instanceof Buffer

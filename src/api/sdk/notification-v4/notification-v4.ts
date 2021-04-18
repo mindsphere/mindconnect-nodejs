@@ -217,4 +217,43 @@ export class NotificationClientV4 extends SdkClient {
 
         return result as NotificationModelsV4.NotificationDispatchStatusSMS;
     }
+
+    public async PostMulticastPushNotificationJobs(
+        job: NotificationModelsV4.MulticastPushNotificationJobsRequest
+    ): Promise<NotificationModelsV4.SMSJobResponse> {
+        if (job === null || job === undefined) {
+            throw new NotificationModelsV4.RequiredError(
+                "job",
+                "Required parameter job was null or undefined when calling PostMulticastSMSNotificationJobs."
+            );
+        }
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/multicastPushNotificationJobs`,
+            body: job,
+        });
+        return result as NotificationModelsV4.SendResponse;
+    }
+
+    /**
+     * ! !important! : in April 2021 there was no support in MindSphere for this method. This was reported
+     * ! to the developer team and should eventually start working.
+     *
+     * @param {string} id
+     * @returns {Promise<NotificationModelsV4.SendResponse>}
+     *
+     * @memberOf NotificationClientV4
+     */
+    public async GetMulticastPushNotificationJobs(id: string): Promise<NotificationModelsV4.SendResponse> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/multicastPushNotificationJobs/${id}`,
+        });
+
+        return result as NotificationModelsV4.SendResponse;
+    }
 }
