@@ -1,8 +1,9 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
-import * as util from "util";
+import * as fs from "fs";
+import * as path from "path";
 import { MindSphereSdk, NotificationModelsV4 } from "../../api/sdk";
-import { retry } from "../../api/utils";
+import { retry, throwError } from "../../api/utils";
 import {
     adjustColor,
     errorLog,
@@ -13,58 +14,59 @@ import {
     serviceCredentialLog,
     verboseLog,
 } from "./command-utils";
-const mime = require("mime-types");
-const streamPipeline = util.promisify(require("stream").pipeline);
-let color = getColor("blue");
+let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
-        .command("mobileapps")
+        .command("mobile-apps")
         .alias("mb")
         .option(
-            "-m, --mode [list|create|delete|update|apptemplate|instancetemplate]",
-            "mode [list | create | delete | update | apptemplate | instancetemplate]",
+            "-m, --mode [list|info|create|delete|update|template]",
+            "mode [list | info | create | delete | update | template]",
             "list"
         )
-        .option("-t, --type [ios|android]", "type [ios|android]", "ios")
-        .option("-a, --appid <appid>", "mobile app id ")
-        .option("-i, --instanceid <instanceid>", "mobile app instance id ")
-        .option("-f, --file <file>", "mobile app (instance) file [app|instance].mdsp.json")
+        .option("-t, --type [ios|android]", "type [ios|android]", "android")
+        .option("-p, --appid <appid>", "mobile app id ")
+        .option("-f, --file <file>", "mobile app file [ios|android].mobileapp.mdsp.json")
+        .option("-a, --all", "list full app information")
         .option("-o, --overwrite", "overwrite template files")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(color(`list, create or delete mobile app (instances) *`))
+        .description(color(`list, create or delete mobile apps *`))
         .action((options) => {
             (async () => {
                 try {
                     checkRequiredParameters(options);
                     const sdk = getSdk(options);
-                    color = adjustColor(color, options, true);
+                    color = adjustColor(color, options);
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
                     switch (options.mode) {
                         case "template":
-                            await createTemplate(options, sdk);
+                            await createAppTemplate(options);
                             console.log("Edit the files before submitting them to mindsphere.");
                             break;
+                        case "update":
                         case "create":
-                            await createModel(options, sdk);
+                            await createOrUpdateApp(options, sdk);
                             break;
                         case "list":
-                            await listmobileapps(options, sdk);
+                            await listMobileApps(options, sdk);
+                            break;
+
+                        case "info":
+                            {
+                                options.all = true;
+                                // hack as there is no parameterized get method
+                                console.log(`App with ${options.appid}:\n`);
+                                await listMobileApps(options, sdk);
+                                console.log(`Mobile App instances:\n`);
+                                await listInstances(options, sdk);
+                            }
                             break;
                         case "delete":
-                            await deleteModel(options, sdk);
-                            break;
-                        case "update":
-                            await updateModel(options, sdk);
-                            break;
-                        case "info":
-                            await modelInfo(options, sdk);
-                            break;
-                        case "download":
-                            await downloadModel(options, sdk);
+                            await deleteApp(options, sdk);
                             break;
                         default:
                             throw Error(`no such option: ${options.mode}`);
@@ -79,37 +81,42 @@ export default (program: CommanderStatic) => {
 
 function printHelp() {
     log("\n  Examples:\n");
+    log(`    mc mobile-apps --mode list \t\t\t\t\tlist mobile apps`);
+    log(`    mc mobile-apps --mode template --type [android|ios] \tcreate template file for mobileapp`);
+    log(`    mc mobile-apps --mode create --file [android|ios].mobileapp.mdsp.json\tcreate mobileapp`);
+    log(`    mc mobile-apps --mode info --appid <appid>\t\t\tmobile app info`);
+    log(`    mc mobile-apps --mode delete --appid <appid>\t\tdelete mobile app`);
     serviceCredentialLog();
 }
 
-export async function listmobileapps(options: any, sdk: MindSphereSdk) {
-    const mobileApps = sdk.GetNotificationClientV4();
+async function listMobileApps(options: any, sdk: MindSphereSdk) {
+    const mobileAppsClient = sdk.GetNotificationClientV4();
 
-    let page = 0;
+    let page = 1; // the mobile apps client is starting paging from 1 for some strange reason
     let mobileapps;
 
-    console.log(`modelid  name  [type]  author  version`);
+    console.log(`appId  [type]\t${color("name")}`);
 
     let appCount = 0;
 
     do {
-        const params = page === 0 ? undefined : { page: page, size: 20 };
+        const params = { page: page, size: 20 };
 
         mobileapps = (await retry(options.retry, () =>
-            mobileApps.GetMobileApps(params)
+            mobileAppsClient.GetMobileApps(params)
         )) as NotificationModelsV4.PagedAppRegistrationResponse;
 
         mobileapps.mobileApps = mobileapps.mobileApps || [];
         mobileapps.page = mobileapps.page || { totalPages: 0 };
 
         for (const mobileApp of mobileapps.mobileApps || []) {
+            // there is no info method for GET so we are using this way to do this
+            if (options.appid && mobileApp.id !== options.appid) continue;
             appCount++;
-            console.log(
-                `[${mobileApp.type}]  ${color(mobileApp.name)}\t${mobileApp.android?.fcmServerKey}\t[${
-                    mobileApp.ios?.apnsAppPrivateKey
-                }`
-            );
-
+            console.log(`${mobileApp.id} [${mobileApp.type}]\t${color(mobileApp.name)}`);
+            options.all && console.log(`${color(mobileApp.type)} properties:`);
+            options.all &&
+                (mobileApp.type === "android" ? console.table(mobileApp.android) : console.table(mobileApp.ios));
             verboseLog(JSON.stringify(mobileApp, null, 2), options.verbose);
         }
     } while (page++ < (mobileapps.page.totalPages || 0));
@@ -117,149 +124,108 @@ export async function listmobileapps(options: any, sdk: MindSphereSdk) {
     console.log(`${color(appCount)} mobileapps listed.\n`);
 }
 
-async function updateModel(options: any, sdk: MindSphereSdk) {
-    // const tenant = sdk.GetTenant();
-    // const modelMgmt = sdk.GetModelManagementClient();
-    // const oModel = (await retry(options.retry, () =>
-    //     modelMgmt.GetModel(options.modelid)
-    // )) as ModelManagementmobileapps.Model;
-    // verboseLog(JSON.stringify(oModel, null, 2), options.verbose);
-    // const type = options.modeltype ? options.modeltype : oModel.type || `${tenant}.CLI`;
-    // const patch = {
-    //     name: options.modelname || oModel.name,
-    //     type: type,
-    //     description: options.modeldesc || oModel.description,
-    // };
-    // const nextModel = (await retry(options.retry, () =>
-    //     modelMgmt.PatchModel(`${oModel.id}`, patch)
-    // )) as ModelManagementmobileapps.Model;
-    // console.log(`Model with modelid ${color(nextModel.id)} (${color(nextModel.name)}) have been patched.`);
+export async function listInstances(options: any, sdk: MindSphereSdk) {
+    const mobileAppsClient = sdk.GetNotificationClientV4();
+
+    let page = 1; // the mobile apps client is starting paging from 1 for some strange reason
+    let mobileAppsInstances;
+
+    console.log(`appId  [type]\t${color("name")}`);
+
+    let instanceCount = 0;
+
+    do {
+        const params = { page: page, size: 20 };
+
+        mobileAppsInstances = (await retry(options.retry, () =>
+            mobileAppsClient.GetMobileAppsInstances(options.appid, params)
+        )) as NotificationModelsV4.PagedAppInstanceResponse;
+
+        mobileAppsInstances.instances = mobileAppsInstances.instances || [];
+        mobileAppsInstances.page = mobileAppsInstances.page || { totalPages: 0 };
+
+        for (const instance of mobileAppsInstances.instances || []) {
+            instanceCount++;
+            console.log(
+                `${instance.id} [${instance.deviceOS}]  ${instance.language}  ${instance.pushNotificationToken} ${color(
+                    instance.userEmailAddress
+                )}`
+            );
+
+            verboseLog(JSON.stringify(instance, null, 2), options.verbose);
+        }
+    } while (page++ < (mobileAppsInstances.page.totalPages || 0));
+
+    console.log(`${color(instanceCount)} mobile app instances listed.\n`);
 }
 
-async function createTemplate(options: any, sdk: MindSphereSdk) {
-    // const file = {
-    //     name: options.modelname || `unnamed model (${uuid.v4()})`,
-    //     type: options.modeltype || "core.basicmodel",
-    //     description: options.modeldesc || "created with mindsphere CLI",
-    //     lastVersion: {
-    //         number: 1.0,
-    //         dependencies: [
-    //             {
-    //                 name: "sklearn-theano",
-    //                 type: "Python",
-    //                 version: "2.7",
-    //             },
-    //         ],
-    //         io: {
-    //             consumes: "CSV",
-    //             input: [
-    //                 {
-    //                     name: "variablename1",
-    //                     type: "integer",
-    //                     description: "description for variablename1",
-    //                     value: 5,
-    //                 },
-    //             ],
-    //             output: [
-    //                 {
-    //                     name: "outputname1",
-    //                     type: "integer",
-    //                     description: "description for outputname1",
-    //                     value: 3,
-    //                 },
-    //             ],
-    //             optionalParameters: {
-    //                 freeFormParams: "for the author to use",
-    //                 param1: "value1",
-    //             },
-    //         },
-    //         producedBy: [],
-    //         kpi: [
-    //             {
-    //                 name: "error rate",
-    //                 value: 0.9,
-    //             },
-    //         ],
-    //     },
-    // };
-    // const fileName = options.file || "model.file.mdsp.json";
-    // fs.writeFileSync(fileName, JSON.stringify(file, null, 2));
-    // const payloadFile = options.payload || "model.payload.mdsp.json";
-    // fs.writeFileSync(payloadFile, JSON.stringify({ empty: "model" }, null, 2));
-    // console.log(
-    //     `The model file was written into ${color(fileName)} and empty model file ${color(
-    //         payloadFile
-    //     )} was created.\nRun \n\n\tmc mobileapps --mode create --file ${fileName} --payload ${payloadFile} \n\nto create the model.`
-    // );
+async function createAppTemplate(options: any) {
+    const template =
+        options.type === "android"
+            ? {
+                  name: "string",
+                  type: "android",
+                  android: {
+                      fcmServerKey: "string",
+                  },
+              }
+            : {
+                  name: "string",
+                  type: "iOS",
+                  ios: {
+                      fcmServerKey: "string",
+                      bundleId: "string",
+                      apnsSslCertificate: "string",
+                      apnsAppPrivateKey: "string",
+                      production: false,
+                  },
+              };
+
+    const fileName = options.file || `${options.type}.mobileapp.mdsp.json`;
+    const filePath = path.resolve(fileName);
+
+    fs.existsSync(filePath) && !options.overwrite && throwError(`the file ${filePath} already exists.`);
+    fs.writeFileSync(filePath, JSON.stringify(template, null, 2));
+    console.log(`The ${color(options.type)} template file was written into ${color(fileName)}`);
+    console.log(`Run:\n\n\
+              \tmc mobile-apps --mode create --file ${fileName}
+              \nto create mobile app in mindsphere.`);
 }
 
-async function createModel(options: any, sdk: MindSphereSdk) {
-    // const modelMgmt = sdk.GetModelManagementClient();
-    // const filePath = path.resolve(options.file);
-    // const filecontent = fs.readFileSync(filePath);
-    // const filedata = JSON.parse(filecontent.toString());
-    // const payloadFullPath = path.resolve(options.payload);
-    // const filename = path.basename(payloadFullPath);
-    // const buff = fs.readFileSync(payloadFullPath);
-    // const mimetype = getFileType(options.payload);
-    // const result = (await retry(options.retry, async () =>
-    //     modelMgmt.PostModel(filedata, { buffer: buff, fileName: filename, mimeType: mimetype })
-    // )) as ModelManagementmobileapps.Model;
-    // console.log(`Model with modelid ${color(result.id)} and name ${color(result.name)} was created.`);
+async function createOrUpdateApp(options: any, sdk: MindSphereSdk) {
+    const mobileAppsClient = sdk.GetNotificationClientV4();
+    const filePath = path.resolve(options.file);
+    const filecontent = fs.readFileSync(filePath);
+    const filedata = JSON.parse(filecontent.toString()) as NotificationModelsV4.AppRegistrationRequest;
+
+    if (options.mode === "create") {
+        const result = (await retry(options.retry, async () =>
+            mobileAppsClient.PostMobileApp(filedata as NotificationModelsV4.AppRegistrationRequest)
+        )) as NotificationModelsV4.AppRegistrationResponse;
+        console.log(`Mobile app with name ${color(result.name)} and type ${color(result.type)} was created.`);
+    } else if (options.mode === "update") {
+        const result = (await retry(options.retry, async () =>
+            mobileAppsClient.PatchMobileApp(
+                options.appid,
+                filedata as NotificationModelsV4.AppRegistrationUpdateRequest
+            )
+        )) as NotificationModelsV4.AppRegistrationResponse;
+        console.log(`Mobile app with name ${color(result.name)} and type ${color(result.type)} was updated.`);
+    } else {
+        throw Error(`Invalid mode in createOrUpdateMobileApp ${options.mode}`);
+    }
 }
 
-async function deleteModel(options: any, sdk: MindSphereSdk) {
-    // const modelMgmt = sdk.GetModelManagementClient();
-    // const model = await retry(options.retry, () => modelMgmt.GetModel(options.modelid));
-    // verboseLog(JSON.stringify(model, null, 2), options.verbose);
-    // await retry(options.retry, () => modelMgmt.DeleteModel(options.modelid));
-    // console.log(`Model with modelid ${color(model.id)} (${color(model.name)}) was deleted.`);
-}
-
-async function modelInfo(options: any, sdk: MindSphereSdk) {
-    // const model = (await retry(options.retry, () =>
-    //     sdk.GetModelManagementClient().GetModel(options.modelid)
-    // )) as ModelManagementmobileapps.Model;
-    // verboseLog(JSON.stringify(model, null, 2), options.verbose);
-    // const versions = (await retry(options.retry, () =>
-    //     sdk.GetModelManagementClient().GetModelVersions({ modelId: model.id, pageNumber: 0, pageSize: 100 })
-    // )) as ModelManagementmobileapps.VersionArray;
-    // printModel(model);
-    // printLatestModelVersions(versions);
-}
-
-async function downloadModel(options: any, sdk: MindSphereSdk) {
-    // const filePath = path.resolve(options.file);
-    // fs.existsSync(filePath) && errorLog(`the file file ${filePath} already exists!`, true);
-    // const payloadPath = path.resolve(options.payload);
-    // fs.existsSync(payloadPath) && errorLog(`the payload file ${payloadPath} already exists!`, true);
-    // const version = options.version || "last";
-    // const file = (await retry(options.retry, () =>
-    //     sdk.GetModelManagementClient().GetModelVersion(options.modelid, version)
-    // )) as ModelManagementmobileapps.Version;
-    // verboseLog(JSON.stringify(file, null, 2), options.verbose);
-    // fs.writeFileSync(filePath, JSON.stringify(file, null, 2));
-    // console.log(`file file ${color(filePath)} was written successfully.`);
-    // const download = (await retry(options.retry, () =>
-    //     sdk.GetModelManagementClient().DownloadModelVersion(options.modelid, version)
-    // )) as Response;
-    // !download.ok && errorLog(`Unexpected response ${download.statusText}`, true);
-    // const file = fs.createWriteStream(payloadPath);
-    // await streamPipeline(download.body, file);
-    // console.log(`payload file ${color(payloadPath)} was written successfully.`);
+async function deleteApp(options: any, sdk: MindSphereSdk) {
+    const mobileAppsClient = sdk.GetNotificationClientV4();
+    await retry(options.retry, () => mobileAppsClient.DeleteMobileApp(options.appid));
+    console.log(`App with id ${color(options.appid)} was deleted.`);
 }
 
 function checkRequiredParameters(options: any) {
-    // options.mode === "create" && !options.file && errorLog("you have to specify the file file", true);
-    // options.mode === "create" && !options.payload && errorLog("you have to specify the payload file", true);
-    // (options.mode === "delete" || options.mode === "update") &&
-    //     !options.modelid &&
-    //     errorLog("you have to specify the id of the model", true);
-    // options.mode === "update" &&
-    //     !options.modelname &&
-    //     errorLog("you have to specify at least the model name before patching the model", true);
-    // options.mode === "info" && !options.modelid && errorLog("you have to provide a modelid", true);
-    // options.mode === "download" &&
-    //     (!options.modelid || !options.file || !options.payload) &&
-    //     errorLog("you have to provide a modelid, file and payload file for download command", true);
+    options.mode === "create" && !options.file && errorLog("you have to specify the file file", true);
+    (options.mode === "delete" || options.mode === "update") &&
+        !options.appid &&
+        errorLog("you have to specify the appid of the mobile app", true);
+    options.mode === "info" && !options.appid && errorLog("you have to specify the appid of the mobile app", true);
 }

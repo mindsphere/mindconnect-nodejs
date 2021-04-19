@@ -132,6 +132,14 @@ export namespace NotificationModelsV4 {
      */
     export interface AppInstanceResponse {
         /**
+         * !fix: manually added in April 2021 as OpenAPI is not specifying this
+         *
+         * @type {string}
+         * @memberOf AppInstanceResponse
+         */
+        id?: string;
+
+        /**
          * Device operating system
          * @type {string}
          * @memberof AppInstanceResponse
@@ -410,6 +418,13 @@ export namespace NotificationModelsV4 {
      */
     export interface MobileAppObject {
         /**
+         * !fix: April 2021: Manual fix, extened the object definition with id.
+         *
+         * @type {string}
+         * @memberOf MobileAppObject
+         */
+        id?: string;
+        /**
          * App names must be made up of only uppercase and lowercase ASCII letters, numbers, underscores, hyphens, and periods, must be between 1 and 256 characters long, and must begin with a letter.
          * @type {string}
          * @memberof MobileAppObject
@@ -449,11 +464,12 @@ export namespace NotificationModelsV4 {
      */
     export namespace MobileAppObject {
         /**
+         * ! fix: (April 2021) Manual fix to correspond with Implementation (iOS instead of ios)
          * @export
          * @enum {string}
          */
         export enum TypeEnum {
-            Ios = "ios",
+            Ios = "iOS",
             Android = "android",
         }
     }

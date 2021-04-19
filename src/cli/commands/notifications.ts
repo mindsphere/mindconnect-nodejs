@@ -72,7 +72,7 @@ function printHelp() {
         `    mc notifications --mode template --type [mail|sms|push] \t create template file with notification metadata`
     );
     log(
-        `    mc notifications --mode send --metadata <[mail|sms|push].metadata.mdsp.json> --type [mail|sms|push] \t send notifications (mail, sms, push) from template to recipients`
+        `    mc notifications --mode send --metadata <[mail|sms|push].metadata.mdsp.json> --type [mail|sms|push] \n\t\t\t\t\t send notifications (mail, sms, push) to recipients`
     );
     serviceCredentialLog();
 }
