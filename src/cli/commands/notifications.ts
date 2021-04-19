@@ -217,7 +217,7 @@ async function getStatus(options: any, sdk: MindSphereSdk) {
                     console.log(`Start time: ${color(result.startTime)}`);
                 } catch (err) {
                     console.log(
-                        "Error occured. In April 2021 there was no method available to get status of the MulticastPushNotificationJob"
+                        "Error occured. In April 2021 there was no method available to get the status of the MulticastPushNotificationJob"
                     );
                     console.log("This was reported to MindSphere dev team and should eventually start working...");
                     throw err;
