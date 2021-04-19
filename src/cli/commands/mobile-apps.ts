@@ -14,6 +14,7 @@ import {
     serviceCredentialLog,
     verboseLog,
 } from "./command-utils";
+import { listInstances } from "./mobile-app-instances";
 let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
@@ -95,7 +96,7 @@ async function listMobileApps(options: any, sdk: MindSphereSdk) {
     let page = 1; // the mobile apps client is starting paging from 1 for some strange reason
     let mobileapps;
 
-    console.log(`appId  [type]\t${color("name")}`);
+    console.log(`appId  [type]\t${color("name")} [instance count]`);
 
     let appCount = 0;
 
@@ -109,11 +110,17 @@ async function listMobileApps(options: any, sdk: MindSphereSdk) {
         mobileapps.mobileApps = mobileapps.mobileApps || [];
         mobileapps.page = mobileapps.page || { totalPages: 0 };
 
-        for (const mobileApp of mobileapps.mobileApps || []) {
+        for await (const mobileApp of mobileapps.mobileApps || []) {
             // there is no info method for GET so we are using this way to do this
             if (options.appid && mobileApp.id !== options.appid) continue;
             appCount++;
-            console.log(`${mobileApp.id} [${mobileApp.type}]\t${color(mobileApp.name)}`);
+
+            const instances = await mobileAppsClient.GetMobileAppsInstances(`${mobileApp.id}`);
+
+            console.log(
+                `${mobileApp.id} [${mobileApp.type}]\t${color(mobileApp.name)} [${instances.page?.totalElements || 0}]`
+            );
+
             options.all && console.log(`${color(mobileApp.type)} properties:`);
             options.all &&
                 (mobileApp.type === "android" ? console.table(mobileApp.android) : console.table(mobileApp.ios));
@@ -122,41 +129,6 @@ async function listMobileApps(options: any, sdk: MindSphereSdk) {
     } while (page++ < (mobileapps.page.totalPages || 0));
 
     console.log(`${color(appCount)} mobileapps listed.\n`);
-}
-
-export async function listInstances(options: any, sdk: MindSphereSdk) {
-    const mobileAppsClient = sdk.GetNotificationClientV4();
-
-    let page = 1; // the mobile apps client is starting paging from 1 for some strange reason
-    let mobileAppsInstances;
-
-    console.log(`appId  [type]\t${color("name")}`);
-
-    let instanceCount = 0;
-
-    do {
-        const params = { page: page, size: 20 };
-
-        mobileAppsInstances = (await retry(options.retry, () =>
-            mobileAppsClient.GetMobileAppsInstances(options.appid, params)
-        )) as NotificationModelsV4.PagedAppInstanceResponse;
-
-        mobileAppsInstances.instances = mobileAppsInstances.instances || [];
-        mobileAppsInstances.page = mobileAppsInstances.page || { totalPages: 0 };
-
-        for (const instance of mobileAppsInstances.instances || []) {
-            instanceCount++;
-            console.log(
-                `${instance.id} [${instance.deviceOS}]  ${instance.language}  ${instance.pushNotificationToken} ${color(
-                    instance.userEmailAddress
-                )}`
-            );
-
-            verboseLog(JSON.stringify(instance, null, 2), options.verbose);
-        }
-    } while (page++ < (mobileAppsInstances.page.totalPages || 0));
-
-    console.log(`${color(instanceCount)} mobile app instances listed.\n`);
 }
 
 async function createAppTemplate(options: any) {
@@ -223,9 +195,11 @@ async function deleteApp(options: any, sdk: MindSphereSdk) {
 }
 
 function checkRequiredParameters(options: any) {
-    options.mode === "create" && !options.file && errorLog("you have to specify the file file", true);
-    (options.mode === "delete" || options.mode === "update") &&
+    options.mode === "create" &&
+        !options.file &&
+        errorLog("you have to specify the --file for --mode create command", true);
+    options.mode === "update" && !options.file && errorLog("you have to specify the --file for --update command", true);
+    (options.mode === "delete" || options.mode === "update" || options.mode === "info") &&
         !options.appid &&
         errorLog("you have to specify the appid of the mobile app", true);
-    options.mode === "info" && !options.appid && errorLog("you have to specify the appid of the mobile app", true);
 }

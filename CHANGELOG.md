@@ -5,7 +5,9 @@
 ### Bugfixes and Improvements 3.13.0
 
 - CLI: new `mdsp` alias for command additionally to `mc` alias
-- CLI: new `mc notification` command for MindSphere notifications [#252]
+- CLI: new `mc mobile-app-instances` command [#252]
+- CLI: new `mc mobile-apps` command [#252]
+- CLI: new `mc notifications` command for MindSphere notifications [#252]
 - CLI: fixed bug in `mc aggregates` command with multiple lines of same aggregate
 - SDK: NotficationV4 Client [#252]
 - SDK: IotTimeSeriesAggragetesV4 Client [#250]

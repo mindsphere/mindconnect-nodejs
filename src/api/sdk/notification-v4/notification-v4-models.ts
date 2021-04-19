@@ -157,6 +157,16 @@ export namespace NotificationModelsV4 {
          * @memberof AppInstanceResponse
          */
         pushNotificationToken?: string;
+
+        /**
+         * ! fix: April 2021. manually added
+         *
+         * Device model
+         *
+         * @type {string}
+         * @memberOf AppInstanceResponse
+         */
+        deviceModel?: string;
     }
 
     /**

@@ -40,6 +40,7 @@ import unregisterDiagnoticCommand from "./commands/mc-unregister-diagnostic";
 import uploadFileCommand from "./commands/mc-upload-file";
 import uploadTimeSeriesCommand from "./commands/mc-upload-timeseries";
 import versionAndHelp from "./commands/mc-version-help";
+import mobileAppInstancesCommand from "./commands/mobile-app-instances";
 import mobileAppsCommand from "./commands/mobile-apps";
 import modelsCommand from "./commands/models";
 import mqttCreateCommand from "./commands/mqtt-create-jwt";
@@ -115,6 +116,7 @@ dataLakeCommand(program);
 // * mobileApps
 
 mobileAppsCommand(program);
+mobileAppInstancesCommand(program);
 
 // * analytics command
 
