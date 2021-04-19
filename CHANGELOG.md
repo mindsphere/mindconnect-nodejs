@@ -4,7 +4,12 @@
 
 ### Bugfixes and Improvements 3.13.0
 
-- CLI fixed bug in `mc aggregates` command with multiple lines of same aggregate
+- CLI: new `mdsp` alias for command additionally to `mc` alias
+- CLI: new `mc notification` command for MindSphere notifications [#252]
+- CLI: fixed bug in `mc aggregates` command with multiple lines of same aggregate
+- SDK: NotficationV4 Client [#252]
+- SDK: IotTimeSeriesAggragetesV4 Client [#250]
+- Bumped all dependencies
 
 ## 3.12.0 - (Frost Vienna) - April 2021
 
@@ -16,7 +21,6 @@
 - CLI: new `mc tenant` command for tenant management [#246]
 - CLI: new `mc events` command for event management [#241]
 - CLI: renamed and extended `mc download-events` to `mc events-bulk` command with `--mode download` and  `--mode delete` [#240]
-- SDK: IotTimeSeriesAggragetesV4 Client [#250]
 - SDK: ModelManagementClient [#202]
 - SDK: TenantManagementClient
 - Bumped all dependencies

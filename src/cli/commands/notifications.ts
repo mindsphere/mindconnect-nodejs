@@ -3,6 +3,7 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { MindSphereSdk, NotificationModelsV4 } from "../../api/sdk";
+import { throwError } from "../../api/utils";
 import {
     adjustColor,
     errorLog,
@@ -24,7 +25,9 @@ export default (program: CommanderStatic) => {
         .option("-m, --mode [template|status|send]", "mode [template|send]", "template")
         .option("-t, --type [email|sms|push]", "type [email|sms|push]", "email")
         .option("-i, --jobid <jobid>", "job id for status command")
-        .option("-f, --metadata <metadata>", "model metadata file")
+        .option("-f, --metadata <metadata>", "metadata file with notification infos")
+        .option("-a, --files <files>", "comma separated list of attachement files for email (max 5)")
+        .option("-o, --overwrite", "overwrite template files")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
@@ -65,6 +68,9 @@ export default (program: CommanderStatic) => {
 
 function printHelp() {
     log("\n  Examples:\n");
+    log(
+        `    mc notifications --mode template --type [mail|sms|push] \t create template file with notification metadata`
+    );
     log(
         `    mc notifications --mode send --metadata <[mail|sms|push].metadata.mdsp.json> --type [mail|sms|push] \t send notifications (mail, sms, push) from template to recipients`
     );
@@ -114,7 +120,10 @@ async function createTemplate(options: any) {
     }
 
     const fileName = options.metadata || `${options.type}.metadata.mdsp.json`;
-    fs.writeFileSync(fileName, JSON.stringify(metadata, null, 2));
+    const filePath = path.resolve(fileName);
+    fs.existsSync(filePath) && !options.overwrite && throwError(`the file ${filePath} already exists.`);
+
+    fs.writeFileSync(filePath, JSON.stringify(metadata, null, 2));
 
     console.log(
         `The ${options.mode} metadata was written into ${color(
@@ -129,16 +138,27 @@ async function sendMessage(options: any, sdk: MindSphereSdk) {
     const filePath = path.resolve(options.metadata);
     const filecontent = fs.readFileSync(filePath);
     const filedata = JSON.parse(filecontent.toString());
-
     const notificationClient = sdk.GetNotificationClientV4();
 
     let result;
 
     switch (options.type) {
         case "email":
-            // TODO: attachments
             {
-                result = await notificationClient.PostMulticastEmailNotificationJobs(filedata);
+                const files = options.files ? `${options.files}`.split(",") : [];
+
+                const attachements: NotificationModelsV4.Attachment[] = [];
+
+                files.forEach((file) => {
+                    const currentFile = path.resolve(file.trim());
+                    const baseName = path.basename(currentFile);
+                    const buffer = fs.readFileSync(currentFile);
+                    const mimetype = mime.lookup(currentFile);
+                    console.log(`Attaching file: ${color(currentFile)} mime type: ${mimetype}`);
+                    attachements.push({ buffer: buffer, fileName: baseName, mimeType: mimetype });
+                });
+
+                result = await notificationClient.PostMulticastEmailNotificationJobs(filedata, attachements);
             }
             break;
         case "sms":
@@ -170,10 +190,10 @@ async function getStatus(options: any, sdk: MindSphereSdk) {
                 const result = await notificationClient.GetMulticastEmailNotificationJobs(options.jobid);
                 verboseLog(JSON.stringify(result, null, 2), options.verbose);
                 console.log(`${color(options.type)} job with id ${options.jobid}:`);
-                console.log(`\t Status: ${color(result.status)}`);
-                console.log(`\t From Application: ${color(result.fromApplication)}`);
-                console.log(`\t Malicious attachments: ${color(result.maliciousAttachments?.length)}`);
-                console.log(`\t Start time: ${color(result.startTime)}`);
+                console.log(`Status: ${color(result.status)}`);
+                console.log(`From Application: ${color(result.fromApplication)}`);
+                console.log(`Malicious attachments: ${color(result.maliciousAttachments?.length)}`);
+                console.log(`Start time: ${color(result.startTime)}`);
             }
             break;
         case "sms":
@@ -181,9 +201,9 @@ async function getStatus(options: any, sdk: MindSphereSdk) {
                 const result = await notificationClient.GetMulticastSMSNotificationJobs(options.jobid);
                 verboseLog(JSON.stringify(result, null, 2), options.verbose);
                 console.log(`${color(options.type)} job with id ${options.jobid}:`);
-                console.log(`\t Status: ${color(result.status)}`);
-                console.log(`\t From Application: ${color(result.fromApplication)}`);
-                console.log(`\t Start time: ${color(result.startTime)}`);
+                console.log(`Status: ${color(result.status)}`);
+                console.log(`From Application: ${color(result.fromApplication)}`);
+                console.log(`Start time: ${color(result.startTime)}`);
             }
             break;
 
@@ -193,8 +213,8 @@ async function getStatus(options: any, sdk: MindSphereSdk) {
                     const result = await notificationClient.GetMulticastPushNotificationJobs(options.jobid);
                     verboseLog(JSON.stringify(result, null, 2), options.verbose);
                     console.log(`${color(options.type)} job with id ${options.jobid}:`);
-                    console.log(`\t Status: ${color(result.status)}`);
-                    console.log(`\t Start time: ${color(result.startTime)}`);
+                    console.log(`Status: ${color(result.status)}`);
+                    console.log(`Start time: ${color(result.startTime)}`);
                 } catch (err) {
                     console.log(
                         "Error occured. In April 2021 there was no method available to get status of the MulticastPushNotificationJob"

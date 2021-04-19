@@ -100,7 +100,8 @@
         "url": "https://github.com/mindsphere/mindconnect-nodejs.git"
     },
     "bin": {
-        "mc": "bin/mc"
+        "mc": "bin/mc",
+        "mdsp": "bin/mc"
     },
     "pkg": {
         "assets": "dist/**/*"
