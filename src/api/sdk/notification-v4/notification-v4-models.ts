@@ -420,19 +420,27 @@ export namespace NotificationModelsV4 {
          * @type {string}
          * @memberof MobileAppObject
          */
-        type?: MobileAppObject.TypeEnum;
+        type?: MobileAppObject.TypeEnum | string;
+        /**
+         *
+         * !fix: Manually typed in April 2021, there was no defined type in swagger.
+         *
+         * @type {any}
+         * @memberof MobileAppObject
+         */
+        android?: { fcmServerKey?: string };
         /**
          *
          * @type {any}
          * @memberof MobileAppObject
          */
-        android?: any;
-        /**
-         *
-         * @type {any}
-         * @memberof MobileAppObject
-         */
-        ios?: any;
+        ios?: {
+            fcmServerKey?: string;
+            bundleId?: string;
+            apnsSslCertificate?: string;
+            apnsAppPrivateKey?: string;
+            production?: boolean;
+        };
     }
 
     /**

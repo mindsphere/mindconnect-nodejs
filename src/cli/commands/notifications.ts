@@ -246,9 +246,3 @@ function checkRequiredParameters(options: any) {
         !options.metadata &&
         errorLog("You have to specify the template file (--metadata path) for mc nt --mode send command ", true);
 }
-
-function getFileType(metadata: string | Buffer) {
-    return metadata instanceof Buffer
-        ? "application/octet-stream"
-        : `${mime.lookup(metadata)}` || "application/octet-stream";
-}
