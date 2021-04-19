@@ -353,7 +353,7 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 | --- | --- | --- |
 | Asset Management   | :heavy_check_mark: | :heavy_check_mark: |
 | Event Management   | :heavy_check_mark: | :heavy_check_mark: |
-| Notification   |  |  |
+| Notification   | :heavy_check_mark: | :heavy_check_mark: |
 
 ### Analytics Services
 
