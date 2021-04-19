@@ -158,15 +158,15 @@ async function sendMessage(options: any, sdk: MindSphereSdk) {
                     attachements.push({ buffer: buffer, fileName: baseName, mimeType: mimetype });
                 });
 
-                result = await notificationClient.PostMulticastEmailNotificationJobs(filedata, attachements);
+                result = await notificationClient.PostMulticastEmailNotificationJob(filedata, attachements);
             }
             break;
         case "sms":
-            result = await notificationClient.PostMulticastSMSNotificationJobs(filedata);
+            result = await notificationClient.PostMulticastSMSNotificationJob(filedata);
             break;
 
         case "push":
-            result = await notificationClient.PostMulticastPushNotificationJobs(filedata);
+            result = await notificationClient.PostMulticastPushNotificationJob(filedata);
             break;
         default:
             throw Error(`The type ${options.type} is not supported`);
@@ -187,7 +187,7 @@ async function getStatus(options: any, sdk: MindSphereSdk) {
     switch (options.type) {
         case "email":
             {
-                const result = await notificationClient.GetMulticastEmailNotificationJobs(options.jobid);
+                const result = await notificationClient.GetMulticastEmailNotificationJob(options.jobid);
                 verboseLog(JSON.stringify(result, null, 2), options.verbose);
                 console.log(`${color(options.type)} job with id ${options.jobid}:`);
                 console.log(`Status: ${color(result.status)}`);
@@ -198,7 +198,7 @@ async function getStatus(options: any, sdk: MindSphereSdk) {
             break;
         case "sms":
             {
-                const result = await notificationClient.GetMulticastSMSNotificationJobs(options.jobid);
+                const result = await notificationClient.GetMulticastSMSNotificationJob(options.jobid);
                 verboseLog(JSON.stringify(result, null, 2), options.verbose);
                 console.log(`${color(options.type)} job with id ${options.jobid}:`);
                 console.log(`Status: ${color(result.status)}`);
@@ -210,7 +210,7 @@ async function getStatus(options: any, sdk: MindSphereSdk) {
         case "push":
             {
                 try {
-                    const result = await notificationClient.GetMulticastPushNotificationJobs(options.jobid);
+                    const result = await notificationClient.GetMulticastPushNotificationJob(options.jobid);
                     verboseLog(JSON.stringify(result, null, 2), options.verbose);
                     console.log(`${color(options.type)} job with id ${options.jobid}:`);
                     console.log(`Status: ${color(result.status)}`);

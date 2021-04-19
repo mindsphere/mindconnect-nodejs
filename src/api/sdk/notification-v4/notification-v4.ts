@@ -56,7 +56,7 @@ export class NotificationClientV4 extends SdkClient {
      *
      * @memberOf NotificationClientV4
      */
-    public async PostMulticastEmailNotificationJobs(
+    public async PostMulticastEmailNotificationJob(
         metadata: NotificationModelsV4.MulticastEmailNotificationRequestMetadata,
         attachments?: NotificationModelsV4.Attachment[]
     ): Promise<NotificationModelsV4.EmailJobResponse> {
@@ -91,7 +91,7 @@ export class NotificationClientV4 extends SdkClient {
      *
      * @memberOf NotificationClientV4
      */
-    public async GetMulticastEmailNotificationJobs(
+    public async GetMulticastEmailNotificationJob(
         id: string
     ): Promise<NotificationModelsV4.MulticastEmailNotificationJob> {
         const result = await this.HttpAction({
@@ -152,7 +152,7 @@ export class NotificationClientV4 extends SdkClient {
      *
      * @memberOf NotificationClientV4
      */
-    public async PostMulticastSMSNotificationJobs(
+    public async PostMulticastSMSNotificationJob(
         metadata: NotificationModelsV4.MulticastSMSNotificationJobRequest
     ): Promise<NotificationModelsV4.SMSJobResponse> {
         if (metadata === null || metadata === undefined) {
@@ -181,9 +181,7 @@ export class NotificationClientV4 extends SdkClient {
      *
      * @memberOf NotificationClientV4
      */
-    public async GetMulticastSMSNotificationJobs(
-        id: string
-    ): Promise<NotificationModelsV4.MulticastSMSNotificationJob> {
+    public async GetMulticastSMSNotificationJob(id: string): Promise<NotificationModelsV4.MulticastSMSNotificationJob> {
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
@@ -195,6 +193,9 @@ export class NotificationClientV4 extends SdkClient {
     }
 
     /**
+     *
+     * * SMS
+     *
      * Shows detailed delivery information of an sms job.
      *
      * @param {string} id Job ID to fetch the details
@@ -218,7 +219,22 @@ export class NotificationClientV4 extends SdkClient {
         return result as NotificationModelsV4.NotificationDispatchStatusSMS;
     }
 
-    public async PostMulticastPushNotificationJobs(
+    /**
+     * * Push
+     *
+     * Sends a push notification to selected mobile app instances.
+     *
+     * Publishes the notification via Mobile Push to the selected mobile app instances.
+     * The developer can choose to address recipients using their mobile device ids or using the
+     * recipient’s email address. When a recipient is addressed using their email address,
+     * the Notification Service sends the notifications to all app instances registered with that email address.
+     *
+     * @param {NotificationModelsV4.MulticastPushNotificationJobsRequest} job
+     * @returns {Promise<NotificationModelsV4.SMSJobResponse>}
+     *
+     * @memberOf NotificationClientV4
+     */
+    public async PostMulticastPushNotificationJob(
         job: NotificationModelsV4.MulticastPushNotificationJobsRequest
     ): Promise<NotificationModelsV4.SMSJobResponse> {
         if (job === null || job === undefined) {
@@ -246,7 +262,7 @@ export class NotificationClientV4 extends SdkClient {
      *
      * @memberOf NotificationClientV4
      */
-    public async GetMulticastPushNotificationJobs(id: string): Promise<NotificationModelsV4.SendResponse> {
+    public async GetMulticastPushNotificationJob(id: string): Promise<NotificationModelsV4.SendResponse> {
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
@@ -255,5 +271,235 @@ export class NotificationClientV4 extends SdkClient {
         });
 
         return result as NotificationModelsV4.SendResponse;
+    }
+
+    /**
+     * * Mobile Apps
+     *
+     * Register a new mobile app.
+     *
+     * A mobile app developer should use this api to register a mobile app with the Notification Service.
+     * This resource represents a mobile app in Notification Service.
+     * Either an iOS or Android configuration can be chosen for the app.
+     * Registration of the mobile app allows the developer to configure necessary push notification provider credentials.
+     * App Configuration details are masked and not displayed in response owing to security reasons.
+     *
+     * @param {NotificationModelsV4.AppRegistrationRequest} appData
+     * @returns {Promise<NotificationModelsV4.AppRegistrationResponse>}
+     *
+     * @memberOf NotificationClientV4
+     */
+    public async PostMobileApp(
+        appData: NotificationModelsV4.AppRegistrationRequest
+    ): Promise<NotificationModelsV4.AppRegistrationResponse> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            body: appData,
+            baseUrl: `${this._baseUrl}/mobileApps`,
+        });
+
+        return result as NotificationModelsV4.AppRegistrationRequest;
+    }
+
+    /**
+     * * Mobile Apps
+     *
+     * Show all registered apps for a tenant.
+     * App Configuration details are masked and not displayed in response owing to security reasons.
+     *
+     * @param {{
+     *         page?: number;
+     *         size?: number;
+     *     }} [params]
+     * @returns {Promise<NotificationModelsV4.PagedAppRegistrationResponse>}
+     *
+     * @memberOf NotificationClientV4
+     */
+    public async GetMobileApps(params?: {
+        page?: number;
+        size?: number;
+    }): Promise<NotificationModelsV4.PagedAppRegistrationResponse> {
+        const parameters = params || {};
+
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/mobileApps?${toQueryString(parameters)}`,
+        });
+
+        return result as NotificationModelsV4.PagedAppRegistrationResponse;
+    }
+
+    /**
+     * * Mobile Apps
+     *
+     * Edit a registered mobile app.
+     * App Configuration details are masked and not displayed in response
+     * for security reasons.
+     *
+     * @param {string} id
+     * @param {NotificationModelsV4.AppRegistrationUpdateRequest} appData
+     * @returns {Promise<NotificationModelsV4.AppRegistrationResponse>}
+     *
+     * @memberOf NotificationClientV4
+     */
+    public async PatchMobileApp(
+        id: string,
+        appData: NotificationModelsV4.AppRegistrationUpdateRequest
+    ): Promise<NotificationModelsV4.AppRegistrationResponse> {
+        const result = await this.HttpAction({
+            verb: "PATCH",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            body: appData,
+            baseUrl: `${this._baseUrl}/mobileApps/${id}`,
+        });
+
+        return result as NotificationModelsV4.AppRegistrationResponse;
+    }
+
+    /**
+     * * Mobile Apps
+     *
+     * Deregister an existing registered mobile app.
+     *
+     * Deregistration of a mobile app involves deletion of all saved credentials and other configuration.
+     * Any pending notification jobs which depend on this configuration will be terminated,
+     * marked with a failed status and the notifications will not be dispatched to the intended recipients.
+     *
+     * @param {string} id
+     *
+     * @memberOf NotificationClientV4
+     */
+    public async DeleteMobileApp(id: string) {
+        await this.HttpAction({
+            verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/mobileApps/${id}`,
+            noResponse: true,
+        });
+    }
+
+    /**
+     * * Mobile Apps
+     *
+     * Registers a new mobile installation instance with a registered mobile app.
+     *
+     * Registration is invoked when a mobile app is installed on a device and user details can be updated
+     * by the developer based on login.
+     * If the instance is already registered, existing instance entry shall be updated.
+     * Push notification token detail is masked and not displayed in response owing to security reasons.
+     *
+     * @param {string} id
+     * @param {NotificationModelsV4.AppInstanceRequest} appInstanceData
+     * @returns {Promise<NotificationModelsV4.AppInstanceResponse>}
+     *
+     * @memberOf NotificationClientV4
+     */
+    public async PostMobileAppInstance(
+        id: string,
+        appInstanceData: NotificationModelsV4.AppInstanceRequest
+    ): Promise<NotificationModelsV4.AppInstanceResponse> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            body: appInstanceData,
+            baseUrl: `${this._baseUrl}/mobileApps/${id}/instances`,
+        });
+
+        return result as NotificationModelsV4.AppInstanceResponse;
+    }
+
+    /**
+     * * Mobile Apps
+     *
+     * Show all registered mobile app instances for a given mobile app.
+     * Push notification token detail is masked and not displayed in response for security reasons.
+     *
+     * @param {string} id
+     * @param {{
+     *             page?: number;
+     *             size?: number;
+     *         }} [params]
+     * @returns {Promise<NotificationModelsV4.PagedAppInstanceResponse>}
+     *
+     * @memberOf NotificationClientV4
+     */
+    public async GetMobileAppsInstances(
+        id: string,
+        params?: {
+            page?: number;
+            size?: number;
+        }
+    ): Promise<NotificationModelsV4.PagedAppInstanceResponse> {
+        const parameters = params || {};
+
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/mobileApps/${id}/instances?${toQueryString(parameters)}`,
+        });
+
+        return result as NotificationModelsV4.PagedAppInstanceResponse;
+    }
+
+    /**
+     *
+     * * Mobile Apps
+     *
+     * Edit a specific mobile app instance registration.
+     * Push notification token detail is masked and not displayed in response owing to security reasons.
+     *
+     * @param {string} id
+     * @param {string} instanceid
+     * @param {NotificationModelsV4.AppInstancePatchRequest} mobileAppInstanceData
+     * @returns {Promise<NotificationModelsV4.AppInstanceResponse>}
+     *
+     * @memberOf NotificationClientV4
+     */
+    public async PatchMobileAppInstance(
+        id: string,
+        instanceid: string,
+        mobileAppInstanceData: NotificationModelsV4.AppInstancePatchRequest
+    ): Promise<NotificationModelsV4.AppInstanceResponse> {
+        const result = await this.HttpAction({
+            verb: "PATCH",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            body: mobileAppInstanceData,
+            baseUrl: `${this._baseUrl}/mobileApps/${id}/instances/${instanceid}`,
+        });
+
+        return result as NotificationModelsV4.AppInstanceResponse;
+    }
+
+    /**
+     * * Mobile Apps
+     *
+     * Delete a specific mobile app instance registration.
+     *
+     * Deregistration of a mobile app involves deletion of the corresponding push notification token.
+     * Any pending notification jobs which depend on this configuration will be terminated,
+     * marked with a failed status and the notifications will not be dispatched to the mobile app instance.
+     *
+     * @param {string} id
+     * @param {string} instanceid
+     *
+     * @memberOf NotificationClientV4
+     */
+    public async DeleteMobileAppsInstance(id: string, instanceid: string) {
+        await this.HttpAction({
+            verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/mobileApps/${id}/instances/${instanceid}`,
+            noResponse: true,
+        });
     }
 }
