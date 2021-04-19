@@ -40,13 +40,17 @@ import unregisterDiagnoticCommand from "./commands/mc-unregister-diagnostic";
 import uploadFileCommand from "./commands/mc-upload-file";
 import uploadTimeSeriesCommand from "./commands/mc-upload-timeseries";
 import versionAndHelp from "./commands/mc-version-help";
+import mobileAppInstancesCommand from "./commands/mobile-app-instances";
+import mobileAppsCommand from "./commands/mobile-apps";
 import modelsCommand from "./commands/models";
 import mqttCreateCommand from "./commands/mqtt-create-jwt";
+import notificationCommand from "./commands/notifications";
 import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
 import subtenantCommand from "./commands/subtenant";
 import tenantCommand from "./commands/tenant";
 import trendPredictionCommand from "./commands/trend-prediction";
+
 // * generic commands
 
 versionAndHelp(program);
@@ -87,6 +91,7 @@ eventTypesCommand(program);
 eventsCommand(program);
 downloadEventsCommand(program);
 aggregatesCommand(program);
+notificationCommand(program);
 
 // * tenant commands
 
@@ -107,6 +112,11 @@ identityCommand(program);
 
 // * data lake
 dataLakeCommand(program);
+
+// * mobileApps
+
+mobileAppsCommand(program);
+mobileAppInstancesCommand(program);
 
 // * analytics command
 
