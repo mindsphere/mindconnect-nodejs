@@ -23,6 +23,8 @@ export * from "./iotbulk/iot-timeseries-bulk";
 export * from "./iotbulk/iot-timeseries-bulk-models";
 export * from "./iotfile/iot-file";
 export * from "./iotfile/iot-file-models";
+export * from "./jobmanager/jobmanager";
+export * from "./jobmanager/jobmanager-models";
 export * from "./mcapi/mcapi";
 export * from "./mcapi/mcapi-models";
 export * from "./model/model-management";
