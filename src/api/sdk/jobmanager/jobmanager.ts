@@ -176,6 +176,8 @@ export class JobManagerClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/schedules?${toQueryString(parameters)}`,
+            body: {},
+            additionalHeaders: { "Content-Type": "application/json" }, // ! fix:  April 2021 manual fix for the schedules endpoint
         });
 
         return result as JobManagerModels.ScheduleList;
