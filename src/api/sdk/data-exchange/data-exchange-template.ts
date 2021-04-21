@@ -4,7 +4,7 @@ export const dataExchangeTemplate = (metadata: DataExchangeModels.ResourcePatch,
 ----mindsphere\r\n\
 Content-Disposition: form-data; name="file"; filename="${metadata.name}"\
 \r\n\
-Content-Type: ${metadata.type}\
+Content-Type: ${metadata.type || "application/octet-stream"}\
 \r\n\r\n${buffer.toString("ascii")}\r\n\
 ----mindsphere\r\n\
 Content-Disposition: form-data; name="metadata"\

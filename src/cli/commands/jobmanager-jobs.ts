@@ -85,7 +85,7 @@ async function createJob(options: any, sdk: MindSphereSdk) {
     const job = JSON.parse(file.toString());
 
     await sdk.GetJobManagerClient().PostJob(job);
-    console.log(`creted job ${color(name)}`);
+    console.log(`created job ${color(name)}`);
 }
 
 function createTemplate(options: any) {

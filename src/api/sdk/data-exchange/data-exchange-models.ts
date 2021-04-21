@@ -20,13 +20,6 @@ export namespace DataExchangeModels {
     /**
      *
      * @export
-     * @interface Directories
-     */
-    export interface Directories extends Array<Directory> {}
-
-    /**
-     *
-     * @export
      * @interface DirectoriesFilesArray
      */
     export interface DirectoriesFilesArray {
@@ -35,13 +28,13 @@ export namespace DataExchangeModels {
          * @type {Array<Files>}
          * @memberof DirectoriesFilesArray
          */
-        files?: Array<Files>;
+        files?: Array<File>;
         /**
          *
-         * @type {Array<Directories>}
+         * @type {Array<Directory>}
          * @memberof DirectoriesFilesArray
          */
-        directories?: Array<Directories>;
+        directories?: Array<Directory>;
         /**
          *
          * @type {Page}
@@ -87,13 +80,6 @@ export namespace DataExchangeModels {
          */
         modifiedBy?: string;
     }
-
-    /**
-     *
-     * @export
-     * @interface Files
-     */
-    export interface Files extends Array<any> {}
 
     /**
      *

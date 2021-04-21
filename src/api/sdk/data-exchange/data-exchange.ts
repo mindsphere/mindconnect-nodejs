@@ -143,6 +143,8 @@ export class DataExchangeClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/files/${id}/properties`,
+            // !fix: manual fix - this is actually illegal call according to mindsphere rules
+            additionalHeaders: { "Content-Type": "application/json" },
         });
         return result as DataExchangeModels.File;
     }
@@ -210,6 +212,8 @@ export class DataExchangeClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/directories/${id}/properties`,
+            // !fix: manual fix - this is actually illegal call according to mindsphere rules
+            additionalHeaders: { "Content-Type": "application/json" },
         });
         return result as DataExchangeModels.Directory;
     }
@@ -245,7 +249,7 @@ export class DataExchangeClient extends SdkClient {
      */
     public async GetDirectory(
         id: string,
-        params?: { pageNumber?: number; pageSize?: number; filter: string }
+        params?: { pageNumber?: number; pageSize?: number; filter?: string }
     ): Promise<DataExchangeModels.DirectoriesFilesArray> {
         const parameters = params || {};
         const result = await this.HttpAction({
