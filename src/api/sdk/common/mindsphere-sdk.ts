@@ -1,5 +1,6 @@
 import { AgentManagementClient } from "../agent/agent-management";
 import { AssetManagementClient } from "../asset/asset-management";
+import { DataExchangeClient } from "../data-exchange/data-exchange";
 import { DataLakeClient } from "../data-lake/data-lake";
 import { EventAnalyticsClient } from "../event-analytics/eventanalytics";
 import { EventManagementClient } from "../event/event-management";
@@ -330,5 +331,19 @@ export class MindSphereSdk extends SdkClient {
     public GetJobManagerClient(): JobManagerClient {
         this._jobManagerClient = this._jobManagerClient || new JobManagerClient(this._authenticator);
         return this._jobManagerClient;
+    }
+
+    private _dataExchangeClient?: DataExchangeClient;
+
+    /**
+     * Data Exchange Client
+     *
+     * @returns {DataExchangeClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetDataExchangeClient(): DataExchangeClient {
+        this._dataExchangeClient = this._dataExchangeClient || new DataExchangeClient(this._authenticator);
+        return this._dataExchangeClient;
     }
 }
