@@ -73,21 +73,15 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc jobs --mode list \tlist all jobs`);
-            log(`    mc jobs --mode list --status FAILED --message import \tlist all jobs which failed on import`);
-            log(`    mc jobs --mode list --modelid <modelid> \tlist all jobs for specified model`);
-            log(`    mc jobs --mode list --modelid <modelid> \tlist all jobs for specified model`);
-            log(`    mc jobs --mode list --modelid <modelid> \tlist all jobs for specified model`);
-            log(`    mc jobs --mode template \tcreate template file for job creation`);
-            log(`    mc jobs --mode create --file <templatefile> \tcreate job`);
-            log(`    mc jobs --mode info --jobid <jobid> \tget infos about the job`);
-            log(`    mc jobs --mode stop --jobid <jobid> \tstop job with job id`);
-            // log(`    mc jobs --mode list --job Pump\t\t list all jobs which are named Pump`);
-            // log(
-            //     `    mc jobs --mode template --job Pump \n\tcreate a template file (Enironment.job.mdsp.json) for job Pump`
-            // );
-            // log(`    mc jobs --mode create --file Pump.job.mdsp.json \n\tcreate job Pump in MindSphere`);
-
+            log(`    mc jobs --mode list \t\t\t\t\t list all jobs`);
+            log(`    mc jobs --mode list --status FAILED --message import \t list all jobs which failed on import`);
+            log(`    mc jobs --mode list --modelid <modelid> \t\t\t list all jobs for specified model`);
+            log(`    mc jobs --mode list --modelid <modelid> \t\t\t list all jobs for specified model`);
+            log(`    mc jobs --mode list --modelid <modelid> \t\t\t list all jobs for specified model`);
+            log(`    mc jobs --mode template \t\t\t\t\t create template file for job creation`);
+            log(`    mc jobs --mode create --file <templatefile> \t\t create job`);
+            log(`    mc jobs --mode info --jobid <jobid> \t\t\t get infos about the job`);
+            log(`    mc jobs --mode stop --jobid <jobid> \t\t\t stop job with job id`);
             serviceCredentialLog();
         });
 };

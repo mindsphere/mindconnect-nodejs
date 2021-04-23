@@ -218,6 +218,23 @@ export class DataExchangeClient extends SdkClient {
         return result as DataExchangeModels.Directory;
     }
 
+    /**
+     * * Directories
+     *
+     * Allows updating directory's properties.
+     *
+     * Allows updating directory metadata, including the parentId (which triggers a move of the current directory),
+     * or its visibility by moving it under a parentId that has a different visibility,
+     * causing this change to propagate to its inner contents.
+     * Changing the parentId to a parent that already contains a folder with the same name is not possible,
+     * an error will be thrown.
+     *
+     * @param {string} id
+     * @param {DataExchangeModels.ResourcePatch} options
+     * @returns {Promise<DataExchangeModels.Directory>}
+     *
+     * @memberOf DataExchangeClient
+     */
     public async PatchDirectoryProperties(
         id: string,
         options: DataExchangeModels.ResourcePatch
@@ -233,6 +250,8 @@ export class DataExchangeClient extends SdkClient {
     }
 
     /**
+     *
+     * * Directories
      *
      * Using GET on this endpoint to get a list of the source's contents
      *
@@ -259,5 +278,28 @@ export class DataExchangeClient extends SdkClient {
             baseUrl: `${this._baseUrl}/directories/${id}?${toQueryString(parameters)}`,
         });
         return result as DataExchangeModels.DirectoriesFilesArray;
+    }
+
+    /**
+     * * Directories
+     *
+     * Deletes a directory and its contents if recursive=true
+     *
+     * @param {string} id
+     * @param {{ recursive?: boolean }} [params]
+     *
+     * @param params.recursive specifies if the deletion will be performed recursively
+     *
+     * @memberOf DataExchangeClient
+     */
+    public async DeleteDirectory(id: string, params?: { recursive?: boolean }) {
+        const parameters = params || {};
+        await this.HttpAction({
+            verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/directories/${id}?${toQueryString(parameters)}`,
+            noResponse: true,
+        });
     }
 }
