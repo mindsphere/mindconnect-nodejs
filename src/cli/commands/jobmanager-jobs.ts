@@ -3,6 +3,7 @@ import { log } from "console";
 import * as fs from "fs";
 import { retry } from "../..";
 import { JobManagerModels, MindSphereSdk } from "../../api/sdk";
+import { throwError } from "../../api/utils";
 import {
     adjustColor,
     errorLog,
@@ -24,6 +25,10 @@ export default (program: CommanderStatic) => {
         .option("-m, --mode [list|create|stop|template|info]", "list | create | stop | template | info", "list")
         .option("-f, --file <file>", ".mdsp.json file with job definition", "jobmanager.job.mdsp.json")
         .option("-i, --jobid <jobid>", "the job id")
+        .option("-e, --message <message>", "the message filter (contains) for list command")
+        .option("-s, --status <status>", "the status filter (equals, e.g. STOPPED, FAILED...) for list command")
+        .option("-d, --modelid <modelid>", "the modelid filter (equals) for list command")
+        .option("-o, --overwrite", "overwrite template file if it already exists")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
@@ -68,7 +73,15 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc jobs --mode list \t\t\t\t\t list all jobs`);
+            log(`    mc jobs --mode list \tlist all jobs`);
+            log(`    mc jobs --mode list --status FAILED --message import \tlist all jobs which failed on import`);
+            log(`    mc jobs --mode list --modelid <modelid> \tlist all jobs for specified model`);
+            log(`    mc jobs --mode list --modelid <modelid> \tlist all jobs for specified model`);
+            log(`    mc jobs --mode list --modelid <modelid> \tlist all jobs for specified model`);
+            log(`    mc jobs --mode template \tcreate template file for job creation`);
+            log(`    mc jobs --mode create --file <templatefile> \tcreate job`);
+            log(`    mc jobs --mode info --jobid <jobid> \tget infos about the job`);
+            log(`    mc jobs --mode stop --jobid <jobid> \tstop job with job id`);
             // log(`    mc jobs --mode list --job Pump\t\t list all jobs which are named Pump`);
             // log(
             //     `    mc jobs --mode template --job Pump \n\tcreate a template file (Enironment.job.mdsp.json) for job Pump`
@@ -84,8 +97,8 @@ async function createJob(options: any, sdk: MindSphereSdk) {
     const file = fs.readFileSync(filePath);
     const job = JSON.parse(file.toString());
 
-    await sdk.GetJobManagerClient().PostJob(job);
-    console.log(`created job ${color(name)}`);
+    const result = await sdk.GetJobManagerClient().PostJob(job);
+    console.log(`created job ${color(result.id)} with status ${color(result.status)} and message \n ${result.message}`);
 }
 
 function createTemplate(options: any) {
@@ -104,6 +117,10 @@ function writejobToFile(options: any, job: any) {
     const fileName = options.file || `job.jobmanager.mdsp.json`;
     const filePath = path.resolve(fileName);
 
+    fs.existsSync(filePath) &&
+        !options.overwrite &&
+        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+
     fs.writeFileSync(filePath, JSON.stringify(job, null, 2));
     console.log(
         `The data was written into ${color(
@@ -114,8 +131,9 @@ function writejobToFile(options: any, job: any) {
 
 async function stopJob(options: any, sdk: MindSphereSdk) {
     const id = options.jobid;
-    await sdk.GetJobManagerClient().StopJob(id);
-    console.log(`job with id ${color(id)} stopped.`);
+    const result = await sdk.GetJobManagerClient().StopJob(id);
+
+    console.log(`sent stop signal to job with id ${color(id)}. Job status: ${color(result.status)}`);
 }
 
 async function listJobs(sdk: MindSphereSdk, options: any) {
@@ -145,7 +163,9 @@ async function listJobs(sdk: MindSphereSdk, options: any) {
 
         for (const job of jobs.jobs || []) {
             jobCount++;
-            console.log(`${job.id} ${color(job.status)} ${job.message} ${job.createdBy} ${job.modelId}`);
+            console.log(
+                `${job.id} ${color(job.status)} ${(job.message || "").substr(0, 20)} ${job.createdBy}\t${job.modelId}`
+            );
 
             verboseLog(JSON.stringify(job, null, 2), options.verbose);
         }
@@ -155,17 +175,16 @@ async function listJobs(sdk: MindSphereSdk, options: any) {
 }
 
 function buildFilter(options: any) {
-    const filter = (options.filter && JSON.parse(options.filter)) || {};
-    let pointer = filter;
-    if (options.jobid !== undefined) {
-        filter.and = {};
-        pointer = filter.and;
+    const filter: any = {};
+
+    if (options.message) {
+        filter.message = { contains: `${options.message}` };
     }
-    if (options.jobid) {
-        pointer.id = { contains: `${options.jobid}` };
+    if (options.status) {
+        filter.status = { eq: `${options.status}` };
     }
-    if (options.typeid) {
-        pointer.id = { contains: `${options.typeid}` };
+    if (options.modelid) {
+        filter.modelId = { eq: `${options.modelid}` };
     }
     return filter;
 }
@@ -173,7 +192,16 @@ function buildFilter(options: any) {
 async function jobInfo(options: any, sdk: MindSphereSdk) {
     const id = options.jobid! as string;
     const job = await sdk.GetJobManagerClient().GetJob(id);
-    console.table(job);
+    console.log(`Id: ${color(job.id)}`);
+    console.log(`Status: ${color(job.status)}`);
+    console.log(`Configuration Id: ${color((job as any).configurationId)}`);
+    console.log(`Environment Id: ${job.environmentId}`);
+    console.log(`InputFolder Id: ${job.inputFolderId}`);
+    console.log(`OutputFolder Id: ${job.inputFolderId}`);
+    console.log(`Model Id: ${color(job.modelId)}`);
+    console.log(`Created by: ${color(job.createdBy)} on date ${job.creationDate}`);
+    console.log(`Message:\n${job.message}`);
+
     verboseLog(JSON.stringify(job, null, 2), options.verbose);
 }
 
