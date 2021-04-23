@@ -360,9 +360,9 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 | Name |SDK - Client | Command |
 | --- | --- | --- |
 | Anomaly Detection   |  |  |
-| Data Exchange   | |  |
+| Data Exchange   | :heavy_check_mark: | :heavy_check_mark: |
 | Event Analytics   | :heavy_check_mark: | :heavy_check_mark: |
-| Job Manager   | |  |
+| Job Manager   | :heavy_check_mark: | :heavy_check_mark: |
 | KPI Calculation   | :heavy_check_mark: | :heavy_check_mark: |
 | Model Management   | :heavy_check_mark: | :heavy_check_mark: |
 | Signal Calculation   |  |  |
