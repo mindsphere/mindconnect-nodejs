@@ -240,6 +240,38 @@ export namespace JobManagerModels {
          * @memberof ScheduleDetails
          */
         status?: ScheduleDetails.StatusEnum | string;
+
+        /**
+         * !fix: April 2021: manually added as it was missing in swagger 3.0.0
+         *
+         * @type {string}
+         * @memberOf ScheduleDetails
+         */
+        inputFolderId?: string;
+
+        /**
+         * !fix: April 2021: manually added as it was missing in swagger 3.0.0
+         *
+         * @type {string}
+         * @memberOf ScheduleDetails
+         */
+        outputFolderId?: string;
+
+        /**
+         * !fix: April 2021: manually added as it was missing in swagger 3.0.0
+         *
+         * @type {string}
+         * @memberOf ScheduleDetails
+         */
+        configurationId?: string;
+
+        /**
+         * !fix: April 2021: manually added as it was missing in swagger 3.0.0
+         *
+         * @type {string}
+         * @memberOf ScheduleDetails
+         */
+        maximumExecutionTime?: string;
     }
 
     /**

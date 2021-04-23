@@ -19,6 +19,7 @@ import iotBulkRunCommand from "./commands/iot-bulk-run";
 import iotDownloadBulkCommand from "./commands/iot-download-bulk";
 import iotBulkDirCommand from "./commands/iot-prepare-bulk-dir";
 import jobsCommand from "./commands/jobmanager-jobs";
+import scheduleCommand from "./commands/jobmanager-schedules";
 import kpicalculationCommand from "./commands/kpi-calculation";
 import agentStatusCommand from "./commands/mc-agent-status";
 import agentTokenCommand from "./commands/mc-agent-token";
@@ -130,6 +131,7 @@ eventAnalyticsCommand(program);
 // * models commnds
 modelsCommand(program);
 jobsCommand(program);
+scheduleCommand(program);
 dataExchangeCommand(program);
 // * dev proxy command
 devProxyCommand(program);
