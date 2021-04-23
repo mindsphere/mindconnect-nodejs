@@ -6,6 +6,7 @@ import aspectCommands from "./commands/aspect-commands";
 import assetInfoCommand from "./commands/asset-info";
 import assetTypeCommand from "./commands/asset-types";
 import assetsCommand from "./commands/assets";
+import dataExchangeCommand from "./commands/data-exchange";
 import dataLakeCommand from "./commands/data-lake";
 import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
@@ -17,6 +18,8 @@ import iotCheckBulkComand from "./commands/iot-bulk-check";
 import iotBulkRunCommand from "./commands/iot-bulk-run";
 import iotDownloadBulkCommand from "./commands/iot-download-bulk";
 import iotBulkDirCommand from "./commands/iot-prepare-bulk-dir";
+import jobsCommand from "./commands/jobmanager-jobs";
+import scheduleCommand from "./commands/jobmanager-schedules";
 import kpicalculationCommand from "./commands/kpi-calculation";
 import agentStatusCommand from "./commands/mc-agent-status";
 import agentTokenCommand from "./commands/mc-agent-token";
@@ -127,7 +130,9 @@ kpicalculationCommand(program);
 eventAnalyticsCommand(program);
 // * models commnds
 modelsCommand(program);
-
+jobsCommand(program);
+scheduleCommand(program);
+dataExchangeCommand(program);
 // * dev proxy command
 devProxyCommand(program);
 

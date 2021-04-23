@@ -5,10 +5,15 @@
 ### Bugfixes and Improvements 3.13.0
 
 - CLI: new `mdsp` alias for command additionally to `mc` alias
+- CLI: new `mc jobs` command [#255]
+- CLI: new `mc schedules` command [#255]
+- CLI: new `mc data-exchange` command [#256]
 - CLI: new `mc mobile-app-instances` command [#252]
 - CLI: new `mc mobile-apps` command [#252]
 - CLI: new `mc notifications` command for MindSphere notifications [#252]
 - CLI: fixed bug in `mc aggregates` command with multiple lines of same aggregate
+- SDK: Job Manager Client [#255]
+- SDK: Data Exchange Client [#256]
 - SDK: NotficationV4 Client [#252]
 - SDK: IotTimeSeriesAggragetesV4 Client [#250]
 - Bumped all dependencies

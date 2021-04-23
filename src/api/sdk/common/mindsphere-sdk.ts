@@ -1,5 +1,6 @@
 import { AgentManagementClient } from "../agent/agent-management";
 import { AssetManagementClient } from "../asset/asset-management";
+import { DataExchangeClient } from "../data-exchange/data-exchange";
 import { DataLakeClient } from "../data-lake/data-lake";
 import { EventAnalyticsClient } from "../event-analytics/eventanalytics";
 import { EventManagementClient } from "../event/event-management";
@@ -9,6 +10,7 @@ import { TimeSeriesAggregateClientV4 } from "../iotaggregate-v4/iot-timeseries-a
 import { TimeSeriesAggregateClient } from "../iotaggregate/iot-timeseries-aggregate";
 import { TimeSeriesBulkClient } from "../iotbulk/iot-timeseries-bulk";
 import { IotFileClient } from "../iotfile/iot-file";
+import { JobManagerClient } from "../jobmanager/jobmanager";
 import { KPICalculationClient } from "../kpi/kpi";
 import { MindConnectApiClient } from "../mcapi/mcapi";
 import { ModelManagementClient } from "../model/model-management";
@@ -25,7 +27,8 @@ import { SdkClient } from "./sdk-client";
  *
  * Runs in browser and in NodeJs.
  *
- * The SDK uses all 4 types of MindSphere Credentials (Agent Credentials, User Credentials, App Credentials,ServiceCredentials).
+ * The SDK uses all 4 types of MindSphere Credentials
+ * (Agent Credentials, User Credentials, App Credentials,ServiceCredentials).
  *
  * @export
  * @class MindSphereSdk
@@ -314,5 +317,33 @@ export class MindSphereSdk extends SdkClient {
     public GetNotificationClientV4(): NotificationClientV4 {
         this._notificationClient = this._notificationClient || new NotificationClientV4(this._authenticator);
         return this._notificationClient;
+    }
+
+    private _jobManagerClient?: JobManagerClient;
+
+    /**
+     * Job Manager Client
+     *
+     * @returns {JobManagerClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetJobManagerClient(): JobManagerClient {
+        this._jobManagerClient = this._jobManagerClient || new JobManagerClient(this._authenticator);
+        return this._jobManagerClient;
+    }
+
+    private _dataExchangeClient?: DataExchangeClient;
+
+    /**
+     * Data Exchange Client
+     *
+     * @returns {DataExchangeClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetDataExchangeClient(): DataExchangeClient {
+        this._dataExchangeClient = this._dataExchangeClient || new DataExchangeClient(this._authenticator);
+        return this._dataExchangeClient;
     }
 }
