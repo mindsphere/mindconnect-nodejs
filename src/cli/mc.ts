@@ -48,6 +48,7 @@ import mobileAppsCommand from "./commands/mobile-apps";
 import modelsCommand from "./commands/models";
 import mqttCreateCommand from "./commands/mqtt-create-jwt";
 import notificationCommand from "./commands/notifications";
+import signalCalculationCommand from "./commands/signal-calculation";
 import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
 import subtenantCommand from "./commands/subtenant";
@@ -125,6 +126,7 @@ mobileAppInstancesCommand(program);
 
 spectrumAnalysisCommand(program);
 signalValidationCommand(program);
+signalCalculationCommand(program);
 trendPredictionCommand(program);
 kpicalculationCommand(program);
 eventAnalyticsCommand(program);

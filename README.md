@@ -365,7 +365,7 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 | Job Manager   | :heavy_check_mark: | :heavy_check_mark: |
 | KPI Calculation   | :heavy_check_mark: | :heavy_check_mark: |
 | Model Management   | :heavy_check_mark: | :heavy_check_mark: |
-| Signal Calculation   |  |  |
+| Signal Calculation   | :heavy_check_mark: | :heavy_check_mark: |
 | Signal Validation   | :heavy_check_mark: | :heavy_check_mark: |
 | Spectrum Analysis   | :heavy_check_mark: | :heavy_check_mark: |
 | Trend Prediction   | :heavy_check_mark: | :heavy_check_mark: |
