@@ -34,6 +34,8 @@ export * from "./model/model-management";
 export * from "./model/model-models";
 export * from "./notification-v4/notification-v4";
 export * from "./notification-v4/notification-v4-models";
+export * from "./signal-calculation/signal-calculation";
+export * from "./signal-calculation/signal-calculation-models";
 export * from "./signal-validation/signal-validation";
 export * from "./signal-validation/signal-validation-models";
 export * from "./tenant/tenant-management";
