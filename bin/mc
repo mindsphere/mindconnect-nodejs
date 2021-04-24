@@ -1,7 +1,7 @@
-#!/usr/bin/env node 
+#!/usr/bin/env node
 
-'use strict';
+"use strict";
 
-process.title = 'mindconnect cli';
+process.title = "MindSphere CLI";
 
-require ('../dist/src/cli/mc')
+require("../dist/src/cli/mc");

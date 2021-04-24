@@ -1,8 +1,8 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
-import { getColor } from "./command-utils";
 import * as updateNotifier from "update-notifier";
 import { MC_NAME, MC_VERSION } from "../../version";
+import { getColor } from "./command-utils";
 
 const magenta = getColor("magenta");
 const cyan = getColor("cyan");
@@ -12,7 +12,7 @@ const blue = getColor("blue");
 const yellow = getColor("yellow");
 
 export default (program: CommanderStatic) => {
-    program.version(`MindConnect NodeJS CLI - Version: ${MC_VERSION}`);
+    program.version(`MindSphere CLI (mc, mdsp) - Version: ${MC_VERSION}`);
 
     program.on("--help", () => {
         log(`\n  Documentation:\n`);
