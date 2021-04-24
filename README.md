@@ -5,7 +5,7 @@
 </p>
 <h1 align="center">MindConnect-NodeJS</h1>
 <p align="center">
-NodeJS Library for MindSphere Connectivity - TypeScript SDK for MindSphere - MindSphere Command Line Interface - MindSphere Development Proxy
+<a href="#getting-started">NodeJS Library for MindSphere Connectivity</a> - <a href="#mindsphere-typescript-sdk">TypeScript SDK for MindSphere</a> - <a href="#command-line-interface">MindSphere Command Line Interface</a> - <a href="#mindsphere-development-proxy">MindSphere Development Proxy</a>
 
 <!-- markdownlint-enableMD033 -->
 
@@ -562,7 +562,7 @@ Commands:
 
 ```
 
-### MindSphere Development Proxy
+## MindSphere Development Proxy
 
 The CLI comes with a development proxy which can be used to kickstart your MindSphere development. It provides an endpoint
 at your local machine at
