@@ -22,10 +22,10 @@ jobs:
 
     - name: setup the mindsphere authentication
       run: |
-        mkdir .mc
-        echo "${{ secrets.AUTH_JSON }}" >> .mc/auth.json
+        mkdir ~/.mc
+        echo "${{ secrets.AUTH_JSON }}" >> ~/.mc/auth.json
         echo "${{ secrets.PRIVATE_KEY }}" >> private.key
-        ls -la .mc
+        ls -la ~/.mc
 
     - name: install dependencies
       run: |
