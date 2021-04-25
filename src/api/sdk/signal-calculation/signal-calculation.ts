@@ -47,6 +47,18 @@ export class SignalCalculationClient extends SdkClient {
         })) as SignalCalculationModels.Signal;
     }
 
+    private async PostApplyOperationDirectRaw(
+        body: SignalCalculationModels.InputParametersDirect
+    ): Promise<SignalCalculationModels.SignalDirect> {
+        return (await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(), // always use this.GetGateway()  and this.GetToken()
+            authorization: await this.GetToken(), // this is overriden in different authorizers
+            body: body,
+            baseUrl: `${this._baseUrl}/applyOperationDirect`,
+        })) as SignalCalculationModels.SignalDirect;
+    }
+
     /**
      * Applies an operation to the specified properties for the operands defined in the body parameters
      *
@@ -58,12 +70,20 @@ export class SignalCalculationClient extends SdkClient {
     public async PostApplyOperationDirect(
         body: SignalCalculationModels.InputParametersDirect
     ): Promise<SignalCalculationModels.SignalDirect> {
-        return (await this.HttpAction({
-            verb: "POST",
-            gateway: this.GetGateway(), // always use this.GetGateway()  and this.GetToken()
-            authorization: await this.GetToken(), // this is overriden in different authorizers
-            body: body,
-            baseUrl: `${this._baseUrl}/applyOperationDirect`,
-        })) as SignalCalculationModels.SignalDirect;
+        const result = await this.PostApplyOperationDirectRaw(body);
+
+        result.timeSeries.forEach((result) => {
+            if ((result._time as any)?.nano && (result._time as any)?.epochSecond) {
+                const unixMillisecondsDate =
+                    (result._time as any)?.epochSecond * 1000 + Math.floor((result._time as any)?.nano / 1000000);
+
+                // !fix: this thing is buggy, as it returns the nano precision epoch timestamp
+                // !instead of proper ISOString date, fix on the client, report to mindsphere,
+                // !hope for the server side fix...
+
+                result._time = new Date(unixMillisecondsDate).toISOString();
+            }
+        });
+        return result;
     }
 }
