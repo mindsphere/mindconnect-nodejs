@@ -12,6 +12,8 @@ import {
     serviceCredentialLog,
     verboseLog,
 } from "./command-utils";
+import path = require("path");
+import fs = require("fs");
 
 let color = getColor("magenta");
 const magenta = getColor("magenta");
@@ -32,6 +34,7 @@ export default (program: CommanderStatic) => {
         .option("-r, --intervalvalue <intervalvalue>", "interval duration for the aggregates in interval units")
         .option("-u, --intervalunit <intervalunit>", "interval duration unit [minute |hour |day |week | month]")
         .option("-s, --select <select>", "comma separated list of variable names")
+        .option("-d, --download <download>", "download aggregates to specified file")
         .option("-a, --all", "show all aggregates not just average, min, max, sum and sd")
         .option("-l, --local", "use localtime in aggregate list")
         .option("-c, --count <count>", "number of aggregates in response ")
@@ -65,19 +68,13 @@ export default (program: CommanderStatic) => {
             log(
                 `    mc aggregates --asssetid 1234567..ef --aspectname Environment --select Temperature --all \n\t\t\t\t\t\t\t\t\tlist all recent temperature aggregates`
             );
+
             serviceCredentialLog();
         });
 };
 
 async function listAggregates(options: any, sdk: MindSphereSdk) {
     const aggregatesV4Client = sdk.GetTimeSeriesAggregateClientV4();
-
-    !options.all &&
-        console.log(
-            `[from - to]  ${color("variable")}  ${green("average")}  ${yellow("sum")}  ${blue("min")}  ${red(
-                "max"
-            )}  ${cyan("sd")}  ${magenta("count")}`
-        );
 
     const aggregates = (await retry(options.retry, () =>
         aggregatesV4Client.GetAggregates({
@@ -91,6 +88,21 @@ async function listAggregates(options: any, sdk: MindSphereSdk) {
             count: options.count,
         })
     )) as TimeSeriesAggregateModelsV4.Aggregates;
+
+    if (options.download) {
+        const download = options.download || "aggregates.mdsp.json";
+        const downloadPath = path.resolve(download);
+        fs.writeFileSync(downloadPath, JSON.stringify(aggregates));
+        console.log(`The aggregates were downloaded to ${color(downloadPath)}.`);
+        return;
+    }
+
+    !options.all &&
+        console.log(
+            `[from - to]  ${color("variable")}  ${green("average")}  ${yellow("sum")}  ${blue("min")}  ${red(
+                "max"
+            )}  ${cyan("sd")}  ${magenta("count")}`
+        );
 
     for (const aggregate of aggregates.aggregates || []) {
         let line;

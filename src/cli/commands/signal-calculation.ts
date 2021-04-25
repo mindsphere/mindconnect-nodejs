@@ -1,6 +1,7 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
+import { isArray } from "lodash";
 import * as path from "path";
 import { MindSphereSdk, SignalCalculationModels } from "../../api/sdk";
 import { throwError } from "../../api/utils";
@@ -32,9 +33,9 @@ export default (program: CommanderStatic) => {
             ".mdsp.json template file default: (signal.[template|templatedirect].mdsp.json)"
         )
         .option("-u, --result <result>", ".mdsp.json with signal calculation result", "signal.result.mdsp.json")
-        .option("-i, --assetid <assetid>", `assetid for template creation`, "assetid")
-        .option("-a, --aspect <aspect>", `aspect for template creation`, "aspect")
-        .option("-r, --variable <variable>", `variables for template creation`, "variable1")
+        .option("-i, --assetid <assetid>", `assetid for template creation`)
+        .option("-a, --aspect <aspect>", `aspect for template creation`)
+        .option("-r, --variable <variable>", `variables for template creation`)
         .option("-s, --size <size>", `timeseries length for generated data`, "5")
         .option("-t, --timeseries <timeseries>", `comma separated list of time series files (if data is not embedded)`)
         .option("-o, --overwrite", "overwrite template file if it already exists")
@@ -79,12 +80,16 @@ export default (program: CommanderStatic) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(`    mc signal-calculation --mode template \t create template file for signal calculation`);
-            log(`    mc signal-calculation --mode templatedirect --assetid <assetid> --aspect <aspectname> --variable variable\n\
+            log(`    mc signal-calculation --mode templatedirect --assetid <assetid> --aspect <aspect> --variable variable\n\
                                             \t creates template for calculation using mindsphere timeseries data`);
             log(`    mc signal-calculation --mode calculate --template <filename> \n\
                                             \t calculates new signal from the timeseries specified in template file`);
 
-            log(`    mc signal-calculation --mode calculate --template <filename> --timeseries <timeseriesfile>\n\
+            log(`    mc signal-calculation --mode calculate \\
+                     --template <filename> \\
+                     --timeseries <timeseriesfile> \\
+                     --assetid <assetid> \\
+                     --aspect <aspect>\n\
                                             \t calculates new signal from the timeseries specified in external file`);
 
             log(`    mc signal-calculation --mode calculatedirect --template <filename> \n\
@@ -209,7 +214,16 @@ async function calculateSignal(options: any, sdk: MindSphereSdk) {
         timeseriesFiles.forEach((element: string) => {
             const fileName = path.resolve(element.trim());
             const data = JSON.parse(fs.readFileSync(fileName).toString());
-            metadata.data!.push(data);
+            console.log(isArray(data), options.assetid, options.aspect);
+            if (isArray(data)) {
+                // this looks like the raw timeseries
+                !options.assetid &&
+                    errorLog("you have to specify the --assetid if you are using raw time series", true);
+                !options.aspect && errorLog("you have to specify the --aspect if you are using raw time series", true);
+                metadata.data!.push({ entityId: options.assetid, propertySetName: options.aspect, timeSeries: data });
+            } else {
+                metadata.data!.push(data);
+            }
         });
     }
 
