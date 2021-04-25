@@ -25,6 +25,7 @@ jobs:
         mkdir ~/.mc
         echo "${{ secrets.AUTH_JSON }}" >> ~/.mc/auth.json
         echo "${{ secrets.PRIVATE_KEY }}" >> private.key
+        cat ~./auth.json
         ls -la ~/.mc
 
     - name: install dependencies
