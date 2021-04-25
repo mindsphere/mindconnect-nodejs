@@ -1,0 +1,26 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    environment: CI
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v2.1.5
+
+    - uses: actions/checkout@v2
+    - uses: sn0wcat/ms-teams-deploy-card@master
+      if: always()
+      with:
+        github-token: ${{ github.token }}
+        webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
+
+    - name: Setup auth.json
+    - run: |
+        mkdir .mc
+        echo {{ secrets.AUTH_JSON }} > .mc/auth.json
+        echo {{ secrets.PRIVATE_KEY }} > .mc/auth.json
+        ls -R 
