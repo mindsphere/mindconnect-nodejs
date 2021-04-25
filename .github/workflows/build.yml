@@ -77,7 +77,6 @@ jobs:
         $mc asset-types --includeshared
         $mc aspects --includeshared
         $mc event-types --includeshared
-        $mc aggregates
         $mc jobs
         $mc schedules
         $mc data-exchange
@@ -93,6 +92,10 @@ jobs:
       run: |
         npm run license > license-checker.txt
         npm run license:summary >> license-checker.txt
+
+    - name: package 
+      run: |
+        npm pack
 
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2.2.3
