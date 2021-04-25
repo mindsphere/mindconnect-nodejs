@@ -18,9 +18,83 @@ jobs:
         github-token: ${{ github.token }}
         webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
 
-    - name: Setup auth.json
-    - run: |
+    - name: setup the mindsphere authentication
+      run: |
         mkdir .mc
-        echo {{ secrets.AUTH_JSON }} > .mc/auth.json
-        echo {{ secrets.PRIVATE_KEY }} > .mc/auth.json
-        ls -R 
+        echo ${{ secrets.AUTH_JSON }} >> .mc/auth.json
+        echo ${{ secrets.PRIVATE_KEY }} >> private.key
+        ls -la .mc
+
+    - name: install dependencies
+      run: |
+        npm install
+
+    - name: build
+      run: |
+        npm run ts:build
+
+    - name: run mocha tests
+      env: 
+        MDSP_PASSKEY: ${{ secrets.MDSP_PASSKEY }}
+      run: |
+        npm run test-jenkins
+
+    - name: run command line tests
+      env: 
+        MDSP_PASSKEY: ${{ secrets.MDSP_PASSKEY }}
+      run: |
+        dirname=`date +%s`
+        mkdir $dirname
+        cd $dirname
+        alias mc='node ../src/cli/mc'
+        set -e
+        mc create-agent --config agent.unittest.json
+        mc onboard --config agent.unittest.json
+        mc atk --config agent.unittest.json
+        mc configure-agent --config agent.unittest.json --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
+        mc configure-agent --config agent.unittest.json --mode test
+        filename=`date +%s`
+        cp agent.unittest.json $filename
+        mc upload-file --config agent.unittest.json --file $filename
+        mc upload-file --file $filename --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
+        mc create-event --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
+        mc register-diagnostic --config agent.unittest.json
+        mc configure-agent --config agent.unittest.json --mode test
+        mc get-diagnostic --config agent.unittest.json
+        mc unregister-diagnostic --config agent.unittest.json
+        mc offboard-agent --config agent.unittest.json
+        mc delete-asset  --assetid `node -pe 'JSON.parse(process.argv[1]).content.clientId' "$(cat agent.unittest.json)"` 
+        mc list-assets 
+        mc list-files --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
+        mc starter-ts
+        mc starter-js
+        mc download-file --file $filename --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
+        mc delete-file --file $filename --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
+        mc iam --mode list --group
+        mc assets --includeshared
+        mc asset-types --includeshared
+        mc aspects --includeshared
+        mc event-types --includeshared
+        mc aggregates
+        mc jobs
+        mc schedules
+        mc data-exchange
+        mc mobile-apps
+        mc mobile-app-instances
+        mc tenant
+        mc subtenants
+        mc models
+        cd ..
+        rm -rf $dirname
+
+    - name: license check
+      run: |
+        npm run license > license-checker.txt
+        npm run license:summary >> license-checker.txt
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v2.2.3
+      with:
+          path: |
+            *.tgz
+            license-checker.txt
