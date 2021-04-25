@@ -4,10 +4,13 @@ import fetch from "cross-fetch";
 import * as http from "http";
 import * as https from "https";
 import * as url from "url";
+import * as util from "util";
 import { MindSphereSdk } from "../../api/sdk";
 import { authJson, decrypt, loadAuth, throwError } from "../../api/utils";
 import { errorLog, getColor, homeDirLog, proxyLog, verboseLog } from "./command-utils";
 import chalk = require("chalk");
+
+const streamPipeline = util.promisify(require("stream").pipeline);
 const HttpsProxyAgent = require("https-proxy-agent");
 
 const magenta = getColor("magenta");
@@ -304,9 +307,7 @@ async function serve({ configPort, options }: { configPort?: number; options: an
                 });
             });
 
-            req.pipe(proxy, {
-                end: true,
-            });
+            await streamPipeline(req, proxy);
         } catch (error) {
             console.log(`[${red(new Date().toISOString())}] ${error.message}`);
             res.writeHead(500, "Internal server error");
