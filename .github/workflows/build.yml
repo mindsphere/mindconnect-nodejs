@@ -34,11 +34,11 @@ jobs:
       run: |
         npm run ts:build
 
-    - name: run mocha tests
-      env: 
-        MDSP_PASSKEY: ${{ secrets.MDSP_PASSKEY }}
-      run: |
-        npm run test-jenkins
+    # - name: run mocha tests
+    #   env: 
+    #     MDSP_PASSKEY: ${{ secrets.MDSP_PASSKEY }}
+    #   run: |
+    #     npm run test-jenkins
 
     - name: run command line tests
       env: 
@@ -47,7 +47,8 @@ jobs:
         dirname=`date +%s`
         mkdir $dirname
         cd $dirname
-        alias mc='node ../src/cli/mc'
+        ls ..
+        alias mc='node ${{ github.workspace }}/src/cli/mc'
         set -e
         mc create-agent --config agent.unittest.json
         mc onboard --config agent.unittest.json
