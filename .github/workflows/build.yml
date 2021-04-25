@@ -81,7 +81,6 @@ jobs:
         $mc schedules
         $mc data-exchange
         $mc mobile-apps
-        $mc mobile-app-instances
         $mc tenant
         $mc subtenants
         $mc models
@@ -95,6 +94,7 @@ jobs:
 
     - name: package 
       run: |
+        rm -rf dist/
         npm pack
 
     - name: Upload a Build Artifact
