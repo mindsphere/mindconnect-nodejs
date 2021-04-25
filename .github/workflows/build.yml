@@ -11,7 +11,9 @@ jobs:
     - name: Setup Node.js environment
       uses: actions/setup-node@v2.1.5
 
-    - uses: actions/checkout@v2
+    - name: Checkout Branch
+      uses: actions/checkout@v2
+
     - uses: sn0wcat/ms-teams-deploy-card@master
       if: always()
       with:
@@ -21,8 +23,8 @@ jobs:
     - name: setup the mindsphere authentication
       run: |
         mkdir .mc
-        echo ${{ secrets.AUTH_JSON }} >> .mc/auth.json
-        echo ${{ secrets.PRIVATE_KEY }} >> private.key
+        echo "${{ secrets.AUTH_JSON }}" >> .mc/auth.json
+        echo "${{ secrets.PRIVATE_KEY }}" >> private.key
         ls -la .mc
 
     - name: install dependencies
