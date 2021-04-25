@@ -15,12 +15,14 @@ import { KPICalculationClient } from "../kpi/kpi";
 import { MindConnectApiClient } from "../mcapi/mcapi";
 import { ModelManagementClient } from "../model/model-management";
 import { NotificationClientV4 } from "../notification-v4/notification-v4";
+import { SignalCalculationClient } from "../signal-calculation/signal-calculation";
 import { SignalValidationClient } from "../signal-validation/signal-validation";
 import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
 import { TenantManagementClient } from "../tenant/tenant-management";
 import { TrendPredictionClient } from "../trend/trend-prediction";
 import { UsageTransparencyClient } from "../utc/utc";
 import { SdkClient } from "./sdk-client";
+
 /**
  *
  * MindSphere typescript SDK
@@ -35,6 +37,7 @@ import { SdkClient } from "./sdk-client";
  */
 export class MindSphereSdk extends SdkClient {
     private _assetManagementClient?: AssetManagementClient;
+
     /**
      * * Asset Management
      *
@@ -221,7 +224,7 @@ export class MindSphereSdk extends SdkClient {
     }
 
     /**
-     * Identity Management Client
+     * * Identity Management Client
      *
      * @returns {IdentityManagementClient}
      *
@@ -236,7 +239,7 @@ export class MindSphereSdk extends SdkClient {
     private _identityManagementClient?: IdentityManagementClient;
 
     /**
-     * Event Analytics Client
+     * * Event Analytics Client
      *
      * @returns {EventAnalyticsClient}
      *
@@ -252,7 +255,7 @@ export class MindSphereSdk extends SdkClient {
     private _dataLakeClient?: DataLakeClient;
 
     /**
-     * Data Lake Client
+     * * Data Lake Client
      *
      * @returns {DataLakeClient}
      *
@@ -281,7 +284,7 @@ export class MindSphereSdk extends SdkClient {
     private _tenantManagementClient?: TenantManagementClient;
 
     /**
-     * Tenant Management Client
+     * * Tenant Management Client
      *
      * @returns {TenantManagementClient}
      *
@@ -293,8 +296,9 @@ export class MindSphereSdk extends SdkClient {
     }
 
     private _modelManagementClient?: ModelManagementClient;
+
     /**
-     * Model Management Client
+     * * Model Management Client
      *
      * @returns {ModelManagementClient}
      *
@@ -308,7 +312,7 @@ export class MindSphereSdk extends SdkClient {
     private _notificationClient?: NotificationClientV4;
 
     /**
-     * Notification Client
+     * * Notification Client
      *
      * @returns {NotificationClientV4}
      *
@@ -322,7 +326,7 @@ export class MindSphereSdk extends SdkClient {
     private _jobManagerClient?: JobManagerClient;
 
     /**
-     * Job Manager Client
+     * * Job Manager Client
      *
      * @returns {JobManagerClient}
      *
@@ -336,7 +340,7 @@ export class MindSphereSdk extends SdkClient {
     private _dataExchangeClient?: DataExchangeClient;
 
     /**
-     * Data Exchange Client
+     * * Data Exchange Client
      *
      * @returns {DataExchangeClient}
      *
@@ -345,5 +349,20 @@ export class MindSphereSdk extends SdkClient {
     public GetDataExchangeClient(): DataExchangeClient {
         this._dataExchangeClient = this._dataExchangeClient || new DataExchangeClient(this._authenticator);
         return this._dataExchangeClient;
+    }
+
+    private _signalCalculationClient?: SignalCalculationClient;
+
+    /**
+     * * Signal Calculation Client
+     *
+     * @returns {SignalCalculationClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetSignalCalculationClient(): SignalCalculationClient {
+        this._signalCalculationClient =
+            this._signalCalculationClient || new SignalCalculationClient(this._authenticator);
+        return this._signalCalculationClient;
     }
 }

@@ -255,7 +255,8 @@ export const humanFileSize = (size: number) => {
 export function generateTestData(
     size: number,
     fn: (x: number) => number | undefined,
-    variableName: string = "variable1"
+    variableName: string = "variable1",
+    format: "string" | "number" = "string"
 ) {
     const startDate = new Date();
     const results = [];
@@ -268,7 +269,7 @@ export function generateTestData(
                 _time: time.toISOString(),
             };
 
-            item[variableName] = value!.toString();
+            item[variableName] = format === "string" ? value!.toString() : value;
             results.push(item);
         }
     }
