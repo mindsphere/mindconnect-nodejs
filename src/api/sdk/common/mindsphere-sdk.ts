@@ -14,6 +14,7 @@ import { JobManagerClient } from "../jobmanager/jobmanager";
 import { KPICalculationClient } from "../kpi/kpi";
 import { MindConnectApiClient } from "../mcapi/mcapi";
 import { ModelManagementClient } from "../model/model-management";
+import { AnomalyDetectionClient } from "../anomaly-detection/anomaly-detection";
 import { NotificationClientV4 } from "../notification-v4/notification-v4";
 import { SignalCalculationClient } from "../signal-calculation/signal-calculation";
 import { SignalValidationClient } from "../signal-validation/signal-validation";
@@ -62,6 +63,20 @@ export class MindSphereSdk extends SdkClient {
     public GetAgentManagementClient(): AgentManagementClient {
         this._agentManagementClient = this._agentManagementClient || new AgentManagementClient(this._authenticator);
         return this._agentManagementClient;
+    }
+
+    private _anomalyDetectionClient?: AnomalyDetectionClient;
+
+    /**
+     * * Anomaly Detection Client
+     *
+     * @returns {AnomalyDetectionClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetAnomalydetectionClient(): AnomalyDetectionClient {
+        this._anomalyDetectionClient = this._anomalyDetectionClient || new AnomalyDetectionClient(this._authenticator);
+        return this._anomalyDetectionClient;
     }
 
     private _iotFileClient?: IotFileClient;

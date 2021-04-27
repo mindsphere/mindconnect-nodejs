@@ -46,6 +46,7 @@ import versionAndHelp from "./commands/mc-version-help";
 import mobileAppInstancesCommand from "./commands/mobile-app-instances";
 import mobileAppsCommand from "./commands/mobile-apps";
 import modelsCommand from "./commands/models";
+import anomalydetectionCommand from "./commands/anomaly-detection";
 import mqttCreateCommand from "./commands/mqtt-create-jwt";
 import notificationCommand from "./commands/notifications";
 import signalCalculationCommand from "./commands/signal-calculation";
@@ -135,6 +136,10 @@ modelsCommand(program);
 jobsCommand(program);
 scheduleCommand(program);
 dataExchangeCommand(program);
+
+// * anomaly detection commands
+anomalydetectionCommand(program);
+
 // * dev proxy command
 devProxyCommand(program);
 
