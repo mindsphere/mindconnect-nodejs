@@ -2,7 +2,6 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
-import * as util from "util";
 import { AnomalyDetectionModels, MindSphereSdk} from "../../api/sdk";
 import { retry } from "../../api/utils";
 import {

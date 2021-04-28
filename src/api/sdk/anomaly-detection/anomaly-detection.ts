@@ -215,7 +215,7 @@ export class AnomalyDetectionClient extends SdkClient {
             throw new AnomalyDetectionModels.RequiredError('id','Required parameter id was null or undefined when calling detectAnomaliesJobsIdCancelPost.');
         }
 
-        const result = await this.HttpAction({
+        await this.HttpAction({
             verb: "POST",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
@@ -335,7 +335,7 @@ export class AnomalyDetectionClient extends SdkClient {
             throw new AnomalyDetectionModels.RequiredError('id','Required parameter id was null or undefined when calling trainModelJobsIdCancelPost.');
         }
 
-        const result = await this.HttpAction({
+        await this.HttpAction({
             verb: "POST",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
