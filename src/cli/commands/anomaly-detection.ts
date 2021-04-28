@@ -143,7 +143,7 @@ async function trainNewModel(options: any, sdk: MindSphereSdk) {
             const filecontent = fs.readFileSync(filePath);
             const filedata = JSON.parse(filecontent.toString());
             const result = (await retry(options.retry, async () =>
-                anomalyDetectionClient.modelsPost(filedata,epsilon,clustersize,algorithm,modelname)
+                anomalyDetectionClient.modelsPost(filedata, epsilon, clustersize, algorithm, modelname)
             )) as AnomalyDetectionModels.Model;
             console.log(`Model with modelid ${color(result.id)} and name ${color(result.name)} was created.`);
             break;
@@ -164,7 +164,7 @@ async function trainNewModel(options: any, sdk: MindSphereSdk) {
                 to = (options.to? new Date(options.to): toNow)
             } catch (error) {}
             const result_asset = (await retry(options.retry, async () =>
-                anomalyDetectionClient.modelsDirectPost(epsilon,clustersize,assetid,aspectname,from,to,algorithm,modelname)
+                anomalyDetectionClient.modelsDirectPost(epsilon, clustersize, assetid, aspectname, from, to, algorithm, modelname)
             )) as AnomalyDetectionModels.Model;
 
             console.log(`Model with modelid ${color(result_asset.id)} and name ${color(result_asset.name)} was created.`);
@@ -186,7 +186,7 @@ async function detectAnomalies(options: any, sdk: MindSphereSdk) {
             const filecontent = fs.readFileSync(filePath);
             const filedata = JSON.parse(filecontent.toString());
             result = (await retry(options.retry, async () =>
-                anomalyDetectionClient.detectanomaliesPost(filedata, modelid)
+                anomalyDetectionClient.detectAnomaliesPost(filedata, modelid)
             )) as Array<AnomalyDetectionModels.Anomaly>;
             break;
         case "asset":
@@ -206,7 +206,7 @@ async function detectAnomalies(options: any, sdk: MindSphereSdk) {
                 to = (options.to? new Date(options.to): toNow)
             } catch (error) {}
             result = (await retry(options.retry, async () =>
-                anomalyDetectionClient.detectanomaliesDirectPost(modelid, assetid, aspectname, from, to)
+                anomalyDetectionClient.detectAnomaliesDirectPost(modelid, assetid, aspectname, from, to)
             )) as Array<AnomalyDetectionModels.Anomaly>;
         default:
             break;

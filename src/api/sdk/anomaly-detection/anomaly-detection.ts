@@ -33,15 +33,15 @@ export class AnomalyDetectionClient extends SdkClient {
     ): Promise<AnomalyDetectionModels.Model> {
         // verify required parameter 'ioTTimeSeriesItems' is not null or undefined
         if (ioTTimeSeriesItems === null || ioTTimeSeriesItems === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('ioTTimeSeriesItems','Required parameter ioTTimeSeriesItems was null or undefined when calling modelsPost.');
+            throw new AnomalyDetectionModels.RequiredError('ioTTimeSeriesItems', 'Required parameter ioTTimeSeriesItems was null or undefined when calling modelsPost.');
         }
         // verify required parameter 'epsilon' is not null or undefined
         if (epsilon === null || epsilon === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('epsilon','Required parameter epsilon was null or undefined when calling modelsPost.');
+            throw new AnomalyDetectionModels.RequiredError('epsilon', 'Required parameter epsilon was null or undefined when calling modelsPost.');
         }
         // verify required parameter 'minPointsPerCluster' is not null or undefined
         if (minPointsPerCluster === null || minPointsPerCluster === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('minPointsPerCluster','Required parameter minPointsPerCluster was null or undefined when calling modelsPost.');
+            throw new AnomalyDetectionModels.RequiredError('minPointsPerCluster', 'Required parameter minPointsPerCluster was null or undefined when calling modelsPost.');
         }
 
         const result = await this.HttpAction({
@@ -65,17 +65,17 @@ export class AnomalyDetectionClient extends SdkClient {
      * @throws {AnomalyDetectionModels.RequiredError}
      * @memberof AnomalyDetectionClient
      */
-    public async detectanomaliesPost(
+    public async detectAnomaliesPost(
         ioTTimeSeriesItems: Array<AnomalyDetectionModels.Timeseries>, 
         modelID: string
     ):Promise<Array<AnomalyDetectionModels.Anomaly>>{
         // verify required parameter 'ioTTimeSeriesItems' is not null or undefined
         if (ioTTimeSeriesItems === null || ioTTimeSeriesItems === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('ioTTimeSeriesItems','Required parameter ioTTimeSeriesItems was null or undefined when calling detectanomaliesPost.');
+            throw new AnomalyDetectionModels.RequiredError('ioTTimeSeriesItems', 'Required parameter ioTTimeSeriesItems was null or undefined when calling detectanomaliesPost.');
         }
         // verify required parameter 'modelID' is not null or undefined
         if (modelID === null || modelID === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('modelID','Required parameter modelID was null or undefined when calling detectanomaliesPost.');
+            throw new AnomalyDetectionModels.RequiredError('modelID', 'Required parameter modelID was null or undefined when calling detectanomaliesPost.');
         }
 
         const result = await this.HttpAction({
@@ -117,27 +117,27 @@ export class AnomalyDetectionClient extends SdkClient {
     ): Promise<AnomalyDetectionModels.Model>{
         // verify required parameter 'epsilon' is not null or undefined
         if (epsilon === null || epsilon === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('epsilon','Required parameter epsilon was null or undefined when calling modelsDirectPost.');
+            throw new AnomalyDetectionModels.RequiredError('epsilon', 'Required parameter epsilon was null or undefined when calling modelsDirectPost.');
         }
         // verify required parameter 'minPointsPerCluster' is not null or undefined
         if (minPointsPerCluster === null || minPointsPerCluster === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('minPointsPerCluster','Required parameter minPointsPerCluster was null or undefined when calling modelsDirectPost.');
+            throw new AnomalyDetectionModels.RequiredError('minPointsPerCluster', 'Required parameter minPointsPerCluster was null or undefined when calling modelsDirectPost.');
         }
         // verify required parameter 'assetId' is not null or undefined
         if (assetId === null || assetId === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('assetId','Required parameter assetId was null or undefined when calling modelsDirectPost.');
+            throw new AnomalyDetectionModels.RequiredError('assetId', 'Required parameter assetId was null or undefined when calling modelsDirectPost.');
         }
         // verify required parameter 'aspectName' is not null or undefined
         if (aspectName === null || aspectName === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('aspectName','Required parameter aspectName was null or undefined when calling modelsDirectPost.');
+            throw new AnomalyDetectionModels.RequiredError('aspectName', 'Required parameter aspectName was null or undefined when calling modelsDirectPost.');
         }
         // verify required parameter 'from' is not null or undefined
         if (from === null || from === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('from','Required parameter from was null or undefined when calling modelsDirectPost.');
+            throw new AnomalyDetectionModels.RequiredError('from', 'Required parameter from was null or undefined when calling modelsDirectPost.');
         }
         // verify required parameter 'to' is not null or undefined
         if (to === null || to === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('to','Required parameter to was null or undefined when calling modelsDirectPost.');
+            throw new AnomalyDetectionModels.RequiredError('to', 'Required parameter to was null or undefined when calling modelsDirectPost.');
         }
 
         const result = await this.HttpAction({
@@ -164,7 +164,7 @@ export class AnomalyDetectionClient extends SdkClient {
      * @throws {AnomalyDetectionModels.RequiredError}
      * @memberof AnomalyDetectionClient
      */
-     public async detectanomaliesDirectPost(
+     public async detectAnomaliesDirectPost(
          modelID: string, 
          assetId: string, 
          aspectName: string, 
@@ -173,23 +173,23 @@ export class AnomalyDetectionClient extends SdkClient {
     ): Promise<Array<AnomalyDetectionModels.Anomaly>> {
         // verify required parameter 'modelID' is not null or undefined
         if (modelID === null || modelID === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('modelID','Required parameter modelID was null or undefined when calling detectanomaliesDirectPost.');
+            throw new AnomalyDetectionModels.RequiredError('modelID', 'Required parameter modelID was null or undefined when calling detectanomaliesDirectPost.');
         }
         // verify required parameter 'assetId' is not null or undefined
         if (assetId === null || assetId === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('assetId','Required parameter assetId was null or undefined when calling detectanomaliesDirectPost.');
+            throw new AnomalyDetectionModels.RequiredError('assetId', 'Required parameter assetId was null or undefined when calling detectanomaliesDirectPost.');
         }
         // verify required parameter 'aspectName' is not null or undefined
         if (aspectName === null || aspectName === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('aspectName','Required parameter aspectName was null or undefined when calling detectanomaliesDirectPost.');
+            throw new AnomalyDetectionModels.RequiredError('aspectName', 'Required parameter aspectName was null or undefined when calling detectanomaliesDirectPost.');
         }
         // verify required parameter 'from' is not null or undefined
         if (from === null || from === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('from','Required parameter from was null or undefined when calling detectanomaliesDirectPost.');
+            throw new AnomalyDetectionModels.RequiredError('from', 'Required parameter from was null or undefined when calling detectanomaliesDirectPost.');
         }
         // verify required parameter 'to' is not null or undefined
         if (to === null || to === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('to','Required parameter to was null or undefined when calling detectanomaliesDirectPost.');
+            throw new AnomalyDetectionModels.RequiredError('to', 'Required parameter to was null or undefined when calling detectanomaliesDirectPost.');
         }
         const result = await this.HttpAction({
             verb: "POST",
@@ -212,7 +212,7 @@ export class AnomalyDetectionClient extends SdkClient {
      public async detectAnomaliesJobsIdCancelPost(id: string) {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('id','Required parameter id was null or undefined when calling detectAnomaliesJobsIdCancelPost.');
+            throw new AnomalyDetectionModels.RequiredError('id', 'Required parameter id was null or undefined when calling detectAnomaliesJobsIdCancelPost.');
         }
 
         await this.HttpAction({
@@ -238,7 +238,7 @@ export class AnomalyDetectionClient extends SdkClient {
     ): Promise<AnomalyDetectionModels.ReasoningJobInfo>{
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('id','Required parameter id was null or undefined when calling detectAnomaliesJobsIdGet.');
+            throw new AnomalyDetectionModels.RequiredError('id', 'Required parameter id was null or undefined when calling detectAnomaliesJobsIdGet.');
         }
         const result = await this.HttpAction({
             verb: "GET",
@@ -308,7 +308,7 @@ export class AnomalyDetectionClient extends SdkClient {
     public async trainModelJobsIdGet(id: string): Promise<AnomalyDetectionModels.TrainingJobInfo> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('id','Required parameter id was null or undefined when calling trainModelJobsIdGet.');
+            throw new AnomalyDetectionModels.RequiredError('id', 'Required parameter id was null or undefined when calling trainModelJobsIdGet.');
         }
 
         const result = await this.HttpAction({
@@ -332,7 +332,7 @@ export class AnomalyDetectionClient extends SdkClient {
      public async trainModelJobsIdCancelPost(id: string) {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
-            throw new AnomalyDetectionModels.RequiredError('id','Required parameter id was null or undefined when calling trainModelJobsIdCancelPost.');
+            throw new AnomalyDetectionModels.RequiredError('id', 'Required parameter id was null or undefined when calling trainModelJobsIdCancelPost.');
         }
 
         await this.HttpAction({
