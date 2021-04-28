@@ -3,8 +3,7 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import * as util from "util";
-import * as uuid from "uuid";
-import { AnomalyDetectionModels, MindSphereSdk, ModelManagementModels } from "../../api/sdk";
+import { AnomalyDetectionModels, MindSphereSdk} from "../../api/sdk";
 import { retry } from "../../api/utils";
 import {
     adjustColor,
@@ -15,10 +14,8 @@ import {
     homeDirLog,
     proxyLog,
     serviceCredentialLog,
-    verboseLog,
 } from "./command-utils";
-const mime = require("mime-types");
-const streamPipeline = util.promisify(require("stream").pipeline);
+
 let color = getColor("blue");
 
 export default (program: CommanderStatic) => {
