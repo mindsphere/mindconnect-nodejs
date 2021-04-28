@@ -31,8 +31,8 @@ export default (program: CommanderStatic) => {
             "train"
         )
         .option(
-            "-o, --on [data|asset]", // batch are excluded for now
-            "on [data | asset]", // batch are excluded for now
+            "-o, --on [data|asset]", // NOTE: 29/04/2021 - batch are excluded for now
+            "on [data | asset]", // NOTE: 29/04/2021 - batch are excluded for now
             "data"
         )
         .option("-d, --data <data>", "time serie data file", "timeserie.mdsp.json")
