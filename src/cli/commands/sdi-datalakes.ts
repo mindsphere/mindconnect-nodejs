@@ -1,9 +1,8 @@
 import { CommanderStatic } from "commander";
 import { log } from "console";
-import { verboseLog } from "../../../dist/src/cli/commands/command-utils";
 import { MindSphereSdk, SemanticDataInterconnectModels } from "../../api/sdk";
 import { throwError } from "../../api/utils";
-import { adjustColor, errorLog, getColor, getSdk, homeDirLog, proxyLog, serviceCredentialLog } from "./command-utils";
+import { adjustColor, errorLog, getColor, getSdk, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
 import fs = require("fs");
 import path = require("path");
 
