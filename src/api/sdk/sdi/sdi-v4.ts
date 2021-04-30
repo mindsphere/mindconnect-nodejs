@@ -157,12 +157,30 @@ export class SemanticDataInterconnectClient extends SdkClient {
         return result as SemanticDataInterconnectModels.CreateDataLakeRequest;
     }
 
+    /**
+     * * Data Lakes
+     *
+     * !important: this doesn't work because of missing support in mindsphere in April 2021
+     * !fix: implemented the method for the case that there is a support in the future
+     *
+     * @param {string} id
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
     public async DeleteDataLake(id: string) {
-        await this.HttpAction({
-            verb: "DELETE",
-            gateway: this.GetGateway(),
-            authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/dataLakes/${id}`,
-        });
+        try {
+            await this.HttpAction({
+                verb: "DELETE",
+                gateway: this.GetGateway(),
+                authorization: await this.GetToken(),
+                baseUrl: `${this._baseUrl}/dataLakes/${id}`,
+            });
+        } catch (error) {
+            console.log(
+                "At the time of creation of this client (April 2021), MindSphere didn't have any support for /delete operation on data lakes."
+            );
+            console.log("This was reported to mindsphere development team and should eventually start working.");
+            throw error;
+        }
     }
 }

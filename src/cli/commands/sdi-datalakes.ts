@@ -2,7 +2,16 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import { MindSphereSdk, SemanticDataInterconnectModels } from "../../api/sdk";
 import { throwError } from "../../api/utils";
-import { adjustColor, errorLog, getColor, getSdk, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
+import {
+    adjustColor,
+    errorLog,
+    getColor,
+    getSdk,
+    homeDirLog,
+    proxyLog,
+    serviceCredentialLog,
+    verboseLog,
+} from "./command-utils";
 import fs = require("fs");
 import path = require("path");
 
@@ -46,6 +55,9 @@ export default (program: CommanderStatic) => {
                             createTemplate(options);
                             console.log("Edit the file before submitting it to MindSphere.");
                             break;
+                        case "update":
+                            await updateDataLake(options, sdk);
+                            break;
                         case "create":
                             await createDataLake(options, sdk);
                             break;
@@ -64,11 +76,47 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
+            log(`    mc sdi-datalakes --mode list \t\t list all sdi datalakes`);
+            log(`    mc sdi-datalakes --mode template \t\t create template file`);
+            log(`    mc sdi-datalakes --mode create --datalake <datalakefile> \t\t create sdi data lake`);
+            log(`    mc sdi-datalakes --mode update --datalake <datalakefile> --datalakeid <datalakeid> \
+                                                                              \t\t update sdi data lake`);
+            log(`    mc sdi-datalakes --mode info --datalakeid <datalakeid>   \t\t get sdi data lake info`);
+            log(`    mc sdi-datalakes --mode delete --datalakeid <datalakeid> \t\t delete sdi data lake`);
+
             serviceCredentialLog();
         });
 };
 
-function checkRequiredParamaters(options: any) {}
+function checkRequiredParamaters(options: any) {
+    options.mode === "create" &&
+        !options.datalake &&
+        errorLog(
+            "you have to provide a datalake template file to create a sdi datalake (see mc sdi-datalakes --help for more details)",
+            true
+        );
+
+    options.mode === "update" &&
+        !options.datalakeid &&
+        errorLog(
+            "you have to provide the datalakeid of the datalake you want to update (see mc sdi-datalakes --help for more details)",
+            true
+        );
+
+    options.mode === "info" &&
+        !options.datalakeid &&
+        errorLog(
+            "you have to provide the datalakeid to get infos about the sdi data lake (see mc sdi-datalakes --help for more details)",
+            true
+        );
+
+    options.mode === "delete" &&
+        !options.datalakeid &&
+        errorLog(
+            "you have to provide the datalakeid to delete the sdi data lake (see mc sdi-datalakes --help for more details)",
+            true
+        );
+}
 
 async function listDataLakes(sdk: MindSphereSdk, options: any) {
     const sdiClient = sdk.GetSemanticDataInterConnectClient();
@@ -133,15 +181,22 @@ function writeToFile(options: any, dataLake: any) {
 async function createDataLake(options: any, sdk: MindSphereSdk) {
     const filePath = path.resolve(options.datalake);
     const file = fs.readFileSync(filePath);
-    const schedule = JSON.parse(file.toString());
+    const dataLake = JSON.parse(file.toString());
 
-    const result = await sdk.GetSemanticDataInterConnectClient().PostDataLake(schedule);
+    const result = await sdk.GetSemanticDataInterConnectClient().PostDataLake(dataLake);
     printDataLakeInfos(result, options);
 }
 
+async function updateDataLake(options: any, sdk: MindSphereSdk) {
+    const filePath = path.resolve(options.datalake);
+    const file = fs.readFileSync(filePath);
+    const dataLake = JSON.parse(file.toString());
+
+    const result = await sdk.GetSemanticDataInterConnectClient().PatchDataLake(`${options.datalakeid}`, dataLake);
+    printDataLakeInfos(result, options);
+}
 async function deleteDataLake(options: any, sdk: MindSphereSdk) {
     const sdiClient = sdk.GetSemanticDataInterConnectClient();
     await sdiClient.DeleteDataLake(`${options.datalakeid}`);
-
     console.log(`The sdi data lake with id : ${color(options.datalakeid)} was deleted.`);
 }
