@@ -2,6 +2,7 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
+import { verboseLog } from "../../../dist/src/cli/commands/command-utils";
 import { AnomalyDetectionModels, MindSphereSdk } from "../../api/sdk";
 import { retry } from "../../api/utils";
 import {
@@ -225,10 +226,11 @@ async function detectAnomalies(options: any, sdk: MindSphereSdk) {
             break;
     }
     console.log(`${color((result || [])?.length)} anomalies found.\n`);
-    (result || [])?.length > 0 && printDetectedAnomalies(result);
+    (result || [])?.length > 0 && printDetectedAnomalies(result, options);
 }
 
-function printDetectedAnomalies(anomalies: Array<AnomalyDetectionModels.Anomaly>) {
+function printDetectedAnomalies(anomalies: Array<AnomalyDetectionModels.Anomaly>, options: any) {
     console.log("\nDetected anomalies:");
-    console.table(anomalies || [], ["_time:", "anomalyExtent"]);
+    console.table(anomalies || [], ["_time", "anomalyExtent"]);
+    verboseLog(JSON.stringify(anomalies, null, 2), options.verbose);
 }
