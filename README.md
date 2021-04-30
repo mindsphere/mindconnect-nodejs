@@ -359,7 +359,7 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 
 | Name |SDK - Client | Command |
 | --- | --- | --- |
-| Anomaly Detection   |  |  |
+| Anomaly Detection   | :heavy_check_mark:  | :heavy_check_mark: |
 | Data Exchange   | :heavy_check_mark: | :heavy_check_mark: |
 | Event Analytics   | :heavy_check_mark: | :heavy_check_mark: |
 | Job Manager   | :heavy_check_mark: | :heavy_check_mark: |
