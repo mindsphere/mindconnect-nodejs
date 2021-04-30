@@ -82,7 +82,7 @@ describe("[SDK] AnomalyDetectionClient", () => {
         );
 
         // Create a new model
-        const model = await anomalyDetectionClient.modelsPost(generatedData, 50, 10, 'EUCLIDEAN', `xyz_${tenant}_${timeOffset}_ano_A`);
+        const model = await anomalyDetectionClient.PostModel(generatedData, 50, 10, 'EUCLIDEAN', `xyz_${tenant}_${timeOffset}_ano_A`);
         model.should.not.be.undefined;
         model.should.not.be.null;        
         (model as any).id.should.not.be.undefined;
@@ -111,7 +111,7 @@ describe("[SDK] AnomalyDetectionClient", () => {
         );
 
         // test the model
-        const anomalies = await anomalyDetectionClient.detectAnomaliesPost(generatedData, `${modelIDTotest}`);
+        const anomalies = await anomalyDetectionClient.DetectAnomalies(generatedData, `${modelIDTotest}`);
         anomalies.should.not.be.undefined;
         anomalies.should.not.be.null;
         anomalies.length.should.be.equals(0);      
@@ -142,7 +142,7 @@ describe("[SDK] AnomalyDetectionClient", () => {
         const allGeneratedData = generatedData.concat(generatedData2);
 
         // test the model
-        const anomalies = await anomalyDetectionClient.detectAnomaliesPost(allGeneratedData, `${modelIDTotest}`);
+        const anomalies = await anomalyDetectionClient.DetectAnomalies(allGeneratedData, `${modelIDTotest}`);
         anomalies.should.not.be.undefined;
         anomalies.should.not.be.null;
         anomalies.length.should.be.gt(0);
@@ -173,7 +173,7 @@ describe("[SDK] AnomalyDetectionClient", () => {
         const toNow = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
 
         // Create a new model
-        const model = await anomalyDetectionClient.modelsDirectPost(5.0,2,assetid, `VibrationData` , fromLastMonth, toNow, 'EUCLIDEAN', `xyz_${tenant}_${timeOffset}_ano_B`);
+        const model = await anomalyDetectionClient.PostModelDirect(5.0,2,assetid, `VibrationData` , fromLastMonth, toNow, 'EUCLIDEAN', `xyz_${tenant}_${timeOffset}_ano_B`);
         model.should.not.be.undefined;
         model.should.not.be.null;        
         (model as any).id.should.not.be.undefined;

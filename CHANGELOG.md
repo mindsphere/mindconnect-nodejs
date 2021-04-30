@@ -5,6 +5,7 @@
 ### Bugfixes and Improvements 3.13.0
 
 - CLI: new `mdsp` alias for command additionally to `mc` alias
+- CLI: new `mc anomalies` command [#254]
 - CLI: new `mc jobs` command [#255]
 - CLI: new `mc schedules` command [#255]
 - CLI: new `mc data-exchange` command [#256]
@@ -19,6 +20,10 @@
 - SDK: NotficationV4 Client [#252]
 - SDK: IotTimeSeriesAggragetesV4 Client [#250]
 - Bumped all dependencies
+
+### Contributions 3.13.0
+
+- Thanks to @jupiterbak for his AnomalyDetection contribution. <3 :heart:
 
 ## 3.12.0 - (Frost Vienna) - April 2021
 
