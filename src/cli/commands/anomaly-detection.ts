@@ -2,7 +2,6 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
-import { verboseLog } from "../../../dist/src/cli/commands/command-utils";
 import { AnomalyDetectionModels, MindSphereSdk } from "../../api/sdk";
 import { retry } from "../../api/utils";
 import {
@@ -14,6 +13,7 @@ import {
     homeDirLog,
     proxyLog,
     serviceCredentialLog,
+    verboseLog,
 } from "./command-utils";
 
 let color = getColor("blue");
