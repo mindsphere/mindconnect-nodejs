@@ -16,6 +16,7 @@ import { MindConnectApiClient } from "../mcapi/mcapi";
 import { ModelManagementClient } from "../model/model-management";
 import { AnomalyDetectionClient } from "../anomaly-detection/anomaly-detection";
 import { NotificationClientV4 } from "../notification-v4/notification-v4";
+import { SemanticDataInterconnectClient } from "../sdi/sdi-v4";
 import { SignalCalculationClient } from "../signal-calculation/signal-calculation";
 import { SignalValidationClient } from "../signal-validation/signal-validation";
 import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
@@ -379,5 +380,20 @@ export class MindSphereSdk extends SdkClient {
         this._signalCalculationClient =
             this._signalCalculationClient || new SignalCalculationClient(this._authenticator);
         return this._signalCalculationClient;
+    }
+
+    private _semanticDataInterConnectClient?: SemanticDataInterconnectClient;
+
+    /**
+     * Semantic Data Interconnect Client
+     *
+     * @returns {SemanticDataInterconnectClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetSemanticDataInterConnectClient(): SemanticDataInterconnectClient {
+        this._semanticDataInterConnectClient =
+            this._semanticDataInterConnectClient || new SemanticDataInterconnectClient(this._authenticator);
+        return this._semanticDataInterConnectClient;
     }
 }

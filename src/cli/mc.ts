@@ -49,6 +49,7 @@ import modelsCommand from "./commands/models";
 import anomalydetectionCommand from "./commands/anomaly-detection";
 import mqttCreateCommand from "./commands/mqtt-create-jwt";
 import notificationCommand from "./commands/notifications";
+import sdiDataLakesCommand from "./commands/sdi-datalakes";
 import signalCalculationCommand from "./commands/signal-calculation";
 import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
@@ -117,6 +118,9 @@ identityCommand(program);
 
 // * data lake
 dataLakeCommand(program);
+
+// sdi
+sdiDataLakesCommand(program);
 
 // * mobileApps
 
