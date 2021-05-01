@@ -12,6 +12,8 @@ export * from "./data-exchange/data-exchange-models";
 export * from "./data-exchange/data-exchange-template";
 export * from "./data-lake/data-lake";
 export * from "./data-lake/data-lake.models";
+export * from "./device-status/device-status-management";
+export * from "./device-status/device-status-models";
 export * from "./event-analytics/eventanalytics";
 export * from "./event-analytics/eventanalytics-models";
 export * from "./event/event-management";
