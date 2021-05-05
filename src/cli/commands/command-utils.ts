@@ -291,3 +291,22 @@ export function buildFilter(options: any) {
     }
     return filter;
 }
+
+export function printObjectInfo(
+    title: string,
+    dto: object,
+    options: any,
+    coloredProperties: Array<string>,
+    color: Function
+) {
+    console.log(`${title}`);
+
+    for (const [key, value] of Object.entries(dto)) {
+        const words = key
+            .split(/(?=[A-Z])/)
+            .join(" ")
+            .toLowerCase();
+        console.log(`${words}: ${coloredProperties.indexOf(key) >= 0 ? color(value) : value}`);
+    }
+    verboseLog(JSON.stringify(dto, null, 2), options.verbose);
+}

@@ -1,3 +1,4 @@
+import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
 import { SemanticDataInterconnectModels } from "./sdi-models";
 
@@ -176,10 +177,150 @@ export class SemanticDataInterconnectClient extends SdkClient {
                 baseUrl: `${this._baseUrl}/dataLakes/${id}`,
             });
         } catch (error) {
-            console.log(
+            console.error(
                 "At the time of creation of this client (April 2021), MindSphere didn't have any support for /delete operation on data lakes."
             );
-            console.log("This was reported to mindsphere development team and should eventually start working.");
+            console.error("This was reported to mindsphere development team and should eventually start working.");
+            throw error;
+        }
+    }
+
+    /**
+     * * Data Registries
+     *
+     * Retrieves Data Registry for a given registry id
+     *
+     * @param {string} id
+     * @returns {Promise<SemanticDataInterconnectModels.DataRegistry>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetDataRegistry(id: string): Promise<SemanticDataInterconnectModels.DataRegistry> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/dataRegistries/${id}`,
+        });
+        return result as SemanticDataInterconnectModels.DataRegistry;
+    }
+
+    /**
+     *
+     * * Data Registries
+     *
+     * Update Data Registry entries for a given Data Registry Id.
+     *
+     * @param {string} id
+     * @param {SemanticDataInterconnectModels.UpdateDataRegistryRequest} updateDataRegistryRequest
+     * @returns {Promise<SemanticDataInterconnectModels.DataRegistry>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async PatchDataRegistry(
+        id: string,
+        updateDataRegistryRequest: SemanticDataInterconnectModels.UpdateDataRegistryRequest
+    ): Promise<SemanticDataInterconnectModels.DataRegistry> {
+        const result = await this.HttpAction({
+            verb: "PATCH",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/dataRegistries/${id}`,
+            body: updateDataRegistryRequest,
+        });
+        return result as SemanticDataInterconnectModels.DataRegistry;
+    }
+
+    /**
+     *
+     * * Data Registries
+     *
+     * Retrieves all Data Registry entries, Data Registry based on sourceName, dataTag or combination of sourceName and dataTag.
+     *
+     * @param {{
+     *         dataTag?: string;
+     *         sourceName?: string;
+     *         pageToken?: string;
+     *     }} [params]
+     * @param params.datatag dataTag
+     * @param params.sourceName sourceName
+     * @param params.pageToken Selects next page. Value must be taken rom response body property 'page.nextToken’. If omitted, first page is returned.
+     *
+     * @returns {Promise<SemanticDataInterconnectModels.ListOfRegistryResponse>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetDataRegistries(params?: {
+        dataTag?: string;
+        sourceName?: string;
+        pageToken?: string;
+    }): Promise<SemanticDataInterconnectModels.ListOfRegistryResponse> {
+        const parameters = params || {};
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/dataRegistries?${toQueryString(parameters)}`,
+        });
+        return result as SemanticDataInterconnectModels.ListOfRegistryResponse;
+    }
+
+    /**
+     *
+     * * Data Registries
+     *
+     * Initiate creation of Data Registry for the current tenant.
+     * The Data Registry information is used during data ingest for the tenant.
+     * Only one Data Registry can be created for a request.
+     * The dataTag, sourceName and fileUploadStrategy is required to create Date Registry
+     * otherwise creation is rejected.
+     * DataUpload will allow only files to be uploaded matching this Data Registry.
+     * This returns unique registryId for each request that can be used to retrieve the created registry.
+     * The tenant cannot have more than 500 data registries in the system.
+     * The schemaFrozen flag must be set to false during creation of a registry.
+     * It can be set to true after creation of the initial schema for the registry.
+     *
+     * @param {SemanticDataInterconnectModels.CreateDataRegistryRequest} createDataRegistryRequest
+     * @returns {Promise<SemanticDataInterconnectModels.DataRegistry>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async PostDataRegistry(
+        createDataRegistryRequest: SemanticDataInterconnectModels.CreateDataRegistryRequest
+    ): Promise<SemanticDataInterconnectModels.DataRegistry> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/dataRegistries`,
+            body: createDataRegistryRequest,
+        });
+        return result as SemanticDataInterconnectModels.DataRegistry;
+    }
+
+    /**
+     * * Data Registries
+     *
+     * !important: this doesn't work because of missing support in mindsphere in April 2021
+     * !fix: implemented the method for the case that there is a support in the future
+     *
+     * @param {string} id
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async DeleteDataRegistry(id: string) {
+        try {
+            await this.HttpAction({
+                verb: "DELETE",
+                gateway: this.GetGateway(),
+                authorization: await this.GetToken(),
+                baseUrl: `${this._baseUrl}/dataLakes/${id}`,
+            });
+        } catch (error) {
+            console.error(
+                "At the time of creation of this client (April 2021), MindSphere didn't have any support for /delete operation on data registries."
+            );
+            console.error("This was reported to mindsphere development team and should eventually start working.");
             throw error;
         }
     }

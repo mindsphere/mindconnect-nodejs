@@ -2,6 +2,7 @@
 import * as program from "commander";
 import aggregatesCommand from "./commands/aggregates";
 import eventAnalyticsCommand from "./commands/analyze-events";
+import anomalydetectionCommand from "./commands/anomaly-detection";
 import aspectCommands from "./commands/aspect-commands";
 import assetInfoCommand from "./commands/asset-info";
 import assetTypeCommand from "./commands/asset-types";
@@ -46,9 +47,9 @@ import versionAndHelp from "./commands/mc-version-help";
 import mobileAppInstancesCommand from "./commands/mobile-app-instances";
 import mobileAppsCommand from "./commands/mobile-apps";
 import modelsCommand from "./commands/models";
-import anomalydetectionCommand from "./commands/anomaly-detection";
 import mqttCreateCommand from "./commands/mqtt-create-jwt";
 import notificationCommand from "./commands/notifications";
+import sdiDataRegistriesCommand from "./commands/sdi-data-registries";
 import sdiDataLakesCommand from "./commands/sdi-datalakes";
 import signalCalculationCommand from "./commands/signal-calculation";
 import signalValidationCommand from "./commands/signal-validation";
@@ -118,6 +119,7 @@ identityCommand(program);
 
 // * data lake
 dataLakeCommand(program);
+sdiDataRegistriesCommand(program);
 
 // sdi
 sdiDataLakesCommand(program);
