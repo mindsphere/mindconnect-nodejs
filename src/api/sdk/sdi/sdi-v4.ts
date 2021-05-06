@@ -436,4 +436,157 @@ export class SemanticDataInterconnectClient extends SdkClient {
             throw error;
         }
     }
+
+    /**
+     * * Data Types
+     *
+     * Update custom datatypes. The patterns can be added only to existing datatype.
+     *
+     * @param {string} name data type name
+     * @param {SemanticDataInterconnectModels.DataTypePattern} dataTypePattern
+     * @returns {Promise<SemanticDataInterconnectModels.DataTypeDefinition>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async AddPatternToDataType(
+        name: string,
+        dataTypePattern: SemanticDataInterconnectModels.DataTypePattern
+    ): Promise<SemanticDataInterconnectModels.DataTypeDefinition> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/dataTypes/${name}/addPatterns`,
+            body: dataTypePattern,
+        });
+        return result as SemanticDataInterconnectModels.DataTypeDefinition;
+    }
+
+    /**
+     *
+     * * Data Types
+     *
+     * Retrieves Data Type for Given Name
+     *
+     * @param {string} name
+     * @returns {Promise<SemanticDataInterconnectModels.DataTypeDefinition>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetDataType(name: string): Promise<SemanticDataInterconnectModels.DataTypeDefinition> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/dataTypes/${name}`,
+        });
+        return result as SemanticDataInterconnectModels.DataTypeDefinition;
+    }
+
+    /**
+     * * Data Types
+     *
+     * Deletes custom datatype for a given datatype name if it is not being used by any schema
+     *
+     * @param {string} name
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async DeleteDataType(name: string) {
+        await this.HttpAction({
+            verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/dataTypes/${name}`,
+        });
+    }
+
+    /**
+     * * Data Types
+     *
+     * Retrieves custom datatypes for the current tenant containing data type name and one or more registered patterns.
+     *
+     * @param {{
+     *         pageToken?: string;
+     *     }} [params]
+     * @returns {Promise<SemanticDataInterconnectModels.ListOfDataTypeDefinition>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetDataTypes(params?: {
+        pageToken?: string;
+    }): Promise<SemanticDataInterconnectModels.ListOfDataTypeDefinition> {
+        const parameters = params || {};
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/dataTypes?${toQueryString(parameters)}`,
+        });
+        return result as SemanticDataInterconnectModels.ListOfDataTypeDefinition;
+    }
+
+    /**
+     * * Data Types
+     *
+     * Custom Data Type Registration
+     *
+     * Initiates a registration for list of custom datatypes for given datatype name and regular expression patterns.
+     * There can be one or more pattern for a given custom data type.
+     * The custom datatype is being used by DataUpload process during schema generation.
+     * The custom datatype registration is rejected for the current tenant if invalid regular expression pattern
+     * is provided.
+     *
+     * The custom datatype applies to all the files ingested for the current tenant.
+     * The tenant can have maximum 200 datatypes per tenant and each datatype cannot exceed 10
+     * regular expression pattern per datatypename. This returns unique *name that can be used to
+     * retrieve the custom data type.
+     *
+     * @param {SemanticDataInterconnectModels.DataTypeDefinition} dataTypeDefinition
+     * @returns {Promise<SemanticDataInterconnectModels.DataTypeDefinition>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async PostDataType(
+        dataTypeDefinition: SemanticDataInterconnectModels.DataTypeDefinition
+    ): Promise<SemanticDataInterconnectModels.DataTypeDefinition> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/dataTypes`,
+            body: dataTypeDefinition,
+        });
+        return result as SemanticDataInterconnectModels.DataTypeDefinition;
+    }
+
+    /**
+     * * Data Types
+     *
+     * Generates the regular expression patterns for a given set of sample values.
+     * In this case sampleValues generates a number of regex patterns and tries to match with
+     * patterns provided in testValues.
+     *
+     * The response contains any of testValues that matches sampleValues as probable pattern match.
+     *
+     * @param {{
+     *         sampleValues: Array<string>;
+     *         testValues: Array<string>;
+     *     }} params
+     * @returns {Promise<SemanticDataInterconnectModels.ListOfPatterns>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async SuggestPatterns(params: {
+        sampleValues: Array<string>;
+        testValues: Array<string>;
+    }): Promise<SemanticDataInterconnectModels.ListOfPatterns> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/suggestPatterns?${toQueryString(params)}`,
+        });
+        return result as SemanticDataInterconnectModels.ListOfPatterns;
+    }
 }
