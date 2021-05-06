@@ -115,7 +115,7 @@ function createTemplate(options: any) {
         maximumExecutionTime: 3600,
         scheduleString: "1 1 * * *",
     };
-    verboseLog(templateType, options.verbose);
+    verboseLog(JSON.stringify(templateType, null, 2), options.verbose);
     writescheduleToFile(options, templateType);
 }
 

@@ -152,7 +152,7 @@ function createTemplate(options: any) {
         type: "Custom",
         basePath: "your/custom/path/to/datalake",
     };
-    verboseLog(templateType, options.verbose);
+    verboseLog(JSON.stringify(templateType, null, 2), options.verbose);
     writeToFile(options, templateType);
 }
 

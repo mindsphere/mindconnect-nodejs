@@ -119,7 +119,7 @@ function createTemplate(options: any, sdk: MindSphereSdk) {
             },
         ],
     };
-    verboseLog(templateType, options.verbose);
+    verboseLog(JSON.stringify(templateType, null, 2), options.verbose);
     writeEventTypeToFile(options, templateType);
 }
 

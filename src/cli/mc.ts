@@ -51,6 +51,7 @@ import mqttCreateCommand from "./commands/mqtt-create-jwt";
 import notificationCommand from "./commands/notifications";
 import sdiDataRegistriesCommand from "./commands/sdi-data-registries";
 import sdiDataLakesCommand from "./commands/sdi-datalakes";
+import sdiIotRegistriesCommand from "./commands/sdi-iot-registries";
 import signalCalculationCommand from "./commands/signal-calculation";
 import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
@@ -120,6 +121,7 @@ identityCommand(program);
 // * data lake
 dataLakeCommand(program);
 sdiDataRegistriesCommand(program);
+sdiIotRegistriesCommand(program);
 
 // sdi
 sdiDataLakesCommand(program);

@@ -178,7 +178,7 @@ export class SemanticDataInterconnectClient extends SdkClient {
             });
         } catch (error) {
             console.error(
-                "At the time of creation of this client (April 2021), MindSphere didn't have any support for /delete operation on data lakes."
+                "At the time of creation of this client (April 2021), MindSphere didn't have any support for DELETE operation on data lakes."
             );
             console.error("This was reported to mindsphere development team and should eventually start working.");
             throw error;
@@ -314,11 +314,123 @@ export class SemanticDataInterconnectClient extends SdkClient {
                 verb: "DELETE",
                 gateway: this.GetGateway(),
                 authorization: await this.GetToken(),
-                baseUrl: `${this._baseUrl}/dataLakes/${id}`,
+                baseUrl: `${this._baseUrl}/dataRegistries/${id}`,
             });
         } catch (error) {
             console.error(
-                "At the time of creation of this client (April 2021), MindSphere didn't have any support for /delete operation on data registries."
+                "At the time of creation of this client (April 2021), MindSphere didn't have any support for DELETE operation on data registries."
+            );
+            console.error("This was reported to mindsphere development team and should eventually start working.");
+            throw error;
+        }
+    }
+
+    /**
+     * * IoT Data Registries
+     *
+     * Retrieves an IoT Data Registry with MindSphere AssetId and AspectName
+     *
+     * @param {{
+     *         filter?: string;
+     *         pageToken?: string;
+     *     }} [params]
+     * @param params.filter filter
+     * @param params.pageToken Selects next page. Value must be taken rom response body property 'page.nextToken’. If omitted, first page is returned.
+     *
+     * @returns {Promise<SemanticDataInterconnectModels.ListOfIoTRegistryResponse>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetIotDataRegistries(params?: {
+        filter?: string;
+        pageToken?: string;
+    }): Promise<SemanticDataInterconnectModels.ListOfIoTRegistryResponse> {
+        const parameters = params || {};
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/iotDataRegistries?${toQueryString(parameters)}`,
+        });
+        return result as SemanticDataInterconnectModels.ListOfIoTRegistryResponse;
+    }
+
+    /**
+     * * IoT Data Registry
+     *
+     * Create new IoT Data Registry with MindSphereAssetId and AspectName
+     *
+     * @param {SemanticDataInterconnectModels.IotDataRegistry} iotDataRegistry
+     * @returns {Promise<SemanticDataInterconnectModels.IotDataRegistryResponse>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async PostIotDataRegistry(
+        iotDataRegistry: SemanticDataInterconnectModels.IotDataRegistry
+    ): Promise<SemanticDataInterconnectModels.IotDataRegistryResponse> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/iotDataRegistries`,
+            body: iotDataRegistry,
+        });
+        return result as SemanticDataInterconnectModels.IotDataRegistryResponse;
+    }
+
+    /**
+     * * Iot Data Registry
+     *
+     * Gets the details about the iot data registry
+     *
+     * !important!: this is convenience method in the client as the SDI API didn't have a specific operation in April 2021
+     *     *
+     * @param {string} registryId
+     * @returns {Promise<SemanticDataInterconnectModels.IotDataRegistry>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetIotDataRegistry(registryId: string): Promise<SemanticDataInterconnectModels.IotDataRegistry> {
+        let nextToken = undefined;
+        let registry = undefined;
+
+        do {
+            const result = await this.GetIotDataRegistries();
+            result.iotDataRegistries?.forEach((x) => {
+                if (x.registryId === registryId) {
+                    registry = x;
+                }
+            });
+            nextToken = result.page?.nextToken;
+        } while (nextToken);
+
+        if (!registry) {
+            throw new Error(`couldn't find iot data registry with id ${registryId}`);
+        }
+        return registry;
+    }
+
+    /**
+     * * Iot Registries
+     *
+     * !important: this doesn't work because of missing support in mindsphere in April 2021
+     * !fix: implemented the method for the case that there is a support in the future
+     *
+     * @param {string} id
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async DeleteIotRegistry(id: string) {
+        try {
+            await this.HttpAction({
+                verb: "DELETE",
+                gateway: this.GetGateway(),
+                authorization: await this.GetToken(),
+                baseUrl: `${this._baseUrl}/iotDataRegistries/${id}`,
+            });
+        } catch (error) {
+            console.error(
+                "At the time of creation of this client (April 2021), MindSphere didn't have any support for DELETE operation on data registries."
             );
             console.error("This was reported to mindsphere development team and should eventually start working.");
             throw error;
