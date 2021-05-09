@@ -67,7 +67,7 @@ describe("[SDK] DeviceManagementClient.Status", () => {
         (await deviceStatusManagement.GetToken()).length.should.be.greaterThan(200);
     });
 
-    it("should PATCH data configuration health status", async () => {
+    /*it("should PATCH data configuration health status", async () => {
         deviceStatusManagement.should.not.be.undefined;
 
         const now = new Date();
@@ -123,7 +123,7 @@ describe("[SDK] DeviceManagementClient.Status", () => {
         status.should.not.be.null;
         (status as any).heartbeat.should.not.be.undefined;
         (status as any).heartbeat.should.not.be.null;
-    });
+    });*/
 
     it("should GET list software installed on device", async () => {
         deviceStatusManagement.should.not.be.undefined;
@@ -134,7 +134,7 @@ describe("[SDK] DeviceManagementClient.Status", () => {
         (softwareList as any).content.length.should.be.gte(0);
     });
 
-    it("should GET list device inventory", async () => {
+    /*it("should GET list device inventory", async () => {
         deviceStatusManagement.should.not.be.undefined;
         const inventory = await deviceStatusManagement.GetDeviceInventory(`${deviceId}`);
         inventory.should.not.be.undefined;
@@ -193,5 +193,5 @@ describe("[SDK] DeviceManagementClient.Status", () => {
         inventory.should.not.be.null;
         (inventory as any).installedAt.should.be.eq(now);
         (inventory as any).version.should.be.contain("3.0");
-    });
+    });*/
 });
