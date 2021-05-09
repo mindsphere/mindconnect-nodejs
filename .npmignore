@@ -1,6 +1,7 @@
 .mc
 .mochatest
 .vscode
+.idea
 **.tgz
 agentconfig*.json
 images/
