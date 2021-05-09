@@ -1,4 +1,4 @@
-import {AssetManagementModels, DeviceManagementModels, MindSphereSdk } from "../src/api/sdk";
+import { AgentManagementModels, AssetManagementModels, DeviceManagementModels, MindSphereSdk } from "../src";
 import { sleep } from "./test-utils";
 
 const timeOffset = new Date().getTime();
@@ -6,9 +6,10 @@ const timeOffset = new Date().getTime();
 export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
     const assetMgmt = sdk.GetAssetManagementClient();
     const deviceManagementClient = sdk.GetDeviceManagementClient();
+    const agentMgmt = sdk.GetAgentManagementClient();
 
     const tenant = sdk.GetTenant();
-    const rootassetid = `${(await assetMgmt.GetRootAsset()).assetId}`;
+    const rootAssetId = `${(await assetMgmt.GetRootAsset()).assetId}`;
     const folders = unroll<AssetManagementModels.AssetResource>(
         await assetMgmt.GetAssets({
             filter: JSON.stringify({
@@ -22,23 +23,24 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
         const folder = await assetMgmt.PostAsset({
             name: "UnitTestFolder",
             typeId: "core.basicarea",
-            parentId: rootassetid,
+            parentId: rootAssetId,
         });
         folders.push(folder);
     }
     const folder = folders[0];
     const folderid = `${folder.assetId}`;
-    
+
     // Check if we have the asset types setup
     const assetTypes = unroll<AssetManagementModels.AssetTypeResource>(
         await assetMgmt.GetAssetTypes({
-            filter: JSON.stringify({ name: { startsWith: `${tenant}.UnitTestDeviceType` } }),
+            filter: JSON.stringify({ name: { startsWith: `${tenant}.UnitTestDeviceAssetType` } }),
         })
     );
     if (assetTypes.length === 0) {
         const _assetType = await assetMgmt.PutAssetType(`${tenant}.UnitTestDeviceAssetType`, {
-            name: `${tenant}.UnitTestDeviceType.${timeOffset}`,
-            parentTypeId: "core.BasicAsset",
+            name: `${tenant}.UnitTestDeviceAssetType.${timeOffset}`,
+            description: `${tenant}.UnitTestDeviceAssetType.${timeOffset}`,
+            parentTypeId: "core.basicagent",
             instantiable: true,
             scope: AssetManagementModels.AssetTypeBase.ScopeEnum.Private,
             aspects: [
@@ -86,7 +88,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
         deviceTypes.push(_deviceType);
     }
     const deviceType = deviceTypes.pop();
- 
+
     // Check if we have the asset setup
     const assets = unroll(
         await assetMgmt.GetAssets({
@@ -112,19 +114,29 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
     }
     const deviceAsset = assets.pop();
 
+    // Register an agent for this asset
+    const agent = await agentMgmt.PostAgent({
+        name: `${tenant}.UnitTestDeviceAgent.${timeOffset}`,
+        securityProfile: AgentManagementModels.AgentUpdate.SecurityProfileEnum.SHAREDSECRET,
+        entityId: `${deviceAsset.assetId}`,
+    });
+
+    const deviceAgentId = `${agent.id}`;
+
     // Check if we have the asset setup
     const devices = unroll(
         await deviceManagementClient.GetDevices({
             assetId: `${(deviceAsset as any).assetId}`,
             page: 0,
-            size:0
+            size: 0
         })
-    );    
+    );
     if (devices.length === 0) {
         const _device = await deviceManagementClient.PostDevice({
             deviceTypeId: `${(deviceType as any).id}`,
             assetId: `${(deviceAsset as any).assetId}`,
-            properties:{
+            agents: [`${deviceAgentId}`],
+            properties: {
                 name: `${tenant}.UnitTestDevice.${timeOffset}`,
                 parentId: folderid,
             }
@@ -132,8 +144,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
         devices.push(_device);
     }
     const device = devices.pop();
-
-    return { device:device, deviceAsset:deviceAsset, deviceType:deviceType, deviceAssetType: deviceAssetType, folderid };
+    return { device: device, deviceAsset: deviceAsset, deviceType: deviceType, deviceAssetType: deviceAssetType, folderid };
 }
 
 function unroll<T>(obj: { _embedded?: any, content?: any }) {
@@ -143,7 +154,6 @@ function unroll<T>(obj: { _embedded?: any, content?: any }) {
     const keys = Object.keys(embedded);
     if (keys.length === 0) return [];
     if (keys.length === 1) return embedded[keys[0]] as T[];
-    
     throw new Error("cant unroll object");
 }
 
@@ -153,48 +163,51 @@ export async function tearDownDeviceTestStructure(
     await sleep(500);
     const assetMgmt = sdk.GetAssetManagementClient();
     const deviceManagementClient = sdk.GetDeviceManagementClient();
+    const agentMgmt = sdk.GetAgentManagementClient();
     const tenant = sdk.GetTenant();
 
     // delete devices
     const devices = (await deviceManagementClient.GetDevices({
             page: 0,
-            size:100
+            size: 100
         })) as any;
-    
+
     for (const x of devices.content) {
-        if(x.properties.name.startsWith( `${tenant}.UnitTestDevice`)){
+        if (x.properties.name.startsWith( `${tenant}.UnitTestDevice`)) {
             await deviceManagementClient.DeleteDevice(x.id);
+        }
+    }
+
+    // delete agents
+    const agents = (await agentMgmt.GetAgents({
+        page: 0,
+        size: 100
+    })) as any;
+    for (const x of agents.content) {
+        if (x.name.startsWith( `${tenant}.UnitTestDeviceAgent`)) {
+            await agentMgmt.DeleteAgent(`${x.id}`, { ifMatch: `${x.eTag}` });
         }
     }
     // delete assets
     const assets = (await assetMgmt.GetAssets({
         filter: JSON.stringify({
-            and: {
-                name: {
-                    startsWith: `${tenant}.UnitTestDeviceAsset`,
-                }
-            },
+            name: {
+                startsWith: `${tenant}.UnitTestDeviceAsset`,
+            }
         }),
-        })) as any;
+    })) as any;
     for (const x of assets._embedded.assets) {
         await assetMgmt.DeleteAsset(x.assetId, {ifMatch: `${x.etag}`});
-    }    
-    
+    }
+
     // delete AssetTypes
     const assetTypes = (await assetMgmt.GetAssetTypes({
         filter: JSON.stringify({
-            and: {
-                id: {
-                    startsWith: `${tenant}`,
-                },
-                name: {
-                    startsWith: `${tenant}.UnitTestDeviceType`,
-                },
+            name: {
+                startsWith: `${tenant}.UnitTestDeviceAssetType`,
             },
         }),
-        sort: "DESC",
-        page: 0,
-        size: 0,
+        sort: "DESC"
     })) as any;
     for (const x of assetTypes._embedded.assetTypes) {
         await assetMgmt.DeleteAssetType(x.id, { ifMatch: x.etag });
