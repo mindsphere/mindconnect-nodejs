@@ -17,7 +17,7 @@ describe("[SDK] DeviceManagementClient.Devices", () => {
     const assetMgmt = sdk.GetAssetManagementClient();
     const tenant = sdk.GetTenant();
 
-    let testDevice = {
+    const testDevice = {
         deviceTypeId: `${tenant}.UnitTestDeviceType`,
         assetId: `myAssetId`,
         serialNumber: `UnitTestserialNumber_A`,
@@ -36,12 +36,12 @@ describe("[SDK] DeviceManagementClient.Devices", () => {
 
     before(async () => {
         // Setup the testing architecture
-        const {device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);        
+        const {device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);
         assetTypeId = `${(deviceAssetType as any).id}`;
         deviceTypeId = `${(deviceType as any).id}`;
         assetId = `${(deviceAsset as any).assetId}`;
-        deviceId = `${(device as any).id}`;        
-        gFolderid = `${folderid}`;        
+        deviceId = `${(device as any).id}`;
+        gFolderid = `${folderid}`;
         testDevice.deviceTypeId = `${deviceTypeId}`;
         testDevice.assetId = `${assetId}`;
     });
@@ -103,7 +103,7 @@ describe("[SDK] DeviceManagementClient.Devices", () => {
             typeId: `${assetTypeId}`,
             parentId: gFolderid,
         });
-        
+
         // Add new device
         testDevice.deviceTypeId = `${deviceTypeId}`;
         testDevice.assetId = `${_asset.assetId}`;
@@ -116,14 +116,14 @@ describe("[SDK] DeviceManagementClient.Devices", () => {
         await deviceManagementClient.DeleteDevice(`${device.id}`);
         // Delete the newly created asset
         await assetMgmt.DeleteAsset(
-            `${_asset.assetId}`, 
+            `${_asset.assetId}`,
             {ifMatch: `${_asset.etag}`}
         );
     });
 
     it("should PATCH specific device ", async () => {
         deviceManagementClient.should.not.be.undefined;
-        let _device = await deviceManagementClient.GetDevice(deviceId);
+        const _device = await deviceManagementClient.GetDevice(deviceId);
 
         _device.serialNumber = `UnitTestserialNumber_D`;
         const patchedDevice = await deviceManagementClient.PatchDevice(`${_device.id}`, _device);
@@ -141,7 +141,7 @@ describe("[SDK] DeviceManagementClient.Devices", () => {
             typeId: `${assetTypeId}`,
             parentId: gFolderid,
         });
-        
+
         // Add new device
         testDevice.deviceTypeId = `${deviceTypeId}`;
         testDevice.assetId = `${_asset.assetId}`;
@@ -153,7 +153,7 @@ describe("[SDK] DeviceManagementClient.Devices", () => {
 
         // Delete the newly created asset
         await assetMgmt.DeleteAsset(
-            `${_asset.assetId}`, 
+            `${_asset.assetId}`,
             {ifMatch: `${_asset.etag}`}
         );
     });

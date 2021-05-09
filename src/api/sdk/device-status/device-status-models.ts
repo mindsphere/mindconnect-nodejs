@@ -1,5 +1,5 @@
 export namespace DeviceStatusModels {
-    
+
     /**
      *
      * @export
@@ -7,32 +7,32 @@ export namespace DeviceStatusModels {
      * @extends {Error}
      */
     export class RequiredError extends Error {
-        name: "RequiredError"= "RequiredError";
+        name: "RequiredError" = "RequiredError";
         constructor(public field: string, msg?: string) {
             super(msg);
         }
     }
 
     /**
-     * 
+     *
      * @export
      * @interface DataConfigHealth
      */
     export interface DataConfigHealth {
         /**
-         * 
+         *
          * @type {Date}
          * @memberof DataConfigHealth
          */
         lastUpdate?: Date;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DataConfigHealth
          */
         configurationId: string;
         /**
-         * 
+         *
          * @type {Array<DataSourceHealth>}
          * @memberof DataConfigHealth
          */
@@ -40,25 +40,25 @@ export namespace DeviceStatusModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface DataConfigHealthInput
      */
     export interface DataConfigHealthInput {
         /**
-         * 
+         *
          * @type {Date}
          * @memberof DataConfigHealthInput
          */
         lastUpdate?: Date;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DataConfigHealthInput
          */
         configurationId: string;
         /**
-         * 
+         *
          * @type {Array<DataSourceHealthNestedInput>}
          * @memberof DataConfigHealthInput
          */
@@ -66,25 +66,25 @@ export namespace DeviceStatusModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface DataConfigHealthNestedInput
      */
     export interface DataConfigHealthNestedInput {
         /**
-         * 
+         *
          * @type {Date}
          * @memberof DataConfigHealthNestedInput
          */
         lastUpdate?: Date;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DataConfigHealthNestedInput
          */
         configurationId: string;
         /**
-         * 
+         *
          * @type {Array<DataSourceHealthNestedInput>}
          * @memberof DataConfigHealthNestedInput
          */
@@ -92,55 +92,55 @@ export namespace DeviceStatusModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface DataPointHealth
      */
     export interface DataPointHealth {
         /**
-         * 
+         *
          * @type {Date}
          * @memberof DataPointHealth
          */
         lastUpdate?: Date;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DataPointHealth
          */
         dataPointId: string;
         /**
-         * 
+         *
          * @type {HealthStatus}
          * @memberof DataPointHealth
          */
         health: HealthStatus;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DataPointHealth
          */
         message?: string;
         /**
-         * 
+         *
          * @type {Date}
          * @memberof DataPointHealth
          */
         lastErrorTime?: Date;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DataPointHealth
          */
         lastErrorMessage?: string;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DataPointHealth
          */
         lastErrorCode?: string;
         /**
-         * 
+         *
          * @type {Date}
          * @memberof DataPointHealth
          */
@@ -148,37 +148,37 @@ export namespace DeviceStatusModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface DataPointHealthNestedInput
      */
     export interface DataPointHealthNestedInput {
         /**
-         * 
+         *
          * @type {Date}
          * @memberof DataPointHealthNestedInput
          */
         lastUpdate?: Date;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DataPointHealthNestedInput
          */
         dataPointId: string;
         /**
-         * 
+         *
          * @type {HealthStatus}
          * @memberof DataPointHealthNestedInput
          */
         health: HealthStatus;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DataPointHealthNestedInput
          */
         message?: string;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DataPointHealthNestedInput
          */
@@ -186,43 +186,43 @@ export namespace DeviceStatusModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface DataSourceHealth
      */
     export interface DataSourceHealth {
         /**
-         * 
+         *
          * @type {Date}
          * @memberof DataSourceHealth
          */
         lastUpdate?: Date;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DataSourceHealth
          */
         name: string;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DataSourceHealth
          */
         dataSourceId?: string;
         /**
-         * 
+         *
          * @type {HealthStatus}
          * @memberof DataSourceHealth
          */
         health: HealthStatus;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DataSourceHealth
          */
         message?: string;
         /**
-         * 
+         *
          * @type {Array<DataPointHealth>}
          * @memberof DataSourceHealth
          */
@@ -230,43 +230,43 @@ export namespace DeviceStatusModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface DataSourceHealthNestedInput
      */
     export interface DataSourceHealthNestedInput {
         /**
-         * 
+         *
          * @type {Date}
          * @memberof DataSourceHealthNestedInput
          */
         lastUpdate?: Date;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DataSourceHealthNestedInput
          */
         name: string;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DataSourceHealthNestedInput
          */
         dataSourceId?: string;
         /**
-         * 
+         *
          * @type {HealthStatus}
          * @memberof DataSourceHealthNestedInput
          */
         health: HealthStatus;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DataSourceHealthNestedInput
          */
         message?: string;
         /**
-         * 
+         *
          * @type {Array<DataPointHealthNestedInput>}
          * @memberof DataSourceHealthNestedInput
          */
@@ -274,31 +274,31 @@ export namespace DeviceStatusModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface DeviceHealthStatusReport
      */
     export interface DeviceHealthStatusReport {
         /**
-         * 
+         *
          * @type {Date}
          * @memberof DeviceHealthStatusReport
          */
         lastUpdate?: Date;
         /**
-         * 
+         *
          * @type {OverallDeviceHealth}
          * @memberof DeviceHealthStatusReport
          */
         overall?: OverallDeviceHealth;
         /**
-         * 
+         *
          * @type {DataConfigHealth}
          * @memberof DeviceHealthStatusReport
          */
         dataConfigHealth?: DataConfigHealth;
         /**
-         * 
+         *
          * @type {{ [key: string]: any; }}
          * @memberof DeviceHealthStatusReport
          */
@@ -306,25 +306,25 @@ export namespace DeviceStatusModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface DeviceHealthStatusReportInput
      */
     export interface DeviceHealthStatusReportInput {
         /**
-         * 
+         *
          * @type {OverallDeviceHealth}
          * @memberof DeviceHealthStatusReportInput
          */
         overall?: OverallDeviceHealth;
         /**
-         * 
+         *
          * @type {DataConfigHealthNestedInput}
          * @memberof DeviceHealthStatusReportInput
          */
         dataConfigHealth?: DataConfigHealthNestedInput;
         /**
-         * 
+         *
          * @type {{ [key: string]: any; }}
          * @memberof DeviceHealthStatusReportInput
          */
@@ -332,13 +332,13 @@ export namespace DeviceStatusModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface ErrorResponse
      */
     export interface ErrorResponse {
         /**
-         * 
+         *
          * @type {Array<Error>}
          * @memberof ErrorResponse
          */
@@ -346,30 +346,30 @@ export namespace DeviceStatusModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @enum {string}
      */
     export enum HealthStatus {
-        OK = <any> 'OK',
-        WARNING = <any> 'WARNING',
-        ERROR = <any> 'ERROR'
+        OK = <any> "OK",
+        WARNING = <any> "WARNING",
+        ERROR = <any> "ERROR"
     }
 
     /**
-     * 
+     *
      * @export
      * @interface Heartbeat
      */
     export interface Heartbeat {
         /**
-         * 
+         *
          * @type {Date}
          * @memberof Heartbeat
          */
         lastUpdate: Date;
         /**
-         * 
+         *
          * @type {boolean}
          * @memberof Heartbeat
          */
@@ -403,7 +403,7 @@ export namespace DeviceStatusModels {
          */
         version: string;
         /**
-         * 
+         *
          * @type {SoftwareTypeApplication}
          * @memberof InventoryApplicationEntry
          */
@@ -449,7 +449,7 @@ export namespace DeviceStatusModels {
          */
         version: string;
         /**
-         * 
+         *
          * @type {SoftwareType}
          * @memberof InventoryEntry
          */
@@ -466,14 +466,6 @@ export namespace DeviceStatusModels {
          * @memberof InventoryEntry
          */
         installedAt: Date;
-    }
-
-    /**
-     * collection of installation records for software installed on a device
-     * @export
-     * @interface InventoryFirmwareArray
-     */
-    export interface InventoryFirmwareArray extends Array<InventoryFirmwareEntry> {
     }
 
     /**
@@ -495,7 +487,7 @@ export namespace DeviceStatusModels {
          */
         version: string;
         /**
-         * 
+         *
          * @type {SoftwareTypeFirmware}
          * @memberof InventoryFirmwareEntry
          */
@@ -515,7 +507,7 @@ export namespace DeviceStatusModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface ModelError
      */
@@ -541,13 +533,13 @@ export namespace DeviceStatusModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface OnlineStatus
      */
     export interface OnlineStatus {
         /**
-         * 
+         *
          * @type {Heartbeat}
          * @memberof OnlineStatus
          */
@@ -555,25 +547,25 @@ export namespace DeviceStatusModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface OverallDeviceHealth
      */
     export interface OverallDeviceHealth {
         /**
-         * 
+         *
          * @type {Date}
          * @memberof OverallDeviceHealth
          */
         lastUpdate?: Date;
         /**
-         * 
+         *
          * @type {HealthStatus}
          * @memberof OverallDeviceHealth
          */
         health: HealthStatus;
         /**
-         * 
+         *
          * @type {string}
          * @memberof OverallDeviceHealth
          */
@@ -581,19 +573,19 @@ export namespace DeviceStatusModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface PaginatedSoftwareInventoryRecord
      */
     export interface PaginatedSoftwareInventoryRecord {
         /**
-         * 
+         *
          * @type {Array<SoftwareInventoryRecord>}
          * @memberof PaginatedSoftwareInventoryRecord
          */
         content?: Array<SoftwareInventoryRecord>;
         /**
-         * 
+         *
          * @type {any}
          * @memberof PaginatedSoftwareInventoryRecord
          */
@@ -613,13 +605,13 @@ export namespace DeviceStatusModels {
          */
         id?: string;
         /**
-         * 
+         *
          * @type {string}
          * @memberof SoftwareInventoryRecord
          */
         deviceId?: string;
         /**
-         * 
+         *
          * @type {string}
          * @memberof SoftwareInventoryRecord
          */
@@ -666,16 +658,16 @@ export namespace DeviceStatusModels {
          * @enum {string}
          */
         export enum SoftwareTypeEnum {
-            FIRMWARE = <any> 'FIRMWARE',
-            APP = <any> 'APP'
+            FIRMWARE = <any> "FIRMWARE",
+            APP = <any> "APP"
         }
         /**
          * @export
          * @enum {string}
          */
         export enum InstalledByEnum {
-            MANUAL = <any> 'MANUAL',
-            SWDEPLOY = <any> 'SWDEPLOY'
+            MANUAL = <any> "MANUAL",
+            SWDEPLOY = <any> "SWDEPLOY"
         }
     }
 
@@ -685,8 +677,8 @@ export namespace DeviceStatusModels {
      * @enum {string}
      */
     export enum SoftwareType {
-        FIRMWARE = <any> 'FIRMWARE',
-        APP = <any> 'APP'
+        FIRMWARE = <any> "FIRMWARE",
+        APP = <any> "APP"
     }
 
     /**
@@ -695,7 +687,7 @@ export namespace DeviceStatusModels {
      * @enum {string}
      */
     export enum SoftwareTypeApplication {
-        APP = <any> 'APP'
+        APP = <any> "APP"
     }
 
     /**
@@ -704,14 +696,6 @@ export namespace DeviceStatusModels {
      * @enum {string}
      */
     export enum SoftwareTypeFirmware {
-        FIRMWARE = <any> 'FIRMWARE'
+        FIRMWARE = <any> "FIRMWARE"
     }
-
-    // /**
-    //  * time of the report
-    //  * @export
-    //  * @interface Time
-    //  */
-    // export interface Time {
-    // }
 }

@@ -4,7 +4,7 @@ import { DeviceStatusModels } from "./device-status-models";
 
 /**
  * Device Status API
- * Device Status API allows devices to provide status information to be queried by backend applications. Device status comprises information about device health, connection status, and the installed software inventory. Health information can be flexibly extended to contain custom health information. 
+ * Device Status API allows devices to provide status information to be queried by backend applications. Device status comprises information about device health, connection status, and the installed software inventory. Health information can be flexibly extended to contain custom health information.
  *
  *
  * @export
@@ -15,7 +15,7 @@ export class DeviceStatusManagementClient extends SdkClient {
     private _baseUrl: string = "/api/devicestatus/v3";
 
     /**
-     * Allows the devices to report on the device health status 
+     * Allows the devices to report on the device health status
      * @summary Report device health status
      * @param {string} id ID of the device
      * @param {DeviceStatusModels.DeviceHealthStatusReportInput} healthStatusReport Report of the device health status
@@ -29,15 +29,15 @@ export class DeviceStatusManagementClient extends SdkClient {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceStatusModels.RequiredError(
-                'id',
-                'Required parameter id was null or undefined when calling PatchDeviceHealth.'
+                "id",
+                "Required parameter id was null or undefined when calling PatchDeviceHealth."
             );
         }
         // verify required parameter 'healthStatusReport' is not null or undefined
         if (healthStatusReport === null || healthStatusReport === undefined) {
             throw new DeviceStatusModels.RequiredError(
-                'healthStatusReport',
-                'Required parameter healthStatusReport was null or undefined when calling PatchDeviceHealth.'
+                "healthStatusReport",
+                "Required parameter healthStatusReport was null or undefined when calling PatchDeviceHealth."
             );
         }
 
@@ -54,7 +54,7 @@ export class DeviceStatusManagementClient extends SdkClient {
     }
 
     /**
-     * Retrieves the device health status 
+     * Retrieves the device health status
      * @summary Retrieves the device health status
      * @param {string} id id of the device
      * @throws {DeviceStatusModels.RequiredError}
@@ -66,8 +66,8 @@ export class DeviceStatusManagementClient extends SdkClient {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceStatusModels.RequiredError(
-                'id',
-                'Required parameter id was null or undefined when calling GetDeviceHealth.'
+                "id",
+                "Required parameter id was null or undefined when calling GetDeviceHealth."
             );
         }
 
@@ -83,7 +83,7 @@ export class DeviceStatusManagementClient extends SdkClient {
     }
 
     /**
-     * Persist data configuration health status. 
+     * Persist data configuration health status.
      * @summary Persist data configuration health status
      * @param {string} id ID of the device
      * @param {DeviceStatusModels.DataConfigHealthInput} dataConfig Data configuration health status
@@ -97,15 +97,15 @@ export class DeviceStatusManagementClient extends SdkClient {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceStatusModels.RequiredError(
-                'id',
-                'Required parameter id was null or undefined when calling PatchDeviceHealthDataConfig.'
+                "id",
+                "Required parameter id was null or undefined when calling PatchDeviceHealthDataConfig."
             );
         }
         // verify required parameter 'dataConfig' is not null or undefined
         if (dataConfig === null || dataConfig === undefined) {
             throw new DeviceStatusModels.RequiredError(
-                'dataConfig',
-                'Required parameter dataConfig was null or undefined when calling PatchDeviceHealthDataConfig.'
+                "dataConfig",
+                "Required parameter dataConfig was null or undefined when calling PatchDeviceHealthDataConfig."
             );
         }
 
@@ -122,7 +122,7 @@ export class DeviceStatusManagementClient extends SdkClient {
     }
 
     /**
-     * Retrieves the data configuration health status. 
+     * Retrieves the data configuration health status.
      * @summary Retrieves the data configuration health status
      * @param {string} id id of the device
      * @throws {DeviceStatusModels.RequiredError}
@@ -134,8 +134,8 @@ export class DeviceStatusManagementClient extends SdkClient {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceStatusModels.RequiredError(
-                'id',
-                'Required parameter id was null or undefined when calling GetDeviceHealthDataConfig.'
+                "id",
+                "Required parameter id was null or undefined when calling GetDeviceHealthDataConfig."
             );
         }
 
@@ -151,7 +151,7 @@ export class DeviceStatusManagementClient extends SdkClient {
     }
 
     /**
-     * Sends the heartbeat. 
+     * Sends the heartbeat.
      * @summary Sends the heartbeat
      * @param {string} id ID of the device
      * @throws {DeviceStatusModels.RequiredError}
@@ -159,12 +159,12 @@ export class DeviceStatusManagementClient extends SdkClient {
     */
      public async PostDeviceHeartbeat(
         id: string
-    ): Promise<Response>{
+    ): Promise<Response> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceStatusModels.RequiredError(
-                'id',
-                'Required parameter id was null or undefined when calling PostDeviceHeartbeat.'
+                "id",
+                "Required parameter id was null or undefined when calling PostDeviceHeartbeat."
             );
         }
 
@@ -181,7 +181,7 @@ export class DeviceStatusManagementClient extends SdkClient {
     }
 
     /**
-     * Retrieves the device connection status 
+     * Retrieves the device connection status
      * @summary Retrieves the device connection status
      * @param {string} id ID of the device
      * @throws {DeviceStatusModels.RequiredError}
@@ -193,8 +193,8 @@ export class DeviceStatusManagementClient extends SdkClient {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceStatusModels.RequiredError(
-                'id',
-                'Required parameter id was null or undefined when calling GetDeviceConnectionStatus.'
+                "id",
+                "Required parameter id was null or undefined when calling GetDeviceConnectionStatus."
             );
         }
 
@@ -210,7 +210,7 @@ export class DeviceStatusManagementClient extends SdkClient {
     }
 
     /**
-     * Returns a paginated list of all software (firmware, apps, etc) installed on the device  # Searching / Filtering # The following filter criteria can be specified as query parameters * *type*: return only firmware or apps or ... * *softwareId*: return only software belonging to the specified product (potentially multiple different versions could be installed at the same time) 
+     * Returns a paginated list of all software (firmware, apps, etc) installed on the device  # Searching / Filtering # The following filter criteria can be specified as query parameters * *type*: return only firmware or apps or ... * *softwareId*: return only software belonging to the specified product (potentially multiple different versions could be installed at the same time)
      * @summary List software installed on device
      * @param {string} id ID of the device
      * @param {'FIRMWARE' | 'APP'} [type] type of software
@@ -222,7 +222,7 @@ export class DeviceStatusManagementClient extends SdkClient {
      */
      public async GetDeviceSoftwares(
         id: string,
-        type?: 'FIRMWARE' | 'APP',
+        type?: "FIRMWARE" | "APP",
         softwareId?: string,
         size?: number,
         page?: number
@@ -230,8 +230,8 @@ export class DeviceStatusManagementClient extends SdkClient {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceStatusModels.RequiredError(
-                'id',
-                'Required parameter id was null or undefined when calling GetDeviceSoftwares.'
+                "id",
+                "Required parameter id was null or undefined when calling GetDeviceSoftwares."
             );
         }
 
@@ -247,7 +247,7 @@ export class DeviceStatusManagementClient extends SdkClient {
     }
 
     /**
-     * Returns the software inventory of the device. 
+     * Returns the software inventory of the device.
      * @summary Get inventory
      * @param {string} id ID of the device
      * @param {'FIRMWARE' | 'APP'} [type] type of software
@@ -256,13 +256,13 @@ export class DeviceStatusManagementClient extends SdkClient {
      */
      public async GetDeviceInventory(
         id: string,
-        type?: 'FIRMWARE' | 'APP'
+        type?: "FIRMWARE" | "APP"
     ): Promise<DeviceStatusModels.InventoryArray> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceStatusModels.RequiredError(
-                'id',
-                'Required parameter id was null or undefined when calling GetDeviceInventory.'
+                "id",
+                "Required parameter id was null or undefined when calling GetDeviceInventory."
             );
         }
 
@@ -278,7 +278,7 @@ export class DeviceStatusManagementClient extends SdkClient {
     }
 
     /**
-     * Updates the software inventory of the device. The whole inventory is replaced with the content sent by the device. 
+     * Updates the software inventory of the device. The whole inventory is replaced with the content sent by the device.
      * @summary Update inventory
      * @param {string} id ID of the device
      * @param {Array<DeviceStatusModels.InventoryEntry>} installationSoftwareInventory List of installed software
@@ -286,21 +286,21 @@ export class DeviceStatusManagementClient extends SdkClient {
      * @memberof DeviceStatusManagementClient
     */
      public async PatchDeviceSoftwareInventory(
-        id: string, 
+        id: string,
         installationSoftwareInventory: Array<DeviceStatusModels.InventoryEntry>
     ): Promise<Array<DeviceStatusModels.InventoryEntry>> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceStatusModels.RequiredError(
-                'id',
-                'Required parameter id was null or undefined when calling PatchDeviceSoftwareInventory.'
+                "id",
+                "Required parameter id was null or undefined when calling PatchDeviceSoftwareInventory."
             );
         }
         // verify required parameter 'installationSoftwareInventory' is not null or undefined
         if (installationSoftwareInventory === null || installationSoftwareInventory === undefined) {
             throw new DeviceStatusModels.RequiredError(
-                'installationSoftwareInventory',
-                'Required parameter installationSoftwareInventory was null or undefined when calling PatchDeviceSoftwareInventory.'
+                "installationSoftwareInventory",
+                "Required parameter installationSoftwareInventory was null or undefined when calling PatchDeviceSoftwareInventory."
             );
         }
 
@@ -317,7 +317,7 @@ export class DeviceStatusManagementClient extends SdkClient {
     }
 
     /**
-     * Updates the software inventory of the device for firmware type Provided as a convenience method for device implementations that use separate processes for managing firmware and app updates. By utilizing this endpoint the device does not have to aggregate firmware and apps into a wholistic list but can update firmware independently. 
+     * Updates the software inventory of the device for firmware type Provided as a convenience method for device implementations that use separate processes for managing firmware and app updates. By utilizing this endpoint the device does not have to aggregate firmware and apps into a wholistic list but can update firmware independently.
      * @summary Update firmware inventory on a device
      * @param {string} id ID of the device
      * @param {Array<DeviceStatusModels.InventoryFirmwareEntry>} installationFirmwareInventory List of installed firmware
@@ -325,21 +325,21 @@ export class DeviceStatusManagementClient extends SdkClient {
      * @memberof DeviceStatusManagementClient
     */
      public async PatchDeviceFirmwareInventory(
-        id: string, 
+        id: string,
         installationFirmwareInventory: Array<DeviceStatusModels.InventoryFirmwareEntry>
     ): Promise<Array<DeviceStatusModels.InventoryEntry>> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceStatusModels.RequiredError(
-                'id',
-                'Required parameter id was null or undefined when calling PatchDeviceFirmwareInventory.'
+                "id",
+                "Required parameter id was null or undefined when calling PatchDeviceFirmwareInventory."
             );
         }
         // verify required parameter 'installationFirmwareInventory' is not null or undefined
         if (installationFirmwareInventory === null || installationFirmwareInventory === undefined) {
             throw new DeviceStatusModels.RequiredError(
-                'installationFirmwareInventory',
-                'Required parameter installationFirmwareInventory was null or undefined when calling PatchDeviceFirmwareInventory.'
+                "installationFirmwareInventory",
+                "Required parameter installationFirmwareInventory was null or undefined when calling PatchDeviceFirmwareInventory."
             );
         }
 
@@ -356,7 +356,7 @@ export class DeviceStatusManagementClient extends SdkClient {
     }
 
     /**
-     * Updates the software inventory of the device for edge application type Provided as a convenience method for device implementations that use separate processes for managing firmware and app updates. By utilizing this endpoint the device does not have to aggregate firmware and apps into a wholistic list but can update edge applications independently. 
+     * Updates the software inventory of the device for edge application type Provided as a convenience method for device implementations that use separate processes for managing firmware and app updates. By utilizing this endpoint the device does not have to aggregate firmware and apps into a wholistic list but can update edge applications independently.
      * @summary Update edge application inventory on a device
      * @param {string} id ID of the device
      * @param {Array<DeviceStatusModels.InventoryApplicationEntry>} installationApplicationInventory List of installed edge applications
@@ -364,21 +364,21 @@ export class DeviceStatusManagementClient extends SdkClient {
      * @memberof DeviceStatusManagementClient
     */
      public async PatchDeviceApplicationInventory(
-        id: string, 
+        id: string,
         installationApplicationInventory: Array<DeviceStatusModels.InventoryApplicationEntry>
     ): Promise<DeviceStatusModels.InventoryApplicationArray> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceStatusModels.RequiredError(
-                'id',
-                'Required parameter id was null or undefined when calling PatchDeviceApplicationInventory.'
+                "id",
+                "Required parameter id was null or undefined when calling PatchDeviceApplicationInventory."
             );
         }
         // verify required parameter 'installationApplicationInventory' is not null or undefined
         if (installationApplicationInventory === null || installationApplicationInventory === undefined) {
             throw new DeviceStatusModels.RequiredError(
-                'installationApplicationInventory',
-                'Required parameter installationApplicationInventory was null or undefined when calling PatchDeviceApplicationInventory.'
+                "installationApplicationInventory",
+                "Required parameter installationApplicationInventory was null or undefined when calling PatchDeviceApplicationInventory."
             );
         }
 
