@@ -33,7 +33,11 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
     // Check if we have the asset types setup
     const assetTypes = unroll<AssetManagementModels.AssetTypeResource>(
         await assetMgmt.GetAssetTypes({
-            filter: JSON.stringify({ name: { startsWith: `${tenant}.UnitTestDeviceAssetType` } }),
+            filter: JSON.stringify({
+                name: {
+                    startsWith: `${tenant}.UnitTestDeviceAssetType`
+                }
+            }),
         })
     );
     if (assetTypes.length === 0) {
@@ -44,7 +48,10 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
             instantiable: true,
             scope: AssetManagementModels.AssetTypeBase.ScopeEnum.Private,
             aspects: [
-                { name: "firmwarestatus", aspectTypeId: "core.firmwarestatus" },
+                {
+                    name: "firmwarestatus",
+                    aspectTypeId: "core.firmwarestatus"
+                },
             ],
             variables: [
                 {
@@ -157,9 +164,7 @@ function unroll<T>(obj: { _embedded?: any, content?: any }) {
     throw new Error("cant unroll object");
 }
 
-export async function tearDownDeviceTestStructure(
-    sdk: MindSphereSdk
-) {
+export async function tearDownDeviceTestStructure(sdk: MindSphereSdk) {
     await sleep(500);
     const assetMgmt = sdk.GetAssetManagementClient();
     const deviceManagementClient = sdk.GetDeviceManagementClient();
@@ -171,9 +176,8 @@ export async function tearDownDeviceTestStructure(
             page: 0,
             size: 100
         })) as any;
-
     for (const x of devices.content) {
-        if (x.properties.name.startsWith( `${tenant}.UnitTestDevice`)) {
+        if (`${x.properties.name}`.startsWith( `${tenant}.UnitTestDevice`)) {
             await deviceManagementClient.DeleteDevice(x.id);
         }
     }
@@ -184,7 +188,7 @@ export async function tearDownDeviceTestStructure(
         size: 100
     })) as any;
     for (const x of agents.content) {
-        if (x.name.startsWith( `${tenant}.UnitTestDeviceAgent`)) {
+        if (`${x.name}`.startsWith( `${tenant}.UnitTestDeviceAgent`)) {
             await agentMgmt.DeleteAgent(`${x.id}`, { ifMatch: `${x.eTag}` });
         }
     }
