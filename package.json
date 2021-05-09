@@ -11,7 +11,7 @@
         "prepare": "npm run clean && npm run ts:build:dist && npm run copyfiles:dist && npm run browser:build",
         "copyfiles:dist": "copyfiles src/cli/commands/html/sc/* dist/src/cli/commands/html/sc/ --flat",
         "test": "npm run ts:build && mocha --colors --timeout=0",
-        "test-device-status": "npm run ts:build && mocha --grep DeviceStatusManagementClient --colors --timeout=0",
+        "test-device-management": "npm run ts:build && mocha --grep DeviceManagementClient --colors --timeout=0",
         "sanity": "npm run ts:build && mocha --colors --grep @sanity --timeout=0",
         "s4f": "npm run ts:build && mocha --colors --grep @s4f --timeout=0",
         "test-dev": "npm run ts:build && cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 mocha --reporter=list --timeout=0",
