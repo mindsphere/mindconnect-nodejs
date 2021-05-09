@@ -196,7 +196,11 @@ describe("[SDK] AnomalyDetectionClient", () => {
         models_after.should.not.be.undefined;
         models_after.should.not.be.null;
         (models_after as any).page.number.should.equal(0);
+<<<<<<< HEAD
         // (models_after as any).page.size.should.be.gt(model_count);
+=======
+        (models_after as any).page.size.should.be.gte(model_count);
+>>>>>>> chore: Update anomaly detection
     });
 
     async function deleteModels(mm: ModelManagementClient) {
