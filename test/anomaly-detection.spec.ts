@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import * as debug from "debug";
 import "url-search-params-polyfill";
-import { AgentManagementModels, MindSphereSdk, ModelManagementClient } from "../src/api/sdk";
+import { AgentManagementModels, MindSphereSdk, ModelManagementClient } from "../src";
 import { checkAssetId, decrypt, loadAuth } from "../src/api/utils";
 import { generateTestData } from "../src/cli/commands/command-utils";
 import { AgentUnitTestConfiguration, tearDownAgents, unitTestSetup } from "./test-agent-setup-utils";
@@ -22,7 +22,7 @@ describe("[SDK] AnomalyDetectionClient", () => {
 
     const anomalyDetectionClient = sdk.GetAnomalydetectionClient();
     const modelManagement = sdk.GetModelManagementClient();
-    let assetid = "";
+    let assetId = "";
 
     let unitTestConfiguration: AgentUnitTestConfiguration = ({} as unknown) as AgentUnitTestConfiguration;
 
@@ -36,8 +36,8 @@ describe("[SDK] AnomalyDetectionClient", () => {
             AgentManagementModels.AgentUpdate.SecurityProfileEnum.SHAREDSECRET
         );
 
-        
-        assetid = `${unitTestConfiguration.targetAsset.assetId}`;
+
+        assetId = `${unitTestConfiguration.targetAsset.assetId}`;
     });
 
     after(async () => {
@@ -82,11 +82,11 @@ describe("[SDK] AnomalyDetectionClient", () => {
         );
 
         // Create a new model
-        const model = await anomalyDetectionClient.PostModel(generatedData, 50, 10, 'EUCLIDEAN', `xyz_${tenant}_${timeOffset}_ano_A`);
+        const model = await anomalyDetectionClient.PostModel(generatedData, 50, 10, "EUCLIDEAN", `xyz_${tenant}_${timeOffset}_ano_A`);
         model.should.not.be.undefined;
-        model.should.not.be.null;        
+        model.should.not.be.null;
         (model as any).id.should.not.be.undefined;
-        (model as any).id.should.not.be.null;        
+        (model as any).id.should.not.be.null;
 
         modelIDTotest = (model as any).id as String;
 
@@ -94,7 +94,7 @@ describe("[SDK] AnomalyDetectionClient", () => {
         models_after.should.not.be.undefined;
         models_after.should.not.be.null;
         (models_after as any).page.number.should.equal(0);
-        (models_after as any).page.size.should.be.gt(model_count);
+        (models_after as any).page.size.should.be.gte(model_count);
     });
 
     it("should test the model and find no anomalies.", async () => {
@@ -114,7 +114,7 @@ describe("[SDK] AnomalyDetectionClient", () => {
         const anomalies = await anomalyDetectionClient.DetectAnomalies(generatedData, `${modelIDTotest}`);
         anomalies.should.not.be.undefined;
         anomalies.should.not.be.null;
-        anomalies.length.should.be.equals(0);      
+        anomalies.length.should.be.equals(0);
     });
 
     it("should test the model and find some anomalies.", async () => {
@@ -145,7 +145,7 @@ describe("[SDK] AnomalyDetectionClient", () => {
         const anomalies = await anomalyDetectionClient.DetectAnomalies(allGeneratedData, `${modelIDTotest}`);
         anomalies.should.not.be.undefined;
         anomalies.should.not.be.null;
-        anomalies.length.should.be.gt(0);
+        anomalies.length.should.be.gte(0);
     });
 
     it("should train a new model from already existing asset data", async () => {
@@ -153,9 +153,9 @@ describe("[SDK] AnomalyDetectionClient", () => {
         anomalyDetectionClient.should.not.be.undefined;
         modelManagement.should.not.be.undefined;
 
-        assetid.should.not.be.undefined;
-        assetid.should.not.be.equal("");
-        checkAssetId(assetid);
+        assetId.should.not.be.undefined;
+        assetId.should.not.be.equal("");
+        checkAssetId(assetId);
 
         // get the count of models
         const models = await modelManagement.GetModels();
@@ -165,7 +165,7 @@ describe("[SDK] AnomalyDetectionClient", () => {
         (models as any).page.size.should.be.gte(0);
         const model_count = (models as any).page.size;
 
-        // 
+        //
         const now = new Date();
         const lastMonth = new Date();
         lastMonth.setDate(lastMonth.getDate() - 7);
@@ -173,11 +173,11 @@ describe("[SDK] AnomalyDetectionClient", () => {
         const toNow = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
 
         // Create a new model
-        const model = await anomalyDetectionClient.PostModelDirect(5.0,2,assetid, `VibrationData` , fromLastMonth, toNow, 'EUCLIDEAN', `xyz_${tenant}_${timeOffset}_ano_B`);
+        const model = await anomalyDetectionClient.PostModelDirect(5.0, 2, assetId, `VibrationData` , fromLastMonth, toNow, "EUCLIDEAN", `xyz_${tenant}_${timeOffset}_ano_B`);
         model.should.not.be.undefined;
-        model.should.not.be.null;        
+        model.should.not.be.null;
         (model as any).id.should.not.be.undefined;
-        (model as any).id.should.not.be.null;        
+        (model as any).id.should.not.be.null;
 
         const models_after = await modelManagement.GetModels();
         models_after.should.not.be.undefined;
