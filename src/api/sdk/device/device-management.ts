@@ -4,7 +4,7 @@ import { DeviceManagementModels } from "./device-models";
 
 /**
  * Device Management API
- * Device Managment API can be used by device builders to define device types and by device operators to manage device instances. At the moment, device types are only visible to the tenant creating them.  Devices are the basis for managing software and configuration in other edge APIs.     Each device is associated to a device type, which defines the firmware to be installed on the device. Once a device is created, the device type association cannot be changed anymore. Agents must be associated to devices to be able to access the Deployment Workflow API. 
+ * Device Managment API can be used by device builders to define device types and by device operators to manage device instances. At the moment, device types are only visible to the tenant creating them.  Devices are the basis for managing software and configuration in other edge APIs.     Each device is associated to a device type, which defines the firmware to be installed on the device. Once a device is created, the device type association cannot be changed anymore. Agents must be associated to devices to be able to access the Deployment Workflow API.
  *
  * @export
  * @class DeviceManagementClient
@@ -12,7 +12,7 @@ import { DeviceManagementModels } from "./device-models";
  */
 export class DeviceManagementClient extends SdkClient {
     private _baseUrl: string = "/api/devicemanagement/v3";
-    
+
     /**
      * * DeviceTypes
      *
@@ -32,7 +32,6 @@ export class DeviceManagementClient extends SdkClient {
      * @param {number} [size] The maximum number of elements returned in one page
      * @param {number} [page] The (0-based) index of the page
      * @param {string} [sort] The order of returned elements.&lt;br/&gt;Multiple fields could be used separated by commas (e.g. &#39;field1,field2&#39;).&lt;br/&gt;Descending order could be requested by appending &#39;,desc&#39; at the end of parameter.(e.g. &#39;field1,field2,desc&#39;)
-     
      * @example await deviceManagement.GetDeviceTypes();
      * @example await deviceManagement.GetDeviceTypes({sort: 'id,name'});
 
@@ -78,8 +77,8 @@ export class DeviceManagementClient extends SdkClient {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceManagementModels.RequiredError(
-                    'id',
-                    'Required parameter id was null or undefined when calling GetDeviceType.'
+                    "id",
+                    "Required parameter id was null or undefined when calling GetDeviceType."
                 );
         }
         const result = await this.HttpAction({
@@ -109,8 +108,8 @@ export class DeviceManagementClient extends SdkClient {
         // verify required parameter 'deviceType' is not null or undefined
         if (deviceType === null || deviceType === undefined) {
             throw new DeviceManagementModels.RequiredError(
-                    'deviceType',
-                    'Required parameter deviceType was null or undefined when calling PostDeviceType.'
+                    "deviceType",
+                    "Required parameter deviceType was null or undefined when calling PostDeviceType."
                 );
         }
 
@@ -144,15 +143,15 @@ export class DeviceManagementClient extends SdkClient {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceManagementModels.RequiredError(
-                    'id',
-                    'Required parameter id was null or undefined when calling PatchDeviceType.'
+                    "id",
+                    "Required parameter id was null or undefined when calling PatchDeviceType."
                 );
         }
         // verify required parameter 'deviceType' is not null or undefined
         if (deviceType === null || deviceType === undefined) {
             throw new DeviceManagementModels.RequiredError(
-                    'deviceType',
-                    'Required parameter deviceType was null or undefined when calling PatchDeviceType.'
+                    "deviceType",
+                    "Required parameter deviceType was null or undefined when calling PatchDeviceType."
                 );
         }
 
@@ -194,11 +193,10 @@ export class DeviceManagementClient extends SdkClient {
             noResponse: true,
         });
     }
-    
 
     /**
      * * Devices
-     * Returns a paginated list of all devices within the caller tenant  Searching / filtering is currently not supported 
+     * Returns a paginated list of all devices within the caller tenant  Searching / filtering is currently not supported
      * @summary List devices
      * @summary List devices
      * @param {{
@@ -209,7 +207,7 @@ export class DeviceManagementClient extends SdkClient {
      * @param {number} [size] The maximum number of elements returned in one page
      * @param {number} [page] The (0-based) index of the page
      * @param {string} [assetId] Associated asset id
-     * 
+     *
      * @example await deviceManagement.GetDevices();
      * @example await deviceManagement.GetDevices({size: 10});
 
@@ -237,7 +235,7 @@ export class DeviceManagementClient extends SdkClient {
 
     /**
      * * Devices
-     * Returns the specified device 
+     * Returns the specified device
      * @summary Fetch a device
      * @param {string} id id of the device
      * @returns {Promise<DeviceManagementModels.Device>}
@@ -251,8 +249,8 @@ export class DeviceManagementClient extends SdkClient {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceManagementModels.RequiredError(
-                    'id',
-                    'Required parameter id was null or undefined when calling GetDevice.'
+                    "id",
+                    "Required parameter id was null or undefined when calling GetDevice."
                 );
         }
         const result = await this.HttpAction({
@@ -268,7 +266,7 @@ export class DeviceManagementClient extends SdkClient {
 
     /**
      * * Devices
-     * Updates the device.  # Constraints # * All fields are optional. If a field is null or is omitted, the current value will be preserved. * If the read-only fields `id` and `deviceTypeId` are present, they must match the current value or an error is returned. * The `agents` list and `properties` json block are replaced with the content specified in the request if present. Partial modification of these elements is not possible. 
+     * Updates the device.  # Constraints # * All fields are optional. If a field is null or is omitted, the current value will be preserved. * If the read-only fields `id` and `deviceTypeId` are present, they must match the current value or an error is returned. * The `agents` list and `properties` json block are replaced with the content specified in the request if present. Partial modification of these elements is not possible.
      * @summary Update device
      * @param {string} id id of the device
      * @param {DeviceManagementModels.DeviceUpdate} deviceMetadata Device metadata
@@ -284,15 +282,15 @@ export class DeviceManagementClient extends SdkClient {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceManagementModels.RequiredError(
-                    'id',
-                    'Required parameter id was null or undefined when calling PatchDevice.'
+                    "id",
+                    "Required parameter id was null or undefined when calling PatchDevice."
                 );
         }
         // verify required parameter 'deviceMetadata' is not null or undefined
         if (deviceMetadata === null || deviceMetadata === undefined) {
             throw new DeviceManagementModels.RequiredError(
-                    'deviceMetadata',
-                    'Required parameter deviceMetadata was null or undefined when calling PatchDevice.'
+                    "deviceMetadata",
+                    "Required parameter deviceMetadata was null or undefined when calling PatchDevice."
                 );
         }
 
@@ -310,7 +308,7 @@ export class DeviceManagementClient extends SdkClient {
 
     /**
      * * Devices
-     * Creates a new device.   # Constraints #  The (mandatory) device type cannot be modified after the device has been created. 
+     * Creates a new device.   # Constraints #  The (mandatory) device type cannot be modified after the device has been created.
      * @summary Create a new device
      * @param {DeviceManagementModels.DeviceCreation} deviceMetadata Device metadata
      * @returns {Promise<DeviceManagementModels.Device}
@@ -324,8 +322,8 @@ export class DeviceManagementClient extends SdkClient {
         // verify required parameter 'deviceType' is not null or undefined
         if (deviceMetadata === null || deviceMetadata === undefined) {
             throw new DeviceManagementModels.RequiredError(
-                    'deviceMetadata',
-                    'Required parameter deviceMetadata was null or undefined when calling PostDevice.'
+                    "deviceMetadata",
+                    "Required parameter deviceMetadata was null or undefined when calling PostDevice."
                 );
         }
 

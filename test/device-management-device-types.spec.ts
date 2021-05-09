@@ -16,7 +16,7 @@ describe("[SDK] DeviceManagementClient.DeviceTypes", () => {
     const deviceManagementClient = sdk.GetDeviceManagementClient();
     const tenant = sdk.GetTenant();
 
-    let testDeviceType = {
+    const testDeviceType = {
         name: `${tenant}.UnitTestDeviceType`,
         code: `${tenant}.V001`,
         assetTypeId: `${tenant}.UnitTestDeviceAssetType`,
@@ -26,7 +26,7 @@ describe("[SDK] DeviceManagementClient.DeviceTypes", () => {
             key2: "value2"
         }
     };
-    
+
     let deviceTypeId = "aee2e37f-f562-4ed6-b90a-c43208dc054a";
     let assetTypeId = `${tenant}.UnitTestDeviceAssetType`;
     let assetId = "";
@@ -35,11 +35,11 @@ describe("[SDK] DeviceManagementClient.DeviceTypes", () => {
 
     before(async () => {
         // Setup the testing architecture
-        const {device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);        
+        const {device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);
         assetTypeId = `${(deviceAssetType as any).id}`;
         deviceTypeId = `${(deviceType as any).id}`;
         assetId = `${(deviceAsset as any).id}`;
-        deviceId = `${(device as any).id}`;        
+        deviceId = `${(device as any).id}`;
         gFolderid = `${folderid}`;
     });
 

@@ -14,7 +14,7 @@ export namespace DeviceManagementModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface Device
      */
@@ -64,7 +64,7 @@ export namespace DeviceManagementModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface DeviceCreation
      */
@@ -102,13 +102,13 @@ export namespace DeviceManagementModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface DeviceType
      */
     export interface DeviceType {
         /**
-         * 
+         *
          * @type {string}
          * @memberof DeviceType
          */
@@ -132,13 +132,13 @@ export namespace DeviceManagementModels {
          */
         assetTypeId: string;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DeviceType
          */
         name: string;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DeviceType
          */
@@ -158,19 +158,19 @@ export namespace DeviceManagementModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface DeviceTypeUpdate
      */
     export interface DeviceTypeUpdate {
         /**
-         * 
+         *
          * @type {string}
          * @memberof DeviceTypeUpdate
          */
         name?: string;
         /**
-         * 
+         *
          * @type {string}
          * @memberof DeviceTypeUpdate
          */
@@ -184,7 +184,7 @@ export namespace DeviceManagementModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface DeviceUpdate
      */
@@ -210,13 +210,13 @@ export namespace DeviceManagementModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface ErrorResponse
      */
     export interface ErrorResponse {
         /**
-         * 
+         *
          * @type {Array<Error>}
          * @memberof ErrorResponse
          */
@@ -224,7 +224,7 @@ export namespace DeviceManagementModels {
     }
 
     /**
-     * 
+     *
      * @export
      * @interface ModelError
      */
@@ -256,13 +256,13 @@ export namespace DeviceManagementModels {
      */
     export interface PaginatedDevice {
         /**
-         * 
+         *
          * @type {Array<Device>}
          * @memberof PaginatedDevice
          */
         content?: Array<Device>;
         /**
-         * 
+         *
          * @type {any}
          * @memberof PaginatedDevice
          */
@@ -276,13 +276,13 @@ export namespace DeviceManagementModels {
      */
     export interface PaginatedDeviceType {
         /**
-         * 
+         *
          * @type {Array<DeviceType>}
          * @memberof PaginatedDeviceType
          */
         content?: Array<DeviceType>;
         /**
-         * 
+         *
          * @type {any}
          * @memberof PaginatedDeviceType
          */

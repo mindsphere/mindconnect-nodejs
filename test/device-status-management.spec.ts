@@ -14,11 +14,10 @@ describe("[SDK] DeviceStatusManagementClient", () => {
         basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
     const deviceStatusManagement = sdk.GetDeviceStatusManagementClient();
-    let deviceId = "";
+    const deviceId = "";
 
     before(async () => {
         await deleteModels(deviceStatusManagement);
-        
     });
 
     after(async () => {
@@ -36,10 +35,10 @@ describe("[SDK] DeviceStatusManagementClient", () => {
         (await deviceStatusManagement.GetToken()).length.should.be.greaterThan(200);
     });
 
-    
+
 });
 
 async function deleteModels(mm: DeviceStatusManagementClient) {
     await sleep(2000);
-    
+
 }
