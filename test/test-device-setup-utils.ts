@@ -40,6 +40,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
             }),
         })
     );
+    console.log("AssetTypes", assetTypes);
     if (assetTypes.length === 0) {
         const _assetType = await assetMgmt.PutAssetType(
             `${tenant}.UnitTestDeviceAssetType`,
