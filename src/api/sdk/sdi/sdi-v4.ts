@@ -1,5 +1,6 @@
 import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
+import { sdiDataTemplate } from "./sdi-data-template";
 import { SemanticDataInterconnectModels } from "./sdi-models";
 
 /**
@@ -565,6 +566,8 @@ export class SemanticDataInterconnectClient extends SdkClient {
      *
      * * Data Types
      *
+     * !fix: important! in may 2021 the SDI was return wrong results here (array instead of object). this was fixed in the client.
+     *
      * Generates the regular expression patterns for a given set of sample values.
      * In this case sampleValues generates a number of regex patterns and tries to match with
      * patterns provided in testValues.
@@ -589,7 +592,7 @@ export class SemanticDataInterconnectClient extends SdkClient {
         });
 
         const transformed: any = { suggestPatterns: [] };
-        
+
         // !fix: manual fix for wrong result, in April 2021 sdi was returning wrong results here
 
         if (Array.isArray(result)) {
@@ -610,5 +613,32 @@ export class SemanticDataInterconnectClient extends SdkClient {
         }
 
         return result as SemanticDataInterconnectModels.ListOfPatterns;
+    }
+
+    /**
+     * * Data Ingest
+     *
+     * Initiate the file upload process for provided file under the current tenant.
+     *
+     * @param {string} fileName Select the file to Upload for SDI process
+     * @param {Buffer} buffer
+     * @param {string} [mimetype]
+     * @returns
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async DataUpload(fileName: string, buffer: Buffer, mimetype?: string) {
+        const body = sdiDataTemplate(fileName, buffer, mimetype);
+
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/dataUpload`,
+            body: body,
+            multiPartFormData: true,
+            additionalHeaders: { enctype: "multipart/form-data" },
+        });
+        return result as SemanticDataInterconnectModels.SdiFileUploadResponse;
     }
 }

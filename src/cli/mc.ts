@@ -52,6 +52,7 @@ import notificationCommand from "./commands/notifications";
 import sdiDataRegistriesCommand from "./commands/sdi-data-registries";
 import sdiDataTypesCommand from "./commands/sdi-data-types";
 import sdiDataLakesCommand from "./commands/sdi-datalakes";
+import sdiFileUploadCommand from "./commands/sdi-file-upload";
 import sdiIotRegistriesCommand from "./commands/sdi-iot-registries";
 import signalCalculationCommand from "./commands/signal-calculation";
 import signalValidationCommand from "./commands/signal-validation";
@@ -127,6 +128,7 @@ sdiDataLakesCommand(program);
 sdiDataRegistriesCommand(program);
 sdiIotRegistriesCommand(program);
 sdiDataTypesCommand(program);
+sdiFileUploadCommand(program);
 
 // * mobileApps
 
