@@ -41,30 +41,34 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
         })
     );
     if (assetTypes.length === 0) {
-        const _assetType = await assetMgmt.PutAssetType(`${tenant}.UnitTestDeviceAssetType`, {
-            name: `${tenant}.UnitTestDeviceAssetType.${timeOffset}`,
-            description: `${tenant}.UnitTestDeviceAssetType.${timeOffset}`,
-            parentTypeId: "core.basicagent",
-            instantiable: true,
-            scope: AssetManagementModels.AssetTypeBase.ScopeEnum.Private,
-            aspects: [
-                {
-                    name: "firmwarestatus",
-                    aspectTypeId: "core.firmwarestatus"
-                },
-            ],
-            variables: [
-                {
-                    name: "temperature",
-                    dataType: AssetManagementModels.VariableDefinition.DataTypeEnum.STRING,
-                    unit: "C/F",
-                    searchable: true,
-                    length: 5,
-                    defaultValue: "25/77",
-                },
-            ],
-            fileAssignments: [],
-        });
+        const _assetType = await assetMgmt.PutAssetType(
+            `${tenant}.UnitTestDeviceAssetType`,
+            {
+                name: `${tenant}.UnitTestDeviceAssetType.${timeOffset}`,
+                description: `${tenant}.UnitTestDeviceAssetType.${timeOffset}`,
+                parentTypeId: "core.basicagent",
+                instantiable: true,
+                scope: AssetManagementModels.AssetTypeBase.ScopeEnum.Private,
+                aspects: [
+                    {
+                        name: "firmwarestatus",
+                        aspectTypeId: "core.firmwarestatus"
+                    },
+                ],
+                variables: [
+                    {
+                        name: "temperature",
+                        dataType: AssetManagementModels.VariableDefinition.DataTypeEnum.STRING,
+                        unit: "C/F",
+                        searchable: true,
+                        length: 5,
+                        defaultValue: "25/77",
+                    },
+                ],
+                fileAssignments: [],
+            },
+            {ifNoneMatch: "*"}
+        );
         assetTypes.push(_assetType);
     }
     const deviceAssetType = assetTypes.pop();
@@ -184,6 +188,7 @@ export async function tearDownDeviceTestStructure(sdk: MindSphereSdk) {
 
     // delete agents
     const agents = (await agentMgmt.GetAgents({
+        sort: "DESC",
         page: 0,
         size: 100
     })) as any;
@@ -192,6 +197,7 @@ export async function tearDownDeviceTestStructure(sdk: MindSphereSdk) {
             await agentMgmt.DeleteAgent(`${x.id}`, { ifMatch: `${x.eTag}` });
         }
     }
+
     // delete assets
     const assets = (await assetMgmt.GetAssets({
         filter: JSON.stringify({
@@ -199,19 +205,22 @@ export async function tearDownDeviceTestStructure(sdk: MindSphereSdk) {
                 startsWith: `${tenant}.UnitTestDeviceAsset`,
             }
         }),
+        sort: "DESC",
+        size: 100
     })) as any;
     for (const x of assets._embedded.assets) {
         await assetMgmt.DeleteAsset(x.assetId, {ifMatch: `${x.etag}`});
     }
 
-    // delete AssetTypes
+    // delete asset types
     const assetTypes = (await assetMgmt.GetAssetTypes({
         filter: JSON.stringify({
             name: {
                 startsWith: `${tenant}.UnitTestDeviceAssetType`,
             },
         }),
-        sort: "DESC"
+        sort: "DESC",
+        size: 100
     })) as any;
     for (const x of assetTypes._embedded.assetTypes) {
         await assetMgmt.DeleteAssetType(x.id, { ifMatch: x.etag });
