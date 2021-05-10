@@ -2307,4 +2307,15 @@ export namespace SemanticDataInterconnectModels {
             Replace = <any>"replace",
         }
     }
+
+    /**
+     * !fix: Manually created type for Suggest Pattern Request
+     *
+     * @export
+     * @interface SuggestPatternsRequest
+     */
+    export interface SuggestPatternsRequest {
+        sampleValues: Array<string>;
+        testValues: Array<string>;
+    }
 }

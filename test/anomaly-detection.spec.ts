@@ -20,7 +20,7 @@ describe("[SDK] AnomalyDetectionClient", () => {
     });
     const tenant = sdk.GetTenant();
 
-    const anomalyDetectionClient = sdk.GetAnomalydetectionClient();
+    const anomalyDetectionClient = sdk.GetAnomalyDetectionClient();
     const modelManagement = sdk.GetModelManagementClient();
     let assetid = "";
 
@@ -46,7 +46,7 @@ describe("[SDK] AnomalyDetectionClient", () => {
     });
 
     it("should instantiate", () => {
-        const _anomalyDetectionClient = sdk.GetAnomalydetectionClient();
+        const _anomalyDetectionClient = sdk.GetAnomalyDetectionClient();
         log(_anomalyDetectionClient);
         _anomalyDetectionClient.should.exist;
     });

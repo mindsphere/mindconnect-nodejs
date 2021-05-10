@@ -498,6 +498,7 @@ export class SemanticDataInterconnectClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/dataTypes/${name}`,
+            noResponse: true,
         });
     }
 
@@ -561,6 +562,7 @@ export class SemanticDataInterconnectClient extends SdkClient {
     }
 
     /**
+     *
      * * Data Types
      *
      * Generates the regular expression patterns for a given set of sample values.
@@ -569,24 +571,44 @@ export class SemanticDataInterconnectClient extends SdkClient {
      *
      * The response contains any of testValues that matches sampleValues as probable pattern match.
      *
-     * @param {{
-     *         sampleValues: Array<string>;
-     *         testValues: Array<string>;
-     *     }} params
+     *
+     * @param {SemanticDataInterconnectModels.SuggestPatternsRequest} request
      * @returns {Promise<SemanticDataInterconnectModels.ListOfPatterns>}
      *
      * @memberOf SemanticDataInterconnectClient
      */
-    public async SuggestPatterns(params: {
-        sampleValues: Array<string>;
-        testValues: Array<string>;
-    }): Promise<SemanticDataInterconnectModels.ListOfPatterns> {
-        const result = await this.HttpAction({
+    public async SuggestPatterns(
+        request: SemanticDataInterconnectModels.SuggestPatternsRequest
+    ): Promise<SemanticDataInterconnectModels.ListOfPatterns> {
+        let result = await this.HttpAction({
             verb: "POST",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/suggestPatterns?${toQueryString(params)}`,
+            baseUrl: `${this._baseUrl}/suggestPatterns`,
+            body: request,
         });
+
+        const transformed: any = { suggestPatterns: [] };
+        
+        // !fix: manual fix for wrong result, in April 2021 sdi was returning wrong results here
+
+        if (Array.isArray(result)) {
+            (result as Array<any>).forEach((element) => {
+                const result: Array<string> = [];
+                (element.matches || []).forEach((t: any) => {
+                    result.push(t.toString());
+                });
+
+                transformed.suggestPatterns.push({
+                    schema: element.schema,
+                    matches: result,
+                    schemaValid: element.schemaValid,
+                });
+            });
+
+            result = transformed;
+        }
+
         return result as SemanticDataInterconnectModels.ListOfPatterns;
     }
 }

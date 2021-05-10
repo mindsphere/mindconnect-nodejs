@@ -50,6 +50,7 @@ import modelsCommand from "./commands/models";
 import mqttCreateCommand from "./commands/mqtt-create-jwt";
 import notificationCommand from "./commands/notifications";
 import sdiDataRegistriesCommand from "./commands/sdi-data-registries";
+import sdiDataTypesCommand from "./commands/sdi-data-types";
 import sdiDataLakesCommand from "./commands/sdi-datalakes";
 import sdiIotRegistriesCommand from "./commands/sdi-iot-registries";
 import signalCalculationCommand from "./commands/signal-calculation";
@@ -120,11 +121,12 @@ identityCommand(program);
 
 // * data lake
 dataLakeCommand(program);
-sdiDataRegistriesCommand(program);
-sdiIotRegistriesCommand(program);
 
 // sdi
 sdiDataLakesCommand(program);
+sdiDataRegistriesCommand(program);
+sdiIotRegistriesCommand(program);
+sdiDataTypesCommand(program);
 
 // * mobileApps
 

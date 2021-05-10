@@ -15,6 +15,7 @@
 - CLI: new `mc signal-calculation` command for MindSphere Signal Calculation Service [#258]
 - CLI: new `mc sdi-data-lakes` command for SDI [#265]
 - CLI: new `mc sdi-data-registries` command for SDI [#265]
+- CLI: new `mc sdi-data-types` command for SDI [#265]
 - CLI: fixed bug in `mc aggregates` command with multiple lines of same aggregate
 - SDK: signal calculation client [#258]
 - SDK: Job Manager Client [#255]
