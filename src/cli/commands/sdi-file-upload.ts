@@ -2,8 +2,7 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
-import { serviceCredentialLog } from "../../../dist/src/cli/commands/command-utils";
-import { errorLog, getColor, getSdk, homeDirLog, proxyLog, verboseLog } from "./command-utils";
+import { errorLog, getColor, getSdk, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
 import ora = require("ora");
 const mime = require("mime-types");
 

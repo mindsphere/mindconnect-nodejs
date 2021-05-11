@@ -26,7 +26,11 @@ export class ModelManagementClient extends SdkClient {
      * }} [params]
      * @param [params.pageNumber] Specifies the requested page index
      * @param [params.pageSize] Specifies the number of elements in a page
-     * @param [params.filter] Specifies the additional filtering criteria
+     * @param [params.filter] Specifies the additional filtering criteria.
+     * Complex filter that can filter by model name, type, description, author or fields set as optional parameters. All fields are optional. Filters can be set as plain string or as a regular expression.
+     * The expected format follows:
+     * @example {"name":"model\*","type":"type","description":"modelDescription","optionalParameters":{"entityId":"64","entityName": "*"}}
+     *
      * @param [params.sort] Specifies the ordering of returned elements e.g. 'asc' or 'desc'
      *
      * @returns {Promise<ModelManagementModels.ModelArray>}
