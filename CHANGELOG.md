@@ -16,7 +16,9 @@
 - CLI: new `mc sdi-data-lakes` command for SDI [#265]
 - CLI: new `mc sdi-data-registries` command for SDI [#265]
 - CLI: new `mc sdi-data-types` command for SDI [#265]
+- CLI: new `mc sdi-file-upload` command for SDI [#265]
 - CLI: fixed bug in `mc aggregates` command with multiple lines of same aggregate
+- CLI: if the authentication is configured, the information about it is removed from help to reduce verbosity.
 - SDK: signal calculation client [#258]
 - SDK: Job Manager Client [#255]
 - SDK: Data Exchange Client [#256]

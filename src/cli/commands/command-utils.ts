@@ -1,8 +1,10 @@
 import * as chalk from "chalk";
 import { log } from "console";
+import * as updateNotifier from "update-notifier";
 import { FrontendAuth } from "../../api/frontend-auth";
 import { AssetManagementModels, MindSphereSdk } from "../../api/sdk";
 import { decrypt, getHomeDotMcDir, loadAuth } from "../../api/utils";
+import { MC_NAME, MC_VERSION } from "../../version";
 
 const magenta = getColor("magenta");
 const yellow = getColor("yellow");
@@ -10,7 +12,35 @@ const green = getColor("green");
 const red = getColor("red");
 const cyan = getColor("cyan");
 
+export function checkForUpdates() {
+    const pkgInfo = {
+        pkg: {
+            name: `@mindconnect/${MC_NAME}`,
+            version: `${MC_VERSION}`,
+        },
+    };
+
+    const notifier = updateNotifier(pkgInfo);
+
+    if (notifier.update) {
+        console.log(
+            `\n\t There is an update available: ${magenta(notifier.update.latest + " ")} (${notifier.update.type})`
+        );
+        console.log(`\t Run ${magenta("npm install -g ")}${magenta(pkgInfo.pkg.name)} to update`);
+        console.log(`\t or download the release for your system from`);
+        console.log(`\t ${magenta("https://github.com/mindsphere/mindconnect-nodejs/releases")}\n`);
+    }
+}
+
 export const serviceCredentialLog = (color: Function = magenta) => {
+    if (
+        process.env.MDSP_PASSKEY ||
+        (process.env.MDSP_HOST && process.env.MDSP_SESSION && process.env.MDSP_XSRF_TOKEN)
+    ) {
+        checkForUpdates();
+        return;
+    }
+
     log(`\n  Important: `);
     log(`\n  Authentication with ${color("service credentials")} or ${color("app credentials")}:\n`);
 
@@ -26,6 +56,8 @@ export const serviceCredentialLog = (color: Function = magenta) => {
     );
     log(`\n  Full Documentation: \n`);
     log(`    ${color("https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/setting-up-the-cli.html")}\n`);
+
+    checkForUpdates();
 };
 
 export function colorizeStatus(message: string) {

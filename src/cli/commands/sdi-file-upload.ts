@@ -69,6 +69,11 @@ export default (program: CommanderStatic) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(`    mc sdi-file-upload --file <file> \t\t\t upload file to SDI`);
+            log(`\n  Restriction:\n`);
+            log(`    This works only for SDI only tenants (without Integrated Data Lake)`);
+            log(
+                `    If you are MindSphere Integrated Data Lake Customer use mc data-lake --mode upload command instead. `
+            );
             serviceCredentialLog();
         });
 };
