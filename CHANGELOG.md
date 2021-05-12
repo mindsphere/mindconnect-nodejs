@@ -25,6 +25,7 @@
 - SDK: AnomalyDetection Client [#254]
 - SDK: NotficationV4 Client [#252]
 - SDK: IotTimeSeriesAggragetesV4 Client [#250]
+- SDK: Semantic Data InterConnect Client [#265]
 - Bumped all dependencies
 
 ### Contributions 3.13.0

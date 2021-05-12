@@ -1,5 +1,6 @@
 import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
+import { inferOntologyTemplate } from "./infer-ontology-template";
 import { sdiDataTemplate } from "./sdi-data-template";
 import { SemanticDataInterconnectModels } from "./sdi-models";
 
@@ -640,5 +641,605 @@ export class SemanticDataInterconnectClient extends SdkClient {
             additionalHeaders: { enctype: "multipart/form-data" },
         });
         return result as SemanticDataInterconnectModels.SdiFileUploadResponse;
+    }
+
+    /**
+     * * Data Ingest
+     *
+     * Initiate the data ingestion and start the SDI’s schema generation process for the current tenant.
+     * This operation currently supports CSV and XML format files. The XML format file requires root element
+     * information that is entry point for this operation. This is provided as either rootTag parameter to this
+     * operation or registered as part of Data Registry API operation. There are two modes for data ingest.
+     *
+     * Default: Allows performing the data ingest without need of any Data Registry.
+     * In this case service processes files with default policy for schema generation.
+     * The schema generated this way cannot be versioned or changed with different files.
+     * This mode is used for quick validating the generated schema.
+     *
+     * Dataregistry: The operation uses Data Registry for ingested file to generate schema.
+     * This is preferred mode as it allows more validation against the Data Registry and create
+     * multiple schema based on different domains created under Data Registry.
+     * Using this mode customer can create combination of schemas from different domain and query
+     * them or use for analytical modelling. This works in combination with Data Registry API.
+     *
+     * @param {SemanticDataInterconnectModels.SDIIngestData} ingestData
+     * Specifies the file path and Data Registry information to initiate data ingest process.
+     * The ‘{filePath}’ is required parameter and valid file path used during file upload operations.
+     * The ‘{dataTag}’ and ‘{sourceName}’ are the valid Data Registry source name and data tag.
+     * The ‘{rootTag}’ is optional and applies to XML formatted files.
+     * @returns {Promise<SemanticDataInterconnectModels.SdiJobStatusResponse>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async PostIngestJob(
+        ingestData: SemanticDataInterconnectModels.SDIIngestData
+    ): Promise<SemanticDataInterconnectModels.SdiJobStatusResponse> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/ingestJobs`,
+            body: ingestData,
+        });
+        return result as SemanticDataInterconnectModels.SdiJobStatusResponse;
+    }
+
+    /**
+     * * Data Ingest
+     *
+     * Get a list of jobIds that is ingested, this jobId can be used to find detailed status using ingestJobStatus.
+     *
+     * @param {{
+     *         pageToken?: string;
+     *     }} [params]
+     *
+     * @param params.pageToken
+     *
+     * Selects next page. Value must be taken rom response body property 'page.nextToken’.
+     * If omitted, first page is returned.
+     *
+     * @returns {Promise<SemanticDataInterconnectModels.ListOfJobIds>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetIngestJobs(params?: { pageToken?: string }): Promise<SemanticDataInterconnectModels.ListOfJobIds> {
+        const parameters = params || {};
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/ingestJobStatus?${toQueryString(parameters)}`,
+        });
+        return result as SemanticDataInterconnectModels.ListOfJobIds;
+    }
+
+    /**
+     *
+     * * Data Ingest
+     *
+     * Retrieve the job status based on jobid for the current tenant. The jobid belongs to data ingestion process started for the current tenant.
+     *
+     * @param {string} id
+     * @returns {Promise<SemanticDataInterconnectModels.SdiJobStatusResponse>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetIngestJobStatus(id: string): Promise<SemanticDataInterconnectModels.SdiJobStatusResponse> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/ingestJobStatus/${id}`,
+        });
+        return result as SemanticDataInterconnectModels.SdiJobStatusResponse;
+    }
+
+    /**
+     * * Schema registry
+     *
+     * Operations to review generated schemas and infer semantic model based on extracted schemas.
+     * Search schema for ingested data.
+     *
+     * The data ingestion API creates and stores the schemas for each ingested file.
+     * This schema can be retrieved based on schema name, or source name and data tag combination.
+     * SchemaSearchRequest is limited to 20 schemas atmost.
+     *
+     * @param {SemanticDataInterconnectModels.SchemaSearchRequest} schemaSearchRequest
+     * @param {{ pageToken?: string }} [params]
+     * @param params.pageToken
+     * Selects next page. Value must be taken from response body property 'page.nextToken’.
+     * If omitted, first page is returned
+     *
+     * @returns {Promise<SemanticDataInterconnectModels.ListOfSchemaRegistry>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async SearchSchemas(
+        schemaSearchRequest: SemanticDataInterconnectModels.SchemaSearchRequest,
+        params?: { pageToken?: string }
+    ): Promise<SemanticDataInterconnectModels.ListOfSchemaRegistry> {
+        const parameters = params || {};
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/searchSchemas?${toQueryString(parameters)}`,
+            body: schemaSearchRequest,
+        });
+        return result as SemanticDataInterconnectModels.ListOfSchemaRegistry;
+    }
+
+    /**
+     * * Data Query
+     *
+     * Returns a list of Data Query SQL Model
+     *
+     * @param {{
+     *         pageToken?: string;
+     *         executable?: boolean;
+     *         isDynamic?: boolean;
+     *         ontologyId?: string;
+     *     }} [params]
+     * 
+     * @param params.pageToken
+     * Selects next page. Value must be taken from response body property 'page.nextToken’.
+     * If omitted, first page is returned
+     * 
+     * @param params.executable
+     * Filter based on executable flag.
+     * 
+     * @param params.isDynamic
+     * Filter based on isDynamic flag.
+     * 
+     * @param params.ontologyId
+     * Filter based on ontology id
+     
+     * @returns {Promise<SemanticDataInterconnectModels.ResponseAllDataSQLQuery>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetQueries(params?: {
+        pageToken?: string;
+        executable?: boolean;
+        isDynamic?: boolean;
+        ontologyId?: string;
+    }): Promise<SemanticDataInterconnectModels.ResponseAllDataSQLQuery> {
+        const parameters = params || {};
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/queries?${toQueryString(parameters)}`,
+        });
+        return result as SemanticDataInterconnectModels.ResponseAllDataSQLQuery;
+    }
+
+    /**
+     * * Data Query
+     *
+     * Create new queries and returns id of created query.
+     *
+     * @param {SemanticDataInterconnectModels.DataQuerySQLRequest} dataQuerySQLRequest
+     * @returns {Promise<SemanticDataInterconnectModels.DataQuerySQLResponse>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async PostQuery(
+        dataQuerySQLRequest: SemanticDataInterconnectModels.DataQuerySQLRequest
+    ): Promise<SemanticDataInterconnectModels.DataQuerySQLResponse> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/queries`,
+            body: dataQuerySQLRequest,
+        });
+        return result as SemanticDataInterconnectModels.DataQuerySQLResponse;
+    }
+
+    /**
+     * * Data Query
+     *
+     * Retrieve query by query id.
+     * Returns a Data Query SQL Model.
+     *
+     * @param {string} id
+     * @returns {Promise<SemanticDataInterconnectModels.NativeQueryGetResponse>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetQuery(id: string): Promise<SemanticDataInterconnectModels.NativeQueryGetResponse> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/${id}`,
+        });
+        return result as SemanticDataInterconnectModels.NativeQueryGetResponse;
+    }
+
+    /**
+     * * Data Query
+     *
+     * Update query by query id
+     * Returns Updated Data Query SQL Model
+     *
+     *
+     * @param {string} id
+     * @param {SemanticDataInterconnectModels.DataQuerySQLUpdateRequest} dataQuerySQLUpdateRequest
+     * @returns {Promise<SemanticDataInterconnectModels.DataQuerySQLResponse>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async PatchQuery(
+        id: string,
+        dataQuerySQLUpdateRequest: SemanticDataInterconnectModels.DataQuerySQLUpdateRequest
+    ): Promise<SemanticDataInterconnectModels.DataQuerySQLResponse> {
+        const result = await this.HttpAction({
+            verb: "PATCH",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/queries/${id}`,
+            body: dataQuerySQLUpdateRequest,
+        });
+        return result as SemanticDataInterconnectModels.DataQuerySQLResponse;
+    }
+
+    /**
+     * * Data Query
+     *
+     * delete query by query id
+     *
+     * @param {string} id
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async DeleteQuery(id: string) {
+        await this.HttpAction({
+            verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/${id}`,
+            noResponse: true,
+        });
+    }
+
+    /**
+     * * Query Execution Jobs
+     *
+     * Create execution job for dynamic query. There is soft limit of upto 10 number of parameters and aliases.
+     * Returns id of created job
+     *
+     * @param {string} id
+     * @param {SemanticDataInterconnectModels.DataQueryExecuteQueryRequest} dataQueryExecuteRequest
+     * @returns {Promise<SemanticDataInterconnectModels.DataQuerySQLResponse>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async PostQueryExecutionJob(
+        id: string,
+        dataQueryExecuteRequest: SemanticDataInterconnectModels.DataQueryExecuteQueryRequest
+    ): Promise<SemanticDataInterconnectModels.DataQuerySQLResponse> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/queries/${id}/executionJobs`,
+            body: dataQueryExecuteRequest,
+        });
+        return result as SemanticDataInterconnectModels.DataQueryExecuteQueryResponse;
+    }
+
+    /**
+     * * Query Execution Jobs
+     *
+     * Retrieve latest query results by query id
+     *
+     * @param {string} id
+     * @param {{ Range?: string }} [params]
+     * @param params.Range
+     * Part of a file to return in Bytes, eg bytes=200-600
+     *
+     * @returns {Promise<SemanticDataInterconnectModels.QueryResult>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetQueryExecutionJobLatestResults(
+        id: string,
+        params?: { Range?: string }
+    ): Promise<SemanticDataInterconnectModels.QueryResult> {
+        const parameters = params || {};
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/queries/${id}/executionJobs/latestResults`,
+            additionalHeaders: parameters,
+        });
+        return result as SemanticDataInterconnectModels.QueryResult;
+    }
+
+    /**
+     *
+     * * Execution Jobs
+     *
+     * Returns query results
+     *
+     * @param {string} id
+     * @param {{ Range?: string }} [params]
+     *
+     * @param params.Range
+     * Part of a file to return in Bytes, eg bytes=200-600
+     *
+     * @returns {Promise<SemanticDataInterconnectModels.QueryResult>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetExecutionJobResults(
+        id: string,
+        params?: { Range?: string }
+    ): Promise<SemanticDataInterconnectModels.QueryResult> {
+        const parameters = params || {};
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/executionJobs/${id}/results`,
+            additionalHeaders: parameters,
+        });
+        return result as SemanticDataInterconnectModels.QueryResult;
+    }
+
+    /**
+     * * Execution Jobs
+     *
+     * Retrieve job details by job id
+     * Returns Data Query Execution Model
+     * @param {string} id
+     * @returns {Promise<SemanticDataInterconnectModels.DataQueryExecutionResponse>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetExecutionJob(id: string): Promise<SemanticDataInterconnectModels.DataQueryExecutionResponse> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/executionJobs/${id}`,
+        });
+        return result as SemanticDataInterconnectModels.DataQueryExecutionResponse;
+    }
+
+    /**
+     * * Execution Jobs
+     *
+     * Delete job by job id
+     *
+     * @param {string} id
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async DeleteExecutionJob(id: string) {
+        await this.HttpAction({
+            verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/executionJobs/${id}`,
+        });
+    }
+
+    /**
+     * * Execution Job
+     *
+     * Retrieve all jobs
+     *     *
+     * @param {{
+     *         pageToken?: string;
+     *         queryId?: string;
+     *         status?: string;
+     *     }} [params]
+     * @param params.pageToken
+     * Selects next page.
+     * Value must be taken rom response body property 'page.nextToken’. If omitted, first page is returned.
+     *
+     * @param params.queryId
+     * Filter based on query id
+     *
+     * @param params.status
+     * Filter based on job status
+     *
+     * @returns {Promise<SemanticDataInterconnectModels.ResponseAllDataQueryExecutionResponse>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetExecutionJobs(params?: {
+        pageToken?: string;
+        queryId?: string;
+        status?: string;
+    }): Promise<SemanticDataInterconnectModels.ResponseAllDataQueryExecutionResponse> {
+        const parameters = params || {};
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/executionJobs?${toQueryString(parameters)}`,
+        });
+        return result as SemanticDataInterconnectModels.ResponseAllDataQueryExecutionResponse;
+    }
+
+    /**
+     * * Ontologies
+     *
+     * Retrieve all ontologies.
+     * Returns a list of ontologies
+     *
+     * @param {{
+     *         pageToken?: string;
+     *     }} [params]
+     * 
+     * @param params.pageToken
+     * Selects next page.
+     * Value must be taken rom response body property 'page.nextToken’. If omitted, first page is returned.
+     
+     * @returns {Promise<SemanticDataInterconnectModels.ResponseAllOntologies>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetOntologies(params?: {
+        pageToken?: string;
+    }): Promise<SemanticDataInterconnectModels.ResponseAllOntologies> {
+        const parameters = params || {};
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/ontologies?${toQueryString(parameters)}`,
+        });
+        return result as SemanticDataInterconnectModels.ResponseAllOntologies;
+    }
+
+    /**
+     * * Ontologies
+     *
+     * Retrieve ontology.
+     * @param {string} id
+     *
+     * @param {{ Range?: string }} [params]
+     *
+     * @param params.Range
+     * Part of a file to return in Bytes, eg bytes=200-600
+     *
+     * @returns {Promise<SemanticDataInterconnectModels.OntologyResponseData>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetOntology(
+        id: string,
+        params?: { Range?: string }
+    ): Promise<SemanticDataInterconnectModels.OntologyResponseData> {
+        const parameters = params || {};
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/ontologies/${id}`,
+            additionalHeaders: parameters,
+        });
+        return result as SemanticDataInterconnectModels.OntologyResponseData;
+    }
+
+    /**
+     * * Ontologies
+     *
+     * Delete ontology.
+     *
+     * @param {string} id
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async DeleteOntology(id: string) {
+        await this.HttpAction({
+            verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/ontologies/${id}`,
+            noResponse: true,
+        });
+    }
+
+    /**
+     * * Ontologies
+     *
+     * Infer semantic model based on two or more generated schemas. Currently it supports infer of up to 20 schemas.
+     * Provide two or more schemas to infer an ontology.
+     *
+     * @param {SemanticDataInterconnectModels.InferSchemaSearchRequest} inferSchemaSearchRequest
+     * @returns this returns the predefined JSON format as required by ontologyJobs operation.
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async InferOntology(
+        inferSchemaSearchRequest: SemanticDataInterconnectModels.InferSchemaSearchRequest
+    ): Promise<any> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/ontologies`,
+            body: inferSchemaSearchRequest,
+        });
+        return result;
+    }
+
+    /**
+     *
+     * * Ontologies
+     *
+     * Upload file and submit job for create/update ontology
+     *
+     * @param {string} ontologyName
+     * Ontology name should be unique.
+     * @param {Buffer} file
+     * We support JSON and OWL file pre-defined format.
+     * @param {string} [ontologyId]
+     * Provide OntologyId for updating existing ontology. If empty then will create new ontology.
+     * @param {string} [ontologyDescription]
+     * Ontology description.
+     * @param {string} [keyMappingType]
+     * Define keyMappingType for ontology.
+     * Available values : INNER JOIN, FULL OUTER JOIN
+     * Default value : INNER JOIN
+     * @returns {Promise<SemanticDataInterconnectModels.OntologyJob>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async PostOntologyJob(
+        fileName: string,
+        file: Buffer,
+        mimetype: string,
+        ontologyName: string,
+        ontologyId?: string,
+        ontologyDescription?: string,
+        keyMappingType?: string
+    ): Promise<SemanticDataInterconnectModels.OntologyJob> {
+        const body = inferOntologyTemplate(
+            fileName,
+            file,
+            mimetype,
+            ontologyName,
+            ontologyId,
+            ontologyDescription,
+            keyMappingType
+        );
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/ontologyJobs`,
+            body: body,
+            multiPartFormData: true,
+            additionalHeaders: { enctype: "multipart/form-data" },
+        });
+        return result as SemanticDataInterconnectModels.OntologyJob;
+    }
+
+    /**
+     * * Ontologies
+     *
+     * Retrieve status of ontology creation/updation job
+     *
+     * @param {string} id
+     * @returns {Promise<SemanticDataInterconnectModels.JobStatus>}
+     *
+     * @memberOf SemanticDataInterconnectClient
+     */
+    public async GetOntologyJobStatus(id: string): Promise<SemanticDataInterconnectModels.JobStatus> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/ontologyJobs/${id}`,
+        });
+        return result as SemanticDataInterconnectModels.JobStatus;
     }
 }
