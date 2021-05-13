@@ -42,6 +42,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
             }),
         })
     );
+    console.log("Assettypes", assetTypes);
     await sleep(2000);
     if (assetTypes.length === 0) {
         const _assetType = await assetMgmt.PutAssetType(
@@ -76,7 +77,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
         assetTypes.push(_assetType);
     }
     const deviceAssetType = assetTypes.pop();
-
+    console.log("deviceAssetType", deviceAssetType);
     // Check if we have the device types setup
     const deviceTypes =  unroll<DeviceManagementModels.DeviceType>(
         await deviceManagementClient.GetDeviceTypes({
@@ -134,12 +135,24 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
     const deviceAsset = assets.pop();
 
     // Register an agent for this asset
-    const agent = await agentMgmt.PostAgent({
-        name: `${tenant}.UnitTestDeviceAgent.${timeOffset}`,
-        securityProfile: AgentManagementModels.AgentUpdate.SecurityProfileEnum.SHAREDSECRET,
-        entityId: `${deviceAsset.assetId}`,
-    });
+    const agents = unroll(
+        (await agentMgmt.GetAgents({
+            sort: "DESC",
+            page: 0,
+            size: 100
+        }))
+    )?.filter((x: any) => (x as any)?.name?.startsWith( `${tenant}.UnitTestDeviceAgent`));
     await sleep(2000);
+    if (agents?.length === 0) {
+        const _agent = await agentMgmt.PostAgent({
+            name: `${tenant}.UnitTestDeviceAgent.${timeOffset}`,
+            securityProfile: AgentManagementModels.AgentUpdate.SecurityProfileEnum.SHAREDSECRET,
+            entityId: `${deviceAsset.assetId}`,
+        });
+        await sleep(1000);
+        agents.push(_agent);
+    }
+    const agent = agents.pop();
     const deviceAgentId = `${agent.id}`;
 
     // Check if we have the asset setup
