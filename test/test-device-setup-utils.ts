@@ -19,12 +19,14 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
             }),
         })
     );
+    await sleep(2000);
     if (folders.length === 0) {
         const folder = await assetMgmt.PostAsset({
             name: "UnitTestFolder",
             typeId: "core.basicarea",
             parentId: rootAssetId,
         });
+        await sleep(1000);
         folders.push(folder);
     }
     const folder = folders[0];
@@ -40,7 +42,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
             }),
         })
     );
-    console.log("AssetTypes", assetTypes);
+    await sleep(2000);
     if (assetTypes.length === 0) {
         const _assetType = await assetMgmt.PutAssetType(
             `${tenant}.UnitTestDeviceAssetType`,
@@ -70,6 +72,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
             },
             {ifNoneMatch: "*"}
         );
+        await sleep(1000);
         assetTypes.push(_assetType);
     }
     const deviceAssetType = assetTypes.pop();
@@ -84,6 +87,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
             size: 10,
         })
     );
+    await sleep(2000);
     if (deviceTypes.length === 0) {
         const _deviceType = await deviceManagementClient.PostDeviceType(
             {
@@ -97,6 +101,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
                 }
             }
         );
+        await sleep(1000);
         deviceTypes.push(_deviceType);
     }
     const deviceType = deviceTypes.pop();
@@ -116,12 +121,14 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
             }),
         })
     );
+    await sleep(2000);
     if (assets.length === 0) {
         const _asset = await assetMgmt.PostAsset({
             name: `${tenant}.UnitTestDeviceAsset.${timeOffset}`,
             typeId: `${(deviceAssetType as any).id}`,
             parentId: folderid,
         });
+        await sleep(1000);
         assets.push(_asset);
     }
     const deviceAsset = assets.pop();
@@ -132,7 +139,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
         securityProfile: AgentManagementModels.AgentUpdate.SecurityProfileEnum.SHAREDSECRET,
         entityId: `${deviceAsset.assetId}`,
     });
-
+    await sleep(2000);
     const deviceAgentId = `${agent.id}`;
 
     // Check if we have the asset setup
@@ -143,6 +150,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
             size: 0
         })
     );
+    await sleep(2000);
     if (devices.length === 0) {
         const _device = await deviceManagementClient.PostDevice({
             deviceTypeId: `${(deviceType as any).id}`,
@@ -153,8 +161,10 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
                 parentId: folderid,
             }
         });
+        await sleep(1000);
         devices.push(_device);
     }
+    await sleep(2000);
     const device = devices.pop();
     return { device: device, deviceAsset: deviceAsset, deviceType: deviceType, deviceAssetType: deviceAssetType, folderid };
 }
@@ -170,37 +180,40 @@ function unroll<T>(obj: { _embedded?: any, content?: any }) {
 }
 
 export async function tearDownDeviceTestStructure(sdk: MindSphereSdk) {
-    await sleep(500);
+    await sleep(1000);
     const assetMgmt = sdk.GetAssetManagementClient();
     const deviceManagementClient = sdk.GetDeviceManagementClient();
     const agentMgmt = sdk.GetAgentManagementClient();
     const tenant = sdk.GetTenant();
 
     // delete devices
-    const devices = (await deviceManagementClient.GetDevices({
+    const devices: DeviceManagementModels.PaginatedDevice = (await deviceManagementClient.GetDevices({
             page: 0,
             size: 100
-        })) as any;
-    for (const x of devices.content) {
-        if (`${x.properties.name}`.startsWith( `${tenant}.UnitTestDevice`)) {
-            await deviceManagementClient.DeleteDevice(x.id);
+        }));
+    await sleep(2000);
+    for await (const x of devices.content || []) {
+        if ((x as any)?.properties?.name?.startsWith( `${tenant}.UnitTestDevice`)) {
+            await deviceManagementClient.DeleteDevice(x.id!);
         }
+        await sleep(1000);
     }
 
     // delete agents
-    const agents = (await agentMgmt.GetAgents({
+    const agents: AgentManagementModels.PagedAgent = (await agentMgmt.GetAgents({
         sort: "DESC",
         page: 0,
         size: 100
-    })) as any;
-    for (const x of agents.content) {
-        if (`${x.name}`.startsWith( `${tenant}.UnitTestDeviceAgent`)) {
-            await agentMgmt.DeleteAgent(`${x.id}`, { ifMatch: `${x.eTag}` });
+    }));
+    await sleep(2000);
+    for await (const x of agents.content || []) {
+        if ((x as any)?.name?.startsWith( `${tenant}.UnitTestDeviceAgent`)) {
+            await agentMgmt.DeleteAgent(x.id!, { ifMatch: `${x.eTag}` });
         }
+        await sleep(1000);
     }
-
     // delete assets
-    const assets = (await assetMgmt.GetAssets({
+    const assets: AssetManagementModels.AssetListResource = (await assetMgmt.GetAssets({
         filter: JSON.stringify({
             name: {
                 startsWith: `${tenant}.UnitTestDeviceAsset`,
@@ -208,13 +221,15 @@ export async function tearDownDeviceTestStructure(sdk: MindSphereSdk) {
         }),
         sort: "DESC",
         size: 100
-    })) as any;
-    for (const x of assets._embedded.assets) {
-        await assetMgmt.DeleteAsset(x.assetId, {ifMatch: `${x.etag}`});
+    }));
+    await sleep(2000);
+    for await (const x of assets?._embedded?.assets || []) {
+        await assetMgmt.DeleteAsset(x.assetId!, {ifMatch: `${x.etag}`});
+        await sleep(1000);
     }
 
     // delete asset types
-    const assetTypes = (await assetMgmt.GetAssetTypes({
+    const assetTypes: AssetManagementModels.AssetTypeListResource = (await assetMgmt.GetAssetTypes({
         filter: JSON.stringify({
             name: {
                 startsWith: `${tenant}.UnitTestDeviceAssetType`,
@@ -222,9 +237,11 @@ export async function tearDownDeviceTestStructure(sdk: MindSphereSdk) {
         }),
         sort: "DESC",
         size: 100
-    })) as any;
-    for (const x of assetTypes._embedded.assetTypes) {
-        await assetMgmt.DeleteAssetType(x.id, { ifMatch: x.etag });
+    }));
+    await sleep(2000);
+    for await (const x of assetTypes?._embedded?.assetTypes || []) {
+        await assetMgmt.DeleteAssetType(x.id!, { ifMatch: `${x.etag}` });
+        await sleep(1000);
     }
 }
 

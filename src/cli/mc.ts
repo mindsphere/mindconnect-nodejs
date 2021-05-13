@@ -7,6 +7,7 @@ import aspectCommands from "./commands/aspect-commands";
 import assetInfoCommand from "./commands/asset-info";
 import assetTypeCommand from "./commands/asset-types";
 import assetsCommand from "./commands/assets";
+import deviceTypeCommand from "./commands/device-types";
 import dataExchangeCommand from "./commands/data-exchange";
 import dataLakeCommand from "./commands/data-lake";
 import deleteAssetCommand from "./commands/delete-asset";
@@ -108,6 +109,7 @@ eventsCommand(program);
 downloadEventsCommand(program);
 aggregatesCommand(program);
 notificationCommand(program);
+deviceTypeCommand(program);
 
 // * tenant commands
 
