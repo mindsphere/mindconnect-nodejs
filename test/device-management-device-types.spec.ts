@@ -34,6 +34,9 @@ describe("[SDK] DeviceManagementClient.DeviceTypes", () => {
     let gFolderid = "";
 
     before(async () => {
+        // tear Down test infrastructure
+        await tearDownDeviceTestStructure(sdk);
+
         // Setup the testing architecture
         const {device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);
         assetTypeId = `${(deviceAssetType as any).id}`;
@@ -45,7 +48,7 @@ describe("[SDK] DeviceManagementClient.DeviceTypes", () => {
 
     after(async () => {
         // tear Down test infrastructure
-        // await tearDownDeviceTestStructure(sdk);
+        await tearDownDeviceTestStructure(sdk);
     });
 
     it("SDK should not be undefined", async () => {

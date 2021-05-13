@@ -42,7 +42,6 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
             }),
         })
     );
-    console.log("Assettypes", assetTypes);
     await sleep(2000);
     if (assetTypes.length === 0) {
         const _assetType = await assetMgmt.PutAssetType(
@@ -77,7 +76,6 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
         assetTypes.push(_assetType);
     }
     const deviceAssetType = assetTypes.pop();
-    console.log("deviceAssetType", deviceAssetType);
     // Check if we have the device types setup
     const deviceTypes =  unroll<DeviceManagementModels.DeviceType>(
         await deviceManagementClient.GetDeviceTypes({
