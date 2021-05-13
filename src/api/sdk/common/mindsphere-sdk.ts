@@ -76,7 +76,7 @@ export class MindSphereSdk extends SdkClient {
      *
      * @memberOf MindSphereSdk
      */
-    public GetAnomalydetectionClient(): AnomalyDetectionClient {
+    public GetAnomalyDetectionClient(): AnomalyDetectionClient {
         this._anomalyDetectionClient = this._anomalyDetectionClient || new AnomalyDetectionClient(this._authenticator);
         return this._anomalyDetectionClient;
     }

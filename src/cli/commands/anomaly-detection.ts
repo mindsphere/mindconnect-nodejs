@@ -128,7 +128,7 @@ async function createTemplate(options: any, sdk: MindSphereSdk) {
 }
 
 async function trainNewModel(options: any, sdk: MindSphereSdk) {
-    const anomalyDetectionClient = sdk.GetAnomalydetectionClient();
+    const anomalyDetectionClient = sdk.GetAnomalyDetectionClient();
     const tenant = sdk.GetTenant();
     const timeOffset = new Date().getTime();
 
@@ -188,7 +188,7 @@ async function trainNewModel(options: any, sdk: MindSphereSdk) {
 }
 
 async function detectAnomalies(options: any, sdk: MindSphereSdk) {
-    const anomalyDetectionClient = sdk.GetAnomalydetectionClient();
+    const anomalyDetectionClient = sdk.GetAnomalyDetectionClient();
     const modelid = options.modelid;
     const on = options.on || "data";
     let result: AnomalyDetectionModels.Anomaly[] = [];
