@@ -6,11 +6,12 @@ import aspectCommands from "./commands/aspect-commands";
 import assetInfoCommand from "./commands/asset-info";
 import assetTypeCommand from "./commands/asset-types";
 import assetsCommand from "./commands/assets";
-import deviceTypeCommand from "./commands/device-types";
 import dataExchangeCommand from "./commands/data-exchange";
 import dataLakeCommand from "./commands/data-lake";
 import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
+import deviceTypeCommand from "./commands/device-types";
+import deviceCommand from "./commands/devices";
 import downloadEventsCommand from "./commands/download-events";
 import eventTypesCommand from "./commands/event-types";
 import eventsCommand from "./commands/events";
@@ -99,6 +100,7 @@ downloadEventsCommand(program);
 aggregatesCommand(program);
 notificationCommand(program);
 deviceTypeCommand(program);
+deviceCommand(program);
 
 // * tenant commands
 
@@ -133,7 +135,7 @@ signalCalculationCommand(program);
 trendPredictionCommand(program);
 kpicalculationCommand(program);
 eventAnalyticsCommand(program);
-// * models commnds
+// * models commands
 modelsCommand(program);
 jobsCommand(program);
 scheduleCommand(program);

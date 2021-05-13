@@ -1,3 +1,5 @@
+// noinspection JSValidateJSDoc
+
 import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
 import { DeviceManagementModels } from "./device-models";
@@ -26,12 +28,12 @@ export class DeviceManagementClient extends SdkClient {
      *         size?: number;
      *         sort?: string;
      *     }} [params]
-     * @param {string} [owner] Owner tenant
-     * @param {string} [code] Device Type Code
-     * @param {string} [assetTypeId] Associated asset type id
-     * @param {number} [size] The maximum number of elements returned in one page
-     * @param {number} [page] The (0-based) index of the page
-     * @param {string} [sort] The order of returned elements.&lt;br/&gt;Multiple fields could be used separated by commas (e.g. &#39;field1,field2&#39;).&lt;br/&gt;Descending order could be requested by appending &#39;,desc&#39; at the end of parameter.(e.g. &#39;field1,field2,desc&#39;)
+     * @param {string} [params.owner] Owner tenant
+     * @param {string} [params.code] Device Type Code
+     * @param {string} [params.assetTypeId] Associated asset type id
+     * @param {number} [params.size] The maximum number of elements returned in one page
+     * @param {number} [params.page] The (0-based) index of the page
+     * @param {string} [params.sort] The order of returned elements.&lt;br/&gt;Multiple fields could be used separated by commas (e.g. &#39;field1,field2&#39;).&lt;br/&gt;Descending order could be requested by appending &#39;,desc&#39; at the end of parameter.(e.g. &#39;field1,field2,desc&#39;)
      * @example await deviceManagement.GetDeviceTypes();
      * @example await deviceManagement.GetDeviceTypes({sort: 'id,name'});
 
@@ -204,9 +206,9 @@ export class DeviceManagementClient extends SdkClient {
      *         page?: number;
      *         size?: number;
      *     }} [params]
-     * @param {number} [size] The maximum number of elements returned in one page
-     * @param {number} [page] The (0-based) index of the page
-     * @param {string} [assetId] Associated asset id
+     * @param {number} [params.size] The maximum number of elements returned in one page
+     * @param {number} [params.page] The (0-based) index of the page
+     * @param {string} [params.assetId] Associated asset id
      *
      * @example await deviceManagement.GetDevices();
      * @example await deviceManagement.GetDevices({size: 10});

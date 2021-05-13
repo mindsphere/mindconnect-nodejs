@@ -25,11 +25,10 @@ export default (program: CommanderStatic) => {
         .option("-m, --mode [list|create|delete|template | info]", "list | create | delete | template | info", "list")
         .option("-f, --file <file>", ".mdsp.json file with device type definition")
         .option("-o, --owner <owner>", "owner tenant of the device type definition")
+        .option("-n, --devicetype <devicetype>", "the device type name")
         .option("-c, --code <code>", "device type code")
         .option("-a, --assettype <assettype>", "the device type associated asset type id")
-        .option("-s, --schema <schema>", "JSON Schema")
         .option("-i, --id <id>", "the device type id")
-        .option("-n, --devicetype <devicetype>", "the asset type name")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
@@ -37,7 +36,7 @@ export default (program: CommanderStatic) => {
         .action((options) => {
             (async () => {
                 try {
-                    checkRequiredParamaters(options);
+                    checkRequiredParameters(options);
                     const sdk = getSdk(options);
                     color = adjustColor(color, options);
                     homeDirLog(options.verbose, color);
@@ -45,7 +44,7 @@ export default (program: CommanderStatic) => {
 
                     switch (options.mode) {
                         case "list":
-                            await listdeviceTypes(sdk, options);
+                            await listDeviceTypes(sdk, options);
                             break;
 
                         case "template":
@@ -53,11 +52,11 @@ export default (program: CommanderStatic) => {
                             console.log("Edit the file before submitting it to MindSphere.");
                             break;
                         case "delete":
-                            await deletedeviceType(options, sdk);
+                            await deleteDeviceType(options, sdk);
                             break;
 
                         case "create":
-                            await createdeviceType(options, sdk);
+                            await createDeviceType(options, sdk);
                             break;
 
                         case "info":
@@ -78,7 +77,7 @@ export default (program: CommanderStatic) => {
             log(`    mc device-types --mode list --owner siemens\t\t list all device types which belongs to \"siemens\"`);
             log(`    mc device-types --mode info --id 7ed34q...\t\t get details of device type with the id \"7ed34q...\"`);
             log(
-                `    mc device-types --mode template --devicetype Pump \n\tcreate a template file (Enironment.id.mdsp.json) for id Pump`
+                `    mc device-types --mode template --devicetype Pump \n\tcreate a template file (Pump.id.mdsp.json) for device type Pump`
             );
             log(
                 `    mc device-types --mode create --file Pump.id.mdsp.json \n\tcreate device type Pump in MindSphere`
@@ -88,7 +87,7 @@ export default (program: CommanderStatic) => {
         });
 };
 
-async function createdeviceType(options: any, sdk: MindSphereSdk) {
+async function createDeviceType(options: any, sdk: MindSphereSdk) {
     const filePath = path.resolve(options.file);
     const file = fs.readFileSync(filePath);
     const deviceType = JSON.parse(file.toString());
@@ -105,17 +104,17 @@ async function createTemplate(options: any, sdk: MindSphereSdk) {
         description: "",
         owner: `${sdk.GetTenant()}`,
         code: options.code || `${tenant}.${options.devicetype}`,
-        assetTypeId: "7ed34q...",
+        assetTypeId: options.assettype || "7ed34q...",
         properties: {
             key1: "value1",
             key2: "value2",
         },
     };
     verboseLog(templateType, options.verbose);
-    writedeviceTypeToFile(options, templateType);
+    writeDeviceTypeToFile(options, templateType);
 }
 
-function writedeviceTypeToFile(options: any, templateType: any) {
+function writeDeviceTypeToFile(options: any, templateType: any) {
     const fileName = options.file || `${options.devicetype}.id.mdsp.json`;
     fs.writeFileSync(fileName, JSON.stringify(templateType, null, 2));
     console.log(
@@ -125,14 +124,14 @@ function writedeviceTypeToFile(options: any, templateType: any) {
     );
 }
 
-async function deletedeviceType(options: any, sdk: MindSphereSdk) {
+async function deleteDeviceType(options: any, sdk: MindSphereSdk) {
     const id = (options.id! as string) ? options.id : `${options.id}`;
     const deviceType = await sdk.GetDeviceManagementClient().GetDeviceType(id);
     await sdk.GetDeviceManagementClient().DeleteDeviceType(id);
-    console.log(`id with id ${color(id)} deleted.`);
+    console.log(`Device type with id ${color(id)} deleted.`);
 }
 
-async function listdeviceTypes(sdk: MindSphereSdk, options: any) {
+async function listDeviceTypes(sdk: MindSphereSdk, options: any) {
     const deviceMgmt = sdk.GetDeviceManagementClient();
 
     let page = 0;
@@ -179,7 +178,7 @@ async function deviceTypeInfo(options: any, sdk: MindSphereSdk) {
     console.log(JSON.stringify(deviceType, null, 2));
 }
 
-function checkRequiredParamaters(options: any) {
+function checkRequiredParameters(options: any) {
     options.mode === "template" &&
         !options.devicetype &&
         errorLog(
