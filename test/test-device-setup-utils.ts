@@ -84,7 +84,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
             owner: `${tenant}`,
             sort: "DESC",
             page: 0,
-            size: 10,
+            size: 100,
         })
     );
     await sleep(2000);
@@ -92,7 +92,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
         const _deviceType = await deviceManagementClient.PostDeviceType(
             {
                 name: `${tenant}.UnitTestDeviceType`,
-                code: `${tenant}.V001`,
+                code: `${tenant}.V001.${timeOffset}`,
                 assetTypeId: `${(deviceAssetType as any).id}`,
                 description: " example device type",
                 properties: {
