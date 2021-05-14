@@ -33,7 +33,7 @@ export default (program: CommanderStatic) => {
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(color("list, create or delete device types *"))
+        .description(color("list, create or delete devices *"))
         .action((options) => {
             (async () => {
                 try {
