@@ -172,7 +172,7 @@ export class DeviceStatusManagementClient extends SdkClient {
             verb: "POST",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/devices/${id}/sendHeartbeat`,
+            baseUrl: `${this._baseUrl}/devices/${id}/sendHeartbeat/`,
             rawResponse: true,
             additionalHeaders: { "Content-Type": "application/json" },
         });
@@ -224,8 +224,8 @@ export class DeviceStatusManagementClient extends SdkClient {
         id: string,
         type?: "FIRMWARE" | "APP",
         softwareId?: string,
-        size?: number,
-        page?: number
+        page?: number,
+        size?: number
     ): Promise<DeviceStatusModels.PaginatedSoftwareInventoryRecord> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
