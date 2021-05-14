@@ -254,6 +254,7 @@ async function deviceInfo(options: any, sdk: MindSphereSdk) {
 }
 
 function checkRequiredParameters(options: any) {
+    options.mode !== "template" &&
     !options.deviceid &&
     errorLog(
         "you have to provide the deviceid to get or update the device status information (see mc device-status --help for more details)",
