@@ -76,7 +76,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
         assetTypes.push(_assetType);
     }
     const deviceAssetType = assetTypes.pop();
-    console.log("deviceAssetType", deviceAssetType);
+    // console.log("deviceAssetType", deviceAssetType);
     // Check if we have the device types setup
     const deviceTypes =  unroll<DeviceManagementModels.DeviceType>(
         await deviceManagementClient.GetDeviceTypes({
@@ -105,7 +105,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
         deviceTypes.push(_deviceType);
     }
     const deviceType = deviceTypes.pop();
-    console.log("deviceType", deviceType);
+    // console.log("deviceType", deviceType);
     // Check if we have the asset setup
     const assets = unroll(
         await assetMgmt.GetAssets({
@@ -132,7 +132,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
         assets.push(_asset);
     }
     const deviceAsset = assets.pop();
-    console.log("deviceAsset", deviceAsset);
+    // console.log("deviceAsset", deviceAsset);
 
     // Register an agent for this asset
     const agents = unroll(
@@ -154,7 +154,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
     }
     const agent = agents.pop();
     const deviceAgentId = `${agent.id}`;
-    console.log("agent", agent);
+    // console.log("agent", agent);
     // Check if we have the asset setup
     const devices = unroll(
         await deviceManagementClient.GetDevices({
@@ -179,7 +179,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
     }
     await sleep(2000);
     const device = devices.pop();
-    console.log("device", device);
+    // console.log("device", device);
     return { device: device, deviceAsset: deviceAsset, deviceType: deviceType, deviceAssetType: deviceAssetType, folderid };
 }
 
