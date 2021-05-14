@@ -36,7 +36,7 @@ export async function setupDeviceTestStructure(sdk: MindSphereSdk) {
     const assetTypes = unroll<AssetManagementModels.AssetTypeResource>(
         await assetMgmt.GetAssetTypes({
             filter: JSON.stringify({
-                name: {
+                id: {
                     startsWith: `${tenant}.UnitTestDeviceAssetType`
                 }
             }),
