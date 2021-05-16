@@ -103,7 +103,7 @@ function createTemplate(options: any) {
         outputFolderId: "<outputFolderIdFromDataExchange:id",
         maximumExecutionTimeInSeconds: "60",
     };
-    verboseLog(templateType, options.verbose);
+    verboseLog(JSON.stringify(templateType, null, 2), options.verbose);
     writejobToFile(options, templateType);
 }
 

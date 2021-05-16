@@ -1,8 +1,10 @@
 import * as chalk from "chalk";
 import { log } from "console";
+import * as updateNotifier from "update-notifier";
 import { FrontendAuth } from "../../api/frontend-auth";
 import { AssetManagementModels, MindSphereSdk } from "../../api/sdk";
 import { decrypt, getHomeDotMcDir, loadAuth } from "../../api/utils";
+import { MC_NAME, MC_VERSION } from "../../version";
 
 const magenta = getColor("magenta");
 const yellow = getColor("yellow");
@@ -10,7 +12,35 @@ const green = getColor("green");
 const red = getColor("red");
 const cyan = getColor("cyan");
 
+export function checkForUpdates() {
+    const pkgInfo = {
+        pkg: {
+            name: `@mindconnect/${MC_NAME}`,
+            version: `${MC_VERSION}`,
+        },
+    };
+
+    const notifier = updateNotifier(pkgInfo);
+
+    if (notifier.update) {
+        console.log(
+            `\n\t There is an update available: ${magenta(notifier.update.latest + " ")} (${notifier.update.type})`
+        );
+        console.log(`\t Run ${magenta("npm install -g ")}${magenta(pkgInfo.pkg.name)} to update`);
+        console.log(`\t or download the release for your system from`);
+        console.log(`\t ${magenta("https://github.com/mindsphere/mindconnect-nodejs/releases")}\n`);
+    }
+}
+
 export const serviceCredentialLog = (color: Function = magenta) => {
+    if (
+        process.env.MDSP_PASSKEY ||
+        (process.env.MDSP_HOST && process.env.MDSP_SESSION && process.env.MDSP_XSRF_TOKEN)
+    ) {
+        checkForUpdates();
+        return;
+    }
+
     log(`\n  Important: `);
     log(`\n  Authentication with ${color("service credentials")} or ${color("app credentials")}:\n`);
 
@@ -26,6 +56,8 @@ export const serviceCredentialLog = (color: Function = magenta) => {
     );
     log(`\n  Full Documentation: \n`);
     log(`    ${color("https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/setting-up-the-cli.html")}\n`);
+
+    checkForUpdates();
 };
 
 export function colorizeStatus(message: string) {
@@ -290,4 +322,47 @@ export function buildFilter(options: any) {
         pointer.typeId = { contains: `${options.typeid}` };
     }
     return filter;
+}
+
+export function printObjectInfo(
+    title: string,
+    dto: object,
+    options: any,
+    coloredProperties: Array<string>,
+    color: Function,
+    depth: number = 0
+) {
+    console.log(`${title}`);
+
+    if (isPrimitive(dto)) {
+        console.log(dto);
+        return;
+    }
+
+    for (const [key, value] of Object.entries(dto)) {
+        if (Array.isArray(value)) {
+            for (let index = 0; index < value.length; index++) {
+                const element = value[index];
+                if (isPrimitive(element)) {
+                    console.log(`${key}[${color(index)}]: ${element}`);
+                } else {
+                    printObjectInfo(`${key}[${color(index)}]`, element, options, coloredProperties, color, depth + 1);
+                }
+            }
+        } else if (typeof value === "object" && value !== null) {
+            printObjectInfo(key, value, options, coloredProperties, color, depth + 1);
+        } else {
+            const words = key
+                .split(/(?=[A-Z])/)
+                .join(" ")
+                .toLowerCase();
+
+            console.log(`${"\t".repeat(depth)}${words}: ${coloredProperties.indexOf(key) >= 0 ? color(value) : value}`);
+        }
+    }
+    depth === 0 && verboseLog(JSON.stringify(dto, null, 2), options.verbose);
+}
+
+export function isPrimitive(x: any) {
+    return x !== Object(x);
 }

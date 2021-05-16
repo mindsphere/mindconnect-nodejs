@@ -95,9 +95,8 @@ export default (program: CommanderStatic) => {
             log("\n  Examples:\n");
             log(`    mc dev-proxy  \t\t\t\t runs on default port (7707) using ${yellow("cookies")}`);
             log(
-                `    mc dev-proxy --port 7777 --passkey passkey \t runs on port 7777 using ${magenta(
-                    "app/service credentials"
-                )}`
+                `    mc dev-proxy --mode credentials --port 7777 --passkey $MDSP_PASSKEY 
+                                        \t runs on port 7777 using ${magenta("app/service credentials")}`
             );
 
             log("\n  Configuration:\n");

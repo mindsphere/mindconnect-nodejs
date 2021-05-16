@@ -123,7 +123,7 @@ async function createEventTemplate(options: any, sdk: MindSphereSdk) {
         .GetEventManagementClient()
         .GetEventType(eventType, { includeShared: options.includeshared });
 
-    verboseLog(templateType, options.verbose);
+    verboseLog(JSON.stringify(templateType, null, 2), options.verbose);
     writeEventToFile(options, templateType);
 }
 

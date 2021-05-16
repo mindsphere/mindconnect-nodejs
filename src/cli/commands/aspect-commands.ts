@@ -12,7 +12,7 @@ import {
     homeDirLog,
     proxyLog,
     serviceCredentialLog,
-    verboseLog,
+    verboseLog
 } from "./command-utils";
 import path = require("path");
 
@@ -234,7 +234,7 @@ function createTemplate(options: any) {
             },
         ],
     };
-    verboseLog(templateType, options.verbose);
+    verboseLog(JSON.stringify(templateType, null, 2), options.verbose);
     writeAspectTypeToFile(options, templateType);
 }
 
