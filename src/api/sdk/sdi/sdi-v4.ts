@@ -759,13 +759,24 @@ export class SemanticDataInterconnectClient extends SdkClient {
         params?: { pageToken?: string }
     ): Promise<SemanticDataInterconnectModels.ListOfSchemaRegistry> {
         const parameters = params || {};
-        const result = await this.HttpAction({
+        const response = (await this.HttpAction({
             verb: "POST",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/searchSchemas?${toQueryString(parameters)}`,
             body: schemaSearchRequest,
-        });
+            rawResponse: true,
+        })) as Response;
+
+        let result;
+
+        // handle no content
+        if (response.status === 204) {
+            result = { schemas: [] };
+        } else {
+            result = response.json();
+        }
+
         return result as SemanticDataInterconnectModels.ListOfSchemaRegistry;
     }
 

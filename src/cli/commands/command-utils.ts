@@ -329,16 +329,40 @@ export function printObjectInfo(
     dto: object,
     options: any,
     coloredProperties: Array<string>,
-    color: Function
+    color: Function,
+    depth: number = 0
 ) {
     console.log(`${title}`);
 
-    for (const [key, value] of Object.entries(dto)) {
-        const words = key
-            .split(/(?=[A-Z])/)
-            .join(" ")
-            .toLowerCase();
-        console.log(`${words}: ${coloredProperties.indexOf(key) >= 0 ? color(value) : value}`);
+    if (isPrimitive(dto)) {
+        console.log(dto);
+        return;
     }
-    verboseLog(JSON.stringify(dto, null, 2), options.verbose);
+
+    for (const [key, value] of Object.entries(dto)) {
+        if (Array.isArray(value)) {
+            for (let index = 0; index < value.length; index++) {
+                const element = value[index];
+                if (isPrimitive(element)) {
+                    console.log(`${key}[${color(index)}]: ${element}`);
+                } else {
+                    printObjectInfo(`${key}[${color(index)}]`, element, options, coloredProperties, color, depth + 1);
+                }
+            }
+        } else if (typeof value === "object" && value !== null) {
+            printObjectInfo(key, value, options, coloredProperties, color, depth + 1);
+        } else {
+            const words = key
+                .split(/(?=[A-Z])/)
+                .join(" ")
+                .toLowerCase();
+
+            console.log(`${"\t".repeat(depth)}${words}: ${coloredProperties.indexOf(key) >= 0 ? color(value) : value}`);
+        }
+    }
+    depth === 0 && verboseLog(JSON.stringify(dto, null, 2), options.verbose);
+}
+
+export function isPrimitive(x: any) {
+    return x !== Object(x);
 }
