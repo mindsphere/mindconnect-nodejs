@@ -1177,7 +1177,7 @@ export class SemanticDataInterconnectClient extends SdkClient {
             verb: "POST",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/ontologies`,
+            baseUrl: `${this._baseUrl}/inferOntology`,
             body: inferSchemaSearchRequest,
         });
         return result;

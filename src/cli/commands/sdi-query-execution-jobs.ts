@@ -86,7 +86,7 @@ export default (program: CommanderStatic) => {
                 `    mc sdi-execution-jobs --mode create --executionjob <executionjobfile> \t create sdi data execution job`
             );
             log(`    mc sdi-execution-jobs --mode update --executionjob <executionjobfile> --jobid <jobid> \
-                                                                                             \t\t update sdi data executionjob`);
+                                                                                    \t\t update sdi data executionjob`);
             log(`    mc sdi-execution-jobs --mode info --jobid <jobid>   \t\t get sdi data execution job info`);
             log(`    mc sdi-execution-jobs --mode result --jobid <jobid>   \t\t get execution job results`);
             log(`    mc sdi-execution-jobs --mode delete --jobid <jobid> \t\t delete sdi data execution job`);
@@ -136,14 +136,18 @@ async function listDataExecutionJobs(sdk: MindSphereSdk, options: any) {
 
     let pageToken = undefined;
     let count = 0;
-    console.log(`${color("id")}  ${"name"}  ${"description"} `);
+    console.log(`${color("id")} queryId  status  params  aliases `);
     do {
         const jobs: SemanticDataInterconnectModels.ResponseAllDataQueryExecutionResponse =
             await sdiClient.GetExecutionJobs({
                 pageToken: pageToken,
             });
         jobs.jobs?.forEach((executionjob) => {
-            console.log(`${color(executionjob.id)}  ${executionjob.queryId}  ${executionjob.parameters} `);
+            console.log(
+                `${color(executionjob.id)}  ${executionjob.queryId} ${executionjob.status}\t params: [${
+                    (executionjob.parameters || [])?.length
+                }] aliases: [${(executionjob.aliases || [])?.length}] ${executionjob.description || ""}  `
+            );
             verboseLog(JSON.stringify(executionjob, null, 2), options.verbose);
             count++;
         });

@@ -19,6 +19,7 @@
 - CLI: new `mc sdi-file-upload` command for SDI [#265]
 - CLI: new `mc sdi-search-schemas` command for SDI [#265]
 - CLI: new `mc sdi-data-queries` command for SDI [#265]
+- CLI: new `mc sdi-ontologies` command for SDI [#265]
 - CLI: fixed bug in `mc aggregates` command with multiple lines of same aggregate
 - CLI: if the authentication is configured, the information about it is removed from help to reduce verbosity.
 - SDK: signal calculation client [#258]
