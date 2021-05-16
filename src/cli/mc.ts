@@ -50,6 +50,7 @@ import modelsCommand from "./commands/models";
 import mqttCreateCommand from "./commands/mqtt-create-jwt";
 import notificationCommand from "./commands/notifications";
 import sdiDataIngestCommand from "./commands/sdi-data-ingest";
+import sdiDataQueriesCommand from "./commands/sdi-data-queries";
 import sdiDataRegistriesCommand from "./commands/sdi-data-registries";
 import sdiDataTypesCommand from "./commands/sdi-data-types";
 import sdiDataLakesCommand from "./commands/sdi-datalakes";
@@ -133,6 +134,7 @@ sdiDataTypesCommand(program);
 sdiFileUploadCommand(program);
 sdiDataIngestCommand(program);
 sdiSearchSchemasCommand(program);
+sdiDataQueriesCommand(program);
 
 // * mobileApps
 

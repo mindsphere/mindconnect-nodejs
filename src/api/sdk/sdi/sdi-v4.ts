@@ -864,7 +864,7 @@ export class SemanticDataInterconnectClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/${id}`,
+            baseUrl: `${this._baseUrl}/queries/${id}`,
         });
         return result as SemanticDataInterconnectModels.NativeQueryGetResponse;
     }
@@ -910,7 +910,7 @@ export class SemanticDataInterconnectClient extends SdkClient {
             verb: "DELETE",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/${id}`,
+            baseUrl: `${this._baseUrl}/queries/${id}`,
             noResponse: true,
         });
     }
