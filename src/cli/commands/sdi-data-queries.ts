@@ -23,13 +23,14 @@ export default (program: CommanderStatic) => {
         .command("sdi-data-queries")
         .alias("sdq")
         .option(
-            "-m, --mode [list|create|update|template|info|delete]",
-            "list | create | update | template | info | delete",
+            "-m, --mode [list|create|update|template|info|delete|latest]",
+            "list | create | update | template | info | delete | latest",
             "list"
         )
         .option("-d, --query <query>", "data query file with definition for --mode create or update command")
         .option("-i, --queryid <queryid>", "the query id for --mode info, update or delete command")
         .option("-o, --overwrite", "overwrite template file if it already exists")
+        .option("-r, --result <result>", "result file for --mode latest", "sdi.query.latest.mdsp.json")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
@@ -67,6 +68,9 @@ export default (program: CommanderStatic) => {
                             await deleteQuery(options, sdk);
                             break;
 
+                        case "latest":
+                            await queryResults(options, sdk);
+                            break;
                         default:
                             throw Error(`no such option: ${options.mode}`);
                     }
@@ -83,6 +87,7 @@ export default (program: CommanderStatic) => {
             log(`    mc sdi-data-queries --mode update --query <queryfile> --queryid <queryid> \
                                                                                              \t\t update sdi data query`);
             log(`    mc sdi-data-queries --mode info --queryid <queryid>   \t\t get sdi data query info`);
+            log(`    mc sdi-data-queries --mode latest --queryid <queryid>   \t\t get latest query results`);
             log(`    mc sdi-data-queries --mode delete --queryid <queryid> \t\t delete sdi data query`);
 
             serviceCredentialLog();
@@ -200,4 +205,19 @@ async function deleteQuery(options: any, sdk: MindSphereSdk) {
     const sdiClient = sdk.GetSemanticDataInterConnectClient();
     await sdiClient.DeleteQuery(`${options.queryid}`);
     console.log(`The sdi data query with id : ${color(options.queryid)} was deleted.`);
+}
+
+async function queryResults(options: any, sdk: MindSphereSdk) {
+    const fileName = options.results || `sdi.query.latest.mdsp.json`;
+    const filePath = path.resolve(fileName);
+
+    fs.existsSync(filePath) &&
+        !options.overwrite &&
+        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+    const sdiClient = sdk.GetSemanticDataInterConnectClient();
+    const result = await sdiClient.GetQueryExecutionJobLatestResults(`${options.queryid}`);
+    verboseLog(JSON.stringify(result, null, 2), options.verbose);
+
+    fs.writeFileSync(filePath, JSON.stringify(result, null, 2));
+    console.log(`The result data was written into ${color(fileName)}.`);
 }

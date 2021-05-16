@@ -927,7 +927,7 @@ export class SemanticDataInterconnectClient extends SdkClient {
      *
      * @memberOf SemanticDataInterconnectClient
      */
-    public async PostQueryExecutionJob(
+    public async PostExecutionJob(
         id: string,
         dataQueryExecuteRequest: SemanticDataInterconnectModels.DataQueryExecuteQueryRequest
     ): Promise<SemanticDataInterconnectModels.DataQuerySQLResponse> {
@@ -1036,6 +1036,7 @@ export class SemanticDataInterconnectClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/executionJobs/${id}`,
+            noResponse: true,
         });
     }
 
