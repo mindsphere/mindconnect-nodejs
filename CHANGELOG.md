@@ -21,6 +21,9 @@
 - CLI: new `mc sdi-data-queries` command for SDI [#265]
 - CLI: new `mc sdi-ontologies` command for SDI [#265]
 - CLI: new `mc sdi-ontology-jobs` command for SDI [#265]
+- CLI: new `mc device-types` command [#264]
+- CLI: new `mc devices` command [#264]
+- CLI: new `mc device-status` command [#264]
 - CLI: fixed bug in `mc aggregates` command with multiple lines of same aggregate
 - CLI: if the authentication is configured, the information about it is removed from help to reduce verbosity.
 - SDK: signal calculation client [#258]
@@ -30,6 +33,8 @@
 - SDK: NotficationV4 Client [#252]
 - SDK: IotTimeSeriesAggragetesV4 Client [#250]
 - SDK: Semantic Data InterConnect Client [#265]
+- SDK: Open Edge - Device Management Client [#264]
+- SDK: Open Edge - Device Status Management Client [#264]
 - Bumped all dependencies
 
 ### Contributions 3.13.0
