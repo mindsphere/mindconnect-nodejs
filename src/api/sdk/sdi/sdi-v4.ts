@@ -1247,7 +1247,7 @@ export class SemanticDataInterconnectClient extends SdkClient {
      */
     public async GetOntologyJobStatus(id: string): Promise<SemanticDataInterconnectModels.JobStatus> {
         const result = await this.HttpAction({
-            verb: "POST",
+            verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/ontologyJobs/${id}`,

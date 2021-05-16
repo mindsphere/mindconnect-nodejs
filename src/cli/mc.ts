@@ -57,6 +57,7 @@ import sdiDataLakesCommand from "./commands/sdi-datalakes";
 import sdiFileUploadCommand from "./commands/sdi-file-upload";
 import sdiIotRegistriesCommand from "./commands/sdi-iot-registries";
 import sdiOntologiesCommand from "./commands/sdi-ontologies";
+import sdiOntologyJobsCommand from "./commands/sdi-ontology-jobs";
 import sdiQueryExecutionJobsCommand from "./commands/sdi-query-execution-jobs";
 import sdiSearchSchemasCommand from "./commands/sdi-search-schemas";
 import signalCalculationCommand from "./commands/signal-calculation";
@@ -139,6 +140,7 @@ sdiSearchSchemasCommand(program);
 sdiDataQueriesCommand(program);
 sdiQueryExecutionJobsCommand(program);
 sdiOntologiesCommand(program);
+sdiOntologyJobsCommand(program);
 
 // * mobileApps
 
