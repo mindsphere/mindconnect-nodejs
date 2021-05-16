@@ -18,7 +18,6 @@ import path = require("path");
 
 let color = getColor("magenta");
 let green = getColor("green");
-let red = getColor("red");
 
 export default (program: CommanderStatic) => {
     program
