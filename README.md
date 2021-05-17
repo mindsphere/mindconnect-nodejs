@@ -386,9 +386,9 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 
 | Name |SDK - Client | Command |
 | --- | --- | --- |
-| SDI Data Management   |  |  |
-| SDI Data Query   |  |  |
-| SDI Semantic Modelling   |  |  |
+| SDI Data Management   | :heavy_check_mark:   | :heavy_check_mark: |
+| SDI Data Query   | :heavy_check_mark:  |  |
+| SDI Semantic Modelling   | :heavy_check_mark:  |  |
 
 ### Example
 

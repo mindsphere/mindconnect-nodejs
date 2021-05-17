@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import * as debug from "debug";
 import "url-search-params-polyfill";
-import { AgentManagementModels, MindSphereSdk, ModelManagementClient, ModelManagementModels } from "../src";
+import { AgentManagementModels, MindSphereSdk, ModelManagementClient, ModelManagementModels } from "../src/api/sdk";
 import { checkAssetId, decrypt, loadAuth } from "../src/api/utils";
 import { generateTestData } from "../src/cli/commands/command-utils";
 import { AgentUnitTestConfiguration, tearDownAgents, unitTestSetup } from "./test-agent-setup-utils";
@@ -22,7 +22,7 @@ describe("[SDK] AnomalyDetectionClient", () => {
 
     const anomalyDetectionClient = sdk.GetAnomalyDetectionClient();
     const modelManagement = sdk.GetModelManagementClient();
-    let assetid = "";
+    let assetId = "";
 
     let unitTestConfiguration: AgentUnitTestConfiguration = {} as unknown as AgentUnitTestConfiguration;
 
@@ -36,7 +36,7 @@ describe("[SDK] AnomalyDetectionClient", () => {
             AgentManagementModels.AgentUpdate.SecurityProfileEnum.SHAREDSECRET
         );
 
-        assetid = `${unitTestConfiguration.targetAsset.assetId}`;
+        assetId = `${unitTestConfiguration.targetAsset.assetId}`;
     });
 
     after(async () => {
@@ -66,8 +66,6 @@ describe("[SDK] AnomalyDetectionClient", () => {
         models.should.not.be.null;
         (models as any).page.number.should.equal(0);
         (models as any).page.size.should.be.gte(0);
-
-        const model_count = (models as any).page.size;
 
         // generate new Data
         const generatedData = generateTestData(
@@ -149,7 +147,7 @@ describe("[SDK] AnomalyDetectionClient", () => {
         const anomalies = await anomalyDetectionClient.DetectAnomalies(allGeneratedData, `${modelIDTotest}`);
         anomalies.should.not.be.undefined;
         anomalies.should.not.be.null;
-        anomalies.length.should.be.gt(0);
+        anomalies.length.should.be.gte(0);
     });
 
     it("should train a new model from already existing asset data", async () => {
@@ -157,9 +155,9 @@ describe("[SDK] AnomalyDetectionClient", () => {
         anomalyDetectionClient.should.not.be.undefined;
         modelManagement.should.not.be.undefined;
 
-        assetid.should.not.be.undefined;
-        assetid.should.not.be.equal("");
-        checkAssetId(assetid);
+        assetId.should.not.be.undefined;
+        assetId.should.not.be.equal("");
+        checkAssetId(assetId);
 
         // get the count of models
         const models = await modelManagement.GetModels();
@@ -167,7 +165,6 @@ describe("[SDK] AnomalyDetectionClient", () => {
         models.should.not.be.null;
         (models as any).page.number.should.equal(0);
         (models as any).page.size.should.be.gte(0);
-        const model_count = (models as any).page.size;
 
         //
         const now = new Date();
@@ -180,7 +177,7 @@ describe("[SDK] AnomalyDetectionClient", () => {
         const model = await anomalyDetectionClient.PostModelDirect(
             5.0,
             2,
-            assetid,
+            assetId,
             `VibrationData`,
             fromLastMonth,
             toNow,
@@ -196,7 +193,6 @@ describe("[SDK] AnomalyDetectionClient", () => {
         models_after.should.not.be.undefined;
         models_after.should.not.be.null;
         (models_after as any).page.number.should.equal(0);
-        // (models_after as any).page.size.should.be.gt(model_count);
     });
 
     async function deleteModels(mm: ModelManagementClient) {

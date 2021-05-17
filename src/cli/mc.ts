@@ -2,6 +2,7 @@
 import * as program from "commander";
 import aggregatesCommand from "./commands/aggregates";
 import eventAnalyticsCommand from "./commands/analyze-events";
+import anomalydetectionCommand from "./commands/anomaly-detection";
 import aspectCommands from "./commands/aspect-commands";
 import assetInfoCommand from "./commands/asset-info";
 import assetTypeCommand from "./commands/asset-types";
@@ -49,9 +50,19 @@ import versionAndHelp from "./commands/mc-version-help";
 import mobileAppInstancesCommand from "./commands/mobile-app-instances";
 import mobileAppsCommand from "./commands/mobile-apps";
 import modelsCommand from "./commands/models";
-import anomalydetectionCommand from "./commands/anomaly-detection";
 import mqttCreateCommand from "./commands/mqtt-create-jwt";
 import notificationCommand from "./commands/notifications";
+import sdiDataIngestCommand from "./commands/sdi-data-ingest";
+import sdiDataQueriesCommand from "./commands/sdi-data-queries";
+import sdiDataRegistriesCommand from "./commands/sdi-data-registries";
+import sdiDataTypesCommand from "./commands/sdi-data-types";
+import sdiDataLakesCommand from "./commands/sdi-datalakes";
+import sdiFileUploadCommand from "./commands/sdi-file-upload";
+import sdiIotRegistriesCommand from "./commands/sdi-iot-registries";
+import sdiOntologiesCommand from "./commands/sdi-ontologies";
+import sdiOntologyJobsCommand from "./commands/sdi-ontology-jobs";
+import sdiQueryExecutionJobsCommand from "./commands/sdi-query-execution-jobs";
+import sdiSearchSchemasCommand from "./commands/sdi-search-schemas";
 import signalCalculationCommand from "./commands/signal-calculation";
 import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
@@ -123,6 +134,19 @@ identityCommand(program);
 
 // * data lake
 dataLakeCommand(program);
+
+// sdi
+sdiDataLakesCommand(program);
+sdiDataRegistriesCommand(program);
+sdiIotRegistriesCommand(program);
+sdiDataTypesCommand(program);
+sdiFileUploadCommand(program);
+sdiDataIngestCommand(program);
+sdiSearchSchemasCommand(program);
+sdiDataQueriesCommand(program);
+sdiQueryExecutionJobsCommand(program);
+sdiOntologiesCommand(program);
+sdiOntologyJobsCommand(program);
 
 // * mobileApps
 

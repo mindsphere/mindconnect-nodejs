@@ -126,7 +126,7 @@ function createTemplate(options: any) {
             },
         ],
     };
-    verboseLog(templateType, options.verbose);
+    verboseLog(JSON.stringify(templateType, null, 2), options.verbose);
     writeAssetTypeToFile(options, templateType);
 }
 

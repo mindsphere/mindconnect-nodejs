@@ -1,9 +1,10 @@
 import { AgentManagementClient } from "../agent/agent-management";
+import { AnomalyDetectionClient } from "../anomaly-detection/anomaly-detection";
 import { AssetManagementClient } from "../asset/asset-management";
 import { DataExchangeClient } from "../data-exchange/data-exchange";
 import { DataLakeClient } from "../data-lake/data-lake";
-import { DeviceManagementClient } from "../device/device-management";
 import { DeviceStatusManagementClient } from "../device-status/device-status-management";
+import { DeviceManagementClient } from "../device/device-management";
 import { EventAnalyticsClient } from "../event-analytics/eventanalytics";
 import { EventManagementClient } from "../event/event-management";
 import { IdentityManagementClient } from "../identity/identity";
@@ -16,8 +17,8 @@ import { JobManagerClient } from "../jobmanager/jobmanager";
 import { KPICalculationClient } from "../kpi/kpi";
 import { MindConnectApiClient } from "../mcapi/mcapi";
 import { ModelManagementClient } from "../model/model-management";
-import { AnomalyDetectionClient } from "../anomaly-detection/anomaly-detection";
 import { NotificationClientV4 } from "../notification-v4/notification-v4";
+import { SemanticDataInterconnectClient } from "../sdi/sdi-v4";
 import { SignalCalculationClient } from "../signal-calculation/signal-calculation";
 import { SignalValidationClient } from "../signal-validation/signal-validation";
 import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
@@ -315,9 +316,9 @@ export class MindSphereSdk extends SdkClient {
     private _deviceManagementClient?: DeviceManagementClient;
 
     /**
-     ** Device Management Client
+     * * Device Management Client
      *
-     * @returns {DeviceStatusManagementClient}
+     * @returns {DeviceManagementClient}
      *
      * @memberOf MindSphereSdk
      */
@@ -329,14 +330,15 @@ export class MindSphereSdk extends SdkClient {
     private _deviceStatusManagementClient?: DeviceStatusManagementClient;
 
     /**
-     ** Device Status Management Client
+     * * Device Status Management client
      *
      * @returns {DeviceStatusManagementClient}
      *
      * @memberOf MindSphereSdk
      */
     public GetDeviceStatusManagementClient(): DeviceStatusManagementClient {
-        this._deviceStatusManagementClient = this._deviceStatusManagementClient || new DeviceStatusManagementClient(this._authenticator);
+        this._deviceStatusManagementClient =
+            this._deviceStatusManagementClient || new DeviceStatusManagementClient(this._authenticator);
         return this._deviceStatusManagementClient;
     }
 
@@ -409,5 +411,20 @@ export class MindSphereSdk extends SdkClient {
         this._signalCalculationClient =
             this._signalCalculationClient || new SignalCalculationClient(this._authenticator);
         return this._signalCalculationClient;
+    }
+
+    private _semanticDataInterConnectClient?: SemanticDataInterconnectClient;
+
+    /**
+     * Semantic Data Interconnect Client
+     *
+     * @returns {SemanticDataInterconnectClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetSemanticDataInterConnectClient(): SemanticDataInterconnectClient {
+        this._semanticDataInterConnectClient =
+            this._semanticDataInterConnectClient || new SemanticDataInterconnectClient(this._authenticator);
+        return this._semanticDataInterConnectClient;
     }
 }
