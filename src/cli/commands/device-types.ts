@@ -2,14 +2,15 @@ import { CommanderStatic } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import { retry } from "../..";
-import { MindSphereSdk } from "../../api/sdk";
-import { DeviceManagementModels } from "../../api/sdk";
+import { DeviceManagementModels, MindSphereSdk } from "../../api/sdk";
+import { throwError } from "../../api/utils";
 import {
     adjustColor,
     errorLog,
     getColor,
     getSdk,
     homeDirLog,
+    printObjectInfo,
     proxyLog,
     serviceCredentialLog,
     verboseLog,
@@ -22,17 +23,18 @@ export default (program: CommanderStatic) => {
     program
         .command("device-types")
         .alias("dt")
-        .option("-m, --mode [list|create|delete|template | info]", "list | create | delete | template | info", "list")
+        .option("-m, --mode [list|create|delete|template|info]", "list | create | delete | template | info", "list")
         .option("-f, --file <file>", ".mdsp.json file with device type definition")
-        .option("-o, --owner <owner>", "owner tenant of the device type definition")
+        .option("-w, --owner <owner>", "owner tenant of the device type definition")
         .option("-n, --devicetype <devicetype>", "the device type name")
         .option("-c, --code <code>", "device type code")
         .option("-a, --assettype <assettype>", "the device type associated asset type id")
         .option("-i, --id <id>", "the device type id")
+        .option("-o, --overwrite", "overwrite template file if it already exists")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(color("list, create or delete device types *"))
+        .description(color("list, create or delete device types (open edge) *"))
         .action((options) => {
             (async () => {
                 try {
@@ -74,13 +76,17 @@ export default (program: CommanderStatic) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(`    mc device-types --mode list \t\t\t list all device types`);
-            log(`    mc device-types --mode list --owner siemens\t\t list all device types which belongs to \"siemens\"`);
-            log(`    mc device-types --mode info --id 7ed34q...\t\t get details of device type with the id \"7ed34q...\"`);
             log(
-                `    mc device-types --mode template --devicetype Pump \n\tcreate a template file (Pump.id.mdsp.json) for device type Pump`
+                `    mc device-types --mode list --owner siemens\t\t list all device types which belongs to \"siemens\"`
             );
             log(
-                `    mc device-types --mode create --file Pump.id.mdsp.json \n\tcreate device type Pump in MindSphere`
+                `    mc device-types --mode info --id 7ed34q...\t\t get details of device type with the id \"7ed34q...\"`
+            );
+            log(
+                `    mc device-types --mode template --devicetype Pump \n\tcreate a template file (Pump.devicetype.mdsp.json) for device type Pump`
+            );
+            log(
+                `    mc device-types --mode create --file Pump.devicetype.mdsp.json \n\tcreate device type Pump in MindSphere`
             );
             log(`    mc device-types --mode delete --id 7ed34q...\t delete the device type with the id \"7ed34q...\"`);
             serviceCredentialLog();
@@ -100,11 +106,11 @@ async function createDeviceType(options: any, sdk: MindSphereSdk) {
 async function createTemplate(options: any, sdk: MindSphereSdk) {
     const tenant = sdk.GetTenant();
     const templateType = {
-        name: `${tenant}.${options.devicetype}`,
-        description: "",
+        name: `${tenant}.${options.devicetype || "<devicetype>"}`,
+        description: "created by mindsphere CLI",
         owner: `${sdk.GetTenant()}`,
-        code: options.code || `${tenant}.${options.devicetype}`,
-        assetTypeId: options.assettype || "7ed34q...",
+        code: options.code || `${tenant}.${options.devicetype || "<devicetype>"}`,
+        assetTypeId: options.assettype || "<your assetid>",
         properties: {
             key1: "value1",
             key2: "value2",
@@ -115,18 +121,25 @@ async function createTemplate(options: any, sdk: MindSphereSdk) {
 }
 
 function writeDeviceTypeToFile(options: any, templateType: any) {
-    const fileName = options.file || `${options.devicetype}.id.mdsp.json`;
-    fs.writeFileSync(fileName, JSON.stringify(templateType, null, 2));
+    const fileName = options.file || `openedge.devicetype.mdsp.json`;
+    const filePath = path.resolve(fileName);
+
+    fs.existsSync(filePath) &&
+        !options.overwrite &&
+        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+
+    fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
         `The data was written into ${color(
-            fileName
+            filePath
         )} run \n\n\tmc device-types --mode create --file ${fileName} \n\nto create the device type`
     );
 }
 
 async function deleteDeviceType(options: any, sdk: MindSphereSdk) {
     const id = (options.id! as string) ? options.id : `${options.id}`;
-    const deviceType = await sdk.GetDeviceManagementClient().GetDeviceType(id);
+    // !important! this will not work (no support in mindsphere)
+    // !but we are leaving it here for future
     await sdk.GetDeviceManagementClient().DeleteDeviceType(id);
     console.log(`Device type with id ${color(id)} deleted.`);
 }
@@ -145,7 +158,7 @@ async function listDeviceTypes(sdk: MindSphereSdk, options: any) {
             size: 100,
             sort: "id,asc",
             owner: options.owner,
-            assetTypeId: options.assettype
+            assetTypeId: options.assettype,
         };
         deviceTypes = (await retry(options.retry, () =>
             deviceMgmt.GetDeviceTypes(filter)
@@ -157,11 +170,7 @@ async function listDeviceTypes(sdk: MindSphereSdk, options: any) {
         for (const id of deviceTypes.content || []) {
             deviceCount++;
             console.log(
-                `${color(
-                    id.id)
-                }\t${id.owner}\t${id.code}\t${id.assetTypeId}\t${color(
-                    id.name
-                )}\t${id.createdAt}`
+                `${color(id.id)}\t${id.owner}\t${id.code}\t${id.assetTypeId}\t${color(id.name)}\t${id.createdAt}`
             );
             verboseLog(JSON.stringify(id, null, 2), options.verbose);
         }
@@ -171,21 +180,12 @@ async function listDeviceTypes(sdk: MindSphereSdk, options: any) {
 }
 
 async function deviceTypeInfo(options: any, sdk: MindSphereSdk) {
-    const id = (options.id! as string).includes(".")
-        ? options.id
-        : `${options.id}`;
+    const id = (options.id! as string).includes(".") ? options.id : `${options.id}`;
     const deviceType = await sdk.GetDeviceManagementClient().GetDeviceType(id);
-    console.log(JSON.stringify(deviceType, null, 2));
+    printObjectInfo("Device Type", deviceType, options, ["id", "code", "name", "status"], color);
 }
 
 function checkRequiredParameters(options: any) {
-    options.mode === "template" &&
-        !options.devicetype &&
-        errorLog(
-            "you have to provide device type to create a template (see mc device-types --help for more details)",
-            true
-        );
-
     options.mode === "create" &&
         !options.file &&
         errorLog(
@@ -195,7 +195,10 @@ function checkRequiredParameters(options: any) {
 
     options.mode === "delete" &&
         !options.id &&
-        errorLog("you have to provide the id of the device type to delete (see mc device-types --help for more details)", true);
+        errorLog(
+            "you have to provide the id of the device type to delete (see mc device-types --help for more details)",
+            true
+        );
 
     options.mode === "info" &&
         !options.id &&

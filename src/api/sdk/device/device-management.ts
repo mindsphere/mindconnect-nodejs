@@ -55,7 +55,7 @@ export class DeviceManagementClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/deviceTypes?${toQueryString({owner, code, assetTypeId, page, size, sort})}`,
+            baseUrl: `${this._baseUrl}/deviceTypes?${toQueryString({ owner, code, assetTypeId, page, size, sort })}`,
             additionalHeaders: { "Content-Type": "application/json" },
         });
 
@@ -73,15 +73,13 @@ export class DeviceManagementClient extends SdkClient {
      * @example await deviceManagement.GetDeviceType("mdsp.EnvironmentDevice")
      * @memberOf DeviceManagementClient
      */
-     public async GetDeviceType(
-        id: string
-    ): Promise<DeviceManagementModels.DeviceType> {
+    public async GetDeviceType(id: string): Promise<DeviceManagementModels.DeviceType> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceManagementModels.RequiredError(
-                    "id",
-                    "Required parameter id was null or undefined when calling GetDeviceType."
-                );
+                "id",
+                "Required parameter id was null or undefined when calling GetDeviceType."
+            );
         }
         const result = await this.HttpAction({
             verb: "GET",
@@ -104,15 +102,15 @@ export class DeviceManagementClient extends SdkClient {
      * @example await deviceManagement.PostDeviceType (myDeviceType)
      * @memberOf DeviceManagementClient
      */
-     public async PostDeviceType(
+    public async PostDeviceType(
         deviceType: DeviceManagementModels.DeviceType
     ): Promise<DeviceManagementModels.DeviceType> {
         // verify required parameter 'deviceType' is not null or undefined
         if (deviceType === null || deviceType === undefined) {
             throw new DeviceManagementModels.RequiredError(
-                    "deviceType",
-                    "Required parameter deviceType was null or undefined when calling PostDeviceType."
-                );
+                "deviceType",
+                "Required parameter deviceType was null or undefined when calling PostDeviceType."
+            );
         }
 
         const result = await this.HttpAction({
@@ -145,16 +143,16 @@ export class DeviceManagementClient extends SdkClient {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceManagementModels.RequiredError(
-                    "id",
-                    "Required parameter id was null or undefined when calling PatchDeviceType."
-                );
+                "id",
+                "Required parameter id was null or undefined when calling PatchDeviceType."
+            );
         }
         // verify required parameter 'deviceType' is not null or undefined
         if (deviceType === null || deviceType === undefined) {
             throw new DeviceManagementModels.RequiredError(
-                    "deviceType",
-                    "Required parameter deviceType was null or undefined when calling PatchDeviceType."
-                );
+                "deviceType",
+                "Required parameter deviceType was null or undefined when calling PatchDeviceType."
+            );
         }
 
         const result = await this.HttpAction({
@@ -170,7 +168,7 @@ export class DeviceManagementClient extends SdkClient {
     }
 
     /**
-    * Deletes the device type with the specified id # Idempotency # This endpoint provides idempotent deletes, i.e., repeated deletes to the same resource will always return 204 responses regardless whether the resource existed in the first place or not.
+     * Deletes the device type with the specified id # Idempotency # This endpoint provides idempotent deletes, i.e., repeated deletes to the same resource will always return 204 responses regardless whether the resource existed in the first place or not.
      * @summary Delete devicetype
      * @param {string} id id of the device tye
      *
@@ -178,7 +176,7 @@ export class DeviceManagementClient extends SdkClient {
      *
      * @memberOf DeviceManagementClient
      */
-     public async DeleteDeviceType(id: string) {
+    public async DeleteDeviceType(id: string) {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceManagementModels.RequiredError(
@@ -187,13 +185,21 @@ export class DeviceManagementClient extends SdkClient {
             );
         }
 
-        await this.HttpAction({
-            verb: "DELETE",
-            gateway: this.GetGateway(),
-            authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/deviceTypes/${id}`,
-            noResponse: true,
-        });
+        try {
+            await this.HttpAction({
+                verb: "DELETE",
+                gateway: this.GetGateway(),
+                authorization: await this.GetToken(),
+                baseUrl: `${this._baseUrl}/deviceTypes/${id}`,
+                noResponse: true,
+            });
+        } catch (error) {
+            console.error(
+                "At the time of creation of this client (May 2021), MindSphere didn't have any support for DELETE operation on  device-types."
+            );
+            console.error("This was reported to mindsphere development team and should eventually start working.");
+            throw error;
+        }
     }
 
     /**
@@ -228,7 +234,7 @@ export class DeviceManagementClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/devices?${toQueryString({assetId, page, size})}`,
+            baseUrl: `${this._baseUrl}/devices?${toQueryString({ assetId, page, size })}`,
             additionalHeaders: { "Content-Type": "application/json" },
         });
 
@@ -245,15 +251,13 @@ export class DeviceManagementClient extends SdkClient {
      * @example await deviceManagement.GetDevice("mdsp.EnvironmentDevice")
      * @memberOf DeviceManagementClient
      */
-     public async GetDevice(
-        id: string
-    ): Promise<DeviceManagementModels.Device> {
+    public async GetDevice(id: string): Promise<DeviceManagementModels.Device> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceManagementModels.RequiredError(
-                    "id",
-                    "Required parameter id was null or undefined when calling GetDevice."
-                );
+                "id",
+                "Required parameter id was null or undefined when calling GetDevice."
+            );
         }
         const result = await this.HttpAction({
             verb: "GET",
@@ -277,23 +281,23 @@ export class DeviceManagementClient extends SdkClient {
      * @example await deviceManagement.PatchDevice("mdsp.EnvironmentDevice", myDevice;Metadata)
      * @memberOf DeviceManagementClient
      */
-     public async PatchDevice(
+    public async PatchDevice(
         id: string,
         deviceMetadata: DeviceManagementModels.DeviceUpdate
     ): Promise<DeviceManagementModels.Device> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceManagementModels.RequiredError(
-                    "id",
-                    "Required parameter id was null or undefined when calling PatchDevice."
-                );
+                "id",
+                "Required parameter id was null or undefined when calling PatchDevice."
+            );
         }
         // verify required parameter 'deviceMetadata' is not null or undefined
         if (deviceMetadata === null || deviceMetadata === undefined) {
             throw new DeviceManagementModels.RequiredError(
-                    "deviceMetadata",
-                    "Required parameter deviceMetadata was null or undefined when calling PatchDevice."
-                );
+                "deviceMetadata",
+                "Required parameter deviceMetadata was null or undefined when calling PatchDevice."
+            );
         }
 
         const result = await this.HttpAction({
@@ -318,15 +322,15 @@ export class DeviceManagementClient extends SdkClient {
      * @example await deviceManagement.PostDeviceType (myDeviceType)
      * @memberOf DeviceManagementClient
      */
-     public async PostDevice(
+    public async PostDevice(
         deviceMetadata: DeviceManagementModels.DeviceCreation
     ): Promise<DeviceManagementModels.Device> {
         // verify required parameter 'deviceType' is not null or undefined
         if (deviceMetadata === null || deviceMetadata === undefined) {
             throw new DeviceManagementModels.RequiredError(
-                    "deviceMetadata",
-                    "Required parameter deviceMetadata was null or undefined when calling PostDevice."
-                );
+                "deviceMetadata",
+                "Required parameter deviceMetadata was null or undefined when calling PostDevice."
+            );
         }
 
         const result = await this.HttpAction({
@@ -342,7 +346,7 @@ export class DeviceManagementClient extends SdkClient {
     }
 
     /**
-    * Deletes the device with the specified id # Idempotency # This endpoint provides idempotent deletes, i.e., repeated deletes to the same resource will always return 204 responses regardless whether the resource existed in the first place or not.
+     * Deletes the device with the specified id # Idempotency # This endpoint provides idempotent deletes, i.e., repeated deletes to the same resource will always return 204 responses regardless whether the resource existed in the first place or not.
      * @summary Delete device
      * @param {string} id id of the device
      *
@@ -350,7 +354,7 @@ export class DeviceManagementClient extends SdkClient {
      *
      * @memberOf DeviceManagementClient
      */
-     public async DeleteDevice(id: string) {
+    public async DeleteDevice(id: string) {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceManagementModels.RequiredError(
