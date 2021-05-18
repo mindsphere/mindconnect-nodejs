@@ -28,7 +28,7 @@ export default (program: CommanderStatic) => {
             "on [data | asset]", // NOTE: 29/04/2021 - batch are excluded for now
             "data"
         )
-        .option("-d, --data <data>", "time serie data file", "timeseries.mdsp.json")
+        .option("-d, --data <data>", "time series data file", "timeseries.mdsp.json")
 
         .option("-e, --epsilon <epsilon>", "threshold distance")
         .option("-s, --clustersize <clustersize>", "minimum cluster size")
@@ -126,7 +126,7 @@ async function createTemplate(options: any, sdk: MindSphereSdk) {
     fs.writeFileSync(fileName, JSON.stringify(generatedData, null, 2));
 
     console.log(
-        `The time serie data was written into ${color(
+        `The time series data was written into ${color(
             fileName
         )}.\nRun \n\n\tmc ad --mode train --on data --data ${fileName} --epsilon 50.0 \n\nto create the model.\n`
     );
