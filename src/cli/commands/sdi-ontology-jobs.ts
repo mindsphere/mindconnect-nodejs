@@ -90,7 +90,7 @@ async function dataOntologyJobInfo(sdk: MindSphereSdk, options: any) {
 }
 
 function printDataOntologyJob(dataOntology: object, options: any) {
-    printObjectInfo("Data Ontology Job:", dataOntology, options, ["ontologyId", "category", "filePattern"], color);
+    printObjectInfo("Submit Ontology Job:", dataOntology, options, ["id", "status"], color);
 }
 
 async function submitOntology(sdk: MindSphereSdk, options: any) {
