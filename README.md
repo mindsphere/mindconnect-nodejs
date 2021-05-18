@@ -374,10 +374,10 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 
 | Name |SDK - Client | Command |
 | --- | --- | --- |
+| Device Management   | :heavy_check_mark: | :heavy_check_mark:  |
+| Device Status   | :heavy_check_mark: | :heavy_check_mark: |
 | Deployment Workflow   |  |  |
 | Device Configuration   |  |  |
-| Device Management   |  |  |
-| Device Status   |  |  |
 | Edge App Deployment   |  |  |
 | Edge App Instance Management   |  |  |
 | Firmware Deployment   |  |  |
@@ -387,8 +387,8 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 | Name |SDK - Client | Command |
 | --- | --- | --- |
 | SDI Data Management   | :heavy_check_mark:   | :heavy_check_mark: |
-| SDI Data Query   | :heavy_check_mark:  |  |
-| SDI Semantic Modelling   | :heavy_check_mark:  |  |
+| SDI Data Query   | :heavy_check_mark:  | :heavy_check_mark: |
+| SDI Semantic Modelling   | :heavy_check_mark:  | :heavy_check_mark: |
 
 ### Example
 

@@ -103,3 +103,6 @@ mindconnect-nodejs-win.exe
 *.mdsp.js
 *.mdsp.py
 /.venv
+
+# Webstorm
+.idea

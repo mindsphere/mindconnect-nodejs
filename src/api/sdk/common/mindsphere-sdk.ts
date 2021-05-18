@@ -3,6 +3,8 @@ import { AnomalyDetectionClient } from "../anomaly-detection/anomaly-detection";
 import { AssetManagementClient } from "../asset/asset-management";
 import { DataExchangeClient } from "../data-exchange/data-exchange";
 import { DataLakeClient } from "../data-lake/data-lake";
+import { DeviceStatusManagementClient } from "../device-status/device-status-management";
+import { DeviceManagementClient } from "../device/device-management";
 import { EventAnalyticsClient } from "../event-analytics/eventanalytics";
 import { EventManagementClient } from "../event/event-management";
 import { IdentityManagementClient } from "../identity/identity";
@@ -309,6 +311,35 @@ export class MindSphereSdk extends SdkClient {
     public GetTenantManagementClient(): TenantManagementClient {
         this._tenantManagementClient = this._tenantManagementClient || new TenantManagementClient(this._authenticator);
         return this._tenantManagementClient;
+    }
+
+    private _deviceManagementClient?: DeviceManagementClient;
+
+    /**
+     * * Device Management Client
+     *
+     * @returns {DeviceManagementClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetDeviceManagementClient(): DeviceManagementClient {
+        this._deviceManagementClient = this._deviceManagementClient || new DeviceManagementClient(this._authenticator);
+        return this._deviceManagementClient;
+    }
+
+    private _deviceStatusManagementClient?: DeviceStatusManagementClient;
+
+    /**
+     * * Device Status Management client
+     *
+     * @returns {DeviceStatusManagementClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetDeviceStatusManagementClient(): DeviceStatusManagementClient {
+        this._deviceStatusManagementClient =
+            this._deviceStatusManagementClient || new DeviceStatusManagementClient(this._authenticator);
+        return this._deviceStatusManagementClient;
     }
 
     private _modelManagementClient?: ModelManagementClient;

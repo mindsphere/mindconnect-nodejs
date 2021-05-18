@@ -11,6 +11,9 @@ import dataExchangeCommand from "./commands/data-exchange";
 import dataLakeCommand from "./commands/data-lake";
 import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
+import deviceCommand from "./commands/devices";
+import deviceStatusCommand from "./commands/device-status";
+import deviceTypeCommand from "./commands/device-types";
 import downloadEventsCommand from "./commands/download-events";
 import eventTypesCommand from "./commands/event-types";
 import eventsCommand from "./commands/events";
@@ -108,6 +111,9 @@ eventsCommand(program);
 downloadEventsCommand(program);
 aggregatesCommand(program);
 notificationCommand(program);
+deviceTypeCommand(program);
+deviceCommand(program);
+deviceStatusCommand(program);
 
 // * tenant commands
 
@@ -155,7 +161,7 @@ signalCalculationCommand(program);
 trendPredictionCommand(program);
 kpicalculationCommand(program);
 eventAnalyticsCommand(program);
-// * models commnds
+// * models commands
 modelsCommand(program);
 jobsCommand(program);
 scheduleCommand(program);
