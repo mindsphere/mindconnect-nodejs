@@ -3,6 +3,7 @@ import { log } from "console";
 import * as fs from "fs";
 import { DeviceStatusModels, retry } from "../..";
 import { DeviceManagementModels, MindSphereSdk } from "../../api/sdk";
+import { throwError } from "../../api/utils";
 import {
     adjustColor,
     errorLog,
@@ -30,7 +31,7 @@ export default (program: CommanderStatic) => {
         )
         .option("-w, --softwaretype [APP|FIRMWARE]", "software type [ APP | FIRMWARE ]")
         .option("-s, --softwareid <softwareid>", "software id")
-        .option("-f, --file <file>", ".mdsp.json file with update information definition")
+        .option("-f, --file <file>", "openedge.*.mdsp.json file with update information definition")
         .option("-o, --overwrite", "overwrite template file if it already exists")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
@@ -51,7 +52,7 @@ export default (program: CommanderStatic) => {
                             break;
 
                         case "template":
-                            await createTemplate(options, sdk);
+                            await createTemplate(options);
                             console.log("Edit the file before submitting it to MindSphere.");
                             break;
 
@@ -74,31 +75,46 @@ export default (program: CommanderStatic) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc device-status --mode list --deviceid 12345...\t\t\t\t\tlist all installed software on the device with the id \"12345...\"`
+                `    mc device-status --mode list --deviceid <deviceid>\n\
+                            list all installed software on the device`
             );
             log(
-                `    mc device-status --mode list --deviceid 12345... --softwaretype APP \t\tlist all software (firmware, apps, etc) installed on the device of type \"APP\" on the device with the id \"12345...\"`
+                `    mc device-status --mode list --deviceid 12345... --softwaretype APP\n \
+                            list all apps installed on the device`
             );
             log(
-                `    mc device-status --mode info --target health --deviceid 7ed34q...\t\t\tget the health status information of the device with the id \"7ed34q...\"`
+                `    mc device-status --mode info --target health --deviceid <deviceid>\n \
+                            get the device health status`
             );
             log(
-                `    mc device-status --mode info --target health-config-data --deviceid 7ed34q...\tget the health config data of the device with the id \"7ed34q...\"`
+                `    mc device-status --mode info --target health-config-data --deviceid <deviceid>\n \
+                            get the device health config data`
+            );
+
+            log(
+                `    mc device-status --mode info --target inventory --deviceid <deviceid>\n \
+                            get the software inventory of the device`
+            );
+
+            log(
+                `    mc device-status --mode info --target connection-status --deviceid <deviceid>\n \
+                            get the device connection status`
             );
             log(
-                `    mc device-status --mode info --target inventory --deviceid 7ed34q...\t\tget the software inventory of the device with the id \"7ed34q...\"`
+                `    mc device-status --mode template --target inventory\n \
+                            create template file for software inventory`
             );
             log(
-                `    mc device-status --mode info --target connection-status --deviceid 7ed34q...\tget the connection status the device with the id \"7ed34q...\"`
+                `    mc device-status --mode template --target connection-status \n \
+                            create template file for connection status`
             );
             log(
-                `    mc device-status --mode template --target inventory \t\t\t\tcreate a template file (inventory.id.mdsp.json) for the software inventory of a device`
+                `    mc device-status --mode update --target inventory --file openedge.inventory.mdsp.json --deviceid <deviceid>\n \
+                            update the software inventory of the device`
             );
             log(
-                `    mc device-status --mode update --target inventory --file inventory.id.mdsp.json --deviceid 7ed34q...\n\tpath the software inventory of the device with the device id \"7ed34q...\" using the file inventory.id.mdsp.json`
-            );
-            log(
-                `    mc device-status --mode update --target connection-status --deviceid 7ed34q...\tsend a heatbeat to the device with the device id \"7ed34q...\"`
+                `    mc device-status --mode update --target connection-status --deviceid <deviceid>\n \
+                            send a heartbeat to the device`
             );
             serviceCredentialLog();
         });
@@ -148,7 +164,7 @@ async function createDeviceStatusInfo(options: any, sdk: MindSphereSdk) {
     }
 }
 
-async function createTemplate(options: any, sdk: MindSphereSdk) {
+async function createTemplate(options: any) {
     const now = new Date();
     let template = {};
     switch (options.target) {
@@ -186,12 +202,12 @@ async function createTemplate(options: any, sdk: MindSphereSdk) {
                 },
             ];
             if (options.softwaretype && options.softwaretype === "APP") {
-                _template.slice(0, 0);
+                template = _template[1];
+            } else if (options.softwaretype && options.softwaretype === "FIRMWARE") {
+                template = _template[0];
+            } else {
+                template = _template;
             }
-            if (options.softwaretype && options.softwaretype === "FIRMWARE") {
-                _template.slice(1, 1);
-            }
-            template = _template;
             break;
         case "connection-status":
             errorLog(
@@ -207,12 +223,18 @@ async function createTemplate(options: any, sdk: MindSphereSdk) {
 }
 
 function writeDeviceTypeToFile(options: any, templateType: any) {
-    const fileName = options.file || `${options.target}.id.mdsp.json`;
-    fs.writeFileSync(fileName, JSON.stringify(templateType, null, 2));
+    const fileName = options.file || `openedge.${options.target}.mdsp.json`;
+    const filePath = path.resolve(fileName);
+
+    fs.existsSync(filePath) &&
+        !options.overwrite &&
+        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+
+    fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
-        `The data was written into ${color(
-            fileName
-        )} run \n\n\tmc device-status --mode update --deviceid 12345... --target ${options.target} ${
+        `The data was written into ${color(fileName)} run \n\n\tmc device-status --mode update --deviceid ${
+            options.deviceid || "<deviceid>"
+        } --target ${options.target} ${
             options.softwaretype ? "--softwaretype " + options.softwaretype : ""
         } --file ${fileName} \n\nto update the device status`
     );

@@ -76,17 +76,15 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
+            log(`    mc devices --mode list --assetid <assetid>\t\tlist all devices linked to the asset`);
+            log(`    mc devices --mode info --id <deviceid>\t\tget device details`);
+            log(`    mc devices --mode template \t\t\t\tcreate a template file for a new device`);
+            log(`    mc devices --mode delete --id <devieceid>\t\tdelete the device with the specified id`);
             log(
-                `    mc devices --mode list --assetid 12345...\t\tlist all devices linked to the asset with the id \"12345...\"`
+                `    mc devices --mode create --file openedge.device.mdsp.json \n \
+                            create new device using the file openedge.device.mdsp.json`
             );
-            log(`    mc devices --mode info --id 7ed34q...\t\tget details of device with the id \"7ed34q...\"`);
-            log(
-                `    mc devices --mode template --devicename Pump01\tcreate a template file (Pump01.id.mdsp.json) for a new device with the name \"Pump01\"`
-            );
-            log(
-                `    mc devices --mode create --file Pump01.id.mdsp.json \n\tcreate device Pump in MindSphere using the file Pump01.id.mdsp.json`
-            );
-            log(`    mc devices --mode delete --id 7ed34q...\t\tdelete the device with the id \"7ed34q...\"`);
+
             serviceCredentialLog();
         });
 };
@@ -105,7 +103,7 @@ async function createDevice(options: any, sdk: MindSphereSdk) {
 async function createTemplate(options: any, sdk: MindSphereSdk) {
     const tenant = sdk.GetTenant();
     const template = {
-        name: `${tenant}.${options.devicename}`,
+        name: `${tenant}.${options.devicename || "<devicename>"}`,
         description: options.desc,
         deviceTypeId: options.typeid || `12345...`,
         serialNumber: options.serialnumber || `7d018c...`,

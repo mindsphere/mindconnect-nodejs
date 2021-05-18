@@ -79,16 +79,14 @@ export default (program: CommanderStatic) => {
             log(
                 `    mc device-types --mode list --owner siemens\t\t list all device types which belongs to \"siemens\"`
             );
+            log(`    mc device-types --mode info --id <deviceid>\t\t get details of device type with the device id"`);
             log(
-                `    mc device-types --mode info --id 7ed34q...\t\t get details of device type with the id \"7ed34q...\"`
+                `    mc device-types --mode template --devicetype board \n\tcreate a template file for specified device type`
             );
             log(
-                `    mc device-types --mode template --devicetype Pump \n\tcreate a template file (Pump.devicetype.mdsp.json) for device type Pump`
+                `    mc device-types --mode create --file board.devicetype.mdsp.json \n\tcreate device type board in MindSphere`
             );
-            log(
-                `    mc device-types --mode create --file Pump.devicetype.mdsp.json \n\tcreate device type Pump in MindSphere`
-            );
-            log(`    mc device-types --mode delete --id 7ed34q...\t delete the device type with the id \"7ed34q...\"`);
+            log(`    mc device-types --mode delete --id <devicetype>\t delete the device type with the device id`);
             serviceCredentialLog();
         });
 };
