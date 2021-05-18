@@ -494,60 +494,82 @@ Options:
   -h, --help                          display help for command
 
 Commands:
-  onboard|ob [options]                onboard the agent with configuration
-                                      stored in the config file
-  configure-agent|co [options]        create data source configuration and
-                                      mappings (optional: passkey) *
-  agent-token|atk [options]           displays the agent token for use in
-                                      other tools (e.g. postman)
-  upload-timeseries|ts [options]      parse .csv file with timeseriesdata and
-                                      upload the timeseries data to mindsphere
-  upload-file|uf [options]            upload the file to the mindsphere file
-                                      service (optional: passkey) *
-  create-event|ce [options]           create an event in the mindsphere
-                                      (optional: passkey) *
-  agent-status|as [options]           displays the agent status and agent
-                                      onboarding status *
+  onboard|ob [options]                onboard the agent with configuration stored in the config file
+  configure-agent|co [options]        create data source configuration and mappings (optional:
+                                      passkey) *
+  agent-token|atk [options]           displays the agent token for use in other tools (e.g. postman)
+  upload-timeseries|ts [options]      parse .csv file with timeseriesdata and upload the timeseries data to
+                                      mindsphere
+  upload-file|uf [options]            upload the file to the mindsphere file service (optional:
+                                      passkey) *
+  create-event|ce [options]           create an event in the mindsphere (optional: passkey) *
+  agent-status|as [options]           displays the agent status and agent onboarding status *
   create-agent|ca [options]           create an agent in the mindsphere *
   offboard-agent|of [options]         offboards the agent in the mindsphere *
   renew-agent|rn [options]            renews the agent secrets  *
-  service-credentials|sc [options]    provide login for commands which
-                                      require technical user credentials *
-  service-token|stk [options]         displays the service token for use in
-                                      other tools (e.g. postman) *
+  service-credentials|sc [options]    provide login for commands which require technical user credentials
+                                      *
+  service-token|stk [options]         displays the service token for use in other tools (e.g. postman) *
   register-diagnostic|rd [options]    register agent for diagnostic *
   get-diagnostic|gd [options]         get diagnostic information *
   unregister-diagnostic|ud [options]  unregister agent from diagnostic *
-  prepare-bulk|pb [options]           creates a template directory for
-                                      timeseries (bulk) upload *
-  run-bulk|rb [options]               runs the timeseries (bulk) upload job
-                                      from <directoryname> directory *
-  check-bulk|cb [options]             checks the progress of the upload jobs
-                                      from <directoryname> directory *
-  download-bulk|db [options]          download the timeseries from mindsphere
+  prepare-bulk|pb [options]           creates a template directory for timeseries (bulk) upload *
+  run-bulk|rb [options]               runs the timeseries (bulk) upload job from <directoryname> directory
+                                      *
+  check-bulk|cb [options]             checks the progress of the upload jobs from <directoryname> directory
+                                      *
+  download-bulk|db [options]          download the timeseries data in bulk from mindsphere *
+  asset-info|ai [options]             get infos about asset *
+  assets|ast [options]                list, create or delete assets *
+  asset-types|at [options]            list, create or delete asset types *
+  aspects|as [options]                list, create or delete aspects *
+  event-types|et [options]            list, create or delete event types *
+  events|ev [options]                 list, create or delete events *
+  events-bulk|dn [options]            download or delete the events in bulk *
+  aggregates|ag [options]             list timeseries aggregates *
+  notifications|nt [options]          send email, sms and push notifications *
+  device-types|dt [options]           list, create or delete device types (open edge) *
+  devices|dv [options]                list, create or delete (open edge) devices *
+  device-status|ds [options]          list, get, or update (open edge) device status information *
+  tenant|ti [options]                 create or delete tenant legal configuration and logo *
+  subtenants|st [options]             list, create or delete subtenants *
   list-assets|la [options]            list assets in the tenant *
-  delete-asset|da [options]           delete asset with id <assetid> from
-                                      mindsphere *
+  delete-asset|da [options]           delete asset with id <assetid> from mindsphere *
   list-files|ls [options]             list files stored with the asset *
-  download-file|df [options]          download the file from mindsphere file
-                                      service *
-  delete-file|de [options]            delete the file from mindsphere file
-                                      service *
+  download-file|df [options]          download the file from mindsphere file service *
+  delete-file|de [options]            delete the file from mindsphere file service *
   identity-management|iam [options]   manage mindsphere users and groups *
-  spectrum-analysis|sp [options]      perform spectrum analysis on a sound
-                                      file @
+  data-lake|dlk [options]             manage data lake, data lake access permissions and STS tokens *
+  sdi-data-lakes|sdl [options]        manage data lakes for SDI *
+  sdi-data-registries|sdr [options]   manage data registries for SDI *
+  sdi-iot-registries|sdt [options]    manage iot data registries for SDI *
+  sdi-data-types|sdy [options]        manage data types for SDI *
+  sdi-file-upload|sdu [options]       upload file to SDI *
+  sdi-ingest-jobs|sdj [options]       manage ingest jobs for SDI *
+  sdi-search-schemas|sds [options]    search SDI schemas *
+  sdi-data-queries|sdq [options]      manage data queries for SDI *
+  sdi-execution-jobs|sdx [options]    manage data execution jobs for SDI *
+  sdi-ontologies|sdo [options]        manage ontologies for SDI *
+  sdi-ontology-jobs|sdb [options]     manage ontology jobs for SDI *
+  mobile-apps|mb [options]            list, create or delete mobile apps *
+  mobile-app-instances|mbi [options]  list, create or delete mobile app instances *
+  spectrum-analysis|sp [options]      perform spectrum analysis on a sound file @
   signal-validation|sv [options]      perform signal validation @
-  trend-prediction|tp [options]       perform trend prediction
-                                      (linear/polynomial) @
+  signal-calculation|cal [options]    process timeseries data *
+  trend-prediction|tp [options]       perform trend prediction (linear/polynomial) @
   kpi-calculation|kp [options]        calculate kpi states or compute kpis @
-  dev-proxy|px [options]              starts mindsphere development proxy
-                                      (optional passkey) *
-  mqtt-createjwt|jw [options]         creates a signed token for opcua pub
-                                      sub authentication #
-  starter-ts|st [options]             creates a starter project in typescript
-                                      #
-  starter-js|sj [options]             creates a starter project in javascript
-                                      #
+  event-analytics|ea [options]        analyze mindsphere events @
+  models|ml [options]                 list, create or delete analytic models *
+  jobs|jb [options]                   list, create or stop jobs *
+  schedules|js [options]              list, create, start, stop or delete job schedules *
+  data-exchange|dx [options]          list, upload, download and manage data exchange files and directories
+                                      *
+  anomaly-detection|ad [options]      train anomaly detection models and detect timeseries anomalies *
+  dev-proxy|px [options]              starts mindsphere development proxy & (optional passkey)
+                                      *
+  mqtt-createjwt|jw [options]         creates a signed token for opcua pub sub authentication #
+  starter-ts|st [options]             creates a starter project in typescript #
+  starter-js|sj [options]             creates a starter project in javascript #
   help [command]                      display help for command
 
   Documentation:
