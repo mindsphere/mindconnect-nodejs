@@ -1,8 +1,7 @@
 import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
-import { inferOntologyTemplate } from "./infer-ontology-template";
-import { sdiDataTemplate } from "./sdi-data-template";
 import { SemanticDataInterconnectModels } from "./sdi-models";
+import { sdiTemplate } from "./sdi-template";
 
 /**
  * The Semantic Data Interconnect (SDI) is a collection of APIs that allows the user
@@ -629,7 +628,7 @@ export class SemanticDataInterconnectClient extends SdkClient {
      * @memberOf SemanticDataInterconnectClient
      */
     public async DataUpload(fileName: string, buffer: Buffer, mimetype?: string) {
-        const body = sdiDataTemplate(fileName, buffer, mimetype);
+        const body = sdiTemplate(fileName, buffer, mimetype);
 
         const result = await this.HttpAction({
             verb: "POST",
@@ -638,7 +637,6 @@ export class SemanticDataInterconnectClient extends SdkClient {
             baseUrl: `${this._baseUrl}/dataUpload`,
             body: body,
             multiPartFormData: true,
-            additionalHeaders: { enctype: "multipart/form-data" },
         });
         return result as SemanticDataInterconnectModels.SdiFileUploadResponse;
     }
@@ -1214,15 +1212,12 @@ export class SemanticDataInterconnectClient extends SdkClient {
         ontologyDescription?: string,
         keyMappingType?: string
     ): Promise<SemanticDataInterconnectModels.OntologyJob> {
-        const body = inferOntologyTemplate(
-            fileName,
-            file,
-            mimetype,
+        const body = sdiTemplate(fileName, file, mimetype, {
             ontologyName,
             ontologyId,
             ontologyDescription,
-            keyMappingType
-        );
+            keyMappingType,
+        });
         const result = await this.HttpAction({
             verb: "POST",
             gateway: this.GetGateway(),
@@ -1230,7 +1225,6 @@ export class SemanticDataInterconnectClient extends SdkClient {
             baseUrl: `${this._baseUrl}/ontologyJobs`,
             body: body,
             multiPartFormData: true,
-            additionalHeaders: { enctype: "multipart/form-data" },
         });
         return result as SemanticDataInterconnectModels.OntologyJob;
     }

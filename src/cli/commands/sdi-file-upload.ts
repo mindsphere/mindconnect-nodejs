@@ -60,7 +60,11 @@ export default (program: CommanderStatic) => {
                     !options.verbose && spinner.succeed("Done");
 
                     log(`Upload time: ${(endDate.getTime() - startDate.getTime()) / 1000} seconds`);
-                    log(`\nYour file ${color(uploadFile)} with ${color(result.filePath)} was succesfully uploaded.\n`);
+                    log(
+                        `\nYour file ${color(uploadFile)} (SDI Name: ${color(
+                            result.filePath
+                        )}) was succesfully uploaded.\n`
+                    );
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }

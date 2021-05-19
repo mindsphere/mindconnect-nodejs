@@ -28,7 +28,7 @@ export default (program: CommanderStatic) => {
             "on [data | asset]", // NOTE: 29/04/2021 - batch are excluded for now
             "data"
         )
-        .option("-d, --data <data>", "time serie data file", "timeseries.mdsp.json")
+        .option("-d, --data <data>", "time series data file", "timeseries.mdsp.json")
 
         .option("-e, --epsilon <epsilon>", "threshold distance")
         .option("-s, --clustersize <clustersize>", "minimum cluster size")
@@ -79,19 +79,24 @@ export default (program: CommanderStatic) => {
 
 function printHelp() {
     log("\n  Examples:\n");
-    log(`    mc ad --mode template --data timeseries.data.mdsp.json \t creates a template for a time serie data file`);
+    log(`    mc ad --mode template --data timeseries.data.mdsp.json \n \
+                creates a template for a time series data file`);
     log(
-        `    mc ad --mode train --on data --data timeseries.data.mdsp.json --epsilon 0.5 \n\t\t\t\t\t\t\t\t trains a model on the timeserie specified in the data file`
+        `    mc ad --mode train --on data --data timeseries.data.mdsp.json --epsilon 0.5 \n
+                trains a model on the timeserie specified in the data file`
     );
     log(
-        `    mc ad --mode detect --on data --data timeseries.data.mdsp.json --modelid 123456...ef\n\t\t\t\t\t\t\t\t detects anomalities of the timeserie specified in the data file using the model with the id 132456...ef`
+        `    mc ad --mode detect --on data --data timeseries.data.mdsp.json --modelid <modelid>\n \
+                detects anomalities of the timeseries in the data file using the model with specified id`
     );
 
     log(
-        `    mc ad --mode train --on asset --asssetid 1234567..ef --aspectname Environment --epsilon 0.5\n\t\t\t\t\t\t\t\t trains a model on the time series of the aspect "Environment" of the asset with the id "1234567..ef"`
+        `    mc ad --mode train --on asset --assetid <assetid> --aspectname Environment --epsilon 0.5\n\
+                trains a model on the time series of the aspect "Environment" of the asset with the id <assetid>`
     );
     log(
-        `    mc ad --mode detect --on asset --modelid 223456...ef --asssetid 1234567..ef --aspectname Environment --epsilon 0.5\n\t\t\t\t\t\t\t\t detect anomalities of the timeseries of the aspect "Environment" of the asset with the id "1234567..ef" using the model with the id "2234567..ef"`
+        `    mc ad --mode detect --on asset --modelid <modelid> --assetid <assetid> --aspectname Environment --epsilon 0.5\n\
+                detect anomalities of the timeseries on the specified asset and aspect with selected model`
     );
 
     serviceCredentialLog();
@@ -121,7 +126,7 @@ async function createTemplate(options: any, sdk: MindSphereSdk) {
     fs.writeFileSync(fileName, JSON.stringify(generatedData, null, 2));
 
     console.log(
-        `The time serie data was written into ${color(
+        `The time series data was written into ${color(
             fileName
         )}.\nRun \n\n\tmc ad --mode train --on data --data ${fileName} --epsilon 50.0 \n\nto create the model.\n`
     );
