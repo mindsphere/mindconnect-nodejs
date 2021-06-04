@@ -13,8 +13,6 @@ import {
     verboseLog,
 } from "./command-utils";
 
-const mime = require("mime-types");
-
 let color = getColor("magenta");
 let green = getColor("green");
 let red = getColor("red");
