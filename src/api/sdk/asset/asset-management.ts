@@ -1252,6 +1252,47 @@ export class AssetManagementClient extends SdkClient {
     }
 
     /**
+     * * Model Lock
+     *
+     * Provides lock state of an asset model at tenant level.
+     *
+     * @returns {Promise<AssetManagementModels.AssetModelLock>}
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async GetModelLock(): Promise<AssetManagementModels.AssetModelLock> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/model/lock`,
+        });
+        return result as AssetManagementModels.AssetModelLock;
+    }
+
+    /**
+     *
+     * * Model Lock
+     *
+     * Enable/disable lock state of asset model at tenant level, managing restrictions on update/delete operations on assettypes and aspecttypes.
+     *
+     * @param {{ enabled: boolean }} params
+     * @returns {Promise<AssetManagementModels.AssetModelLock>}
+     *
+     * @memberOf AssetManagementClient
+     */
+    public async PutModelLock(params: { enabled: boolean }): Promise<AssetManagementModels.AssetModelLock> {
+        const parameters = params || {};
+        const result = await this.HttpAction({
+            verb: "PUT",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/model/lock?${toQueryString(parameters)}`,
+        });
+        return result as AssetManagementModels.AssetModelLock;
+    }
+
+    /**
      * List all links for available resources
      *
      * @returns {Promise<AssetManagementModels.BillboardResource>}

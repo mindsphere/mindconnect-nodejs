@@ -4,6 +4,8 @@
 
 ### Bugfixes and Improvements 3.14.0
 
+- CLI: new `mc asset-lock` command [#271]
+- SDK: AssetManagement `GetModelLock` and `PutModelLock` Methods
 - Bumped all dependencies
 
 ## 3.13.0 - (Phlox Vienna) - May 2021
