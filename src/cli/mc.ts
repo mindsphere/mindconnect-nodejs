@@ -5,15 +5,16 @@ import eventAnalyticsCommand from "./commands/analyze-events";
 import anomalydetectionCommand from "./commands/anomaly-detection";
 import aspectCommands from "./commands/aspect-commands";
 import assetInfoCommand from "./commands/asset-info";
+import assetModelLockCommand from "./commands/asset-model-lock";
 import assetTypeCommand from "./commands/asset-types";
 import assetsCommand from "./commands/assets";
 import dataExchangeCommand from "./commands/data-exchange";
 import dataLakeCommand from "./commands/data-lake";
 import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
-import deviceCommand from "./commands/devices";
 import deviceStatusCommand from "./commands/device-status";
 import deviceTypeCommand from "./commands/device-types";
+import deviceCommand from "./commands/devices";
 import downloadEventsCommand from "./commands/download-events";
 import eventTypesCommand from "./commands/event-types";
 import eventsCommand from "./commands/events";
@@ -102,6 +103,7 @@ iotCheckBulkComand(program);
 iotDownloadBulkCommand(program);
 
 // * assets files and event handling commands
+assetModelLockCommand(program);
 assetInfoCommand(program);
 assetsCommand(program);
 assetTypeCommand(program);

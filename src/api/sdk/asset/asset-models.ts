@@ -2005,4 +2005,14 @@ export namespace AssetManagementModels {
     export interface VariableUpdateMap {
         [key: string]: VariableUpdate;
     }
+
+    /**
+     *
+     *
+     * @export
+     * @interface AssetModelLock
+     */
+    export interface AssetModelLock {
+        enabled: boolean;
+    }
 }
