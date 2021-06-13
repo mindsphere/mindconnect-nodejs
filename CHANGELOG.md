@@ -4,6 +4,7 @@
 
 ### Bugfixes and Improvements 3.14.0
 
+- CLI: the `mc signal-calculation` now has `--on data` and `--on asset` switch [#263]
 - CLI: new `mc asset-lock` command [#271]
 - SDK: AssetManagement `GetModelLock` and `PutModelLock` Methods
 - Bumped all dependencies
