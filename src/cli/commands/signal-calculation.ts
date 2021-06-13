@@ -14,7 +14,7 @@ import {
     homeDirLog,
     proxyLog,
     serviceCredentialLog,
-    verboseLog,
+    verboseLog
 } from "./command-utils";
 
 let color = getColor("blue");
@@ -23,11 +23,8 @@ export default (program: CommanderStatic) => {
     program
         .command("signal-calculation")
         .alias("cal")
-        .option(
-            "-m, --mode [template|templatedirect|calculate|calculatedirect]",
-            "template | templatedirect | calculate | calculatedirect",
-            "template"
-        )
+        .option("-m, --mode [template|calculate]", "template | calculate", "template")
+        .option("-o, --on [data|asset]", "on [data | asset]", "data")
         .option(
             "-f, --template <template>",
             ".mdsp.json template file default: (signal.[template|templatedirect].mdsp.json)"
@@ -54,20 +51,14 @@ export default (program: CommanderStatic) => {
 
                     switch (options.mode) {
                         case "template":
-                            createTemplate(options);
-                            console.log("Edit the files before submitting them to mindsphere.");
-                            break;
-
-                        case "templatedirect":
-                            createTemplateDirect(options);
+                            options.on === "data" && createTemplate(options);
+                            options.on === "asset" && createTemplateDirect(options);
                             console.log("Edit the files before submitting them to mindsphere.");
                             break;
 
                         case "calculate":
-                            await calculateSignal(options, sdk);
-                            break;
-                        case "calculatedirect":
-                            await calculateSignalDirect(options, sdk);
+                            options.on === "data" && (await calculateSignal(options, sdk));
+                            options.on === "asset" && (await calculateSignalDirect(options, sdk));
                             break;
                         default:
                             throw Error(`no such option: ${options.mode}`);
@@ -80,7 +71,7 @@ export default (program: CommanderStatic) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(`    mc signal-calculation --mode template \t create template file for signal calculation`);
-            log(`    mc signal-calculation --mode templatedirect --assetid <assetid> --aspect <aspect> --variable variable\n\
+            log(`    mc signal-calculation --mode template --on asset --assetid <assetid> --aspect <aspect> --variable variable\n\
                                             \t creates template for calculation using mindsphere timeseries data`);
             log(`    mc signal-calculation --mode calculate --template <filename> \n\
                                             \t calculates new signal from the timeseries specified in template file`);
@@ -92,7 +83,7 @@ export default (program: CommanderStatic) => {
                      --aspect <aspect>\n\
                                             \t calculates new signal from the timeseries specified in external file`);
 
-            log(`    mc signal-calculation --mode calculatedirect --template <filename> \n\
+            log(`    mc signal-calculation --mode calculate --on asset --template <filename> \n\
                                             \t calculates new signal from the mindsphere timeseries`);
 
             log(`\n  Operation List: \n`);
@@ -106,12 +97,16 @@ export default (program: CommanderStatic) => {
 };
 
 function checkRequiredParamaters(options: any) {
-    (options.mode === "calculate" || options.mode === "calculatedirect") &&
+    options.mode === "calculate" &&
         !options.template &&
         errorLog(
             "you have to provide a file with signal calculation parameters (see mc signal-calculation --help for more details)",
             true
         );
+
+    options.on !== "data" &&
+        options.on !== "asset" &&
+        errorLog("you have to specify if the calculation is applied --on data or --on asset", true);
 }
 
 function createTemplate(options: any) {
@@ -151,7 +146,7 @@ function createTemplate(options: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc signal-calculation --mode calculate --template ${fileName} \n\nto calculate the signal.`
+        )} run \n\n\tmc signal-calculation --mode calculate --on data --template ${fileName} \n\nto calculate the signal.`
     );
 }
 
@@ -189,7 +184,7 @@ function createTemplateDirect(options: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc signal-calculation --mode calculatedirect --template ${fileName} \n\nto calculate the signal.`
+        )} run \n\n\tmc signal-calculation --mode calculate --on asset --template ${fileName} \n\nto calculate the signal.`
     );
 }
 
