@@ -18,7 +18,7 @@ jobs:
     - name: Checkout Branch
       uses: actions/checkout@v2
 
-    - uses: sn0wcat/ms-teams-deploy-card@master
+    - uses: toko-bifrost/ms-teams-deploy-card@master
       if: always()
       with:
         github-token: ${{ github.token }}
@@ -42,15 +42,15 @@ jobs:
       env: 
         MDSP_PASSKEY: ${{ secrets.MDSP_PASSKEY }}
       run: |
-        npm run test-jenkins
+        npm run test-ci
 
     - name: Test Report
-      uses: sn0wcat/test-reporter@v1
+      uses: dorny/test-reporter@v1
       if: success() || failure()    
       with:
         name: Test Results            
-        path: report.xml            
-        reporter: jest-junit        
+        path: test-results.json            
+        reporter: mocha-json
 
     - name: run command line tests
       env: 
