@@ -42,7 +42,7 @@ jobs:
       env: 
         MDSP_PASSKEY: ${{ secrets.MDSP_PASSKEY }}
       run: |
-        npm run test-ci
+        npm run test-jenkins
 
     - name: Test Report
       uses: dorny/test-reporter@v1
