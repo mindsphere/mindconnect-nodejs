@@ -1,5 +1,5 @@
-import { toQueryString } from "../../utils";
-import { SdkClient } from "../common/sdk-client";
+import { toQueryString } from "../../../utils";
+import { SdkClient } from "../../common/sdk-client";
 import { DeviceStatusModels } from "./device-status-models";
 
 /**

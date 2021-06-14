@@ -1,7 +1,7 @@
 // noinspection JSValidateJSDoc
 
-import { toQueryString } from "../../utils";
-import { SdkClient } from "../common/sdk-client";
+import { toQueryString } from "../../../utils";
+import { SdkClient } from "../../common/sdk-client";
 import { DeviceManagementModels } from "./device-models";
 
 /**
