@@ -49,8 +49,8 @@ jobs:
       if: success() || failure()    
       with:
         name: Test Results            
-        path: test-results.json            
-        reporter: mocha-json
+        path: report.xml            
+        reporter: jest-junit               
 
     - name: run command line tests
       env: 
