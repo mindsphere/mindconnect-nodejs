@@ -5,6 +5,7 @@ import { DataExchangeClient } from "../data-exchange/data-exchange";
 import { DataLakeClient } from "../data-lake/data-lake";
 import { DeviceStatusManagementClient } from "../open-edge/device-status/device-status-management";
 import { DeviceManagementClient } from "../open-edge/device/device-management";
+import { EdgeAppInstanceManagementClient } from "../open-edge/edge-app/edge-app-management";
 import { EventAnalyticsClient } from "../event-analytics/eventanalytics";
 import { EventManagementClient } from "../event/event-management";
 import { IdentityManagementClient } from "../identity/identity";
@@ -330,7 +331,7 @@ export class MindSphereSdk extends SdkClient {
     private _deviceStatusManagementClient?: DeviceStatusManagementClient;
 
     /**
-     * * Device Status Management client
+     * * Device Status Management Client
      *
      * @returns {DeviceStatusManagementClient}
      *
@@ -340,6 +341,21 @@ export class MindSphereSdk extends SdkClient {
         this._deviceStatusManagementClient =
             this._deviceStatusManagementClient || new DeviceStatusManagementClient(this._authenticator);
         return this._deviceStatusManagementClient;
+    }
+
+    private _edgeAppInstanceManagementClient?: EdgeAppInstanceManagementClient;
+
+    /**
+     * * Edge App Instance Management Client
+     *
+     * @returns {EdgeAppInstanceManagementClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetEdgeAppInstanceManagementClient(): EdgeAppInstanceManagementClient {
+        this._edgeAppInstanceManagementClient =
+            this._edgeAppInstanceManagementClient || new EdgeAppInstanceManagementClient(this._authenticator);
+        return this._edgeAppInstanceManagementClient;
     }
 
     private _modelManagementClient?: ModelManagementClient;
