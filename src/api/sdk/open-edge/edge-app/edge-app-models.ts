@@ -51,6 +51,26 @@ export namespace EdgeAppInstanceModels {
     }
 
     /**
+     * paginated list of app instance configurations
+     * @export
+     * @interface PaginatedApplicationInstance
+     */
+    export interface PaginatedApplicationInstance {
+        /**
+         *
+         * @type {Array<ApplicationInstance>}
+         * @memberof PaginatedApplicationInstance
+         */
+        content?: Array<ApplicationInstance>;
+        /**
+         *
+         * @type {any}
+         * @memberof PaginatedApplicationInstance
+         */
+        page?: any;
+    }
+
+    /**
      *
      * @export
      * @interface ApplicationInstanceLifeCycleResource
@@ -264,9 +284,9 @@ export namespace EdgeAppInstanceModels {
     }
 
     /**
-     * paginated list of devices
+     * paginated list of app instance configurations
      * @export
-     * @interface PaginatedDevice
+     * @interface PaginatedInstanceConfigurationResource
      */
     export interface PaginatedInstanceConfigurationResource {
         /**

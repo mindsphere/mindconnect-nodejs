@@ -16,6 +16,176 @@ export class EdgeAppInstanceManagementClient extends SdkClient {
     private _baseUrl: string = "/api/edgeappinstancemanagement/v3";
 
     /**
+     * Get application instance list by device id.
+     * @summary Get application instance list by device id.
+     * @param {string} deviceId ID of the device
+     * @param {number} [size] The maximum number of elements returned in one page
+     * @param {number} [page] The (0-based) index of the page
+     * @param {string} [sort] The order in which the elements are returned. Multiple fields could be used spearated by comma
+     * @returns {Promise<EdgeAppInstanceModels.PaginatedApplicationInstance>}
+     * @throws {EdgeAppInstanceModels.RequiredError}
+     *
+     * @example await edgeAppInstanceManagementClient.GetAppInstances("mdsp.myDevice")
+     * @memberof EdgeAppInstanceManagementClient
+     */
+    public async GetAppInstances(
+        deviceId: string,
+        size?: number,
+        page?: number,
+        sort?: string
+    ): Promise<EdgeAppInstanceModels.PaginatedApplicationInstance>  {
+        // verify required parameter 'deviceId' is not null or undefined
+        if (deviceId === null || deviceId === undefined) {
+            throw new EdgeAppInstanceModels.RequiredError(
+                "deviceId",
+                "Required parameter deviceId was null or undefined when calling GetAppInstances."
+            );
+        }
+
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/appInstances?${toQueryString({ deviceId, size, page, sort })}`,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as EdgeAppInstanceModels.PaginatedApplicationInstance;
+    }
+
+    /**
+     * Get the status of the application instance.
+     * @summary Get the status of the application instance.
+     * @param {string} id ID of the application instance
+     * @returns {Promise<EdgeAppInstanceModels.ApplicationInstanceLifeCycleResource>}
+     * @throws {EdgeAppInstanceModels.RequiredError}
+     *
+     * @example await edgeAppInstanceManagementClient.GetAppInstanceLifecycle("myAppInstanceID")
+     * @memberOf EdgeAppInstanceManagementClient
+     */
+    public async GetAppInstanceLifecycle(id: string): Promise<EdgeAppInstanceModels.ApplicationInstanceLifeCycleResource> {
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new EdgeAppInstanceModels.RequiredError(
+                "id",
+                "Required parameter id was null or undefined when calling GetAppInstanceLifecycle."
+            );
+        }
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/appInstances/${id}/lifecycle`,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as EdgeAppInstanceModels.ApplicationInstanceLifeCycleResource;
+    }
+
+    /**
+     * This endpoint allows deleting instance.
+     * @summary Delete application instance.
+     * @param {string} id ID of the application instance
+     * @throws {EdgeAppInstanceModels.RequiredError}
+     *
+     * @example await edgeAppInstanceManagementClient.DeleteAppInstance("mdsp.EnvironmentDeviceAppInst")
+     *
+     * @memberOf EdgeAppInstanceManagementClient
+     */
+    public async DeleteAppInstance(id: string) {
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new EdgeAppInstanceModels.RequiredError(
+                "id",
+                "Required parameter id was null or undefined when calling instanceConfigurationsIdDelete."
+            );
+        }
+
+        const baseUrl = `${this._baseUrl}/appInstances/${id}`
+            .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+
+        await this.HttpAction({
+            verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: baseUrl,
+            noResponse: true,
+        });
+    }
+
+    /**
+     * Create application instance
+     * @summary Create application instance.
+     * @param {EdgeAppInstanceModels.ApplicationInstance} applicationInstance Application instance fields.
+     * @returns {Promise<EdgeAppInstanceModels.ApplicationInstance>}
+     *
+     * @example await edgeAppInstanceManagementClient.PostAppInstance(myAppInstanceData)
+     * @memberOf EdgeAppInstanceManagementClient
+     */
+    public async PostAppInstance(
+        applicationInstance: EdgeAppInstanceModels.ApplicationInstance
+    ): Promise<EdgeAppInstanceModels.ApplicationInstanceResource> {
+        // verify required parameter 'applicationInstance' is not null or undefined
+        if (applicationInstance === null || applicationInstance === undefined) {
+            throw new EdgeAppInstanceModels.RequiredError(
+                "instanceConfiguration",
+                "Required parameter applicationInstance was null or undefined when calling PostAppInstance.");
+        }
+
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/appInstances`,
+            body: applicationInstance,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as EdgeAppInstanceModels.ApplicationInstanceResource;
+    }
+
+    /**
+     * Update status of the application instance.
+     * @summary Set Status of Application Release Instance.
+     * @param {string} id ID of the application instance
+     * @param {EdgeAppInstanceModels.ApplicationInstanceLifeCycleStatus} applicationInstanceStatus Application instance status fields.
+     * @returns {Promise<EdgeAppInstanceModels.ApplicationInstanceLifeCycleResource>}
+     *
+     * @example await edgeAppInstanceManagementClient.PatchAppInstanceStatus("mdsp.EnvironmentDeviceAppInst", myNewAppStatusData)
+     * @memberOf EdgeAppInstanceManagementClient
+     */
+    public async PatchAppInstanceStatus(
+        id: string,
+        applicationInstanceStatus: EdgeAppInstanceModels.ApplicationInstanceLifeCycleStatus
+    ): Promise<EdgeAppInstanceModels.ApplicationInstanceLifeCycleResource> {
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new EdgeAppInstanceModels.RequiredError(
+                "id",
+                "Required parameter id was null or undefined when calling PatchAppInstanceStatus."
+            );
+        }
+        // verify required parameter 'applicationInstanceStatus' is not null or undefined
+        if (applicationInstanceStatus === null || applicationInstanceStatus === undefined) {
+            throw new EdgeAppInstanceModels.RequiredError(
+                "instanceConfiguration",
+                "Required parameter instanceConfiguration was null or undefined when calling PatchAppInstanceStatus."
+            );
+        }
+
+        const result = await this.HttpAction({
+            verb: "PATCH",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/appInstances/${id}/lifecycle`,
+            body: applicationInstanceStatus,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as EdgeAppInstanceModels.ApplicationInstanceLifeCycleResource;
+    }
+
+    /**
      * Get all instance configurations by deviceId.
      * @summary Get Instance Configurations for a specific device
      * @param {string} deviceId ID of the device

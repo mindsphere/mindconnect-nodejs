@@ -18,7 +18,7 @@ import deviceCommand from "./commands/devices";
 import downloadEventsCommand from "./commands/download-events";
 import eventTypesCommand from "./commands/event-types";
 import eventsCommand from "./commands/events";
-import appInstConfigCommand from "./commands/edge-app-instance";
+import appInstCommand from "./commands/edge-app-instance";
 import identityCommand from "./commands/identity";
 import iotCheckBulkComand from "./commands/iot-bulk-check";
 import iotBulkRunCommand from "./commands/iot-bulk-run";
@@ -119,7 +119,7 @@ notificationCommand(program);
 deviceTypeCommand(program);
 deviceCommand(program);
 deviceStatusCommand(program);
-appInstConfigCommand(program);
+appInstCommand(program);
 
 // * tenant commands
 

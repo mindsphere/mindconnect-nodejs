@@ -23,15 +23,15 @@ export default (program: CommanderStatic) => {
     program
         .command("edge-app-inst")
         .alias("eai")
-        .option("-m, --mode [list|create|patch|delete|template|info]", "list | create | patch | delete | template | info", "list")
+        .option("-m, --mode [list|create|delete|template|info]", "list | create | delete | template | info", "list")
         .option("-i, --id <id>", "the app instance id")
         .option("-d, --deviceid <id>", "the device id")
-        .option("-f, --file <file>", ".mdsp.json file with configuration")
+        .option("-f, --file <file>", ".mdsp.json file with app inst data")
         .option("-o, --overwrite", "overwrite template file if it already exists")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(color("list, create or delete app instance configurations (open edge) *"))
+        .description(color("list, create or delete app instance (open edge) *"))
         .action((options) => {
             (async () => {
                 try {
@@ -43,15 +43,15 @@ export default (program: CommanderStatic) => {
 
                     switch (options.mode) {
                         case "list":
-                            await listAppConfigurations(sdk, options);
+                            await listApps(sdk, options);
                             break;
 
                         case "template":
-                            await createTemplate(options, sdk);
+                            await createTemplateApp(options, sdk);
                             console.log("Edit the file before submitting it to MindSphere.");
                             break;
                         case "delete":
-                            await deleteAppInstConfiguration(options, sdk);
+                            await deleteAppInst(options, sdk);
                             break;
 
                         case "create":
@@ -72,24 +72,31 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc edge-app-inst --mode list --deviceid <deviceid> \t\tlist all app instance configurations of device with deviceId`);
+            log(`    mc edge-app-inst --mode list --deviceid <deviceid> \t\tlist all app instances of device with deviceId.`);
             log(
-                `    mc edge-app-inst --mode template \t\t\t\tcreate a template file for new app instance configuration`
+                `    mc edge-app-inst --mode template \t\t\t\tcreate a template file for new app instance data.`
             );
             log(
-                `    mc edge-app-inst --mode create --file device.app.conf.mdsp.json \n\t creates a new instance configuration from template file`
+                `    mc edge-app-inst --mode create --file edge.app.mdsp.json \tcreates a new app instance from template file.`
             );
-            log(`    mc edge-app-inst --mode info --id <appinstid>\t\tget details of an app inst configuration`);
-            log(
-                `    mc edge-app-inst --mode patch --id <appinstid> --file device.app.conf.mdsp.json \n\t patch specified instance configuration from template file`
-            );
-            log(`    mc edge-app-inst --mode delete --id <appinstid>\t\tdelete app instance configuration`);
+            log(`    mc edge-app-inst --mode info --id <appinstid>\t\tget details of an app instance.`);
+            log(`    mc edge-app-inst --mode delete --id <appinstid>\t\tdelete app instance configuration.`);
 
             serviceCredentialLog();
         });
 };
 
 async function createAppInstance(options: any, sdk: MindSphereSdk) {
+    const filePath = path.resolve(options.file);
+    const file = fs.readFileSync(filePath);
+    const data = JSON.parse(file.toString());
+
+    const name = data.deviceId ? data.deviceId : `${sdk.GetTenant()}.${data.appInstanceId}`;
+    await sdk.GetEdgeAppInstanceManagementClient().PostAppInstance(data);
+    console.log(`created new app instance for deviceid ${color(name)}`);
+}
+
+async function createAppInstanceConfiguration(options: any, sdk: MindSphereSdk) {
     const filePath = path.resolve(options.file);
     const file = fs.readFileSync(filePath);
     const config = JSON.parse(file.toString());
@@ -99,7 +106,20 @@ async function createAppInstance(options: any, sdk: MindSphereSdk) {
     console.log(`created new configuration for deviceid ${color(name)}`);
 }
 
-async function createTemplate(options: any, sdk: MindSphereSdk) {
+async function createTemplateApp(options: any, sdk: MindSphereSdk) {
+    const tenant = sdk.GetTenant();
+    const _tempalate = {
+        name: `${tenant}.myAppName`,
+        appInstanceId: "718ca5ad0...",
+        deviceId: "718ca5ad0...",
+        releaseId: "718ca5ad0...",
+        applicationId: "718ca5ad0..."
+    };
+    verboseLog(_tempalate, options.verbose);
+    writeAppTemplateToFile(options, _tempalate);
+}
+
+async function createTemplateAppConfig(options: any, sdk: MindSphereSdk) {
     const tenant = sdk.GetTenant();
     const templateType = {
         deviceId: "718ca5ad0...",
@@ -112,11 +132,27 @@ async function createTemplate(options: any, sdk: MindSphereSdk) {
         }
     };
     verboseLog(templateType, options.verbose);
-    writeDeviceTypeToFile(options, templateType);
+    writeAppInstConfigToFile(options, templateType);
 }
 
-function writeDeviceTypeToFile(options: any, templateType: any) {
-    const fileName = options.file || `openedge.appinstconfig.mdsp.json`;
+function writeAppTemplateToFile(options: any, templateType: any) {
+    const fileName = options.file || `edge.app.mdsp.json`;
+    const filePath = path.resolve(fileName);
+
+    fs.existsSync(filePath) &&
+    !options.overwrite &&
+    throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+
+    fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
+    console.log(
+        `The data was written into ${color(
+            filePath
+        )} run \n\n\tmc edge-app-inst --mode create --file ${fileName} \n\nto create a new app instance.`
+    );
+}
+
+function writeAppInstConfigToFile(options: any, templateType: any) {
+    const fileName = options.file || `edge.appinstconfig.mdsp.json`;
     const filePath = path.resolve(fileName);
 
     fs.existsSync(filePath) &&
@@ -131,41 +167,74 @@ function writeDeviceTypeToFile(options: any, templateType: any) {
     );
 }
 
+async function deleteAppInst(options: any, sdk: MindSphereSdk) {
+    const id = (options.id! as string) ? options.id : `${options.id}`;
+    await sdk.GetEdgeAppInstanceManagementClient().DeleteAppInstance(id);
+    console.log(`Application instance with id ${color(id)} deleted.`);
+}
+
 async function deleteAppInstConfiguration(options: any, sdk: MindSphereSdk) {
     const id = (options.id! as string) ? options.id : `${options.id}`;
     await sdk.GetEdgeAppInstanceManagementClient().DeleteAppInstanceConfiguration(id);
     console.log(`Application instance configuration with id ${color(id)} deleted.`);
 }
 
-async function listAppConfigurations(sdk: MindSphereSdk, options: any) {
+async function listApps(sdk: MindSphereSdk, options: any) {
     const edgeAppInstanceClient = sdk.GetEdgeAppInstanceManagementClient();
 
     let page = 0;
-    console.log(`deviceId \tappId \tappReleaseId \tappInstanceId \tconfiguration`);
+    console.log(`name \tStatus \tappInstanceId \tdeviceId \treleaseId \tapplicationId \tconfiguration`);
 
-    let configCount = 0;
-    let configurationPage;
+    let appCount = 0;
+    let appPage;
     do {
-        configurationPage = (await retry(options.retry, () =>
-            edgeAppInstanceClient.GetAppInstanceConfigurations(options.deviceid, 100, page)
-        )) as EdgeAppInstanceModels.PaginatedInstanceConfigurationResource;
+        appPage = (await retry(options.retry, () =>
+            edgeAppInstanceClient.GetAppInstances(options.deviceid, 100, page)
+        )) as EdgeAppInstanceModels.PaginatedApplicationInstance;
 
-        configurationPage.content = configurationPage.content || [];
-        configurationPage.page = configurationPage.page || { totalPages: 0 };
+        appPage.content = appPage.content || [];
+        appPage.page = appPage.page || { totalPages: 0 };
 
-        for (const conf of configurationPage.content || []) {
-            configCount++;
-            console.log(
-                `${color(conf.deviceId)}\t${conf.appId}\t${conf.appReleaseId}\t${conf.appInstanceId}\t${JSON.stringify(conf.configuration)}`
-            );
-            verboseLog(JSON.stringify(conf, null, 2), options.verbose);
+        for (const app of appPage.content || []) {
+            appCount++;
+            // read the configuration of these app
+            try {
+                const config = (await retry(options.retry, () =>
+                    edgeAppInstanceClient.GetAppInstanceConfiguration(app.appInstanceId)
+                )) as EdgeAppInstanceModels.InstanceConfigurationResource;
+
+                const status = (await retry(options.retry, () =>
+                    edgeAppInstanceClient.GetAppInstanceLifecycle(app.appInstanceId)
+                )) as EdgeAppInstanceModels.ApplicationInstanceLifeCycleResource;
+
+                console.log(
+                    `${color(app.name)} \t${color(status.status)} \t${app.appInstanceId} \t${app.deviceId} \t${app.applicationId} \t${app.releaseId} \t${JSON.stringify(config)}`
+                );
+                verboseLog(JSON.stringify(app, null, 2), options.verbose);
+            } catch (e) {}
         }
-    } while (page++ < (configurationPage.page.totalPages || 0));
+    } while (page++ < (appPage.page.totalPages || 0));
 
-    console.log(`${color(configCount)} configuration(s) listed.\n`);
+    console.log(`${color(appCount)} app instance(s) listed.\n`);
 }
 
 async function appInstanceInfo(options: any, sdk: MindSphereSdk) {
+    const id = (options.id! as string) ? options.id : `${options.id}`;
+
+    const appInstConfig = (await retry(options.retry, () =>
+        sdk.GetEdgeAppInstanceManagementClient().GetAppInstanceConfiguration(id)
+    )) as EdgeAppInstanceModels.InstanceConfigurationResource;
+
+    printObjectInfo(
+        "App Instance Configuration",
+        appInstConfig,
+        options,
+        ["deviceId", "appId", "appReleaseId", "appInstanceId", "configuration"],
+        color
+    );
+}
+
+async function appInstanceConfigInfo(options: any, sdk: MindSphereSdk) {
     const id = (options.id! as string) ? options.id : `${options.id}`;
     const appInstConfig = await sdk.GetEdgeAppInstanceManagementClient().GetAppInstanceConfiguration(id);
     printObjectInfo(
@@ -181,7 +250,7 @@ function checkRequiredParameters(options: any) {
     options.mode === "create" &&
     !options.file &&
     errorLog(
-        "you have to provide a file with the app configuration to create a new device configuration (see mc edge-app-inst --help for more details)",
+        "you have to provide a file with the app data to create a new application instance (see mc edge-app-inst --help for more details)",
         true
     );
 
@@ -196,18 +265,10 @@ function checkRequiredParameters(options: any) {
     !options.id &&
     errorLog("you have to provide the id app instance (see mc edge-app-inst --help for more details)", true);
 
-
-    options.mode === "patch" &&
-    !options.file &&
-    errorLog(
-        "you have to provide a file with the app configuration to patch the device configuration (see mc edge-app-inst --help for more details)",
-        true
-    );
-
     options.mode === "delete" &&
     !options.id &&
     errorLog(
-        "you have to provide the id of app configuration to delete it (see mc edge-app-inst --help for more details)",
+        "you have to provide the id of the app instance to delete it (see mc edge-app-inst --help for more details)",
         true
     );
 }
