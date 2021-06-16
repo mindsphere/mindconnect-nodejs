@@ -23,7 +23,7 @@ export default (program: CommanderStatic) => {
     program
         .command("edge-app-inst")
         .alias("eai")
-        .option("-m, --mode [list|create|delete|template|info]", "list | create | delete | template | info", "list")
+        .option("-m, --mode [list|create|config|delete|template|info]", "list | create | config | delete | template | info", "list")
         .option("-i, --id <id>", "the app instance id")
         .option("-d, --deviceid <id>", "the device id")
         .option("-f, --file <file>", ".mdsp.json file with app inst data")
@@ -31,7 +31,7 @@ export default (program: CommanderStatic) => {
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(color("list, create or delete app instance (open edge) *"))
+        .description(color("list, create, configure or delete app instance (open edge) *"))
         .action((options) => {
             (async () => {
                 try {
@@ -48,13 +48,18 @@ export default (program: CommanderStatic) => {
 
                         case "template":
                             await createTemplateApp(options, sdk);
-                            console.log("Edit the file before submitting it to MindSphere.");
+                            await createTemplateAppConfig(options, sdk);
+                            console.log("Edit the file(s) before submitting it to MindSphere.");
                             break;
                         case "delete":
                             await deleteAppInst(options, sdk);
                             break;
 
                         case "create":
+                            await createAppInstance(options, sdk);
+                            break;
+
+                        case "config":
                             await createAppInstance(options, sdk);
                             break;
 
@@ -78,6 +83,9 @@ export default (program: CommanderStatic) => {
             );
             log(
                 `    mc edge-app-inst --mode create --file edge.app.mdsp.json \tcreates a new app instance from template file.`
+            );
+            log(
+                `    mc edge-app-inst --mode config --id <appinstid> --file edge.appconfig.mdsp.json \n\tconfigure an app instance from template file.`
             );
             log(`    mc edge-app-inst --mode info --id <appinstid>\t\tget details of an app instance.`);
             log(`    mc edge-app-inst --mode delete --id <appinstid>\t\tdelete app instance configuration.`);
@@ -145,14 +153,14 @@ function writeAppTemplateToFile(options: any, templateType: any) {
 
     fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
-        `The data was written into ${color(
+        `The app data template was written into ${color(
             filePath
-        )} run \n\n\tmc edge-app-inst --mode create --file ${fileName} \n\nto create a new app instance.`
+        )} run \n\n\tmc edge-app-inst --mode create --file ${fileName} \n\nto create a new app instance.\n`
     );
 }
 
 function writeAppInstConfigToFile(options: any, templateType: any) {
-    const fileName = options.file || `edge.appinstconfig.mdsp.json`;
+    const fileName = options.file || `edge.appconfig.mdsp.json`;
     const filePath = path.resolve(fileName);
 
     fs.existsSync(filePath) &&
@@ -161,10 +169,21 @@ function writeAppInstConfigToFile(options: any, templateType: any) {
 
     fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
-        `The data was written into ${color(
+        `The app config template was written into ${color(
             filePath
-        )} run \n\n\tmc edge-app-inst --mode create --file ${fileName} \n\nto create a new app inst. configuration`
+        )} run \n\n\tmc edge-app-inst --mode config --id <appinstid> --file ${fileName} \n\nto create a new app inst. configuration\n`
     );
+}
+
+async function configureAppInstance(options: any, sdk: MindSphereSdk) {
+    const id = (options.id! as string) ? options.id : `${options.id}`;
+
+    const filePath = path.resolve(options.file);
+    const file = fs.readFileSync(filePath);
+    const data = JSON.parse(file.toString());
+
+    await sdk.GetEdgeAppInstanceManagementClient().PatchAppInstanceConfigurationData(id, data);
+    console.log(`configured app instance with id ${color(id)}`);
 }
 
 async function deleteAppInst(options: any, sdk: MindSphereSdk) {
@@ -269,6 +288,20 @@ function checkRequiredParameters(options: any) {
     !options.id &&
     errorLog(
         "you have to provide the id of the app instance to delete it (see mc edge-app-inst --help for more details)",
+        true
+    );
+
+    options.mode === "config" &&
+    !options.file &&
+    errorLog(
+        "you have to provide a file with the config data to configure the application instance (see mc edge-app-inst --help for more details)",
+        true
+    );
+
+    options.mode === "config" &&
+    !options.id &&
+    errorLog(
+        "you have to provide the id of the app instance to configure (see mc edge-app-inst --help for more details)",
         true
     );
 }

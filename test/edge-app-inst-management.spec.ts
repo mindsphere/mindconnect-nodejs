@@ -1,6 +1,6 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
-import { EdgeAppInstanceModels } from "../dist/src";
+import { EdgeAppInstanceModels } from "../src/api/sdk/open-edge/edge-app/edge-app-models";
 import { MindSphereSdk } from "../src";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import { setupDeviceTestStructure, tearDownDeviceTestStructure } from "./test-device-setup-utils";
