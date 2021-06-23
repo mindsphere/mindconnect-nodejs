@@ -13,7 +13,7 @@ import { DeviceConfigurationModels } from "./device-configuration-models";
  * @extends {SdkClient}
  */
 export class DeviceConfigurationClient extends SdkClient {
-    private _baseUrl: string = "api/deviceconfiguration/v3";
+    private _baseUrl: string = "/api/deviceconfiguration/v3";
 
     /**
      * Returns a paginated list of all tasks of the specified device ordered by descending creation date (newest tasks first)
@@ -46,7 +46,7 @@ export class DeviceConfigurationClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/devices/${id}/configurationTasks?${toQueryString({ id, size, page, sort })}`,
+            baseUrl: `${this._baseUrl}/devices/${id}/configurationTasks?${toQueryString({size, page, sort })}`,
             additionalHeaders: { "Content-Type": "application/json" },
         });
 
@@ -245,7 +245,7 @@ export class DeviceConfigurationClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/devices/${id}`,
+            baseUrl: `${this._baseUrl}/files/${id}`,
             additionalHeaders: { "Content-Type": "application/json" },
         });
 
@@ -473,7 +473,7 @@ export class DeviceConfigurationClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/files/${id}/revisions/${hash}/content`,
-            additionalHeaders: { "Accept": accept ? accept : "*/*"},
+            additionalHeaders: { "Accept": accept ? accept : "application/octet-stream"},
         });
 
         return result as DeviceConfigurationModels.Payload;

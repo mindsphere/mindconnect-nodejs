@@ -5,6 +5,7 @@ import { DataExchangeClient } from "../data-exchange/data-exchange";
 import { DataLakeClient } from "../data-lake/data-lake";
 import { DeviceStatusManagementClient } from "../open-edge/device-status/device-status-management";
 import { DeviceManagementClient } from "../open-edge/device/device-management";
+import { DeviceConfigurationClient } from "../open-edge/device-configuration/device-configuration";
 import { EdgeAppInstanceManagementClient } from "../open-edge/edge-app/edge-app-management";
 import { EventAnalyticsClient } from "../event-analytics/eventanalytics";
 import { EventManagementClient } from "../event/event-management";
@@ -341,6 +342,21 @@ export class MindSphereSdk extends SdkClient {
         this._deviceStatusManagementClient =
             this._deviceStatusManagementClient || new DeviceStatusManagementClient(this._authenticator);
         return this._deviceStatusManagementClient;
+    }
+
+    private _deviceConfigurationClient?: DeviceConfigurationClient;
+
+    /**
+     * * Device Status Management Client
+     *
+     * @returns {DeviceStatusManagementClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetDeviceConfigurationClient(): DeviceConfigurationClient {
+        this._deviceConfigurationClient =
+            this._deviceConfigurationClient || new DeviceConfigurationClient(this._authenticator);
+        return this._deviceConfigurationClient;
     }
 
     private _edgeAppInstanceManagementClient?: EdgeAppInstanceManagementClient;
