@@ -3,10 +3,11 @@ import { AnomalyDetectionClient } from "../anomaly-detection/anomaly-detection";
 import { AssetManagementClient } from "../asset/asset-management";
 import { DataExchangeClient } from "../data-exchange/data-exchange";
 import { DataLakeClient } from "../data-lake/data-lake";
-import { DeviceStatusManagementClient } from "../open-edge/device-status/device-status-management";
-import { DeviceManagementClient } from "../open-edge/device/device-management";
-import { DeviceConfigurationClient } from "../open-edge/device-configuration/device-configuration";
-import { EdgeAppInstanceManagementClient } from "../open-edge/edge-app/edge-app-management";
+import { DeviceStatusManagementClient } from "../open-edge/open-edge";
+import { DeviceManagementClient } from "../open-edge/open-edge";
+import { DeviceConfigurationClient } from "../open-edge/open-edge";
+import { DeploymentWorkflowClient } from "../open-edge/open-edge";
+import { EdgeAppInstanceManagementClient } from "../open-edge/open-edge";
 import { EventAnalyticsClient } from "../event-analytics/eventanalytics";
 import { EventManagementClient } from "../event/event-management";
 import { IdentityManagementClient } from "../identity/identity";
@@ -347,7 +348,7 @@ export class MindSphereSdk extends SdkClient {
     private _deviceConfigurationClient?: DeviceConfigurationClient;
 
     /**
-     * * Device Status Management Client
+     * * Device Configuration Management Client
      *
      * @returns {DeviceStatusManagementClient}
      *
@@ -357,6 +358,21 @@ export class MindSphereSdk extends SdkClient {
         this._deviceConfigurationClient =
             this._deviceConfigurationClient || new DeviceConfigurationClient(this._authenticator);
         return this._deviceConfigurationClient;
+    }
+
+    private _deploymentWorkflowClient?: DeploymentWorkflowClient;
+
+    /**
+     * * Deployment Workflow Client
+     *
+     * @returns {DeploymentWorkflowClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetDeploymentWorkflowClient(): DeploymentWorkflowClient {
+        this._deploymentWorkflowClient =
+            this._deploymentWorkflowClient || new DeploymentWorkflowClient(this._authenticator);
+        return this._deploymentWorkflowClient;
     }
 
     private _edgeAppInstanceManagementClient?: EdgeAppInstanceManagementClient;
