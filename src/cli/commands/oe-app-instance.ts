@@ -21,8 +21,8 @@ let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
-        .command("edge-app-inst")
-        .alias("eai")
+        .command("oe-app-inst")
+        .alias("oeai")
         .option("-m, --mode [list|create|config|delete|template|info]", "list | create | config | delete | template | info", "list")
         .option("-i, --id <id>", "the app instance id")
         .option("-d, --deviceid <id>", "the device id")
@@ -77,18 +77,18 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc edge-app-inst --mode list --deviceid <deviceid> \t\tlist all app instances of device with deviceId.`);
+            log(`    mc oe-app-inst --mode list --deviceid <deviceid> \t\tlist all app instances of device with deviceId.`);
             log(
-                `    mc edge-app-inst --mode template \t\t\t\tcreate a template file for new app instance data.`
+                `    mc oe-app-inst --mode template \t\t\t\tcreate a template file for new app instance data.`
             );
             log(
-                `    mc edge-app-inst --mode create --file edge.app.mdsp.json \tcreates a new app instance from template file.`
+                `    mc oe-app-inst --mode create --file edge.app.mdsp.json \tcreates a new app instance from template file.`
             );
             log(
-                `    mc edge-app-inst --mode config --id <appinstid> --file edge.appconfig.mdsp.json \n\tconfigure an app instance from template file.`
+                `    mc oe-app-inst --mode config --id <appinstid> --file edge.appconfig.mdsp.json \n\tconfigure an app instance from template file.`
             );
-            log(`    mc edge-app-inst --mode info --id <appinstid>\t\tget details of an app instance.`);
-            log(`    mc edge-app-inst --mode delete --id <appinstid>\t\tdelete app instance configuration.`);
+            log(`    mc oe-app-inst --mode info --id <appinstid>\t\tget details of an app instance.`);
+            log(`    mc oe-app-inst --mode delete --id <appinstid>\t\tdelete app instance configuration.`);
 
             serviceCredentialLog();
         });
@@ -155,7 +155,7 @@ function writeAppTemplateToFile(options: any, templateType: any) {
     console.log(
         `The app data template was written into ${color(
             filePath
-        )} run \n\n\tmc edge-app-inst --mode create --file ${fileName} \n\nto create a new app instance.\n`
+        )} run \n\n\tmc oe-app-inst --mode create --file ${fileName} \n\nto create a new app instance.\n`
     );
 }
 
@@ -171,7 +171,7 @@ function writeAppInstConfigToFile(options: any, templateType: any) {
     console.log(
         `The app config template was written into ${color(
             filePath
-        )} run \n\n\tmc edge-app-inst --mode config --id <appinstid> --file ${fileName} \n\nto create a new app inst. configuration\n`
+        )} run \n\n\tmc oe-app-inst --mode config --id <appinstid> --file ${fileName} \n\nto create a new app inst. configuration\n`
     );
 }
 
@@ -269,39 +269,39 @@ function checkRequiredParameters(options: any) {
     options.mode === "create" &&
     !options.file &&
     errorLog(
-        "you have to provide a file with the app data to create a new application instance (see mc edge-app-inst --help for more details)",
+        "you have to provide a file with the app data to create a new application instance (see mc oe-app-inst --help for more details)",
         true
     );
 
     options.mode === "list" &&
     !options.deviceid &&
     errorLog(
-        "you have to provide the deviceid of the target device (see mc edge-app-inst --help for more details)",
+        "you have to provide the deviceid of the target device (see mc oe-app-inst --help for more details)",
         true
     );
 
     options.mode === "info" &&
     !options.id &&
-    errorLog("you have to provide the id app instance (see mc edge-app-inst --help for more details)", true);
+    errorLog("you have to provide the id app instance (see mc oe-app-inst --help for more details)", true);
 
     options.mode === "delete" &&
     !options.id &&
     errorLog(
-        "you have to provide the id of the app instance to delete it (see mc edge-app-inst --help for more details)",
+        "you have to provide the id of the app instance to delete it (see mc oe-app-inst --help for more details)",
         true
     );
 
     options.mode === "config" &&
     !options.file &&
     errorLog(
-        "you have to provide a file with the config data to configure the application instance (see mc edge-app-inst --help for more details)",
+        "you have to provide a file with the config data to configure the application instance (see mc oe-app-inst --help for more details)",
         true
     );
 
     options.mode === "config" &&
     !options.id &&
     errorLog(
-        "you have to provide the id of the app instance to configure (see mc edge-app-inst --help for more details)",
+        "you have to provide the id of the app instance to configure (see mc oe-app-inst --help for more details)",
         true
     );
 }

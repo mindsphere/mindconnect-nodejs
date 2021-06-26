@@ -21,8 +21,8 @@ let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
-        .command("devices")
-        .alias("dv")
+        .command("oe-devices")
+        .alias("oed")
         .option("-m, --mode [list|create|delete|template|info]", "list | create | delete | template | info", "list")
         .option("-f, --file <file>", ".mdsp.json file with device definition")
         .option("-n, --devicename <devicename>", "device name")
@@ -76,12 +76,12 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc devices --mode list --assetid <assetid>\t\tlist all devices linked to the asset`);
-            log(`    mc devices --mode info --id <deviceid>\t\tget device details`);
-            log(`    mc devices --mode template \t\t\t\tcreate a template file for a new device`);
-            log(`    mc devices --mode delete --id <devieceid>\t\tdelete the device with the specified id`);
+            log(`    mc oe-devices --mode list --assetid <assetid>\t\tlist all devices linked to the asset`);
+            log(`    mc oe-devices --mode info --id <deviceid>\t\tget device details`);
+            log(`    mc oe-devices --mode template \t\t\t\tcreate a template file for a new device`);
+            log(`    mc oe-devices --mode delete --id <devieceid>\t\tdelete the device with the specified id`);
             log(
-                `    mc devices --mode create --file openedge.device.mdsp.json \n \
+                `    mc oe-devices --mode create --file openedge.device.mdsp.json \n \
                             create new device using the file openedge.device.mdsp.json`
             );
 
@@ -123,14 +123,14 @@ function writeDeviceTypeToFile(options: any, templateType: any) {
     const filePath = path.resolve(fileName);
 
     fs.existsSync(filePath) &&
-        !options.overwrite &&
-        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+    !options.overwrite &&
+    throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
 
     fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
         `The data was written into ${color(
             filePath
-        )} run \n\n\tmc devices --mode create --file ${fileName} \n\nto create the device`
+        )} run \n\n\tmc oe-devices --mode create --file ${fileName} \n\nto create the device`
     );
 }
 
@@ -183,20 +183,20 @@ async function deviceInfo(options: any, sdk: MindSphereSdk) {
 
 function checkRequiredParameters(options: any) {
     options.mode === "create" &&
-        !options.file &&
-        errorLog(
-            "you have to provide a file with device type to create device type (see mc devices --help for more details)",
-            true
-        );
+    !options.file &&
+    errorLog(
+        "you have to provide a file with device type to create device type (see mc oe-devices --help for more details)",
+        true
+    );
 
     options.mode === "delete" &&
-        !options.id &&
-        errorLog(
-            "you have to provide the id of the device type to delete (see mc devices --help for more details)",
-            true
-        );
+    !options.id &&
+    errorLog(
+        "you have to provide the id of the device type to delete (see mc oe-devices --help for more details)",
+        true
+    );
 
     options.mode === "info" &&
-        !options.id &&
-        errorLog("you have to provide the id of the device type (see mc devices --help for more details)", true);
+    !options.id &&
+    errorLog("you have to provide the id of the device type (see mc oe-devices --help for more details)", true);
 }
