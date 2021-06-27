@@ -24,7 +24,7 @@ export default (program: CommanderStatic) => {
         .command("oe-deploy-workflow")
         .alias("oedw")
         .option("-m, --mode [list|create|instantiate|update|cancel|delete|template|info]", "list | create | instantiate | update | cancel | delete | template | info", "list")
-        .option("-k, --key <id>", "the workflow model key")
+        .option("-k, --key <key>", "the workflow model key")
         .option("-i, --id <id>", "the deployment model instance id")
         .option("-f, --file <file>", ".mdsp.json file")
 
@@ -94,7 +94,7 @@ export default (program: CommanderStatic) => {
             log("\n  Examples:\n");
             log(`    mc oe-deploy-workflow --mode list \t\t\tlist all workflow instances descriptions belonging to the caller's tenant.`);
             log(
-                `    mc oe-deploy-workflow --mode template \t\tcreate a template file to define the workflow state machine model.`
+                `    mc oe-deploy-workflow --mode template \t\tcreate a template files to define the workflow state machine model.`
             );
             log(
                 `    mc oe-deploy-workflow --mode create --file edge.app.model.mdsp.json \n\tcreates a new workflow model from template file.`
@@ -103,7 +103,7 @@ export default (program: CommanderStatic) => {
                 `    mc oe-deploy-workflow --mode instantiate --file edge.app.instance.mdsp.json \n\tcreates a new workflow instance from template file.`
             );
             log(
-                `    mc oe-deploy-workflow --mode update --subject status --file edge.app.status.mdsp.json \n\tcreates a new workflow instance from template file.`
+                `    mc oe-deploy-workflow --mode update --id "7d018c..." --file edge.app.status.mdsp.json \n\tupdate a workflow instance.`
             );
             log(`    mc oe-deploy-workflow --mode info --id <id>\t\tget details of a deployment workflow instance.`);
             log(`    mc oe-deploy-workflow --mode info --key <key>\tget details of a deployment workflow model.`);

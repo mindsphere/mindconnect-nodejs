@@ -76,10 +76,10 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc oe-devices --mode list --assetid <assetid>\t\tlist all devices linked to the asset`);
+            log(`    mc oe-devices --mode list --assetid <assetid>\tlist all devices linked to the asset`);
             log(`    mc oe-devices --mode info --id <deviceid>\t\tget device details`);
-            log(`    mc oe-devices --mode template \t\t\t\tcreate a template file for a new device`);
-            log(`    mc oe-devices --mode delete --id <devieceid>\t\tdelete the device with the specified id`);
+            log(`    mc oe-devices --mode template \t\t\tcreate a template file for a new device`);
+            log(`    mc oe-devices --mode delete --id <devieceid>\tdelete the device with the specified id`);
             log(
                 `    mc oe-devices --mode create --file openedge.device.mdsp.json \n \
                             create new device using the file openedge.device.mdsp.json`

@@ -20,6 +20,7 @@ import downloadEventsCommand from "./commands/download-events";
 import eventTypesCommand from "./commands/event-types";
 import eventsCommand from "./commands/events";
 import appInstCommand from "./commands/oe-app-instance";
+import appDeploymentCommand from "./commands/oe-app-deployment";
 import identityCommand from "./commands/identity";
 import iotCheckBulkComand from "./commands/iot-bulk-check";
 import iotBulkRunCommand from "./commands/iot-bulk-run";
@@ -121,6 +122,7 @@ deviceTypeCommand(program);
 deviceCommand(program);
 deviceStatusCommand(program);
 appInstCommand(program);
+appDeploymentCommand(program);
 deploymentWorkflowCommand(program);
 
 // * tenant commands
