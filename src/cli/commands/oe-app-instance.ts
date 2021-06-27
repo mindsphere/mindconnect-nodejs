@@ -60,7 +60,7 @@ export default (program: CommanderStatic) => {
                             break;
 
                         case "config":
-                            await createAppInstance(options, sdk);
+                            await createAppInstanceConfiguration(options, sdk);
                             break;
 
                         case "info":

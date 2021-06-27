@@ -8,6 +8,7 @@ import { DeviceManagementClient } from "../open-edge/open-edge";
 import { DeviceConfigurationClient } from "../open-edge/open-edge";
 import { DeploymentWorkflowClient } from "../open-edge/open-edge";
 import { EdgeAppInstanceManagementClient } from "../open-edge/open-edge";
+import { EdgeAppDeploymentClient } from "../open-edge/open-edge";
 import { EventAnalyticsClient } from "../event-analytics/eventanalytics";
 import { EventManagementClient } from "../event/event-management";
 import { IdentityManagementClient } from "../identity/identity";
@@ -388,6 +389,21 @@ export class MindSphereSdk extends SdkClient {
         this._edgeAppInstanceManagementClient =
             this._edgeAppInstanceManagementClient || new EdgeAppInstanceManagementClient(this._authenticator);
         return this._edgeAppInstanceManagementClient;
+    }
+
+    private _edgeAppDeploymentClient?: EdgeAppDeploymentClient;
+
+    /**
+     * * Edge AppDeployment Client
+     *
+     * @returns {EdgeDeploymentClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetEdgeDeploymentClient(): EdgeAppDeploymentClient {
+        this._edgeAppDeploymentClient =
+            this._edgeAppDeploymentClient || new EdgeAppDeploymentClient(this._authenticator);
+        return this._edgeAppDeploymentClient;
     }
 
     private _modelManagementClient?: ModelManagementClient;

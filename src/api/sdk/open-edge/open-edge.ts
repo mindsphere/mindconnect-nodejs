@@ -2,7 +2,13 @@
 
 import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
-import { DeploymentWorkflowModels, DeviceConfigurationModels, DeviceManagementModels, DeviceStatusModels, EdgeAppInstanceModels } from "./open-edge-models";
+import { DeploymentWorkflowModels,
+    DeviceConfigurationModels,
+    DeviceManagementModels,
+    DeviceStatusModels,
+    EdgeAppInstanceModels,
+    EdgeAppDeploymentModels
+} from "./open-edge-models";
 
 /**
  * Device Management API
@@ -1965,5 +1971,302 @@ export class EdgeAppInstanceManagementClient extends SdkClient {
         });
 
         return result as EdgeAppInstanceModels.InstanceConfigurationResource;
+    }
+}
+
+/**
+ * Edge App Deployment API
+ *  Edge App Deployment API helps to coordinate installation and removal of edge applications to and from devices. The provided operations do not trigger any actions themselves, but are meant to be used by northbound applications to coordinate user and device efforts. Installation or removal tasks consist of different states that require the app user and the target device to participate in order to complete a task.   Devices can not use this API to participate in installation or removal tasks. Instead, devices must use the Deployment Workflow API. Edge App Deployment Service is based on Deployment Workflow Service and reflects all changes applied through Deployment Workflow API. Once a task is created in this API, it will be available also through Deployment Workflow API.   In order to be able to create an installation task, users first need to accept the terms and conditions for a specific device and application release ID. For this purpose, applications must present the corresponding terms and conditions to a user and forward the user's acceptance to this API.
+ *
+ * @export
+ * @class EdgeAppDeploymentClient
+ * @extends {SdkClient}
+ */
+export class EdgeAppDeploymentClient extends SdkClient {
+    private _baseUrl: string = "/api/edgeappdeployment/v3";
+
+    /**
+     * Returns a paginated list of all installation tasks for the given device id ordered in descending order of creation date (newest tasks first).
+     * @summary List installation tasks for a device
+     * @param {string} deviceId ID of the device
+     * @param {'closed' | 'open'} [status] Task status (closed tasks are tasks in ACTIVATED, CANCELED or FAILED states, open are all other)
+     * @param {number} [size] The maximum number of elements returned in one page
+     * @param {number} [page] The (0-based) index of the page
+     * @param {string} [sort] The order in which the elements are returned. Multiple fields could be used spearated by comma
+     * @returns {Promise<EdgeAppDeploymentModels.PaginatedTaskResource>}
+     * @throws {EdgeAppDeploymentModels.RequiredError}
+     *
+     * @example await edgeAppDeploymentClient.GetInstallationTasks("mdsp.myDevice");
+     * @memberof EdgeAppDeploymentClient
+     */
+    public async GetInstallationTasks(
+        deviceId: string,
+        status?: "closed" | "open",
+        size?: number,
+        page?: number,
+        sort?: string
+    ): Promise<EdgeAppDeploymentModels.PaginatedTaskResource>  {
+        // verify required parameter 'deviceId' is not null or undefined
+        if (deviceId === null || deviceId === undefined) {
+            throw new EdgeAppDeploymentModels.RequiredError(
+                "deviceId",
+                "Required parameter deviceId was null or undefined when calling GetInstallationTasks."
+            );
+        }
+
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/installationTasks?${toQueryString({ deviceId, status, size, page, sort })}`,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as EdgeAppDeploymentModels.PaginatedTaskResource;
+    }
+
+    /**
+     * Returns an installation task by id.
+     * @summary Get an installation task
+     * @param {string} id ID of the task
+     * @returns {Promise<EdgeAppDeploymentModels.TaskResource>}
+     * @throws {EdgeAppDeploymentModels.RequiredError}
+     *
+     * @example await edgeAppDeploymentClient.GetAppInstanceLifecycle("myAppInstanceID")
+     * @memberOf EdgeAppDeploymentClient
+     */
+    public async GetInstallationTask(id: string): Promise<EdgeAppDeploymentModels.TaskResource> {
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new EdgeAppDeploymentModels.RequiredError(
+                "id",
+                "Required parameter id was null or undefined when calling GetInstallationTask."
+            );
+        }
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/installationTasks/${id}`,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as EdgeAppDeploymentModels.TaskResource;
+    }
+
+    /**
+     * Creates a new installation task for the specified software release. The newly created task can be monitored and controlled using the Task Control API.  # Constraints # This endpoint performs a lot of consistency checks. * All ids must refer to existing entities.  * The referenced software release must be compatible with the device.  It is possible to create an installation task for a software already installed on the device. It is dependent on the device implementation what will happen in this case. Devices may re-install the software or cancel / abort the task with an error message.  # Task Execution #  Tasks created via this endpoint are executed in a fire&forget fashion. Execution will start immediately after creation and will run without further user interaction. Progress monitoring is however available via the Task Control API.
+     * @summary Create installation task for an application release to a device
+     * @param {EdgeAppDeploymentModels.Task} task Content of the installation task
+     * @returns {Promise<EdgeAppDeploymentModels.TaskResource>}
+     *
+     * @example await edgeAppDeploymentClient.PostInstallationTask(...)
+     * @memberOf EdgeAppDeploymentClient
+     */
+    public async PostInstallationTask(
+        task: EdgeAppDeploymentModels.Task
+    ): Promise<EdgeAppDeploymentModels.TaskResource> {
+        // verify required parameter 'task' is not null or undefined
+        if (task === null || task === undefined) {
+            throw new EdgeAppDeploymentModels.RequiredError(
+                "task",
+                "Required parameter task was null or undefined when calling PostInstallationTask.");
+        }
+
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/installationTasks`,
+            body: task,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as EdgeAppDeploymentModels.TaskResource;
+    }
+
+    /**
+     * Updates the installation task specified by the given device and task id. This endpoint should be used to perform backend triggered state transitions by advancing the task to the desired target state. # State Machine # The task system uses a state machine to synchronize the state of the device with the state of the backend (see general documentation for more details). All task updates must adhere to the state machine defined in the task. Failing to do so will cause a 409 Conflict error.
+     * @summary Update an installation task
+     * @param {string} id ID of the task
+     * @param {EdgeAppDeploymentModels.TaskStatus} status Content of the task status
+     * @returns {Promise<EdgeAppDeploymentModels.TaskResource>}
+     *
+     * @example await edgeAppDeploymentClient.PatchInstallationTask("myTaskID", myTaskStatus)
+     * @memberOf EdgeAppDeploymentClient
+     */
+    public async PatchInstallationTask(
+        id: string,
+        status: EdgeAppDeploymentModels.TaskStatus
+    ): Promise<EdgeAppDeploymentModels.TaskResource> {
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new EdgeAppDeploymentModels.RequiredError(
+                "id",
+                "Required parameter id was null or undefined when calling PatchInstallationTask."
+            );
+        }
+        // verify required parameter 'status' is not null or undefined
+        if (status === null || status === undefined) {
+            throw new EdgeAppDeploymentModels.RequiredError(
+                "status",
+                "Required parameter status was null or undefined when calling PatchInstallationTask."
+            );
+        }
+
+        const result = await this.HttpAction({
+            verb: "PATCH",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/installationTasks/${id}`,
+            body: status,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as EdgeAppDeploymentModels.TaskResource;
+    }
+
+    /**
+     * Returns a paginated list of all removal tasks for the given device id ordered in descending order of creation date (newest tasks first).
+     * @summary List removal tasks for a device
+     * @param {string} deviceId ID of the device
+     * @param {'closed' | 'open'} [status] Task status (closed tasks are tasks in ACTIVATED, CANCELED or FAILED states, open are all other)
+     * @param {number} [size] The maximum number of elements returned in one page
+     * @param {number} [page] The (0-based) index of the page
+     * @param {string} [sort] The order in which the elements are returned. Multiple fields could be used spearated by comma
+     * @returns {Promise<EdgeAppDeploymentModels.PaginatedTaskResource>}
+     * @throws {EdgeAppDeploymentModels.RequiredError}
+     *
+     * @example await edgeAppDeploymentClient.GetRemovalTasks("mdsp.EnvironmentDevice")
+     * @memberof EdgeAppDeploymentClient
+     */
+    public async GetRemovalTasks(
+        deviceId: string,
+        status?: "closed" | "open",
+        size?: number,
+        page?: number,
+        sort?: string
+    ): Promise<EdgeAppDeploymentModels.PaginatedTaskResource>  {
+        // verify required parameter 'deviceId' is not null or undefined
+        if (deviceId === null || deviceId === undefined) {
+            throw new EdgeAppDeploymentModels.RequiredError(
+                "deviceId",
+                "Required parameter deviceId was null or undefined when calling GetRemovalTasks."
+            );
+        }
+
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/removalTasks?${toQueryString({ deviceId, status, size, page, sort })}`,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as EdgeAppDeploymentModels.PaginatedTaskResource;
+    }
+
+    /**
+     * Creates a new removal task for the specified software release. The newly created task can be monitored and controlled using the Task Control API.  # Constraints # This endpoint performs a lot of consistency checks. * All ids must refer to existing entities.  * The referenced software release must be compatible with the device.  # Task Execution #  Tasks created via this endpoint are executed in a fire&forget fashion. Execution will start immediately after creation and will run without further user interaction. Progress monitoring is however available via the Task Control API.
+     * @summary Create removal task for an application release to a device
+     * @param {EdgeAppDeploymentModels.Task} task Content of the removal task
+     * @returns {Promise<EdgeAppDeploymentModels.TaskRessource>}
+     *
+     * @example await edgeAppDeploymentClient.PostRemovalTask(myRemovalTask)
+     * @memberOf EdgeAppDeploymentClient
+     */
+    public async PostRemovalTask(
+        task: EdgeAppDeploymentModels.Task
+    ): Promise<EdgeAppDeploymentModels.TaskResource> {
+        // verify required parameter 'task' is not null or undefined
+        if (task === null || task === undefined) {
+            throw new EdgeAppDeploymentModels.RequiredError(
+                "task",
+                "Required parameter instanceConfiguration was null or undefined when calling PostRemovalTask.");
+        }
+
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/removalTasks`,
+            body: task,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as EdgeAppDeploymentModels.TaskResource;
+    }
+
+    /**
+     * Checks whether terms and conditions have been accepted for a specific device and release.
+     * @summary Check acceptance of terms and conditions
+     * @param {string} deviceId ID of the device
+     * @param {string} releaseId ID of the application release
+     * @returns {Promise<EdgeAppDeploymentModels.TermsAndConditionsResource>}
+     * @throws {EdgeAppDeploymentModels.RequiredError}
+     *
+     * @example await edgeAppDeploymentClient.GetTermsAndConditions("mdsp.EnvironmentDevice", "V001");
+     * @memberof EdgeAppDeploymentClient
+     */
+    public async GetTermsAndConditions(
+        deviceId: string,
+        releaseId: string
+    ): Promise<EdgeAppDeploymentModels.TermsAndConditionsResource>  {
+        // verify required parameter 'deviceId' is not null or undefined
+        if (deviceId === null || deviceId === undefined) {
+            throw new EdgeAppDeploymentModels.RequiredError(
+                "deviceId",
+                "Required parameter deviceId was null or undefined when calling GetTermsAndConditions."
+            );
+        }
+        // verify required parameter 'releaseId' is not null or undefined
+        if (releaseId === null || releaseId === undefined) {
+            throw new EdgeAppDeploymentModels.RequiredError(
+                "releaseId",
+                "Required parameter releaseId was null or undefined when calling GetTermsAndConditions."
+            );
+        }
+
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/termsAndConditions?${toQueryString({ deviceId, releaseId})}`,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as EdgeAppDeploymentModels.TermsAndConditionsResource;
+    }
+
+    /**
+     * Accepts terms and conditions for a specific device and release. Has no effect if the terms and conditions have already been accepted earlier.
+     * @summary Accept terms and conditions
+     * @param {EdgeAppDeploymentModels.TermsAndConditions} termsandconditions acceptance notification
+     * @returns {Promise<EdgeAppDeploymentModels.TaskRessource>}
+     *
+     * @example await edgeAppDeploymentClient.PostTermsAndConditions(mytermsandconditions)
+     * @memberOf EdgeAppDeploymentClient
+     */
+    public async PostAcceptTermsAndConditions(
+        termsandconditions: EdgeAppDeploymentModels.TermsAndConditions
+    ): Promise<EdgeAppDeploymentModels.TermsAndConditionsResource> {
+        // verify required parameter 'termsandconditions' is not null or undefined
+        if (termsandconditions === null || termsandconditions === undefined) {
+            throw new EdgeAppDeploymentModels.RequiredError(
+                "termsandconditions",
+                "Required parameter termsandconditions was null or undefined when calling acceptTermsAndConditionsPost."
+            );
+        }
+
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/acceptTermsAndConditions`,
+            body: termsandconditions,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as EdgeAppDeploymentModels.TermsAndConditionsResource;
     }
 }

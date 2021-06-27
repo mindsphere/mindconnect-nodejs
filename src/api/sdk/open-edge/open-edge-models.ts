@@ -2196,3 +2196,286 @@ export namespace EdgeAppInstanceModels {
         instanceConfigurations?: Array<any>;
     }
 }
+
+export namespace EdgeAppDeploymentModels {
+
+    /**
+     *
+     * @export
+     */
+    export const COLLECTION_FORMATS = {
+        csv: ",",
+        ssv: " ",
+        tsv: "\t",
+        pipes: "|",
+    };
+
+    /**
+     *
+     * @export
+     * @class RequiredError
+     * @extends {Error}
+     */
+    export class RequiredError extends Error {
+        name: "RequiredError" = "RequiredError";
+        constructor(public field: string, msg?: string) {
+            super(msg);
+        }
+    }
+
+    /**
+     *
+     * @export
+     * @interface ErrorResponse
+     */
+    export interface ErrorResponse {
+        /**
+         *
+         * @type {Array<any>}
+         * @memberof ErrorResponse
+         */
+        errors?: Array<any>;
+    }
+
+    /**
+     *
+     * @export
+     * @interface Task
+     */
+    export interface Task {
+        /**
+         * ID of the device (Will be taken from path if omitted)
+         * @type {string}
+         * @memberof Task
+         */
+        deviceId: string;
+        /**
+         * Globally unique ID of the software product (Version independent)
+         * @type {string}
+         * @memberof Task
+         */
+        softwareId: string;
+        /**
+         * Globally unique ID of the release (Version dependent)
+         * @type {string}
+         * @memberof Task
+         */
+        softwareReleaseId: string;
+        /**
+         * Arbitrary, user defined block of json contaning additional information for the device
+         * @type {{ [key: string]: any; }}
+         * @memberof Task
+         */
+        customData?: { [key: string]: any; };
+    }
+
+    /**
+     *
+     * @export
+     * @interface TaskResource
+     */
+    export interface TaskResource {
+        /**
+         * ID of the task
+         * @type {string}
+         * @memberof TaskResource
+         */
+        id?: string;
+        /**
+         * ID of the device owning the task
+         * @type {string}
+         * @memberof TaskResource
+         */
+        deviceId?: string;
+        /**
+         * Type of software artifact
+         * @type {string}
+         * @memberof TaskResource
+         */
+        softwareType?: TaskResource.SoftwareTypeEnum;
+        /**
+         * Globally unique ID of the software product (Version independent)
+         * @type {string}
+         * @memberof TaskResource
+         */
+        softwareId?: string;
+        /**
+         * Globally unique ID of the software release (Version dependent)
+         * @type {string}
+         * @memberof TaskResource
+         */
+        softwareReleaseId?: string;
+        /**
+         * The version of the software release as human readable string
+         * @type {string}
+         * @memberof TaskResource
+         */
+        softwareVersion?: string;
+        /**
+         *
+         * @type {any}
+         * @memberof TaskResource
+         */
+        transitions?: any;
+        /**
+         *
+         * @type {any}
+         * @memberof TaskResource
+         */
+        history?: any;
+        /**
+         *
+         * @type {Array<any>}
+         * @memberof TaskResource
+         */
+        artifacts?: Array<any>;
+        /**
+         * Arbitrary, user defined block of json containing additional information for the device
+         * @type {{ [key: string]: any; }}
+         * @memberof TaskResource
+         */
+        customData?: { [key: string]: any; };
+        /**
+         * Datetime when the task was created
+         * @type {Date}
+         * @memberof TaskResource
+         */
+        createdAt?: Date;
+        /**
+         *
+         * @type {any}
+         * @memberof TaskResource
+         */
+        currentState?: any;
+    }
+
+    /**
+     * paginated list of task ressources
+     * @export
+     * @interface PaginatedTaskResource
+     */
+    export interface PaginatedTaskResource {
+        /**
+         *
+         * @type {Array<TaskResource>}
+         * @memberof PaginatedTaskResource
+         */
+        content?: Array<TaskResource>;
+        /**
+         *
+         * @type {any}
+         * @memberof PaginatedTaskResource
+         */
+        page?: any;
+    }
+
+    /**
+     * @export
+     * @namespace TaskResource
+     */
+    export namespace TaskResource {
+        /**
+         * @export
+         * @enum {string}
+         */
+        export enum SoftwareTypeEnum {
+            APP = <any> "APP"
+        }
+    }
+
+    /**
+     *
+     * @export
+     * @interface TaskStatus
+     */
+    export interface TaskStatus {
+        /**
+         * The new state of the task (might be same as current state)
+         * @type {string}
+         * @memberof TaskStatus
+         */
+        state: TaskStatus.StateEnum;
+        /**
+         * Progress in current state as value in [0.0, 1.0]
+         * @type {number}
+         * @memberof TaskStatus
+         */
+        progress: number;
+        /**
+         * Status message
+         * @type {string}
+         * @memberof TaskStatus
+         */
+        message?: string;
+        /**
+         * Arbitrary block of json data, should be used to report additional information such as error details, stack traces and etc
+         * @type {{ [key: string]: any; }}
+         * @memberof TaskStatus
+         */
+        details?: { [key: string]: any; };
+    }
+
+    /**
+     * @export
+     * @namespace TaskStatus
+     */
+    export namespace TaskStatus {
+        /**
+         * @export
+         * @enum {string}
+         */
+        export enum StateEnum {
+            DOWNLOAD = <any> "DOWNLOAD",
+            INSTALL = <any> "INSTALL",
+            ACTIVATE = <any> "ACTIVATE",
+            CANCELED = <any> "CANCELED",
+            FAILED = <any> "FAILED"
+        }
+    }
+
+    /**
+     *
+     * @export
+     * @interface TermsAndConditions
+     */
+    export interface TermsAndConditions {
+        /**
+         * ID of the device
+         * @type {string}
+         * @memberof TermsAndConditions
+         */
+        deviceId: string;
+        /**
+         * ID of the application release
+         * @type {string}
+         * @memberof TermsAndConditions
+         */
+        releaseId: string;
+    }
+
+    /**
+     *
+     * @export
+     * @interface TermsAndConditionsResource
+     */
+    export interface TermsAndConditionsResource {
+        /**
+         * ID of the device
+         * @type {string}
+         * @memberof TermsAndConditionsResource
+         */
+        deviceId?: string;
+        /**
+         * ID of the application release
+         * @type {string}
+         * @memberof TermsAndConditionsResource
+         */
+        releaseId?: string;
+        /**
+         *
+         * @type {Date}
+         * @memberof TermsAndConditionsResource
+         */
+        firstAccepted?: Date;
+    }
+}
