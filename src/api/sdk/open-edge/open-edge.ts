@@ -7,7 +7,8 @@ import { DeploymentWorkflowModels,
     DeviceManagementModels,
     DeviceStatusModels,
     EdgeAppInstanceModels,
-    EdgeAppDeploymentModels
+    EdgeAppDeploymentModels,
+    FirmwareDeploymentModels
 } from "./open-edge-models";
 
 /**
@@ -2244,7 +2245,7 @@ export class EdgeAppDeploymentClient extends SdkClient {
      * @param {EdgeAppDeploymentModels.TermsAndConditions} termsandconditions acceptance notification
      * @returns {Promise<EdgeAppDeploymentModels.TaskRessource>}
      *
-     * @example await edgeAppDeploymentClient.PostTermsAndConditions(mytermsandconditions)
+     * @example await edgeAppDeploymentClient.PostAcceptTermsAndConditions(mytermsandconditions)
      * @memberOf EdgeAppDeploymentClient
      */
     public async PostAcceptTermsAndConditions(
@@ -2254,7 +2255,7 @@ export class EdgeAppDeploymentClient extends SdkClient {
         if (termsandconditions === null || termsandconditions === undefined) {
             throw new EdgeAppDeploymentModels.RequiredError(
                 "termsandconditions",
-                "Required parameter termsandconditions was null or undefined when calling acceptTermsAndConditionsPost."
+                "Required parameter termsandconditions was null or undefined when calling PostAcceptTermsAndConditions."
             );
         }
 
@@ -2268,5 +2269,237 @@ export class EdgeAppDeploymentClient extends SdkClient {
         });
 
         return result as EdgeAppDeploymentModels.TermsAndConditionsResource;
+    }
+}
+
+/**
+ * Firmware Deployment API
+ * Firmware Deployment API helps to coordinate installation of firmware to devices. The provided operations do not trigger any actions themselves, but are meant to be used by northbound applications to coordinate user and device efforts. Installation tasks consist of different states that require the app user and the target device to participate in order to complete a task.   Devices cannot use this API to participate in installation tasks. Instead, devices must use the Deployment Workflow API. Firmware Deployment Service is based on Deployment Workflow Service and reflects all changes applied through Deployment Workflow API. Once a task is created in this API, it will be available also through Deployment Workflow API.   In order to be able to create an installation task, users first need to accept the terms and conditions for a specific device and firmware release ID. For this purpose, applications must present the corresponding terms and conditions to a user and forward the user's acceptance to this API.
+ *
+ * @export
+ * @class FirmwareDeploymentClient
+ * @extends {SdkClient}
+ */
+export class FirmwreDeploymentClient extends SdkClient {
+    private _baseUrl: string = "/api/firmwaredeployment/v3";
+
+    /**
+     * Returns a paginated list of all installation tasks for the given device id ordered in descending order of creation date (newest task first). Convenience method, equivalent to /search?deviceId={deviceId} It is possible to create an installation task for a software already installed on the device. It is dependent on the device implementation what will happen in this case. Devices may re-install the software or cancel / abort the task with an error message.  # Filter Criteria # Filter criteria can be specified as query parameters. Supported parameters are * *type*: filter for tasks of a specific type (firmware, app, etc) * *status*: filter based on task progress, one of \"closed\" or \"open\" (closed tasks are tasks in ACTIVATED, CANCELED or FAILED states, open are all other)
+     * @summary Lists installation tasks for a device.
+     * @param {string} deviceId id of the device
+     * @param {string} [type] Task Type
+     * @param {'closed' | 'open'} [status] Task status
+     * @param {number} [size] The maximum number of elements returned in one page
+     * @param {number} [page] The (0-based) index of the page
+     * @param {boolean} [history] Show task history
+     * @returns {Promise<FirmwareDeploymentModels.PaginatedInstallationTask>}
+     * @throws {FirmwareDeploymentModels.RequiredError}
+     *
+     * @example await firmwareDeploymentClient.GetInstallationTasks("mdsp.myDevice");
+     * @memberof FirmwreDeploymentClient
+     */
+    public async GetInstallationTasks(
+        deviceId: string,
+        type?: string,
+        status?: "closed" | "open",
+        size?: number,
+        page?: number,
+        sort?: string,
+        history?: boolean
+    ): Promise<FirmwareDeploymentModels.PaginatedInstallationTask>  {
+        // verify required parameter 'deviceId' is not null or undefined
+        if (deviceId === null || deviceId === undefined) {
+            throw new EdgeAppDeploymentModels.RequiredError(
+                "deviceId",
+                "Required parameter deviceId was null or undefined when calling GetInstallationTasks."
+            );
+        }
+
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/installationTasks?${toQueryString({ deviceId, type, status, size, page, sort, history })}`,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as EdgeAppDeploymentModels.PaginatedTaskResource;
+    }
+
+    /**
+     * Returns a task by id.
+     * @summary Get installation task.
+     * @param {string} id id of the task
+     * @param {boolean} [history] Show task history
+     * @returns {Promise<FirmwareDeploymentModels.TaskResource>}
+     * @throws {FirmwareDeploymentModels.RequiredError}
+     *
+     * @example await firmwareDeploymentClient.GetInstallationTask("myAppInstanceID")
+     * @memberOf FirmwreDeploymentClient
+     */
+    public async GetInstallationTask(id: string, history?: boolean): Promise<FirmwareDeploymentModels.InstallationTask> {
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new FirmwareDeploymentModels.RequiredError(
+                "id",
+                "Required parameter id was null or undefined when calling GetInstallationTask."
+            );
+        }
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/installationTasks/${id}?${toQueryString({ history})}`,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as FirmwareDeploymentModels.InstallationTask;
+    }
+
+    /**
+     * Creates a new deployment task for the specified software release. The newly created task can be monitored and controlled  # Constraints #  This endpoint performs a lot of consistency checks.  * All ids must refer to existing entities. * The referenced software release must be compatible with the device.  It is possible to create an installation task for a software already installed on the device. It is dependent on the device implementation what will happen in this case. Devices may re-install the software or cancel / abort the task with an error message.   # Task Execution #  Tasks created via this endpoint are executed in a fire&forget fashion. Execution will start immediately after creation and will run without further user interaction. Progress monitoring is however available.
+     * @summary Deploy firmware release to device.
+     * @param {InstallationTaskInfo} taskDefinition content of the new task
+     * @returns {Promise<FirmwareDeploymentModels.InstallationTask>}
+     *
+     * @example await firmwareDeploymentClient.PostInstallationTask(...)
+     * @memberOf FirmwreDeploymentClient
+     */
+    public async PostInstallationTask(
+        taskDefinition: FirmwareDeploymentModels.InstallationTaskInfo
+    ): Promise<FirmwareDeploymentModels.InstallationTask> {
+        // verify required parameter 'taskDefinition' is not null or undefined
+        if (taskDefinition === null || taskDefinition === undefined) {
+            throw new FirmwareDeploymentModels.RequiredError(
+                "taskDefinition",
+                "Required parameter taskDefinition was null or undefined when calling PostInstallationTask.");
+        }
+
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/installationTasks`,
+            body: taskDefinition,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as FirmwareDeploymentModels.InstallationTask;
+    }
+
+    /**
+     * Updates the task specified by the given device and task id. This endpoint should be used to perform backend triggered state transitions by advancing the task to the desired target state.  # State Machine # The task system uses a state machine to synchronize the state of the device with the state of the backend (see general documentation for more details). All task updates must adhere to the state machine defined in the task. Failing to do so will cause a 409 Conflict error.
+     * @summary Update installation task.
+     * @param {string} id id of the task
+     * @param {FirmwareDeploymentModels.TaskUpdate} updateTaskInfo update message
+     * @param {boolean} [history] Show task history
+     * @returns {Promise<FirmwareDeploymentModels.TaskResource>}
+     *
+     * @example await firmwareDeploymentClient.PatchInstallationTask("myTaskID", myTaskStatus)
+     * @memberOf FirmwreDeploymentClient
+     */
+    public async PatchInstallationTask(
+        id: string,
+        updateTaskInfo: FirmwareDeploymentModels.TaskUpdate,
+        history?: boolean
+    ): Promise<FirmwareDeploymentModels.InstallationTask> {
+        // verify required parameter 'id' is not null or undefined
+        if (id === null || id === undefined) {
+            throw new FirmwareDeploymentModels.RequiredError(
+                "id",
+                "Required parameter id was null or undefined when calling PatchInstallationTask."
+            );
+        }
+        // verify required parameter 'updateTaskInfo' is not null or undefined
+        if (updateTaskInfo === null || updateTaskInfo === undefined) {
+            throw new FirmwareDeploymentModels.RequiredError(
+                "updateTaskInfo",
+                "Required parameter updateTaskInfo was null or undefined when calling PatchInstallationTask."
+            );
+        }
+
+        const result = await this.HttpAction({
+            verb: "PATCH",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/installationTasks/${id}?${toQueryString({ history})}`,
+            body: updateTaskInfo,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as FirmwareDeploymentModels.InstallationTask;
+    }
+
+    /**
+     * Checks whether terms and conditions have been accepted for a specific device and release
+     * @summary Check acceptance of terms and conditions
+     * @param {string} deviceId id of the device
+     * @param {string} releaseId releaseId
+     * @returns {Promise<FirmwareDeploymentModels.TermsAndConditionsRecord>}
+     * @throws {FirmwareDeploymentModels.RequiredError}
+     *
+     * @example await firmwareDeploymentClient.GetTermsAndConditions("mdsp.EnvironmentDevice", "V001");
+     * @memberof FirmwreDeploymentClient
+     */
+    public async GetTermsAndConditions(
+        deviceId: string,
+        releaseId: string
+    ): Promise<FirmwareDeploymentModels.TermsAndConditionsRecord>  {
+        // verify required parameter 'deviceId' is not null or undefined
+        if (deviceId === null || deviceId === undefined) {
+            throw new FirmwareDeploymentModels.RequiredError(
+                "deviceId",
+                "Required parameter deviceId was null or undefined when calling GetTermsAndConditions."
+            );
+        }
+        // verify required parameter 'releaseId' is not null or undefined
+        if (releaseId === null || releaseId === undefined) {
+            throw new FirmwareDeploymentModels.RequiredError(
+                "releaseId",
+                "Required parameter releaseId was null or undefined when calling GetTermsAndConditions."
+            );
+        }
+
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/termsAndConditions?${toQueryString({ deviceId, releaseId})}`,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as FirmwareDeploymentModels.TermsAndConditionsRecord;
+    }
+
+    /**
+     * Accepts terms and conditions for a specific device and release.  Has no effect if the terms and conditions have already been accepted earlier
+     * @summary Accept terms and conditions
+     * @param {FirmwareDeploymentModels.TermsAndConditionsAcceptance} acceptance acceptance notification
+     * @returns {Promise<FirmwareDeploymentModels.TermsAndConditionsRecord>}
+     *
+     * @example await firmwareDeploymentClient.PostAcceptTermsAndConditions(mytermsandconditions)
+     * @memberOf FirmwreDeploymentClient
+     */
+    public async PostAcceptTermsAndConditions(
+        acceptance: FirmwareDeploymentModels.TermsAndConditionsAcceptance
+    ): Promise<FirmwareDeploymentModels.TermsAndConditionsRecord> {
+        // verify required parameter 'termsandconditions' is not null or undefined
+        if (acceptance === null || acceptance === undefined) {
+            throw new FirmwareDeploymentModels.RequiredError(
+                "acceptance",
+                "Required parameter acceptance was null or undefined when calling PostAcceptTermsAndConditions."
+            );
+        }
+
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/acceptTermsAndConditions`,
+            body: acceptance,
+            additionalHeaders: { "Content-Type": "application/json" },
+        });
+
+        return result as FirmwareDeploymentModels.TermsAndConditionsRecord;
     }
 }

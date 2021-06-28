@@ -2479,3 +2479,555 @@ export namespace EdgeAppDeploymentModels {
         firstAccepted?: Date;
     }
 }
+
+export namespace FirmwareDeploymentModels {
+
+    /**
+     *
+     * @export
+     */
+    export const COLLECTION_FORMATS = {
+        csv: ",",
+        ssv: " ",
+        tsv: "\t",
+        pipes: "|",
+    };
+
+    /**
+     *
+     * @export
+     * @class RequiredError
+     * @extends {Error}
+     */
+    export class RequiredError extends Error {
+        name: "RequiredError" = "RequiredError";
+        constructor(public field: string, msg?: string) {
+            super(msg);
+        }
+    }
+
+    /**
+     *
+     * @export
+     * @interface ErrorResponse
+     */
+    export interface ErrorResponse {
+        /**
+         *
+         * @type {Array<Error>}
+         * @memberof ErrorResponse
+         */
+        errors?: Array<Error>;
+    }
+
+    /**
+     *
+     * @export
+     * @interface InstallationArtifact
+     */
+    export interface InstallationArtifact {
+        /**
+         * name of the file
+         * @type {string}
+         * @memberof InstallationArtifact
+         */
+        name: string;
+        /**
+         * download URI
+         * @type {string}
+         * @memberof InstallationArtifact
+         */
+        uri: string;
+        /**
+         * hash of the file in format `<algorithm>:<hash in hex>`
+         * @type {string}
+         * @memberof InstallationArtifact
+         */
+        checksum: string;
+        /**
+         * expiry time for `uri`
+         * @type {Date}
+         * @memberof InstallationArtifact
+         */
+        validUntil?: Date;
+    }
+
+    /**
+     * information about a single state of the state machine
+     * @export
+     * @interface InstallationStateInfo
+     */
+    export interface InstallationStateInfo {
+        /**
+         * date and time when the state was first entered
+         * @type {Date}
+         * @memberof InstallationStateInfo
+         */
+        entered?: Date;
+        /**
+         * date and time the state was last updated, will differ from \"entered\" if state is updated repeatedly
+         * @type {Date}
+         * @memberof InstallationStateInfo
+         */
+        updated?: Date;
+        /**
+         * progress in current state as value in [0.0, 1.0]
+         * @type {number}
+         * @memberof InstallationStateInfo
+         */
+        progress?: number;
+        /**
+         * status message / info, free text from device
+         * @type {string}
+         * @memberof InstallationStateInfo
+         */
+        message?: string;
+        /**
+         * arbitrary block of json data, should be used to report additional information such as error details, stack traces, etc; max size in string representation is 20k
+         * @type {any}
+         * @memberof InstallationStateInfo
+         */
+        details?: any;
+        /**
+         * name of the state
+         * @type {string}
+         * @memberof InstallationStateInfo
+         */
+        state?: InstallationStateInfo.StateEnum;
+    }
+
+    /**
+     * @export
+     * @namespace InstallationStateInfo
+     */
+    export namespace InstallationStateInfo {
+        /**
+         * @export
+         * @enum {string}
+         */
+        export enum StateEnum {
+            CREATED = <any> "CREATED",
+            DOWNLOAD = <any> "DOWNLOAD",
+            DOWNLOADING = <any> "DOWNLOADING",
+            DOWNLOADED = <any> "DOWNLOADED",
+            INSTALL = <any> "INSTALL",
+            INSTALLING = <any> "INSTALLING",
+            INSTALLED = <any> "INSTALLED",
+            ACTIVATE = <any> "ACTIVATE",
+            ACTIVATING = <any> "ACTIVATING",
+            ACTIVATED = <any> "ACTIVATED",
+            CANCELED = <any> "CANCELED",
+            FAILED = <any> "FAILED"
+        }
+    }
+
+    /**
+     * single task
+     * @export
+     * @interface InstallationTask
+     */
+    export interface InstallationTask {
+        /**
+         * globally unique id of the task
+         * @type {string}
+         * @memberof InstallationTask
+         */
+        id?: string;
+        /**
+         * id of the device owning the task
+         * @type {string}
+         * @memberof InstallationTask
+         */
+        deviceId?: string;
+        /**
+         * type of software artifact: firmware, app, etc; list will be extended in future releases
+         * @type {string}
+         * @memberof InstallationTask
+         */
+        softwareType?: InstallationTask.SoftwareTypeEnum;
+        /**
+         * globally unique id of the software product (version independent id)
+         * @type {string}
+         * @memberof InstallationTask
+         */
+        softwareId?: string;
+        /**
+         * globally unique id of the specific release (version dependent)
+         * @type {string}
+         * @memberof InstallationTask
+         */
+        softwareReleaseId?: string;
+        /**
+         * the version of the software as human readable string
+         * @type {string}
+         * @memberof InstallationTask
+         */
+        softwareVersion?: string;
+        /**
+         * Indicates whether to install or remove the software
+         * @type {string}
+         * @memberof InstallationTask
+         */
+        actionType?: InstallationTask.ActionTypeEnum;
+        /**
+         * if set to true, task is going to be cancelled
+         * @type {boolean}
+         * @memberof InstallationTask
+         */
+        shouldCancel?: boolean;
+        /**
+         * possible set of transitions
+         * @type {Array<Transition>}
+         * @memberof InstallationTask
+         */
+        transitions?: Array<Transition>;
+        /**
+         * previously passed states of task
+         * @type {Array<InstallationStateInfo>}
+         * @memberof InstallationTask
+         */
+        history?: Array<InstallationStateInfo>;
+        /**
+         *
+         * @type {Array<InstallationArtifact>}
+         * @memberof InstallationTask
+         */
+        artifacts?: Array<InstallationArtifact>;
+        /**
+         * optional; arbitrary, user defined block of json containing additional information for the device
+         * @type {{ [key: string]: any; }}
+         * @memberof InstallationTask
+         */
+        customData?: { [key: string]: any; };
+        /**
+         * date and time when the task was created
+         * @type {Date}
+         * @memberof InstallationTask
+         */
+        createdAt?: Date;
+        /**
+         *
+         * @type {InstallationStateInfo}
+         * @memberof InstallationTask
+         */
+        currentState?: InstallationStateInfo;
+    }
+
+    /**
+     * @export
+     * @namespace InstallationTask
+     */
+    export namespace InstallationTask {
+        /**
+         * @export
+         * @enum {string}
+         */
+        export enum SoftwareTypeEnum {
+            FIRMWARE = <any> "FIRMWARE",
+            APP = <any> "APP"
+        }
+        /**
+         * @export
+         * @enum {string}
+         */
+        export enum ActionTypeEnum {
+            INSTALL = <any> "INSTALL",
+            REMOVE = <any> "REMOVE"
+        }
+    }
+
+    /**
+     *
+     * @export
+     * @interface InstallationTaskInfo
+     */
+    export interface InstallationTaskInfo {
+        /**
+         * optional, id of the device; will be taken from path if omitted
+         * @type {string}
+         * @memberof InstallationTaskInfo
+         */
+        deviceId?: string;
+        /**
+         * type of software artifact (firmware, app, etc); list will be extended in future releases
+         * @type {string}
+         * @memberof InstallationTaskInfo
+         */
+        softwareType: InstallationTaskInfo.SoftwareTypeEnum;
+        /**
+         * globally unique id of the software product (version independent id)
+         * @type {string}
+         * @memberof InstallationTaskInfo
+         */
+        softwareId: string;
+        /**
+         * globally unique id of the specific release (version dependent)
+         * @type {string}
+         * @memberof InstallationTaskInfo
+         */
+        softwareReleaseId: string;
+        /**
+         * custom transitions
+         * @type {Array<Transition>}
+         * @memberof InstallationTaskInfo
+         */
+        transitions?: Array<Transition>;
+        /**
+         * optional; arbitrary, user defined block of json containing additional information for the device
+         * @type {{ [key: string]: any; }}
+         * @memberof InstallationTaskInfo
+         */
+        customData?: { [key: string]: any; };
+    }
+
+    /**
+     * @export
+     * @namespace InstallationTaskInfo
+     */
+    export namespace InstallationTaskInfo {
+        /**
+         * @export
+         * @enum {string}
+         */
+        export enum SoftwareTypeEnum {
+            FIRMWARE = <any> "FIRMWARE",
+            APP = <any> "APP"
+        }
+    }
+
+    /**
+     *
+     * @export
+     * @interface ModelError
+     */
+    export interface ModelError {
+        /**
+         * identifier code for the reason of the error
+         * @type {string}
+         * @memberof ModelError
+         */
+        code?: string;
+        /**
+         * log correlation ID
+         * @type {string}
+         * @memberof ModelError
+         */
+        logref?: string;
+        /**
+         * error message
+         * @type {string}
+         * @memberof ModelError
+         */
+        message?: string;
+    }
+
+    /**
+     * paginated list of configuration update tasks
+     * @export
+     * @interface PaginatedInstallationTask
+     */
+    export interface PaginatedInstallationTask {
+        /**
+         *
+         * @type {Array<InstallationTask>}
+         * @memberof PaginatedInstallationTask
+         */
+        content?: Array<InstallationTask>;
+        /**
+         *
+         * @type {any}
+         * @memberof PaginatedInstallationTask
+         */
+        page?: any;
+    }
+
+    /**
+     * backend sent progress update
+     * @export
+     * @interface TaskUpdate
+     */
+    export interface TaskUpdate {
+        /**
+         * the new state of the task (might be same as current state)
+         * @type {string}
+         * @memberof TaskUpdate
+         */
+        state: TaskUpdate.StateEnum;
+        /**
+         * progress in current state as value in [0.0, 1.0]
+         * @type {number}
+         * @memberof TaskUpdate
+         */
+        progress: number;
+        /**
+         * optional; status message / info, free text from backend
+         * @type {string}
+         * @memberof TaskUpdate
+         */
+        message?: string;
+        /**
+         * arbitrary block of json data, should be used to report additional information such as error details, stack traces, etc; max size in string representation is 20k
+         * @type {any}
+         * @memberof TaskUpdate
+         */
+        details?: any;
+    }
+
+    /**
+     * @export
+     * @namespace TaskUpdate
+     */
+    export namespace TaskUpdate {
+        /**
+         * @export
+         * @enum {string}
+         */
+        export enum StateEnum {
+            CREATED = <any> "CREATED",
+            DOWNLOAD = <any> "DOWNLOAD",
+            DOWNLOADING = <any> "DOWNLOADING",
+            DOWNLOADED = <any> "DOWNLOADED",
+            INSTALL = <any> "INSTALL",
+            INSTALLING = <any> "INSTALLING",
+            INSTALLED = <any> "INSTALLED",
+            ACTIVATE = <any> "ACTIVATE",
+            ACTIVATING = <any> "ACTIVATING",
+            ACTIVATED = <any> "ACTIVATED",
+            CANCELED = <any> "CANCELED",
+            FAILED = <any> "FAILED"
+        }
+    }
+
+    /**
+     *
+     * @export
+     * @interface TermsAndConditionsAcceptance
+     */
+    export interface TermsAndConditionsAcceptance {
+        /**
+         *
+         * @type {string}
+         * @memberof TermsAndConditionsAcceptance
+         */
+        deviceId?: string;
+        /**
+         *
+         * @type {string}
+         * @memberof TermsAndConditionsAcceptance
+         */
+        releaseId?: string;
+    }
+
+    /**
+     *
+     * @export
+     * @interface TermsAndConditionsRecord
+     */
+    export interface TermsAndConditionsRecord {
+        /**
+         *
+         * @type {string}
+         * @memberof TermsAndConditionsRecord
+         */
+        deviceId?: string;
+        /**
+         *
+         * @type {string}
+         * @memberof TermsAndConditionsRecord
+         */
+        releaseId?: string;
+        /**
+         *
+         * @type {Date}
+         * @memberof TermsAndConditionsRecord
+         */
+        firstAccepted?: Date;
+        /**
+         *
+         * @type {string}
+         * @memberof TermsAndConditionsRecord
+         */
+        softwareId?: string;
+        /**
+         *
+         * @type {string}
+         * @memberof TermsAndConditionsRecord
+         */
+        bundleId?: string;
+    }
+
+    /**
+     * Information about the transition status
+     * @export
+     * @interface Transition
+     */
+    export interface Transition {
+        /**
+         * type of the transition
+         * @type {string}
+         * @memberof Transition
+         */
+        type?: string;
+        /**
+         * name of the state
+         * @type {string}
+         * @memberof Transition
+         */
+        from?: Transition.FromEnum;
+        /**
+         * name of the state
+         * @type {string}
+         * @memberof Transition
+         */
+        to?: Transition.ToEnum;
+        /**
+         *
+         * @type {any}
+         * @memberof Transition
+         */
+        details?: any;
+    }
+
+    /**
+     * @export
+     * @namespace Transition
+     */
+    export namespace Transition {
+        /**
+         * @export
+         * @enum {string}
+         */
+        export enum FromEnum {
+            CREATED = <any> "CREATED",
+            DOWNLOAD = <any> "DOWNLOAD",
+            DOWNLOADING = <any> "DOWNLOADING",
+            DOWNLOADED = <any> "DOWNLOADED",
+            INSTALL = <any> "INSTALL",
+            INSTALLING = <any> "INSTALLING",
+            INSTALLED = <any> "INSTALLED",
+            ACTIVATE = <any> "ACTIVATE",
+            ACTIVATING = <any> "ACTIVATING",
+            ACTIVATED = <any> "ACTIVATED",
+            CANCELED = <any> "CANCELED",
+            FAILED = <any> "FAILED"
+        }
+        /**
+         * @export
+         * @enum {string}
+         */
+        export enum ToEnum {
+            CREATED = <any> "CREATED",
+            DOWNLOAD = <any> "DOWNLOAD",
+            DOWNLOADING = <any> "DOWNLOADING",
+            DOWNLOADED = <any> "DOWNLOADED",
+            INSTALL = <any> "INSTALL",
+            INSTALLING = <any> "INSTALLING",
+            INSTALLED = <any> "INSTALLED",
+            ACTIVATE = <any> "ACTIVATE",
+            ACTIVATING = <any> "ACTIVATING",
+            ACTIVATED = <any> "ACTIVATED",
+            CANCELED = <any> "CANCELED",
+            FAILED = <any> "FAILED"
+        }
+    }
+}
