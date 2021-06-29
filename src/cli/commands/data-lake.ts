@@ -23,14 +23,19 @@ export default (program: CommanderStatic) => {
         .alias("dlk")
         .option(
             "-m, --mode [...]",
-            "mode: list | read | write | delete | readtoken | writetoken | uploadurl | downloadurl | upload | meta",
+            "mode: list | read | write | delete | readtoken | writetoken | uploadurl | downloadurl | upload | meta | subscriptions | subscribe | unsubscribe ",
             "list"
         )
         .option("-f, --file <file>", "file to upload")
         .option("-l, --shell [bash|ps|cmd]", "output format for STS token [bash | ps | cmd]", "bash")
-        .option("-p, --path <path>", "path for read/write token or uploadUrl downloadUrl comamand")
+        .option(
+            "-p, --path <path>",
+            "path for read/write token or uploadUrl, downloadUrl, subscribe or unsubscribe comamand"
+        )
+        .option("-t, --destination <destination>", "destination for subscribe comamand")
         .option("-i, --permissionid <permissionid>", "permission id for delete operation")
         .option("-s, --subtenantid <subtenantid>", "subtenant id")
+        .option("-b, --subscriptionid <subscriptionid>", "subscription id")
         .option("-d, --duration <duration>", "duration in seconds", "3600")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
@@ -48,6 +53,15 @@ export default (program: CommanderStatic) => {
                     switch (options.mode) {
                         case "list":
                             await listPermissions(options, sdk);
+                            break;
+                        case "subscriptions":
+                            await subscriptions(sdk, options);
+                            break;
+                        case "subscribe":
+                            await subscribe(sdk, options);
+                            break;
+                        case "unsubscribe":
+                            await unsubscribe(sdk, options);
                             break;
                         case "meta":
                             await getMetadata(sdk, options);
@@ -104,6 +118,14 @@ export default (program: CommanderStatic) => {
             log(
                 `    mc data-lake --mode downloadurl --path uploads/CHANGELOG.md \t\t generate download url for the path`
             );
+
+            log(`    mc data-lake --mode subscriptions \t\t\t\t\t\t list all data lake event subscriptions`);
+
+            log(
+                `    mc data-lake --mode subscribe --path <datalakepath> --destination aws-sns://<aws sns topic> \t subscribe an AWS SNS topic to folder changes`
+            );
+
+            log(`    mc data-lake --mode unsubscribe --subscriptionid <id>  \t\t\t delete event subscription`);
 
             log("\n  Additional Information:\n");
             log(
@@ -245,6 +267,62 @@ async function generateToken(sdk: MindSphereSdk, options: any) {
     console.log(color(`\n\ts3://${result.storageAccount}/${result.storagePath}\n`));
 }
 
+async function subscriptions(sdk: MindSphereSdk, options: any) {
+    const dataLake = sdk.GetDataLakeClient();
+
+    let page = 0;
+    let subs;
+    let subsCount = 0;
+
+    console.log(`subid storageAccount ${color("storagePath")} destination eTag status subTenantId`);
+    do {
+        subs = (await retry(options.retry, () =>
+            dataLake.GetObjectEventSubscriptions({
+                page: page,
+                size: 100,
+            })
+        )) as DataLakeModels.SubscriptionListResource;
+
+        subs.page = subs.page || { totalPages: 0 };
+
+        for (const sub of subs.subscriptions || []) {
+            subsCount++;
+            console.log(
+                `${sub.id} ${sub.storageAccount} ${color(sub.storagePath)} ${sub.destination} ${sub.eTag} ${
+                    sub.status
+                } \t${color(sub.subtenantId || "")}`
+            );
+
+            verboseLog(JSON.stringify(sub, null, 2), options.verbose);
+        }
+    } while (page++ < (subs.page.totalPages || 0));
+
+    console.log(`${color(subsCount)} subscriptions listed.\n`);
+}
+
+async function subscribe(sdk: MindSphereSdk, options: any) {
+    const dataLake = sdk.GetDataLakeClient();
+
+    const result = await dataLake.PostObjectEventSubscriptions({
+        destination: options.destination,
+        path: options.path,
+        subtenantId: options.subtenantid,
+    });
+
+    verboseLog(result, options.verbose);
+    console.log(`Subscription created.`);
+}
+
+async function unsubscribe(sdk: MindSphereSdk, options: any) {
+    const dataLake = sdk.GetDataLakeClient();
+    const sub = await dataLake.GetObjectEventSubscription(options.subscriptionid);
+    await dataLake.DeleteObjectEventSubscription(options.subscriptionid, {
+        ifMatch: parseInt(sub.eTag.toString()),
+    });
+
+    console.log(`Subscription with ${color(options.subscriptionid)} deleted.`);
+}
+
 export async function listPermissions(options: any, sdk: MindSphereSdk) {
     const dataLake = sdk.GetDataLakeClient();
 
@@ -277,7 +355,7 @@ export async function listPermissions(options: any, sdk: MindSphereSdk) {
 }
 
 function checkRequiredParameters(options: any) {
-    ["upload", "uploadurl", "downloadurl", "meta"].includes(options.mode) &&
+    ["upload", "uploadurl", "downloadurl", "meta", "subscribe"].includes(options.mode) &&
         !options.path &&
         errorLog(`You have to specify --path for mc data-lake --mode ${options.mode} command.`, true);
 
@@ -292,4 +370,12 @@ function checkRequiredParameters(options: any) {
     options.shell &&
         !["bash", "ps", "cmd"].includes(options.shell) &&
         errorLog("The shell can only be bash, ps (Windows PowerShell) or cmd (Windows cmd).", true);
+
+    options.mode === "subscribe" &&
+        !options.destination &&
+        errorLog("You have to specify the destination topic for notification.", true);
+
+    options.mode === "unsubscribe" &&
+        !options.subscriptionid &&
+        errorLog("You have to specify the subscriptionid.", true);
 }
