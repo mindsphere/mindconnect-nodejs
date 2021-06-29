@@ -92,6 +92,7 @@ describe("[SDK] DeviceManagementClient.FirmwareDeployment", () => {
         testConfigurations.appInstanceId = `${appInstanceId}`;
         testConfigurations.appReleaseId = `${appReleaseId}`;
         const instConfRes = await edgeAppInstanceClient.PostAppInstanceConfigurations(testConfigurations);
+        instConfRes.should.not.be.undefined;
 
         // Set the firmwareTemplate
         firmwareTemplate.deviceId = `${deviceId}`;
