@@ -178,17 +178,17 @@ function writeAppInstConfigToFile(options: any, templateType: any) {
     );
 }
 
-// @Jupiter are these methods not ment to be used?
-async function configureAppInstance(options: any, sdk: MindSphereSdk) {
-    const id = (options.id! as string) ? options.id : `${options.id}`;
+// // @Jupiter are these methods not ment to be used?
+// async function configureAppInstance(options: any, sdk: MindSphereSdk) {
+//     const id = (options.id! as string) ? options.id : `${options.id}`;
 
-    const filePath = path.resolve(options.file);
-    const file = fs.readFileSync(filePath);
-    const data = JSON.parse(file.toString());
+//     const filePath = path.resolve(options.file);
+//     const file = fs.readFileSync(filePath);
+//     const data = JSON.parse(file.toString());
 
-    await sdk.GetEdgeAppInstanceManagementClient().PatchAppInstanceConfigurationData(id, data);
-    console.log(`configured app instance with id ${color(id)}`);
-}
+//     await sdk.GetEdgeAppInstanceManagementClient().PatchAppInstanceConfigurationData(id, data);
+//     console.log(`configured app instance with id ${color(id)}`);
+// }
 
 async function deleteAppInst(options: any, sdk: MindSphereSdk) {
     const id = (options.id! as string) ? options.id : `${options.id}`;
@@ -196,12 +196,12 @@ async function deleteAppInst(options: any, sdk: MindSphereSdk) {
     console.log(`Application instance with id ${color(id)} deleted.`);
 }
 
-// @Jupiter are these methods not ment to be used?
-async function deleteAppInstConfiguration(options: any, sdk: MindSphereSdk) {
-    const id = (options.id! as string) ? options.id : `${options.id}`;
-    await sdk.GetEdgeAppInstanceManagementClient().DeleteAppInstanceConfiguration(id);
-    console.log(`Application instance configuration with id ${color(id)} deleted.`);
-}
+// // @Jupiter are these methods not ment to be used?
+// async function deleteAppInstConfiguration(options: any, sdk: MindSphereSdk) {
+//     const id = (options.id! as string) ? options.id : `${options.id}`;
+//     await sdk.GetEdgeAppInstanceManagementClient().DeleteAppInstanceConfiguration(id);
+//     console.log(`Application instance configuration with id ${color(id)} deleted.`);
+// }
 
 async function listApps(sdk: MindSphereSdk, options: any) {
     const edgeAppInstanceClient = sdk.GetEdgeAppInstanceManagementClient();
@@ -260,17 +260,17 @@ async function appInstanceInfo(options: any, sdk: MindSphereSdk) {
     );
 }
 
-async function appInstanceConfigInfo(options: any, sdk: MindSphereSdk) {
-    const id = (options.id! as string) ? options.id : `${options.id}`;
-    const appInstConfig = await sdk.GetEdgeAppInstanceManagementClient().GetAppInstanceConfiguration(id);
-    printObjectInfo(
-        "App Instance Configuration",
-        appInstConfig,
-        options,
-        ["deviceId", "appId", "appReleaseId", "appInstanceId", "configuration"],
-        color
-    );
-}
+// async function appInstanceConfigInfo(options: any, sdk: MindSphereSdk) {
+//     const id = (options.id! as string) ? options.id : `${options.id}`;
+//     const appInstConfig = await sdk.GetEdgeAppInstanceManagementClient().GetAppInstanceConfiguration(id);
+//     printObjectInfo(
+//         "App Instance Configuration",
+//         appInstConfig,
+//         options,
+//         ["deviceId", "appId", "appReleaseId", "appInstanceId", "configuration"],
+//         color
+//     );
+// }
 
 function checkRequiredParameters(options: any) {
     options.mode === "create" &&

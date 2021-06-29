@@ -2,13 +2,14 @@
 
 import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
-import { DeploymentWorkflowModels,
+import {
+    DeploymentWorkflowModels,
     DeviceConfigurationModels,
     DeviceManagementModels,
     DeviceStatusModels,
-    EdgeAppInstanceModels,
     EdgeAppDeploymentModels,
-    FirmwareDeploymentModels
+    EdgeAppInstanceModels,
+    FirmwareDeploymentModels,
 } from "./open-edge-models";
 
 /**
@@ -438,9 +439,7 @@ export class DeviceStatusManagementClient extends SdkClient {
      * @throws {DeviceStatusModels.RequiredError}
      * @memberof DeviceStatusManagementClient
      */
-    public async GetDeviceHealth(
-        id: string
-    ): Promise<DeviceStatusModels.DeviceHealthStatusReport> {
+    public async GetDeviceHealth(id: string): Promise<DeviceStatusModels.DeviceHealthStatusReport> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceStatusModels.RequiredError(
@@ -506,9 +505,7 @@ export class DeviceStatusManagementClient extends SdkClient {
      * @throws {DeviceStatusModels.RequiredError}
      * @memberof DeviceStatusManagementClient
      */
-    public async GetDeviceHealthDataConfig(
-        id: string
-    ): Promise<DeviceStatusModels.DeviceHealthStatusReport> {
+    public async GetDeviceHealthDataConfig(id: string): Promise<DeviceStatusModels.DeviceHealthStatusReport> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceStatusModels.RequiredError(
@@ -535,9 +532,7 @@ export class DeviceStatusManagementClient extends SdkClient {
      * @throws {DeviceStatusModels.RequiredError}
      * @memberof DeviceStatusManagementClient
      */
-    public async PostDeviceHeartbeat(
-        id: string
-    ): Promise<Response> {
+    public async PostDeviceHeartbeat(id: string): Promise<Response> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceStatusModels.RequiredError(
@@ -565,9 +560,7 @@ export class DeviceStatusManagementClient extends SdkClient {
      * @throws {DeviceStatusModels.RequiredError}
      * @memberof DeviceStatusManagementClient
      */
-    public async GetDeviceConnectionStatus(
-        id: string
-    ): Promise<DeviceStatusModels.OnlineStatus> {
+    public async GetDeviceConnectionStatus(id: string): Promise<DeviceStatusModels.OnlineStatus> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceStatusModels.RequiredError(
@@ -632,10 +625,7 @@ export class DeviceStatusManagementClient extends SdkClient {
      * @throws {DeviceStatusModels.RequiredError}
      * @memberof DeviceStatusManagementClient
      */
-    public async GetDeviceInventory(
-        id: string,
-        type?: "FIRMWARE" | "APP"
-    ): Promise<DeviceStatusModels.InventoryArray> {
+    public async GetDeviceInventory(id: string, type?: "FIRMWARE" | "APP"): Promise<DeviceStatusModels.InventoryArray> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceStatusModels.RequiredError(
@@ -648,7 +638,7 @@ export class DeviceStatusManagementClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/devices/${id}/inventory?${toQueryString({type})}`,
+            baseUrl: `${this._baseUrl}/devices/${id}/inventory?${toQueryString({ type })}`,
             additionalHeaders: { "Content-Type": "application/json" },
         });
 
@@ -802,7 +792,7 @@ export class DeviceConfigurationClient extends SdkClient {
         size?: number,
         page?: number,
         sort?: string
-    ): Promise<DeviceConfigurationModels.PaginatedConfigurationTask>  {
+    ): Promise<DeviceConfigurationModels.PaginatedConfigurationTask> {
         // verify required parameter 'deviceId' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceConfigurationModels.RequiredError(
@@ -815,7 +805,7 @@ export class DeviceConfigurationClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/devices/${id}/configurationTasks?${toQueryString({size, page, sort })}`,
+            baseUrl: `${this._baseUrl}/devices/${id}/configurationTasks?${toQueryString({ size, page, sort })}`,
             additionalHeaders: { "Content-Type": "application/json" },
         });
 
@@ -833,7 +823,10 @@ export class DeviceConfigurationClient extends SdkClient {
      * @example await deviceConfigurationClient.GetDeviceConfigurationTask("mdsp.EnvironmentDevice", "345af46...")
      * @memberOf DeviceConfigurationClient
      */
-    public async GetDeviceConfigurationTask(id: string, taskId: string): Promise<DeviceConfigurationModels.ConfigurationTask> {
+    public async GetDeviceConfigurationTask(
+        id: string,
+        taskId: string
+    ): Promise<DeviceConfigurationModels.ConfigurationTask> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceConfigurationModels.RequiredError(
@@ -940,7 +933,6 @@ export class DeviceConfigurationClient extends SdkClient {
             );
         }
 
-
         const result = await this.HttpAction({
             verb: "PATCH",
             gateway: this.GetGateway(),
@@ -971,7 +963,7 @@ export class DeviceConfigurationClient extends SdkClient {
         size?: number,
         page?: number,
         sort?: string
-    ): Promise<DeviceConfigurationModels.PaginatedFileMetaData>  {
+    ): Promise<DeviceConfigurationModels.PaginatedFileMetaData> {
         // verify required parameter 'pathPrefix' is not null or undefined
         if (pathPrefix === null || pathPrefix === undefined) {
             throw new DeviceConfigurationModels.RequiredError(
@@ -1142,7 +1134,7 @@ export class DeviceConfigurationClient extends SdkClient {
         size?: number,
         page?: number,
         sort?: string
-    ): Promise<DeviceConfigurationModels.PaginatedRevisionMetaData>  {
+    ): Promise<DeviceConfigurationModels.PaginatedRevisionMetaData> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeviceConfigurationModels.RequiredError(
@@ -1242,7 +1234,7 @@ export class DeviceConfigurationClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/files/${id}/revisions/${hash}/content`,
-            additionalHeaders: { "Accept": accept ? accept : "application/octet-stream"},
+            additionalHeaders: { Accept: accept ? accept : "application/octet-stream" },
         });
 
         return result as DeviceConfigurationModels.Payload;
@@ -1287,7 +1279,7 @@ export class DeviceConfigurationClient extends SdkClient {
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/files/${id}/revisions`,
             body: content,
-            additionalHeaders: { "Content-Type": contentType ? contentType : "application/octet-stream"},
+            additionalHeaders: { "Content-Type": contentType ? contentType : "application/octet-stream" },
         });
 
         return result as DeviceConfigurationModels.RevisionMetaData;
@@ -1315,7 +1307,7 @@ export class DeploymentWorkflowClient extends SdkClient {
      * @example await deviceConfigurationClient.GetWorkflowModel( "345af46...")
      * @memberOf DeploymentWorkflowClient
      */
-    public async GetWorkflowModel(modelKey: string, ): Promise<DeploymentWorkflowModels.Model> {
+    public async GetWorkflowModel(modelKey: string): Promise<DeploymentWorkflowModels.Model> {
         // verify required parameter 'modelKey' is not null or undefined
         if (modelKey === null || modelKey === undefined) {
             throw new DeploymentWorkflowModels.RequiredError(
@@ -1345,9 +1337,7 @@ export class DeploymentWorkflowClient extends SdkClient {
      * @example await DeploymentWorkflowClient.PostNewWorkflowModel(...)
      * @memberOf DeploymentWorkflowClient
      */
-    public async PostNewWorkflowModel(
-        model: DeploymentWorkflowModels.Model
-    ): Promise<DeploymentWorkflowModels.Model> {
+    public async PostNewWorkflowModel(model: DeploymentWorkflowModels.Model): Promise<DeploymentWorkflowModels.Model> {
         // verify required parameter 'model' is not null or undefined
         if (model === null || model === undefined) {
             throw new DeploymentWorkflowModels.RequiredError(
@@ -1395,12 +1385,6 @@ export class DeploymentWorkflowClient extends SdkClient {
         });
     }
 
-
-
-
-
-
-
     /**
      * List of instance descriptions belonging to the caller's tenant. By default, this endpoint returns the list of instances in a specific order and predetermined paging properties.  These defaults are:   - Hide model details.     Equivalent of query parameter modelDetails = flase   - Hide history     Equivalent of query parameter history = false   - Ascending sort on createdAt date   - 10 entries per page
      * @summary List of instance descriptions belonging to the caller's tenant
@@ -1423,8 +1407,7 @@ export class DeploymentWorkflowClient extends SdkClient {
         group?: string,
         deviceId?: string,
         modelKey?: string
-    ): Promise<DeploymentWorkflowModels.PaginatedInstanceList>  {
-
+    ): Promise<DeploymentWorkflowModels.PaginatedInstanceList> {
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
@@ -1435,9 +1418,8 @@ export class DeploymentWorkflowClient extends SdkClient {
                 currentState,
                 group,
                 deviceId,
-                modelKey
-            })
-            }`,
+                modelKey,
+            })}`,
             additionalHeaders: { "Content-Type": "application/json" },
         });
 
@@ -1456,7 +1438,11 @@ export class DeploymentWorkflowClient extends SdkClient {
      * @example await deviceConfigurationClient.GetWorkflowInstance("myInstanceId")
      * @memberOf DeploymentWorkflowClient
      */
-    public async GetWorkflowInstance(id: string, model?: boolean, history?: boolean): Promise<DeploymentWorkflowModels.Instance> {
+    public async GetWorkflowInstance(
+        id: string,
+        model?: boolean,
+        history?: boolean
+    ): Promise<DeploymentWorkflowModels.Instance> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new DeploymentWorkflowModels.RequiredError(
@@ -1469,7 +1455,7 @@ export class DeploymentWorkflowClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/instances/${id}?${toQueryString({ model, history})}`,
+            baseUrl: `${this._baseUrl}/instances/${id}?${toQueryString({ model, history })}`,
             additionalHeaders: { "Content-Type": "application/json" },
         });
 
@@ -1505,7 +1491,7 @@ export class DeploymentWorkflowClient extends SdkClient {
             verb: "POST",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/instances?${toQueryString({ model, history})}`,
+            baseUrl: `${this._baseUrl}/instances?${toQueryString({ model, history })}`,
             body: workflowInstance,
             additionalHeaders: { "Content-Type": "application/json" },
         });
@@ -1551,7 +1537,7 @@ export class DeploymentWorkflowClient extends SdkClient {
             verb: "PATCH",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/instances/${id}?${toQueryString({ model, history})}`,
+            baseUrl: `${this._baseUrl}/instances/${id}?${toQueryString({ model, history })}`,
             body: stateInfo,
             additionalHeaders: { "Content-Type": "application/json" },
         });
@@ -1587,7 +1573,7 @@ export class DeploymentWorkflowClient extends SdkClient {
             verb: "POST",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/instances/${id}/cancel?${toQueryString({ model, history})}`,
+            baseUrl: `${this._baseUrl}/instances/${id}/cancel?${toQueryString({ model, history })}`,
             additionalHeaders: { "Content-Type": "application/json" },
         });
 
@@ -1624,7 +1610,7 @@ export class EdgeAppInstanceManagementClient extends SdkClient {
         size?: number,
         page?: number,
         sort?: string
-    ): Promise<EdgeAppInstanceModels.PaginatedApplicationInstance>  {
+    ): Promise<EdgeAppInstanceModels.PaginatedApplicationInstance> {
         // verify required parameter 'deviceId' is not null or undefined
         if (deviceId === null || deviceId === undefined) {
             throw new EdgeAppInstanceModels.RequiredError(
@@ -1654,7 +1640,9 @@ export class EdgeAppInstanceManagementClient extends SdkClient {
      * @example await edgeAppInstanceManagementClient.GetAppInstanceLifecycle("myAppInstanceID")
      * @memberOf EdgeAppInstanceManagementClient
      */
-    public async GetAppInstanceLifecycle(id: string): Promise<EdgeAppInstanceModels.ApplicationInstanceLifeCycleResource> {
+    public async GetAppInstanceLifecycle(
+        id: string
+    ): Promise<EdgeAppInstanceModels.ApplicationInstanceLifeCycleResource> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new EdgeAppInstanceModels.RequiredError(
@@ -1692,8 +1680,7 @@ export class EdgeAppInstanceManagementClient extends SdkClient {
             );
         }
 
-        const baseUrl = `${this._baseUrl}/appInstances/${id}`
-            .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+        const baseUrl = `${this._baseUrl}/appInstances/${id}`.replace(`{${"id"}}`, encodeURIComponent(String(id)));
 
         await this.HttpAction({
             verb: "DELETE",
@@ -1720,7 +1707,8 @@ export class EdgeAppInstanceManagementClient extends SdkClient {
         if (applicationInstance === null || applicationInstance === undefined) {
             throw new EdgeAppInstanceModels.RequiredError(
                 "instanceConfiguration",
-                "Required parameter applicationInstance was null or undefined when calling PostAppInstance.");
+                "Required parameter applicationInstance was null or undefined when calling PostAppInstance."
+            );
         }
 
         const result = await this.HttpAction({
@@ -1794,7 +1782,7 @@ export class EdgeAppInstanceManagementClient extends SdkClient {
         size?: number,
         page?: number,
         sort?: string
-    ): Promise<EdgeAppInstanceModels.PaginatedInstanceConfigurationResource>  {
+    ): Promise<EdgeAppInstanceModels.PaginatedInstanceConfigurationResource> {
         // verify required parameter 'deviceId' is not null or undefined
         if (deviceId === null || deviceId === undefined) {
             throw new EdgeAppInstanceModels.RequiredError(
@@ -1862,8 +1850,10 @@ export class EdgeAppInstanceManagementClient extends SdkClient {
             );
         }
 
-        const baseUrl = `${this._baseUrl}/instanceConfigurations/${id}`
-            .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+        const baseUrl = `${this._baseUrl}/instanceConfigurations/${id}`.replace(
+            `{${"id"}}`,
+            encodeURIComponent(String(id))
+        );
 
         await this.HttpAction({
             verb: "DELETE",
@@ -1890,7 +1880,8 @@ export class EdgeAppInstanceManagementClient extends SdkClient {
         if (instanceConfiguration === null || instanceConfiguration === undefined) {
             throw new EdgeAppInstanceModels.RequiredError(
                 "instanceConfiguration",
-                "Required parameter instanceConfiguration was null or undefined when calling PostAppInstanceConfigurations.");
+                "Required parameter instanceConfiguration was null or undefined when calling PostAppInstanceConfigurations."
+            );
         }
 
         const result = await this.HttpAction({
@@ -1913,23 +1904,23 @@ export class EdgeAppInstanceManagementClient extends SdkClient {
      * @example await edgeAppInstanceManagementClient.PatchAppInstanceConfigurations(myNewAppInstanceConfiguration)
      * @memberOf EdgeAppInstanceManagementClient
      */
-    public async PatchAppInstanceConfigurations(
-        configurations: EdgeAppInstanceModels.ProcessInstanceConfiguration
-    ) {
+    public async PatchAppInstanceConfigurations(configurations: EdgeAppInstanceModels.ProcessInstanceConfiguration) {
         // verify required parameter 'configurations' is not null or undefined
         if (configurations === null || configurations === undefined) {
             throw new EdgeAppInstanceModels.RequiredError(
                 "configurations",
-                "Required parameter configurations was null or undefined when calling PatchAppInstanceConfigurations.");
+                "Required parameter configurations was null or undefined when calling PatchAppInstanceConfigurations."
+            );
         }
 
-        const result = await this.HttpAction({
+        await this.HttpAction({
             verb: "PATCH",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             baseUrl: `${this._baseUrl}/instanceConfigurations`,
             body: configurations,
             additionalHeaders: { "Content-Type": "application/json" },
+            noResponse: true,
         });
     }
 
@@ -2006,7 +1997,7 @@ export class EdgeAppDeploymentClient extends SdkClient {
         size?: number,
         page?: number,
         sort?: string
-    ): Promise<EdgeAppDeploymentModels.PaginatedTaskResource>  {
+    ): Promise<EdgeAppDeploymentModels.PaginatedTaskResource> {
         // verify required parameter 'deviceId' is not null or undefined
         if (deviceId === null || deviceId === undefined) {
             throw new EdgeAppDeploymentModels.RequiredError(
@@ -2071,7 +2062,8 @@ export class EdgeAppDeploymentClient extends SdkClient {
         if (task === null || task === undefined) {
             throw new EdgeAppDeploymentModels.RequiredError(
                 "task",
-                "Required parameter task was null or undefined when calling PostInstallationTask.");
+                "Required parameter task was null or undefined when calling PostInstallationTask."
+            );
         }
 
         const result = await this.HttpAction({
@@ -2147,7 +2139,7 @@ export class EdgeAppDeploymentClient extends SdkClient {
         size?: number,
         page?: number,
         sort?: string
-    ): Promise<EdgeAppDeploymentModels.PaginatedTaskResource>  {
+    ): Promise<EdgeAppDeploymentModels.PaginatedTaskResource> {
         // verify required parameter 'deviceId' is not null or undefined
         if (deviceId === null || deviceId === undefined) {
             throw new EdgeAppDeploymentModels.RequiredError(
@@ -2176,14 +2168,13 @@ export class EdgeAppDeploymentClient extends SdkClient {
      * @example await edgeAppDeploymentClient.PostRemovalTask(myRemovalTask)
      * @memberOf EdgeAppDeploymentClient
      */
-    public async PostRemovalTask(
-        task: EdgeAppDeploymentModels.Task
-    ): Promise<EdgeAppDeploymentModels.TaskResource> {
+    public async PostRemovalTask(task: EdgeAppDeploymentModels.Task): Promise<EdgeAppDeploymentModels.TaskResource> {
         // verify required parameter 'task' is not null or undefined
         if (task === null || task === undefined) {
             throw new EdgeAppDeploymentModels.RequiredError(
                 "task",
-                "Required parameter instanceConfiguration was null or undefined when calling PostRemovalTask.");
+                "Required parameter instanceConfiguration was null or undefined when calling PostRemovalTask."
+            );
         }
 
         const result = await this.HttpAction({
@@ -2212,7 +2203,7 @@ export class EdgeAppDeploymentClient extends SdkClient {
     public async GetTermsAndConditions(
         deviceId: string,
         releaseId: string
-    ): Promise<EdgeAppDeploymentModels.TermsAndConditionsResource>  {
+    ): Promise<EdgeAppDeploymentModels.TermsAndConditionsResource> {
         // verify required parameter 'deviceId' is not null or undefined
         if (deviceId === null || deviceId === undefined) {
             throw new EdgeAppDeploymentModels.RequiredError(
@@ -2232,7 +2223,7 @@ export class EdgeAppDeploymentClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/termsAndConditions?${toQueryString({ deviceId, releaseId})}`,
+            baseUrl: `${this._baseUrl}/termsAndConditions?${toQueryString({ deviceId, releaseId })}`,
             additionalHeaders: { "Content-Type": "application/json" },
         });
 
@@ -2306,7 +2297,7 @@ export class FirmwreDeploymentClient extends SdkClient {
         page?: number,
         sort?: string,
         history?: boolean
-    ): Promise<FirmwareDeploymentModels.PaginatedInstallationTask>  {
+    ): Promise<FirmwareDeploymentModels.PaginatedInstallationTask> {
         // verify required parameter 'deviceId' is not null or undefined
         if (deviceId === null || deviceId === undefined) {
             throw new EdgeAppDeploymentModels.RequiredError(
@@ -2319,7 +2310,15 @@ export class FirmwreDeploymentClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/installationTasks?${toQueryString({ deviceId, type, status, size, page, sort, history })}`,
+            baseUrl: `${this._baseUrl}/installationTasks?${toQueryString({
+                deviceId,
+                type,
+                status,
+                size,
+                page,
+                sort,
+                history,
+            })}`,
             additionalHeaders: { "Content-Type": "application/json" },
         });
 
@@ -2337,7 +2336,10 @@ export class FirmwreDeploymentClient extends SdkClient {
      * @example await firmwareDeploymentClient.GetInstallationTask("myAppInstanceID")
      * @memberOf FirmwreDeploymentClient
      */
-    public async GetInstallationTask(id: string, history?: boolean): Promise<FirmwareDeploymentModels.InstallationTask> {
+    public async GetInstallationTask(
+        id: string,
+        history?: boolean
+    ): Promise<FirmwareDeploymentModels.InstallationTask> {
         // verify required parameter 'id' is not null or undefined
         if (id === null || id === undefined) {
             throw new FirmwareDeploymentModels.RequiredError(
@@ -2349,7 +2351,7 @@ export class FirmwreDeploymentClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/installationTasks/${id}?${toQueryString({ history})}`,
+            baseUrl: `${this._baseUrl}/installationTasks/${id}?${toQueryString({ history })}`,
             additionalHeaders: { "Content-Type": "application/json" },
         });
 
@@ -2372,7 +2374,8 @@ export class FirmwreDeploymentClient extends SdkClient {
         if (taskDefinition === null || taskDefinition === undefined) {
             throw new FirmwareDeploymentModels.RequiredError(
                 "taskDefinition",
-                "Required parameter taskDefinition was null or undefined when calling PostInstallationTask.");
+                "Required parameter taskDefinition was null or undefined when calling PostInstallationTask."
+            );
         }
 
         const result = await this.HttpAction({
@@ -2422,7 +2425,7 @@ export class FirmwreDeploymentClient extends SdkClient {
             verb: "PATCH",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/installationTasks/${id}?${toQueryString({ history})}`,
+            baseUrl: `${this._baseUrl}/installationTasks/${id}?${toQueryString({ history })}`,
             body: updateTaskInfo,
             additionalHeaders: { "Content-Type": "application/json" },
         });
@@ -2444,7 +2447,7 @@ export class FirmwreDeploymentClient extends SdkClient {
     public async GetTermsAndConditions(
         deviceId: string,
         releaseId: string
-    ): Promise<FirmwareDeploymentModels.TermsAndConditionsRecord>  {
+    ): Promise<FirmwareDeploymentModels.TermsAndConditionsRecord> {
         // verify required parameter 'deviceId' is not null or undefined
         if (deviceId === null || deviceId === undefined) {
             throw new FirmwareDeploymentModels.RequiredError(
@@ -2464,7 +2467,7 @@ export class FirmwreDeploymentClient extends SdkClient {
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/termsAndConditions?${toQueryString({ deviceId, releaseId})}`,
+            baseUrl: `${this._baseUrl}/termsAndConditions?${toQueryString({ deviceId, releaseId })}`,
             additionalHeaders: { "Content-Type": "application/json" },
         });
 
