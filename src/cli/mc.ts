@@ -16,11 +16,12 @@ import deviceStatusCommand from "./commands/oe-device-status";
 import deviceTypeCommand from "./commands/oe-device-types";
 import deviceCommand from "./commands/oe-devices";
 import deploymentWorkflowCommand from "./commands/oe-deployment-workflow";
+import appInstCommand from "./commands/oe-app-instance";
+import appDeploymentCommand from "./commands/oe-app-deployment";
+import firmwareDeploymentCommand from "./commands/oe-firmware-deployment";
 import downloadEventsCommand from "./commands/download-events";
 import eventTypesCommand from "./commands/event-types";
 import eventsCommand from "./commands/events";
-import appInstCommand from "./commands/oe-app-instance";
-import appDeploymentCommand from "./commands/oe-app-deployment";
 import identityCommand from "./commands/identity";
 import iotCheckBulkComand from "./commands/iot-bulk-check";
 import iotBulkRunCommand from "./commands/iot-bulk-run";
@@ -124,6 +125,7 @@ deviceStatusCommand(program);
 appInstCommand(program);
 appDeploymentCommand(program);
 deploymentWorkflowCommand(program);
+firmwareDeploymentCommand(program);
 
 // * tenant commands
 

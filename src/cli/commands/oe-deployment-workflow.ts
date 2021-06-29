@@ -172,7 +172,7 @@ async function listInstances(sdk: MindSphereSdk, options: any) {
     let page = 0;
     let instanceCount = 0;
     let instancePage;
-    let rslt_table: any[] = [];
+    console.log(`id \tdeviceId \tcreatedAt \tcurrentState  \tmodel`);
     do {
         instancePage = (await retry(options.retry, () =>
             workflowDeploymentClient.GetWorkflowInstances(
@@ -187,29 +187,15 @@ async function listInstances(sdk: MindSphereSdk, options: any) {
 
         instancePage.content = instancePage.content || [];
         instancePage.page = instancePage.page || { totalPages: 0 };
-        rslt_table = rslt_table.concat((instancePage.content || []).map(inst => {
-            return model ? {
-                id: inst.id,
-                deviceId: inst.deviceId,
-                createdAt: inst.createdAt,
-                currentState: inst.currentState?.state,
-                modelKey: inst.model?.key,
-
-            } : {
-                id: inst.id,
-                deviceId: inst.deviceId,
-                createdAt: inst.createdAt,
-                currentState: inst.currentState?.state,
-            };
-        }));
         for (const inst of instancePage.content || []) {
             instanceCount++;
+            console.log(
+                `${color(inst.id)}\t${inst.deviceId}\t${inst.createdAt} \t${color(inst.currentState?.state)}\t${color(inst.model?.key)}`
+            );
             verboseLog(JSON.stringify(inst, null, 2), options.verbose);
         }
     } while (page++ < (instancePage.page.totalPages || 0));
 
-    // Print out the table
-    console.table(rslt_table);
     console.log(`${color(instanceCount)} worflow instance(s) listed.\n`);
 }
 async function createTemplateWorkflowModel(options: any, sdk: MindSphereSdk) {

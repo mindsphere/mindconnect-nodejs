@@ -77,18 +77,18 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc oe-app-inst --mode list --deviceid <deviceid> \t\tlist all app instances of device with deviceId.`);
+            log(`    mc oe-app-inst --mode list --deviceid <deviceid> \tlist all app instances of device with deviceId.`);
             log(
-                `    mc oe-app-inst --mode template \t\t\t\tcreate a template file for new app instance data.`
+                `    mc oe-app-inst --mode template \t\t\tcreate a template file for new app instance data.`
             );
             log(
-                `    mc oe-app-inst --mode create --file edge.app.mdsp.json \tcreates a new app instance from template file.`
+                `    mc oe-app-inst --mode create --file edge.app.mdsp.json \n\tcreates a new app instance from template file.`
             );
             log(
                 `    mc oe-app-inst --mode config --id <appinstid> --file edge.appconfig.mdsp.json \n\tconfigure an app instance from template file.`
             );
             log(`    mc oe-app-inst --mode info --id <appinstid>\t\tget details of an app instance.`);
-            log(`    mc oe-app-inst --mode delete --id <appinstid>\t\tdelete app instance configuration.`);
+            log(`    mc oe-app-inst --mode delete --id <appinstid>\tdelete app instance configuration.`);
 
             serviceCredentialLog();
         });

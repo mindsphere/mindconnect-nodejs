@@ -25,7 +25,7 @@ export default (program: CommanderStatic) => {
         .alias("oedt")
         .option("-m, --mode [list|create|delete|template|info]", "list | create | delete | template | info", "list")
         .option("-f, --file <file>", ".mdsp.json file with device type definition")
-        .option("-w, --owner <owner>", "owner tenant of the device type definition")
+        .option("-t, --tenant <tenant>", "tenant tenant of the device type definition")
         .option("-n, --devicetype <devicetype>", "the device type name")
         .option("-c, --code <code>", "device type code")
         .option("-a, --assettype <assettype>", "the device type associated asset type id")
@@ -77,9 +77,9 @@ export default (program: CommanderStatic) => {
             log("\n  Examples:\n");
             log(`    mc oe-device-status --mode list \t\t\t list all device types`);
             log(
-                `    mc oe-device-status --mode list --owner siemens\t\t list all device types which belongs to \"siemens\"`
+                `    mc oe-device-status --mode list --tenant siemens\t list all device types which belongs to the tenant \"siemens\"`
             );
-            log(`    mc oe-device-status --mode info --id <deviceid>\t\t get details of device type with the device id"`);
+            log(`    mc oe-device-status --mode info --id <deviceid>\t get details of device type with the specified device id`);
             log(
                 `    mc oe-device-status --mode template --devicetype board \n\tcreate a template file for specified device type`
             );
@@ -155,7 +155,8 @@ async function listDeviceTypes(sdk: MindSphereSdk, options: any) {
             page: page,
             size: 100,
             sort: "id,asc",
-            owner: options.owner,
+            owner: options.tenant,
+            code: options.code,
             assetTypeId: options.assettype,
         };
         deviceTypes = (await retry(options.retry, () =>
