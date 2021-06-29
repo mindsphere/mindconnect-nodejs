@@ -17,7 +17,7 @@ import fs = require("fs");
 import path = require("path");
 
 let color = getColor("magenta");
-let green = getColor("green");
+const green = getColor("green");
 
 export default (program: CommanderStatic) => {
     program
@@ -282,7 +282,7 @@ async function suggestPatterns(options: any, sdk: MindSphereSdk) {
     const test = JSON.parse(fs.readFileSync(testPath).toString());
 
     const request = { sampleValues: samples, testValues: test };
-    let result = await sdk.GetSemanticDataInterConnectClient().SuggestPatterns(request);
+    const result = await sdk.GetSemanticDataInterConnectClient().SuggestPatterns(request);
     verboseLog(JSON.stringify(result, null, 2), options.verbose);
 
     result.suggestPatterns?.forEach((x) => {

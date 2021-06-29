@@ -12,9 +12,13 @@ import dataExchangeCommand from "./commands/data-exchange";
 import dataLakeCommand from "./commands/data-lake";
 import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
-import deviceStatusCommand from "./commands/device-status";
-import deviceTypeCommand from "./commands/device-types";
-import deviceCommand from "./commands/devices";
+import deviceStatusCommand from "./commands/oe-device-status";
+import deviceTypeCommand from "./commands/oe-device-types";
+import deviceCommand from "./commands/oe-devices";
+import deploymentWorkflowCommand from "./commands/oe-deployment-workflow";
+import appInstCommand from "./commands/oe-app-instance";
+import appDeploymentCommand from "./commands/oe-app-deployment";
+import firmwareDeploymentCommand from "./commands/oe-firmware-deployment";
 import downloadEventsCommand from "./commands/download-events";
 import eventTypesCommand from "./commands/event-types";
 import eventsCommand from "./commands/events";
@@ -113,9 +117,15 @@ eventsCommand(program);
 downloadEventsCommand(program);
 aggregatesCommand(program);
 notificationCommand(program);
+
+// * open-edge commands
 deviceTypeCommand(program);
 deviceCommand(program);
 deviceStatusCommand(program);
+appInstCommand(program);
+appDeploymentCommand(program);
+deploymentWorkflowCommand(program);
+firmwareDeploymentCommand(program);
 
 // * tenant commands
 

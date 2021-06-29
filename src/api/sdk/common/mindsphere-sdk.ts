@@ -3,8 +3,13 @@ import { AnomalyDetectionClient } from "../anomaly-detection/anomaly-detection";
 import { AssetManagementClient } from "../asset/asset-management";
 import { DataExchangeClient } from "../data-exchange/data-exchange";
 import { DataLakeClient } from "../data-lake/data-lake";
-import { DeviceStatusManagementClient } from "../device-status/device-status-management";
-import { DeviceManagementClient } from "../device/device-management";
+import { DeviceStatusManagementClient } from "../open-edge/open-edge";
+import { DeviceManagementClient } from "../open-edge/open-edge";
+import { DeviceConfigurationClient } from "../open-edge/open-edge";
+import { DeploymentWorkflowClient } from "../open-edge/open-edge";
+import { EdgeAppInstanceManagementClient } from "../open-edge/open-edge";
+import { EdgeAppDeploymentClient } from "../open-edge/open-edge";
+import { FirmwreDeploymentClient } from "../open-edge/open-edge";
 import { EventAnalyticsClient } from "../event-analytics/eventanalytics";
 import { EventManagementClient } from "../event/event-management";
 import { IdentityManagementClient } from "../identity/identity";
@@ -330,7 +335,7 @@ export class MindSphereSdk extends SdkClient {
     private _deviceStatusManagementClient?: DeviceStatusManagementClient;
 
     /**
-     * * Device Status Management client
+     * * Device Status Management Client
      *
      * @returns {DeviceStatusManagementClient}
      *
@@ -340,6 +345,81 @@ export class MindSphereSdk extends SdkClient {
         this._deviceStatusManagementClient =
             this._deviceStatusManagementClient || new DeviceStatusManagementClient(this._authenticator);
         return this._deviceStatusManagementClient;
+    }
+
+    private _deviceConfigurationClient?: DeviceConfigurationClient;
+
+    /**
+     * * Device Configuration Management Client
+     *
+     * @returns {DeviceStatusManagementClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetDeviceConfigurationClient(): DeviceConfigurationClient {
+        this._deviceConfigurationClient =
+            this._deviceConfigurationClient || new DeviceConfigurationClient(this._authenticator);
+        return this._deviceConfigurationClient;
+    }
+
+    private _deploymentWorkflowClient?: DeploymentWorkflowClient;
+
+    /**
+     * * Deployment Workflow Client
+     *
+     * @returns {DeploymentWorkflowClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetDeploymentWorkflowClient(): DeploymentWorkflowClient {
+        this._deploymentWorkflowClient =
+            this._deploymentWorkflowClient || new DeploymentWorkflowClient(this._authenticator);
+        return this._deploymentWorkflowClient;
+    }
+
+    private _edgeAppInstanceManagementClient?: EdgeAppInstanceManagementClient;
+
+    /**
+     * * Edge App Instance Management Client
+     *
+     * @returns {EdgeAppInstanceManagementClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetEdgeAppInstanceManagementClient(): EdgeAppInstanceManagementClient {
+        this._edgeAppInstanceManagementClient =
+            this._edgeAppInstanceManagementClient || new EdgeAppInstanceManagementClient(this._authenticator);
+        return this._edgeAppInstanceManagementClient;
+    }
+
+    private _edgeAppDeploymentClient?: EdgeAppDeploymentClient;
+
+    /**
+     * * Edge AppDeployment Client
+     *
+     * @returns {EdgeDeploymentClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetEdgeDeploymentClient(): EdgeAppDeploymentClient {
+        this._edgeAppDeploymentClient =
+            this._edgeAppDeploymentClient || new EdgeAppDeploymentClient(this._authenticator);
+        return this._edgeAppDeploymentClient;
+    }
+
+    private _firmwareAppDeploymentClient?: FirmwreDeploymentClient;
+
+    /**
+     * * Edge AppDeployment Client
+     *
+     * @returns {FirmwreDeploymentClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetFirmwareDeploymentClient(): FirmwreDeploymentClient {
+        this._firmwareAppDeploymentClient =
+            this._firmwareAppDeploymentClient || new FirmwreDeploymentClient(this._authenticator);
+        return this._firmwareAppDeploymentClient;
     }
 
     private _modelManagementClient?: ModelManagementClient;

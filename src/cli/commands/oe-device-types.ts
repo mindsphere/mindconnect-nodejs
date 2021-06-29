@@ -21,11 +21,11 @@ let color = getColor("magenta");
 
 export default (program: CommanderStatic) => {
     program
-        .command("device-types")
-        .alias("dt")
+        .command("oe-device-types")
+        .alias("oedt")
         .option("-m, --mode [list|create|delete|template|info]", "list | create | delete | template | info", "list")
         .option("-f, --file <file>", ".mdsp.json file with device type definition")
-        .option("-w, --owner <owner>", "owner tenant of the device type definition")
+        .option("-t, --tenant <tenant>", "tenant tenant of the device type definition")
         .option("-n, --devicetype <devicetype>", "the device type name")
         .option("-c, --code <code>", "device type code")
         .option("-a, --assettype <assettype>", "the device type associated asset type id")
@@ -75,18 +75,20 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc device-types --mode list \t\t\t list all device types`);
+            log(`    mc oe-device-types --mode list \t\t\t list all device types`);
             log(
-                `    mc device-types --mode list --owner siemens\t\t list all device types which belongs to \"siemens\"`
-            );
-            log(`    mc device-types --mode info --id <deviceid>\t\t get details of device type with the device id"`);
-            log(
-                `    mc device-types --mode template --devicetype board \n\tcreate a template file for specified device type`
+                `    mc oe-device-types --mode list --tenant siemens\t list all device types which belongs to the tenant \"siemens\"`
             );
             log(
-                `    mc device-types --mode create --file board.devicetype.mdsp.json \n\tcreate device type board in MindSphere`
+                `    mc oe-device-types --mode info --id <deviceid>\t get details of device type with the specified device id`
             );
-            log(`    mc device-types --mode delete --id <devicetype>\t delete the device type with the device id`);
+            log(
+                `    mc oe-device-types --mode template --devicetype board \n\tcreate a template file for specified device type`
+            );
+            log(
+                `    mc oe-device-types --mode create --file board.devicetype.mdsp.json \n\tcreate device type board in MindSphere`
+            );
+            log(`    mc oe-device-types --mode delete --id <devicetype>\t delete the device type with the device id`);
             serviceCredentialLog();
         });
 };
@@ -130,7 +132,7 @@ function writeDeviceTypeToFile(options: any, templateType: any) {
     console.log(
         `The data was written into ${color(
             filePath
-        )} run \n\n\tmc device-types --mode create --file ${fileName} \n\nto create the device type`
+        )} run \n\n\tmc oe-device-types --mode create --file ${fileName} \n\nto create the device type`
     );
 }
 
@@ -155,7 +157,8 @@ async function listDeviceTypes(sdk: MindSphereSdk, options: any) {
             page: page,
             size: 100,
             sort: "id,asc",
-            owner: options.owner,
+            owner: options.tenant,
+            code: options.code,
             assetTypeId: options.assettype,
         };
         deviceTypes = (await retry(options.retry, () =>
@@ -187,18 +190,21 @@ function checkRequiredParameters(options: any) {
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with device type to create device type (see mc device-types --help for more details)",
+            "you have to provide a file with device type to create device type (see mc oe-device-types --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.id &&
         errorLog(
-            "you have to provide the id of the device type to delete (see mc device-types --help for more details)",
+            "you have to provide the id of the device type to delete (see mc oe-device-types --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.id &&
-        errorLog("you have to provide the id of the device type (see mc device-types --help for more details)", true);
+        errorLog(
+            "you have to provide the id of the device type (see mc oe-device-types --help for more details)",
+            true
+        );
 }
