@@ -65,7 +65,7 @@ describe("[SDK] DeviceManagementClient.FirmwareDeployment", () => {
     let appReleaseId = "";
     let appInstanceId = "";
 
-    let installationTaskId = "";
+    // let installationTaskId = "";
 
     before(async () => {
         // tear Down test infrastructure
@@ -119,6 +119,18 @@ describe("[SDK] DeviceManagementClient.FirmwareDeployment", () => {
         (await firmwareDeploymentClient.GetToken()).length.should.be.greaterThan(200);
     });
 
+    it("should GET list of installation tasks.", async () => {
+        firmwareDeploymentClient.should.not.be.undefined;
+
+        const taks = await firmwareDeploymentClient.GetInstallationTasks(deviceId);
+        (taks as any).should.not.be.undefined;
+        (taks as any).should.not.be.null;
+        (taks as any).page.number.should.equal(0);
+        (taks as any).page.size.should.be.gte(10);
+        (taks as any).content.length.should.be.gte(0);
+    });
+
+    /* NOTE: 27-06-2021 Not supported in yet
     it("should POST accepted term and conditions", async () => {
         firmwareDeploymentClient.should.not.be.undefined;
 
@@ -163,17 +175,6 @@ describe("[SDK] DeviceManagementClient.FirmwareDeployment", () => {
         installationTaskId = `${(installationTask as any).id}`;
     });
 
-    it("should GET list of installation tasks.", async () => {
-        firmwareDeploymentClient.should.not.be.undefined;
-
-        const taks = await firmwareDeploymentClient.GetInstallationTasks(deviceId);
-        (taks as any).should.not.be.undefined;
-        (taks as any).should.not.be.null;
-        (taks as any).page.number.should.equal(0);
-        (taks as any).page.size.should.be.gte(10);
-        (taks as any).content.length.should.be.gte(0);
-    });
-
     it("should GET specific installation task", async () => {
         firmwareDeploymentClient.should.not.be.undefined;
 
@@ -184,52 +185,42 @@ describe("[SDK] DeviceManagementClient.FirmwareDeployment", () => {
         (task as any).id.should.not.be.null;
     });
 
-/*  TODO: 27-06-2021 Not supported in yet
     it("should PATCH installation Status as downloading", async () => {
-        appDeploymentClient.should.not.be.undefined;
+        firmwareDeploymentClient.should.not.be.undefined;
 
         // Set the task template
         const status = {
-            state: EdgeAppDeploymentModels.TaskStatus.StateEnum.DOWNLOAD,
-            progress: 0.9,
-            message: "Task status updated as DOWNLOAD",
-            details: {
-                sampleKey1: "sampleValue1",
-                sampleKey2: "sampleValue2"
-            }
+            "state": FirmwareDeploymentModels.InstallationStateInfo.StateEnum.DOWNLOADING,
+            "progress": 1.0,
+            "message": "string",
+            "details": {}
         };
 
-        const installationTAsk = await appDeploymentClient.PatchInstallationTask(installationTaskId, status);
+        const installationTAsk = await firmwareDeploymentClient.PatchInstallationTask(installationTaskId, status);
         (installationTAsk as any).should.not.be.undefined;
         (installationTAsk as any).should.not.be.null;
         (installationTAsk as any).currentState.should.not.be.undefined;
         (installationTAsk as any).currentState.should.not.be.null;
     });
-*/
 
-/*  TODO: 27-06-2021 Not supported in yet
-    it("should PATCH installation Status as activate", async () => {
-        appDeploymentClient.should.not.be.undefined;
+    it("should PATCH installation Status as activated", async () => {
+        firmwareDeploymentClient.should.not.be.undefined;
 
         // Set the task template
         const status = {
-            state: EdgeAppDeploymentModels.TaskStatus.StateEnum.ACTIVATE,
-            progress: 1.0,
-            message: "Task status updated as ACTIVATE",
-            details: {
-                sampleKey1: "sampleValue1",
-                sampleKey2: "sampleValue2"
-            }
+            "state": FirmwareDeploymentModels.InstallationStateInfo.StateEnum.ACTIVATED,
+            "progress": 1.0,
+            "message": "string",
+            "details": {}
         };
 
-        const installationTAsk = await appDeploymentClient.PatchInstallationTask(installationTaskId, status);
+        const installationTAsk = await firmwareDeploymentClient.PatchInstallationTask(installationTaskId, status);
         (installationTAsk as any).should.not.be.undefined;
         (installationTAsk as any).should.not.be.null;
         (installationTAsk as any).currentState.should.not.be.undefined;
         (installationTAsk as any).currentState.should.not.be.null;
     });
-*/
-
+    */
 });
 
 
