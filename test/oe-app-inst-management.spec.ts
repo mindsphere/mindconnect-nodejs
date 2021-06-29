@@ -1,10 +1,10 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
-import { EdgeAppInstanceModels } from "../src/api/sdk/open-edge/open-edge-models";
 import { MindSphereSdk } from "../src";
-import { decrypt, loadAuth, throwError } from "../src/api/utils";
+import { EdgeAppInstanceModels } from "../src/api/sdk/open-edge/open-edge-models";
+import { decrypt, loadAuth } from "../src/api/utils";
 import { setupDeviceTestStructure, tearDownDeviceTestStructure } from "./test-device-setup-utils";
-import { getPasskeyForUnitTest} from "./test-utils";
+import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
 
 const timeOffset = new Date().getTime();
@@ -15,7 +15,6 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
     const edgeAppInstanceClient = sdk.GetEdgeAppInstanceManagementClient();
-    const assetMgmt = sdk.GetAssetManagementClient();
     const tenant = sdk.GetTenant();
 
     const testAppInstance = {
@@ -23,7 +22,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         appInstanceId: `testAppInst_${tenant}_${timeOffset}`,
         deviceId: "string",
         releaseId: "string",
-        applicationId: `testApp_${tenant}_${timeOffset}`
+        applicationId: `testApp_${tenant}_${timeOffset}`,
     };
     const testConfigurations = {
         deviceId: `${tenant}.UnitTestDeviceType`,
@@ -32,8 +31,8 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         appInstanceId: "718ca5ad0...",
         configuration: {
             sampleKey1: "sampleValue1",
-            sampleKey2: "sampleValue2"
-        }
+            sampleKey2: "sampleValue2",
+        },
     };
     let deviceTypeId = "aee2e37f-f562-4ed6-b90a-c43208dc054a";
     let assetTypeId = `${tenant}.UnitTestDeviceAssetType`;
@@ -50,7 +49,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         await tearDownDeviceTestStructure(sdk);
 
         // Setup the testing architecture
-        const {device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);
+        const { device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);
         assetTypeId = `${(deviceAssetType as any).id}`;
         deviceTypeId = `${(deviceType as any).id}`;
         assetId = `${(deviceAsset as any).assetId}`;
@@ -71,7 +70,6 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         testConfigurations.appId = `${appId}`;
         testConfigurations.appInstanceId = `${appInstanceId}`;
         testConfigurations.appReleaseId = `${appReleaseId}`;
-        const instConfRes = await edgeAppInstanceClient.PostAppInstanceConfigurations(testConfigurations);
     });
 
     after(async () => {
@@ -186,13 +184,15 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         const _appInstanceId = (appInstRes as any).id;
 
         const testStatus = {
-            status: EdgeAppInstanceModels.ApplicationInstanceLifeCycleStatus.StatusEnum.STOPPED
+            status: EdgeAppInstanceModels.ApplicationInstanceLifeCycleStatus.StatusEnum.STOPPED,
         };
 
         const _status = await edgeAppInstanceClient.PatchAppInstanceStatus(_appInstanceId, testStatus);
         _status.should.not.be.undefined;
         _status.should.not.be.null;
-        (_status as any).status.should.equal(EdgeAppInstanceModels.ApplicationInstanceLifeCycleStatus.StatusEnum.STOPPED);
+        (_status as any).status.should.equal(
+            EdgeAppInstanceModels.ApplicationInstanceLifeCycleStatus.StatusEnum.STOPPED
+        );
 
         // Delete App
         await edgeAppInstanceClient.DeleteAppInstance(_appInstanceId);
@@ -217,7 +217,6 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         (configurations as any).page.size.should.equal(10);
         (configurations as any).content.length.should.be.gte(0);
     });
-
 
     it("should GET an instance configuration by id", async () => {
         edgeAppInstanceClient.should.not.be.undefined;
@@ -247,7 +246,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         testConfigurations.appReleaseId = `${appReleaseId}`;
         testConfigurations.configuration = {
             sampleKey1: "sampleValue1_A",
-            sampleKey2: "sampleValue2_A"
+            sampleKey2: "sampleValue2_A",
         };
         const instConfRes = await edgeAppInstanceClient.PostAppInstanceConfigurations(testConfigurations);
 
@@ -271,7 +270,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         testConfigurations.appReleaseId = `${appReleaseId}`;
         testConfigurations.configuration = {
             sampleKey1: `sampleValue1_B_${timeOffset}`,
-            sampleKey2: `sampleValue2_B_${timeOffset}`
+            sampleKey2: `sampleValue2_B_${timeOffset}`,
         };
 
         const instConfRes = await edgeAppInstanceClient.PatchAppInstanceConfigurationData(

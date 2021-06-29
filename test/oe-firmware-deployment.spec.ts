@@ -1,10 +1,10 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
-import {DeviceStatusModels, FirmwareDeploymentModels } from "../src/api/sdk/open-edge/open-edge-models";
 import { MindSphereSdk } from "../src";
-import { decrypt, loadAuth, throwError } from "../src/api/utils";
+import { FirmwareDeploymentModels } from "../src/api/sdk/open-edge/open-edge-models";
+import { decrypt, loadAuth } from "../src/api/utils";
 import { setupDeviceTestStructure, tearDownDeviceTestStructure } from "./test-device-setup-utils";
-import { getPasskeyForUnitTest, sleep } from "./test-utils";
+import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
 
 const timeOffset = new Date().getTime();
@@ -23,7 +23,7 @@ describe("[SDK] DeviceManagementClient.FirmwareDeployment", () => {
         appInstanceId: `testAppInstId_${tenant}_${timeOffset}`,
         deviceId: "string",
         releaseId: `V001${timeOffset}`,
-        applicationId: `testAppID_${tenant}_${timeOffset}`
+        applicationId: `testAppID_${tenant}_${timeOffset}`,
     };
 
     const testConfigurations = {
@@ -33,8 +33,8 @@ describe("[SDK] DeviceManagementClient.FirmwareDeployment", () => {
         appInstanceId: "718ca5ad0...",
         configuration: {
             sampleKey1: "sampleValue1",
-            sampleKey2: "sampleValue2"
-        }
+            sampleKey2: "sampleValue2",
+        },
     };
 
     const firmwareTemplate = {
@@ -47,12 +47,12 @@ describe("[SDK] DeviceManagementClient.FirmwareDeployment", () => {
                 type: "string",
                 from: FirmwareDeploymentModels.Transition.FromEnum.DOWNLOAD,
                 to: FirmwareDeploymentModels.Transition.ToEnum.INSTALL,
-                details: {}
-            }
+                details: {},
+            },
         ],
         customData: {
-            userDefined: {}
-        }
+            userDefined: {},
+        },
     };
 
     let deviceTypeId = "aee2e37f-f562-4ed6-b90a-c43208dc054a";
@@ -72,7 +72,7 @@ describe("[SDK] DeviceManagementClient.FirmwareDeployment", () => {
         await tearDownDeviceTestStructure(sdk);
 
         // Setup the testing architecture
-        const {device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);
+        const { device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);
         assetTypeId = `${(deviceAssetType as any).id}`;
         deviceTypeId = `${(deviceType as any).id}`;
         assetId = `${(deviceAsset as any).assetId}`;
@@ -222,6 +222,3 @@ describe("[SDK] DeviceManagementClient.FirmwareDeployment", () => {
     });
     */
 });
-
-
-

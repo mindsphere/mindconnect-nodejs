@@ -1,16 +1,16 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
-import { DeviceStatusModels, MindSphereSdk } from "../src";
-import { decrypt, loadAuth} from "../src/api/utils";
-import { getPasskeyForUnitTest} from "./test-utils";
+import { MindSphereSdk } from "../src";
+import { decrypt, loadAuth } from "../src/api/utils";
 import { setupDeviceTestStructure, tearDownDeviceTestStructure } from "./test-device-setup-utils";
+import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
 
 describe("[SDK] DeviceManagementClient.Status", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
-        basicAuth: decrypt(auth, getPasskeyForUnitTest())
+        basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
     const deviceStatusManagement = sdk.GetDeviceStatusManagementClient();
     const tenant = sdk.GetTenant();
@@ -20,20 +20,6 @@ describe("[SDK] DeviceManagementClient.Status", () => {
     let assetId = "";
     let deviceId = "";
     let gFolderid = "";
-
-    const reportTemplate = {
-        overall: {
-            lastUpdate: new Date(),
-            health: DeviceStatusModels.HealthStatus.OK,
-            message: "Reporting overall health status."
-        }
-    };
-
-    const heathStatusConfigTemplate = {
-        lastUpdate: new Date(),
-        configurationId: "5re520...",
-        dataSources: []
-    };
 
     before(async () => {
         // Setup the testing architecture

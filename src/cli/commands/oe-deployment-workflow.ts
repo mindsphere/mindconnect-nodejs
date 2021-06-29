@@ -23,7 +23,11 @@ export default (program: CommanderStatic) => {
     program
         .command("oe-deploy-workflow")
         .alias("oedw")
-        .option("-m, --mode [list|create|instantiate|update|cancel|delete|template|info]", "list | create | instantiate | update | cancel | delete | template | info", "list")
+        .option(
+            "-m, --mode [list|create|instantiate|update|cancel|delete|template|info]",
+            "list | create | instantiate | update | cancel | delete | template | info",
+            "list"
+        )
         .option("-k, --key <key>", "the workflow model key")
         .option("-i, --id <id>", "the deployment model instance id")
         .option("-f, --file <file>", ".mdsp.json file")
@@ -38,7 +42,11 @@ export default (program: CommanderStatic) => {
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(color("list, create/instantiate, update or delete/cancel workflow deployment model or instance(s) (open edge) *"))
+        .description(
+            color(
+                "list, create/instantiate, update or delete/cancel workflow deployment model or instance(s) (open edge) *"
+            )
+        )
         .action((options) => {
             (async () => {
                 try {
@@ -92,7 +100,9 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc oe-deploy-workflow --mode list \t\t\tlist all workflow instances descriptions belonging to the caller's tenant.`);
+            log(
+                `    mc oe-deploy-workflow --mode list \t\t\tlist all workflow instances descriptions belonging to the caller's tenant.`
+            );
             log(
                 `    mc oe-deploy-workflow --mode template \t\tcreate a template files to define the workflow state machine model.`
             );
@@ -107,12 +117,8 @@ export default (program: CommanderStatic) => {
             );
             log(`    mc oe-deploy-workflow --mode info --id <id>\t\tget details of a deployment workflow instance.`);
             log(`    mc oe-deploy-workflow --mode info --key <key>\tget details of a deployment workflow model.`);
-            log(
-                `    mc oe-deploy-workflow --mode cancel --id <id> \tcancel a deployment workflow.`
-            );
-            log(
-                `    mc oe-deploy-workflow --mode delete --key <key> \tdelete a deployment workflow model.`
-            );
+            log(`    mc oe-deploy-workflow --mode cancel --id <id> \tcancel a deployment workflow.`);
+            log(`    mc oe-deploy-workflow --mode delete --key <key> \tdelete a deployment workflow model.`);
 
             serviceCredentialLog();
         });
@@ -120,50 +126,54 @@ export default (program: CommanderStatic) => {
 
 function checkRequiredParameters(options: any) {
     options.mode === "create" &&
-    !options.file &&
-    errorLog(
-        "you have to provide a file with the model data to create a new model (see mc oe-deploy-workflow --help for more details)",
-        true
-    );
+        !options.file &&
+        errorLog(
+            "you have to provide a file with the model data to create a new model (see mc oe-deploy-workflow --help for more details)",
+            true
+        );
 
     options.mode === "instantiate" &&
-    !options.file &&
-    errorLog(
-        "you have to provide a file with the instance data to create a new deployment workflow (see mc oe-deploy-workflow --help for more details)",
-        true
-    );
+        !options.file &&
+        errorLog(
+            "you have to provide a file with the instance data to create a new deployment workflow (see mc oe-deploy-workflow --help for more details)",
+            true
+        );
 
     options.mode === "info" &&
-    (!options.id) && (!options.key) &&
-    errorLog("you have to provide the id of the workflow instance or the key of the worflow moel (see mc oe-deploy-workflow --help for more details)", true);
+        !options.id &&
+        !options.key &&
+        errorLog(
+            "you have to provide the id of the workflow instance or the key of the worflow moel (see mc oe-deploy-workflow --help for more details)",
+            true
+        );
 
     options.mode === "delete" &&
-    !options.key &&
-    errorLog(
-        "you have to provide the key of the workflow model to delete it (see mc oe-deploy-workflow --help for more details)",
-        true
-    );
+        !options.key &&
+        errorLog(
+            "you have to provide the key of the workflow model to delete it (see mc oe-deploy-workflow --help for more details)",
+            true
+        );
     options.mode === "cancel" &&
-    !options.id &&
-    errorLog(
-        "you have to provide the id of the workflow instance to cancel it (see mc oe-deploy-workflow --help for more details)",
-        true
-    );
+        !options.id &&
+        errorLog(
+            "you have to provide the id of the workflow instance to cancel it (see mc oe-deploy-workflow --help for more details)",
+            true
+        );
 
     options.mode === "update" &&
-    !options.id &&
-    errorLog(
-        "you have to provide the id of the workflow instance to update it (see mc oe-deploy-workflow --help for more details)",
-        true
-    );
+        !options.id &&
+        errorLog(
+            "you have to provide the id of the workflow instance to update it (see mc oe-deploy-workflow --help for more details)",
+            true
+        );
 }
 
 async function listInstances(sdk: MindSphereSdk, options: any) {
     const workflowDeploymentClient = sdk.GetDeploymentWorkflowClient();
 
     // Parse all options
-    const model = (options.model) ? true : false;
-    const history = (options.history) ? true : false;
+    const model = options.model ? true : false;
+    const history = options.history ? true : false;
     const currentstate = options.currentstate;
     const group = options.group;
     const deviceid = options.deviceid;
@@ -175,14 +185,7 @@ async function listInstances(sdk: MindSphereSdk, options: any) {
     console.log(`id \tdeviceId \tcreatedAt \tcurrentState  \tmodel`);
     do {
         instancePage = (await retry(options.retry, () =>
-            workflowDeploymentClient.GetWorkflowInstances(
-                model,
-                history,
-                currentstate,
-                group,
-                deviceid,
-                modelKey
-            )
+            workflowDeploymentClient.GetWorkflowInstances(model, history, currentstate, group, deviceid, modelKey)
         )) as DeploymentWorkflowModels.PaginatedInstanceList;
 
         instancePage.content = instancePage.content || [];
@@ -190,7 +193,9 @@ async function listInstances(sdk: MindSphereSdk, options: any) {
         for (const inst of instancePage.content || []) {
             instanceCount++;
             console.log(
-                `${color(inst.id)}\t${inst.deviceId}\t${inst.createdAt} \t${color(inst.currentState?.state)}\t${color(inst.model?.key)}`
+                `${color(inst.id)}\t${inst.deviceId}\t${inst.createdAt} \t${color(inst.currentState?.state)}\t${color(
+                    inst.model?.key
+                )}`
             );
             verboseLog(JSON.stringify(inst, null, 2), options.verbose);
         }
@@ -199,47 +204,42 @@ async function listInstances(sdk: MindSphereSdk, options: any) {
     console.log(`${color(instanceCount)} worflow instance(s) listed.\n`);
 }
 async function createTemplateWorkflowModel(options: any, sdk: MindSphereSdk) {
-    const tenant = sdk.GetTenant();
-    const _tempalate = {
-        "key": "com.siemens.nano.fwupdate",
-        "states": [
+    const template = {
+        key: "com.siemens.nano.fwupdate",
+        states: [
             {
-                "name": "string",
-                "description": "string",
-                "initial": true,
-                "final": true,
-                "cancel": true
-            }
+                name: "string",
+                description: "string",
+                initial: true,
+                final: true,
+                cancel: true,
+            },
         ],
-        "transitions": [
+        transitions: [
             {
-                "from": "string",
-                "to": "string",
-                "type": "INSTANTANEOUS",
-                "allowedTypes": [
-                    "INSTANTANEOUS"
-                ]
-            }
+                from: "string",
+                to: "string",
+                type: "INSTANTANEOUS",
+                allowedTypes: ["INSTANTANEOUS"],
+            },
         ],
-        "groups": [
+        groups: [
             {
-                "name": "string",
-                "states": [
-                    "string"
-                ]
-            }
-        ]
+                name: "string",
+                states: ["string"],
+            },
+        ],
     };
-    verboseLog(_tempalate, options.verbose);
-    writeWFModelTemplateToFile(options, _tempalate);
+    verboseLog(template, options.verbose);
+    writeWFModelTemplateToFile(options, template);
 }
 function writeWFModelTemplateToFile(options: any, templateType: any) {
     const fileName = options.file || `edge.workflow.model.mdsp.json`;
     const filePath = path.resolve(fileName);
 
     fs.existsSync(filePath) &&
-    !options.overwrite &&
-    throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+        !options.overwrite &&
+        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
 
     fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
@@ -249,25 +249,24 @@ function writeWFModelTemplateToFile(options: any, templateType: any) {
     );
 }
 async function createTemplateWorkflowInstance(options: any, sdk: MindSphereSdk) {
-    const tenant = sdk.GetTenant();
     const templateType = {
-        "deviceId": "string",
-        "model": {
-            "key": "string",
-            "customTransitions": [
+        deviceId: "string",
+        model: {
+            key: "string",
+            customTransitions: [
                 {
-                    "from": "string",
-                    "to": "string",
-                    "type": "INSTANTANEOUS",
-                    "details": {
-                        "userDefined": {}
-                    }
-                }
-            ]
+                    from: "string",
+                    to: "string",
+                    type: "INSTANTANEOUS",
+                    details: {
+                        userDefined: {},
+                    },
+                },
+            ],
         },
-        "data": {
-            "userDefined": {}
-        }
+        data: {
+            userDefined: {},
+        },
     };
     verboseLog(templateType, options.verbose);
     writeWFInstTemplateToFile(options, templateType);
@@ -277,8 +276,8 @@ function writeWFInstTemplateToFile(options: any, templateType: any) {
     const filePath = path.resolve(fileName);
 
     fs.existsSync(filePath) &&
-    !options.overwrite &&
-    throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+        !options.overwrite &&
+        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
 
     fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
@@ -288,25 +287,24 @@ function writeWFInstTemplateToFile(options: any, templateType: any) {
     );
 }
 async function createTemplateWorkflowStatus(options: any, sdk: MindSphereSdk) {
-    const tenant = sdk.GetTenant();
-    const _tempalate = {
-        "progress": 0,
-        "message": "string",
-        "details": {
-            "userDefined": {}
+    const template = {
+        progress: 0,
+        message: "string",
+        details: {
+            userDefined: {},
         },
-        "state": "DOWNLOAD"
+        state: "DOWNLOAD",
     };
-    verboseLog(_tempalate, options.verbose);
-    writeWFStatusTemplateToFile(options, _tempalate);
+    verboseLog(template, options.verbose);
+    writeWFStatusTemplateToFile(options, template);
 }
 function writeWFStatusTemplateToFile(options: any, templateType: any) {
     const fileName = options.file || `edge.workflow.status.mdsp.json`;
     const filePath = path.resolve(fileName);
 
     fs.existsSync(filePath) &&
-    !options.overwrite &&
-    throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+        !options.overwrite &&
+        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
 
     fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
@@ -331,7 +329,7 @@ async function workflowDeploymentInstInfo(options: any, sdk: MindSphereSdk) {
 
     printObjectInfo(
         "Workflow Instance/Model Info",
-        (info as any),
+        info as any,
         options,
         ["deviceId", "appId", "appReleaseId", "appInstanceId", "configuration"],
         color
@@ -361,9 +359,13 @@ async function createWorkflowInstance(options: any, sdk: MindSphereSdk) {
     const file = fs.readFileSync(filePath);
     const data = JSON.parse(file.toString());
 
-    const deviceId = (data.deviceId! as string) ? data.deviceId : `${data.deviceId}`;
     const inst = await sdk.GetDeploymentWorkflowClient().PostNewWorflowInstance(data, options.model, options.history);
-    console.log(`created a new deployment model instance on the device ${color(inst.deviceId)} as specified by the file ${color(filePath)}`);
+    verboseLog(JSON.stringify(inst, null, 2), options.verbose);
+    console.log(
+        `created a new deployment model instance on the device ${color(inst.deviceId)} as specified by the file ${color(
+            filePath
+        )}`
+    );
 }
 async function createWorkflowModel(options: any, sdk: MindSphereSdk) {
     const filePath = path.resolve(options.file);
@@ -371,5 +373,6 @@ async function createWorkflowModel(options: any, sdk: MindSphereSdk) {
     const data = JSON.parse(file.toString());
 
     const inst = await sdk.GetDeploymentWorkflowClient().PostNewWorkflowModel(data);
+    verboseLog(JSON.stringify(inst, null, 2), options.verbose);
     console.log(`created a new deployment model as specified by the file ${color(filePath)}`);
 }

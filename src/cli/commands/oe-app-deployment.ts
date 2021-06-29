@@ -10,7 +10,6 @@ import {
     getColor,
     getSdk,
     homeDirLog,
-    printObjectInfo,
     proxyLog,
     serviceCredentialLog,
     verboseLog,
@@ -23,7 +22,11 @@ export default (program: CommanderStatic) => {
     program
         .command("oe-app-deploy")
         .alias("oead")
-        .option("-m, --mode [list|create|update|accept|remove|template|info|check]", "list | create | update | accept | remove | template | info | check", "list")
+        .option(
+            "-m, --mode [list|create|update|accept|remove|template|info|check]",
+            "list | create | update | accept | remove | template | info | check",
+            "list"
+        )
         .option("-i, --id <id>", "the installation task id")
         .option("-d, --deviceid <deviceid>", "deviceid to filter")
         .option("-r, --realeaseid <realeaseid>", "software realease id")
@@ -57,7 +60,7 @@ export default (program: CommanderStatic) => {
                             break;
 
                         case "create":
-                            await createInstllationTask(options, sdk);
+                            await createInstallationTask(options, sdk);
                             break;
                         case "remove":
                             await createRemovalTask(options, sdk);
@@ -88,7 +91,9 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc oe-app-deploy --mode list --deviceid "7d018c..." \n\tlist all installation and removal tasks of a specified device.`);
+            log(
+                `    mc oe-app-deploy --mode list --deviceid "7d018c..." \n\tlist all installation and removal tasks of a specified device.`
+            );
             log(
                 `    mc oe-app-deploy --mode template \n\tcreate template files to define an app installation/removal task.`
             );
@@ -102,8 +107,12 @@ export default (program: CommanderStatic) => {
                 `    mc oe-app-deploy --mode update --id "7d018c..." --file edge.app.status.mdsp.json \n\tupdate an installation/removal task from status template file.`
             );
             log(`    mc oe-app-deploy --mode info --id <id>\n\tget details of an installation task.`);
-            log(`    mc oe-app-deploy --mode check --deviceid <deviceid> --realeaseid <realeaseid>  \n\tcheck terms and condition of a software realease on a a specific device.`);
-            log(`    mc oe-app-deploy --mode accept --deviceid <deviceid> --realeaseid <realeaseid> \n\taccept terms and condition of a software realease on a a specific device.`);
+            log(
+                `    mc oe-app-deploy --mode check --deviceid <deviceid> --realeaseid <realeaseid>  \n\tcheck terms and condition of a software realease on a a specific device.`
+            );
+            log(
+                `    mc oe-app-deploy --mode accept --deviceid <deviceid> --realeaseid <realeaseid> \n\taccept terms and condition of a software realease on a a specific device.`
+            );
 
             serviceCredentialLog();
         });
@@ -111,62 +120,65 @@ export default (program: CommanderStatic) => {
 
 function checkRequiredParameters(options: any) {
     options.mode === "list" &&
-    !options.deviceid &&
-    errorLog(
-        "you have to provide the device id to list all the app installation/removal tasks (see mc oe-app-deploy --help for more details)",
-        true
-    );
+        !options.deviceid &&
+        errorLog(
+            "you have to provide the device id to list all the app installation/removal tasks (see mc oe-app-deploy --help for more details)",
+            true
+        );
 
     options.mode === "create" &&
-    !options.file &&
-    errorLog(
-        "you have to provide a file with the task data to create a new installation task (see mc oe-app-deploy --help for more details)",
-        true
-    );
+        !options.file &&
+        errorLog(
+            "you have to provide a file with the task data to create a new installation task (see mc oe-app-deploy --help for more details)",
+            true
+        );
 
     options.mode === "remove" &&
-    !options.file &&
-    errorLog(
-        "you have to provide a file with the task data to create a new deployment workflow (see mc oe-app-deploy --help for more details)",
-        true
-    );
+        !options.file &&
+        errorLog(
+            "you have to provide a file with the task data to create a new deployment workflow (see mc oe-app-deploy --help for more details)",
+            true
+        );
 
     options.mode === "update" &&
-    !options.id &&
-    errorLog(
-        "you have to provide the id of the installation/removal task to update it (see mc oe-app-deploy --help for more details)",
-        true
-    );
+        !options.id &&
+        errorLog(
+            "you have to provide the id of the installation/removal task to update it (see mc oe-app-deploy --help for more details)",
+            true
+        );
 
     options.mode === "check" &&
-    !options.deviceid &&
-    errorLog(
-        "you have to provide the deviceid to check for terms and conditions (see mc oe-app-deploy --help for more details)",
-        true
-    );
+        !options.deviceid &&
+        errorLog(
+            "you have to provide the deviceid to check for terms and conditions (see mc oe-app-deploy --help for more details)",
+            true
+        );
     options.mode === "check" &&
-    !options.realeaseid &&
-    errorLog(
-        "you have to provide the realeaseid to check for terms and conditions (see mc oe-app-deploy --help for more details)",
-        true
-    );
+        !options.realeaseid &&
+        errorLog(
+            "you have to provide the realeaseid to check for terms and conditions (see mc oe-app-deploy --help for more details)",
+            true
+        );
 
     options.mode === "accept" &&
-    !options.deviceid &&
-    errorLog(
-        "you have to provide the deviceid to accept the terms and conditions (see mc oe-app-deploy --help for more details)",
-        true
-    );
+        !options.deviceid &&
+        errorLog(
+            "you have to provide the deviceid to accept the terms and conditions (see mc oe-app-deploy --help for more details)",
+            true
+        );
     options.mode === "accept" &&
-    !options.realeaseid &&
-    errorLog(
-        "you have to provide the realeaseid to accept the terms and conditions (see mc oe-app-deploy --help for more details)",
-        true
-    );
+        !options.realeaseid &&
+        errorLog(
+            "you have to provide the realeaseid to accept the terms and conditions (see mc oe-app-deploy --help for more details)",
+            true
+        );
 
     options.mode === "info" &&
-    (!options.id) &&
-    errorLog("you have to provide the id of the installation task (see mc oe-app-deploy --help for more details)", true);
+        !options.id &&
+        errorLog(
+            "you have to provide the id of the installation task (see mc oe-app-deploy --help for more details)",
+            true
+        );
 }
 
 async function listInstalls(sdk: MindSphereSdk, options: any) {
@@ -190,7 +202,7 @@ async function listInstalls(sdk: MindSphereSdk, options: any) {
 
     // Print out the table
     console.log("App installation tasks");
-    console.table(rslt_table, ["id", "createdAt", "softwareType", "softwareId", "softwareReleaseId", "currentState" ]);
+    console.table(rslt_table, ["id", "createdAt", "softwareType", "softwareId", "softwareReleaseId", "currentState"]);
     console.log(`${color(rslt_table.length)} app installation task(s) listed.\n`);
 
     page = 0;
@@ -208,30 +220,29 @@ async function listInstalls(sdk: MindSphereSdk, options: any) {
 
     // Print out the table
     console.log("Removal Tasks");
-    console.table(rslt_table, ["id", "createdAt", "softwareType", "softwareId", "softwareReleaseId", "currentState" ]);
+    console.table(rslt_table, ["id", "createdAt", "softwareType", "softwareId", "softwareReleaseId", "currentState"]);
     console.log(`${color(rslt_table_2.length)} app removal task(s) listed.\n`);
 }
 async function createTemplateInstallationTask(options: any, sdk: MindSphereSdk) {
-    const tenant = sdk.GetTenant();
-    const _tempalate = {
-        "deviceId": "7d018c...",
-        "softwareId": "7d018c...",
-        "softwareReleaseId": "7d018c...",
-        "customData": {
-            "sampleKey1": "sampleValue1",
-            "sampleKey2": "sampleValue2"
-        }
+    const template = {
+        deviceId: "7d018c...",
+        softwareId: "7d018c...",
+        softwareReleaseId: "7d018c...",
+        customData: {
+            sampleKey1: "sampleValue1",
+            sampleKey2: "sampleValue2",
+        },
     };
-    verboseLog(_tempalate, options.verbose);
-    writeInstallTaskTemplateToFile(options, _tempalate);
+    verboseLog(template, options.verbose);
+    writeInstallTaskTemplateToFile(options, template);
 }
 function writeInstallTaskTemplateToFile(options: any, templateType: any) {
     const fileName = options.file || `edge.install.app.mdsp.json`;
     const filePath = path.resolve(fileName);
 
     fs.existsSync(filePath) &&
-    !options.overwrite &&
-    throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+        !options.overwrite &&
+        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
 
     fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
@@ -241,15 +252,14 @@ function writeInstallTaskTemplateToFile(options: any, templateType: any) {
     );
 }
 async function createTemplateRemovalTask(options: any, sdk: MindSphereSdk) {
-    const tenant = sdk.GetTenant();
     const templateType = {
-        "deviceId": "7d018c...",
-        "softwareId": "7d018c...",
-        "softwareReleaseId": "7d018c...",
-        "customData": {
-            "sampleKey1": "sampleValue1",
-            "sampleKey2": "sampleValue2"
-        }
+        deviceId: "7d018c...",
+        softwareId: "7d018c...",
+        softwareReleaseId: "7d018c...",
+        customData: {
+            sampleKey1: "sampleValue1",
+            sampleKey2: "sampleValue2",
+        },
     };
     verboseLog(templateType, options.verbose);
     writeRemovalTaskTemplateToFile(options, templateType);
@@ -259,8 +269,8 @@ function writeRemovalTaskTemplateToFile(options: any, templateType: any) {
     const filePath = path.resolve(fileName);
 
     fs.existsSync(filePath) &&
-    !options.overwrite &&
-    throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+        !options.overwrite &&
+        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
 
     fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
@@ -270,26 +280,25 @@ function writeRemovalTaskTemplateToFile(options: any, templateType: any) {
     );
 }
 async function createTemplateTaskStatus(options: any, sdk: MindSphereSdk) {
-    const tenant = sdk.GetTenant();
-    const _tempalate = {
-        "state": "DOWNLOAD",
-        "progress": 0.4,
-        "message": "Task status updated as DOWNLOAD",
-        "details": {
-            "sampleKey1": "sampleValue1",
-            "sampleKey2": "sampleValue2"
-        }
+    const template = {
+        state: "DOWNLOAD",
+        progress: 0.4,
+        message: "Task status updated as DOWNLOAD",
+        details: {
+            sampleKey1: "sampleValue1",
+            sampleKey2: "sampleValue2",
+        },
     };
-    verboseLog(_tempalate, options.verbose);
-    writeTaskStatusTemplateToFile(options, _tempalate);
+    verboseLog(template, options.verbose);
+    writeTaskStatusTemplateToFile(options, template);
 }
 function writeTaskStatusTemplateToFile(options: any, templateType: any) {
     const fileName = options.file || `edge.app.status.mdsp.json`;
     const filePath = path.resolve(fileName);
 
     fs.existsSync(filePath) &&
-    !options.overwrite &&
-    throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+        !options.overwrite &&
+        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
 
     fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
@@ -330,30 +339,34 @@ async function checkTermAndConditions(options: any, sdk: MindSphereSdk) {
     }
 }
 async function acceptTermAndConditions(options: any, sdk: MindSphereSdk) {
-    let info = null;
     const deviceid = (options.deviceid! as string) ? options.deviceid : `${options.deviceid}`;
     const realeaseid = (options.realeaseid! as string) ? options.realeaseid : `${options.realeaseid}`;
-    info = (await retry(options.retry, () =>
+    await retry(options.retry, () =>
         sdk.GetEdgeDeploymentClient().PostAcceptTermsAndConditions({
-            "deviceId": deviceid,
-            "releaseId": realeaseid
+            deviceId: deviceid,
+            releaseId: realeaseid,
         })
-    )) as EdgeAppDeploymentModels.TermsAndConditionsResource;
+    );
 }
 async function createRemovalTask(options: any, sdk: MindSphereSdk) {
     const filePath = path.resolve(options.file);
     const file = fs.readFileSync(filePath);
     const data = JSON.parse(file.toString());
 
-    const deviceId = (data.deviceId! as string) ? data.deviceId : `${data.deviceId}`;
     const inst = await sdk.GetEdgeDeploymentClient().PostRemovalTask(data);
-    console.log(`created a new app removal task on the device ${color(inst.deviceId)} as specified by the file ${color(filePath)}`);
+    verboseLog(JSON.stringify(inst, null, 2), options.verbose);
+    console.log(
+        `created a new app removal task on the device ${color(inst.deviceId)} as specified by the file ${color(
+            filePath
+        )}`
+    );
 }
-async function createInstllationTask(options: any, sdk: MindSphereSdk) {
+async function createInstallationTask(options: any, sdk: MindSphereSdk) {
     const filePath = path.resolve(options.file);
     const file = fs.readFileSync(filePath);
     const data = JSON.parse(file.toString());
 
     const inst = await sdk.GetEdgeDeploymentClient().PostInstallationTask(data);
+    verboseLog(JSON.stringify(inst, null, 2), options.verbose);
     console.log(`created a new app installation task as specified by the file ${color(filePath)}`);
 }

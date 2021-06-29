@@ -23,7 +23,11 @@ export default (program: CommanderStatic) => {
     program
         .command("oe-app-inst")
         .alias("oeai")
-        .option("-m, --mode [list|create|config|delete|template|info]", "list | create | config | delete | template | info", "list")
+        .option(
+            "-m, --mode [list|create|config|delete|template|info]",
+            "list | create | config | delete | template | info",
+            "list"
+        )
         .option("-i, --id <id>", "the app instance id")
         .option("-d, --deviceid <id>", "the device id")
         .option("-f, --file <file>", ".mdsp.json file with app inst data")
@@ -77,10 +81,10 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc oe-app-inst --mode list --deviceid <deviceid> \tlist all app instances of device with deviceId.`);
             log(
-                `    mc oe-app-inst --mode template \t\t\tcreate a template file for new app instance data.`
+                `    mc oe-app-inst --mode list --deviceid <deviceid> \tlist all app instances of device with deviceId.`
             );
+            log(`    mc oe-app-inst --mode template \t\t\tcreate a template file for new app instance data.`);
             log(
                 `    mc oe-app-inst --mode create --file edge.app.mdsp.json \n\tcreates a new app instance from template file.`
             );
@@ -116,19 +120,18 @@ async function createAppInstanceConfiguration(options: any, sdk: MindSphereSdk) 
 
 async function createTemplateApp(options: any, sdk: MindSphereSdk) {
     const tenant = sdk.GetTenant();
-    const _tempalate = {
+    const template = {
         name: `${tenant}.myAppName`,
         appInstanceId: "718ca5ad0...",
         deviceId: "718ca5ad0...",
         releaseId: "718ca5ad0...",
-        applicationId: "718ca5ad0..."
+        applicationId: "718ca5ad0...",
     };
-    verboseLog(_tempalate, options.verbose);
-    writeAppTemplateToFile(options, _tempalate);
+    verboseLog(template, options.verbose);
+    writeAppTemplateToFile(options, template);
 }
 
 async function createTemplateAppConfig(options: any, sdk: MindSphereSdk) {
-    const tenant = sdk.GetTenant();
     const templateType = {
         deviceId: "718ca5ad0...",
         appId: "718ca5ad0...",
@@ -136,8 +139,8 @@ async function createTemplateAppConfig(options: any, sdk: MindSphereSdk) {
         appInstanceId: "718ca5ad0...",
         configuration: {
             sampleKey1: "sampleValue1",
-            sampleKey2: "sampleValue2"
-        }
+            sampleKey2: "sampleValue2",
+        },
     };
     verboseLog(templateType, options.verbose);
     writeAppInstConfigToFile(options, templateType);
@@ -148,8 +151,8 @@ function writeAppTemplateToFile(options: any, templateType: any) {
     const filePath = path.resolve(fileName);
 
     fs.existsSync(filePath) &&
-    !options.overwrite &&
-    throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+        !options.overwrite &&
+        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
 
     fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
@@ -164,8 +167,8 @@ function writeAppInstConfigToFile(options: any, templateType: any) {
     const filePath = path.resolve(fileName);
 
     fs.existsSync(filePath) &&
-    !options.overwrite &&
-    throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+        !options.overwrite &&
+        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
 
     fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
@@ -175,6 +178,7 @@ function writeAppInstConfigToFile(options: any, templateType: any) {
     );
 }
 
+// @Jupiter are these methods not ment to be used?
 async function configureAppInstance(options: any, sdk: MindSphereSdk) {
     const id = (options.id! as string) ? options.id : `${options.id}`;
 
@@ -192,6 +196,7 @@ async function deleteAppInst(options: any, sdk: MindSphereSdk) {
     console.log(`Application instance with id ${color(id)} deleted.`);
 }
 
+// @Jupiter are these methods not ment to be used?
 async function deleteAppInstConfiguration(options: any, sdk: MindSphereSdk) {
     const id = (options.id! as string) ? options.id : `${options.id}`;
     await sdk.GetEdgeAppInstanceManagementClient().DeleteAppInstanceConfiguration(id);
@@ -227,7 +232,9 @@ async function listApps(sdk: MindSphereSdk, options: any) {
                 )) as EdgeAppInstanceModels.ApplicationInstanceLifeCycleResource;
 
                 console.log(
-                    `${color(app.name)} \t${color(status.status)} \t${app.appInstanceId} \t${app.deviceId} \t${app.applicationId} \t${app.releaseId} \t${JSON.stringify(config)}`
+                    `${color(app.name)} \t${color(status.status)} \t${app.appInstanceId} \t${app.deviceId} \t${
+                        app.applicationId
+                    } \t${app.releaseId} \t${JSON.stringify(config)}`
                 );
                 verboseLog(JSON.stringify(app, null, 2), options.verbose);
             } catch (e) {}
@@ -267,41 +274,41 @@ async function appInstanceConfigInfo(options: any, sdk: MindSphereSdk) {
 
 function checkRequiredParameters(options: any) {
     options.mode === "create" &&
-    !options.file &&
-    errorLog(
-        "you have to provide a file with the app data to create a new application instance (see mc oe-app-inst --help for more details)",
-        true
-    );
+        !options.file &&
+        errorLog(
+            "you have to provide a file with the app data to create a new application instance (see mc oe-app-inst --help for more details)",
+            true
+        );
 
     options.mode === "list" &&
-    !options.deviceid &&
-    errorLog(
-        "you have to provide the deviceid of the target device (see mc oe-app-inst --help for more details)",
-        true
-    );
+        !options.deviceid &&
+        errorLog(
+            "you have to provide the deviceid of the target device (see mc oe-app-inst --help for more details)",
+            true
+        );
 
     options.mode === "info" &&
-    !options.id &&
-    errorLog("you have to provide the id app instance (see mc oe-app-inst --help for more details)", true);
+        !options.id &&
+        errorLog("you have to provide the id app instance (see mc oe-app-inst --help for more details)", true);
 
     options.mode === "delete" &&
-    !options.id &&
-    errorLog(
-        "you have to provide the id of the app instance to delete it (see mc oe-app-inst --help for more details)",
-        true
-    );
+        !options.id &&
+        errorLog(
+            "you have to provide the id of the app instance to delete it (see mc oe-app-inst --help for more details)",
+            true
+        );
 
     options.mode === "config" &&
-    !options.file &&
-    errorLog(
-        "you have to provide a file with the config data to configure the application instance (see mc oe-app-inst --help for more details)",
-        true
-    );
+        !options.file &&
+        errorLog(
+            "you have to provide a file with the config data to configure the application instance (see mc oe-app-inst --help for more details)",
+            true
+        );
 
     options.mode === "config" &&
-    !options.id &&
-    errorLog(
-        "you have to provide the id of the app instance to configure (see mc oe-app-inst --help for more details)",
-        true
-    );
+        !options.id &&
+        errorLog(
+            "you have to provide the id of the app instance to configure (see mc oe-app-inst --help for more details)",
+            true
+        );
 }

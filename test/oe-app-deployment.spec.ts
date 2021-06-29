@@ -1,10 +1,9 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
-import { EdgeAppDeploymentModels } from "../src/api/sdk/open-edge/open-edge-models";
 import { MindSphereSdk } from "../src";
-import { decrypt, loadAuth, throwError } from "../src/api/utils";
+import { decrypt, loadAuth } from "../src/api/utils";
 import { setupDeviceTestStructure, tearDownDeviceTestStructure } from "./test-device-setup-utils";
-import { getPasskeyForUnitTest, sleep } from "./test-utils";
+import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
 
 const timeOffset = new Date().getTime();

@@ -10,7 +10,6 @@ import {
     getColor,
     getSdk,
     homeDirLog,
-    printObjectInfo,
     proxyLog,
     serviceCredentialLog,
     verboseLog,
@@ -23,7 +22,11 @@ export default (program: CommanderStatic) => {
     program
         .command("oe-firm-deploy")
         .alias("oefd")
-        .option("-m, --mode [list|create|update|info|check|accept|template]", "list | create | update | info | check | accept |template", "list")
+        .option(
+            "-m, --mode [list|create|update|info|check|accept|template]",
+            "list | create | update | info | check | accept |template",
+            "list"
+        )
         .option("-i, --id <id>", "the installation task id")
         .option("-d, --deviceid <deviceid>", "deviceid to filter")
         .option("-r, --realeaseid <realeaseid>", "firmware realease id")
@@ -85,7 +88,9 @@ export default (program: CommanderStatic) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc oe-firm-deploy --mode list --deviceid "7d018c..." \n\tlist all firmware deployment taks on a specified device.`);
+            log(
+                `    mc oe-firm-deploy --mode list --deviceid "7d018c..." \n\tlist all firmware deployment taks on a specified device.`
+            );
             log(
                 `    mc oe-firm-deploy --mode template \n\tcreate template files to define an firmware installation/update task.`
             );
@@ -96,8 +101,12 @@ export default (program: CommanderStatic) => {
                 `    mc oe-firm-deploy --mode update --id "7d018c..." --file edge.firmware.status.mdsp.json \n\tupdate a firmware installation task from status template file.`
             );
             log(`    mc oe-firm-deploy --mode info --id <id>\n\tget details of a firmware installation task.`);
-            log(`    mc oe-firm-deploy --mode check --deviceid <deviceid> --realeaseid <realeaseid>  \n\tcheck terms and condition of a firmware realease on a a specific device.`);
-            log(`    mc oe-firm-deploy --mode accept --deviceid <deviceid> --realeaseid <realeaseid> \n\taccept terms and condition of a firmware realease on a a specific device.`);
+            log(
+                `    mc oe-firm-deploy --mode check --deviceid <deviceid> --realeaseid <realeaseid>  \n\tcheck terms and condition of a firmware realease on a a specific device.`
+            );
+            log(
+                `    mc oe-firm-deploy --mode accept --deviceid <deviceid> --realeaseid <realeaseid> \n\taccept terms and condition of a firmware realease on a a specific device.`
+            );
 
             serviceCredentialLog();
         });
@@ -105,62 +114,65 @@ export default (program: CommanderStatic) => {
 
 function checkRequiredParameters(options: any) {
     options.mode === "list" &&
-    !options.deviceid &&
-    errorLog(
-        "you have to provide the device id to list all the app installation/removal tasks (see mc oe-firm-deploy --help for more details)",
-        true
-    );
+        !options.deviceid &&
+        errorLog(
+            "you have to provide the device id to list all the app installation/removal tasks (see mc oe-firm-deploy --help for more details)",
+            true
+        );
 
     options.mode === "create" &&
-    !options.file &&
-    errorLog(
-        "you have to provide a file with the task data to create a new installation task (see mc oe-firm-deploy --help for more details)",
-        true
-    );
+        !options.file &&
+        errorLog(
+            "you have to provide a file with the task data to create a new installation task (see mc oe-firm-deploy --help for more details)",
+            true
+        );
 
     options.mode === "update" &&
-    !options.file &&
-    errorLog(
-        "you have to provide a file with the update data to update the status of the firmware installation task (see mc oe-firm-deploy --help for more details)",
-        true
-    );
+        !options.file &&
+        errorLog(
+            "you have to provide a file with the update data to update the status of the firmware installation task (see mc oe-firm-deploy --help for more details)",
+            true
+        );
 
     options.mode === "update" &&
-    !options.id &&
-    errorLog(
-        "you have to provide the id of the installation/removal task to update it (see mc oe-firm-deploy --help for more details)",
-        true
-    );
+        !options.id &&
+        errorLog(
+            "you have to provide the id of the installation/removal task to update it (see mc oe-firm-deploy --help for more details)",
+            true
+        );
 
     options.mode === "check" &&
-    !options.deviceid &&
-    errorLog(
-        "you have to provide the deviceid to check for terms and conditions (see mc oe-firm-deploy --help for more details)",
-        true
-    );
+        !options.deviceid &&
+        errorLog(
+            "you have to provide the deviceid to check for terms and conditions (see mc oe-firm-deploy --help for more details)",
+            true
+        );
     options.mode === "check" &&
-    !options.realeaseid &&
-    errorLog(
-        "you have to provide the realeaseid to check for terms and conditions (see mc oe-firm-deploy --help for more details)",
-        true
-    );
+        !options.realeaseid &&
+        errorLog(
+            "you have to provide the realeaseid to check for terms and conditions (see mc oe-firm-deploy --help for more details)",
+            true
+        );
 
     options.mode === "accept" &&
-    !options.deviceid &&
-    errorLog(
-        "you have to provide the deviceid to accept the terms and conditions (see mc oe-firm-deploy --help for more details)",
-        true
-    );
+        !options.deviceid &&
+        errorLog(
+            "you have to provide the deviceid to accept the terms and conditions (see mc oe-firm-deploy --help for more details)",
+            true
+        );
     options.mode === "accept" &&
-    !options.realeaseid &&
-    errorLog(
-        "you have to provide the realeaseid to accept the terms and conditions (see mc oe-firm-deploy --help for more details)",
-        true
-    );
+        !options.realeaseid &&
+        errorLog(
+            "you have to provide the realeaseid to accept the terms and conditions (see mc oe-firm-deploy --help for more details)",
+            true
+        );
 
     options.mode === "info" &&
-    (!options.id) &&
-    errorLog("you have to provide the id of the installation task (see mc oe-firm-deploy --help for more details)", true);
+        !options.id &&
+        errorLog(
+            "you have to provide the id of the installation task (see mc oe-firm-deploy --help for more details)",
+            true
+        );
 }
 
 async function listInstalls(sdk: MindSphereSdk, options: any) {
@@ -174,7 +186,15 @@ async function listInstalls(sdk: MindSphereSdk, options: any) {
     let rslt_table: any[] = [];
     do {
         iTaskPage = (await retry(options.retry, () =>
-            firmDeploymentClient.GetInstallationTasks(deviceid, options.type, options.status, 100, page, undefined, options.history)
+            firmDeploymentClient.GetInstallationTasks(
+                deviceid,
+                options.type,
+                options.status,
+                100,
+                page,
+                undefined,
+                options.history
+            )
         )) as EdgeAppDeploymentModels.PaginatedTaskResource;
 
         iTaskPage.content = iTaskPage.content || [];
@@ -184,38 +204,45 @@ async function listInstalls(sdk: MindSphereSdk, options: any) {
 
     // Print out the table
     console.log("Firmware installation tasks");
-    console.table(rslt_table, ["id", "createdAt", "softwareType", "softwareId", "softwareReleaseId", "actionType", "currentState" ]);
+    console.table(rslt_table, [
+        "id",
+        "createdAt",
+        "softwareType",
+        "softwareId",
+        "softwareReleaseId",
+        "actionType",
+        "currentState",
+    ]);
     console.log(`${color(rslt_table.length)} firmware installation/update task(s) listed.\n`);
 }
 async function createTemplateInstallationTask(options: any, sdk: MindSphereSdk) {
-    const tenant = sdk.GetTenant();
-    const _tempalate = {
-        "deviceId": "7d018c...",
-        "softwareType": "FIRMWARE",
-        "softwareId": "7d018c...",
-        "softwareReleaseId": "7d018c...",
-        "transitions": [
+    const template = {
+        deviceId: "7d018c...",
+        softwareType: "FIRMWARE",
+        softwareId: "7d018c...",
+        softwareReleaseId: "7d018c...",
+        transitions: [
             {
-                "type": "string",
-                "from": "DOWNLOAD",
-                "to": "INSTALL",
-                "details": {}
-            }
+                type: "string",
+                from: "DOWNLOAD",
+                to: "INSTALL",
+                details: {},
+            },
         ],
-        "customData": {
-            "userDefined": {}
-        }
+        customData: {
+            userDefined: {},
+        },
     };
-    verboseLog(_tempalate, options.verbose);
-    writeInstallTaskTemplateToFile(options, _tempalate);
+    verboseLog(template, options.verbose);
+    writeInstallTaskTemplateToFile(options, template);
 }
 function writeInstallTaskTemplateToFile(options: any, templateType: any) {
     const fileName = options.file || `edge.install.firmware.mdsp.json`;
     const filePath = path.resolve(fileName);
 
     fs.existsSync(filePath) &&
-    !options.overwrite &&
-    throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+        !options.overwrite &&
+        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
 
     fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
@@ -225,23 +252,22 @@ function writeInstallTaskTemplateToFile(options: any, templateType: any) {
     );
 }
 async function createTemplateTaskStatus(options: any, sdk: MindSphereSdk) {
-    const tenant = sdk.GetTenant();
-    const _tempalate = {
-        "state": "CREATED",
-        "progress": 0,
-        "message": "string",
-        "details": {}
+    const template = {
+        state: "CREATED",
+        progress: 0,
+        message: "string",
+        details: {},
     };
-    verboseLog(_tempalate, options.verbose);
-    writeTaskStatusTemplateToFile(options, _tempalate);
+    verboseLog(template, options.verbose);
+    writeTaskStatusTemplateToFile(options, template);
 }
 function writeTaskStatusTemplateToFile(options: any, templateType: any) {
     const fileName = options.file || `edge.firmware.status.mdsp.json`;
     const filePath = path.resolve(fileName);
 
     fs.existsSync(filePath) &&
-    !options.overwrite &&
-    throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+        !options.overwrite &&
+        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
 
     fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
@@ -266,7 +292,9 @@ async function updateTaskStatus(options: any, sdk: MindSphereSdk) {
 
     const id = (options.id! as string) ? options.id : `${options.id}`;
     await sdk.GetFirmwareDeploymentClient().PatchInstallationTask(id, data);
-    console.log(`updated the status of the firmware installation task "${color(id)}" as specified in ${color(filePath)}`);
+    console.log(
+        `updated the status of the firmware installation task "${color(id)}" as specified in ${color(filePath)}`
+    );
 }
 async function checkTermAndConditions(options: any, sdk: MindSphereSdk) {
     let info = null;
@@ -287,10 +315,12 @@ async function acceptTermAndConditions(options: any, sdk: MindSphereSdk) {
     const realeaseid = (options.realeaseid! as string) ? options.realeaseid : `${options.realeaseid}`;
     info = (await retry(options.retry, () =>
         sdk.GetFirmwareDeploymentClient().PostAcceptTermsAndConditions({
-            "deviceId": deviceid,
-            "releaseId": realeaseid
+            deviceId: deviceid,
+            releaseId: realeaseid,
         })
     )) as EdgeAppDeploymentModels.TermsAndConditionsResource;
+
+    verboseLog(JSON.stringify(info, null, 2), options.verbose);
 }
 
 async function createInstllationTask(options: any, sdk: MindSphereSdk) {
@@ -299,5 +329,6 @@ async function createInstllationTask(options: any, sdk: MindSphereSdk) {
     const data = JSON.parse(file.toString());
 
     const inst = await sdk.GetFirmwareDeploymentClient().PostInstallationTask(data);
+    verboseLog(JSON.stringify(inst, null, 2), options.verbose);
     console.log(`created a new firmware installation task as specified by the file ${color(filePath)}`);
 }

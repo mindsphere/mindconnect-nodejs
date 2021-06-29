@@ -1,13 +1,12 @@
 import * as chai from "chai";
 import "url-search-params-polyfill";
-import { DeploymentWorkflowModels } from "../src/api/sdk/open-edge/open-edge-models";
 import { MindSphereSdk } from "../src";
-import { decrypt, loadAuth, throwError } from "../src/api/utils";
+import { DeploymentWorkflowModels } from "../src/api/sdk/open-edge/open-edge-models";
+import { decrypt, loadAuth } from "../src/api/utils";
 import { setupDeviceTestStructure, tearDownDeviceTestStructure } from "./test-device-setup-utils";
-import { getPasskeyForUnitTest, sleep } from "./test-utils";
+import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
 
-const timeOffset = new Date().getTime();
 describe("[SDK] DeviceManagementClient.DeploymentWorkflow", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
@@ -15,7 +14,6 @@ describe("[SDK] DeviceManagementClient.DeploymentWorkflow", () => {
         basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
     const deploymentWorkflowClient = sdk.GetDeploymentWorkflowClient();
-    const assetMgmt = sdk.GetAssetManagementClient();
     const tenant = sdk.GetTenant();
 
     const workflowTemplate = {
@@ -26,83 +24,73 @@ describe("[SDK] DeviceManagementClient.DeploymentWorkflow", () => {
                 description: "test state stopped",
                 initial: true,
                 final: false,
-                cancel: false
+                cancel: false,
             },
             {
                 name: "RUN",
                 description: "test state run",
                 initial: false,
                 final: false,
-                cancel: false
+                cancel: false,
             },
             {
                 name: "FINAL",
                 description: "test state run",
                 initial: false,
                 final: true,
-                cancel: false
+                cancel: false,
             },
             {
                 name: "CANCEL",
                 description: "test state run",
                 initial: false,
                 final: false,
-                cancel: true
-            }
+                cancel: true,
+            },
         ],
         transitions: [
             {
                 from: "STOPPED",
                 to: "RUN",
                 type: DeploymentWorkflowModels.TransitionType.BACKENDTRIGGER,
-                allowedTypes: [
-                    DeploymentWorkflowModels.TransitionType.BACKENDTRIGGER
-                ]
+                allowedTypes: [DeploymentWorkflowModels.TransitionType.BACKENDTRIGGER],
             },
             {
                 from: "STOPPED",
                 to: "CANCEL",
                 type: DeploymentWorkflowModels.TransitionType.BACKENDTRIGGER,
-                allowedTypes: [
-                    DeploymentWorkflowModels.TransitionType.BACKENDTRIGGER
-                ]
+                allowedTypes: [DeploymentWorkflowModels.TransitionType.BACKENDTRIGGER],
             },
             {
                 from: "RUN",
                 to: "CANCEL",
                 type: DeploymentWorkflowModels.TransitionType.BACKENDTRIGGER,
-                allowedTypes: [
-                    DeploymentWorkflowModels.TransitionType.BACKENDTRIGGER
-                ]
+                allowedTypes: [DeploymentWorkflowModels.TransitionType.BACKENDTRIGGER],
             },
             {
                 from: "RUN",
                 to: "FINAL",
                 type: DeploymentWorkflowModels.TransitionType.BACKENDTRIGGER,
-                allowedTypes: [
-                    DeploymentWorkflowModels.TransitionType.BACKENDTRIGGER
-                ]
+                allowedTypes: [DeploymentWorkflowModels.TransitionType.BACKENDTRIGGER],
             },
         ],
         groups: [
             {
                 name: "Machine",
-                states: [
-                    "STOPPED", "RUN", "CANCEL", "FINAL"
-                ]
-            }
-        ]
+                states: ["STOPPED", "RUN", "CANCEL", "FINAL"],
+            },
+        ],
     };
 
     const workflowInstance = {
         deviceId: "",
         model: {
             key: `${tenant}_fwupdate`,
-            customTransitions: []
+            customTransitions: [],
         },
         data: {
-            userDefined: {}
-        }
+            userDefined: {},
+        },
     };
 
     let deviceTypeId = "aee2e37f-f562-4ed6-b90a-c43208dc054a";
@@ -118,7 +106,7 @@ describe("[SDK] DeviceManagementClient.DeploymentWorkflow", () => {
         await tearDownDeviceTestStructure(sdk);
 
         // Setup the testing architecture
-        const {device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);
+        const { device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);
         assetTypeId = `${(deviceAssetType as any).id}`;
         deviceTypeId = `${(deviceType as any).id}`;
         assetId = `${(deviceAsset as any).assetId}`;
@@ -185,7 +173,7 @@ describe("[SDK] DeviceManagementClient.DeploymentWorkflow", () => {
     it("should GET list of instance descriptions belonging to the caller's tenant.", async () => {
         deploymentWorkflowClient.should.not.be.undefined;
 
-        const workflowInstances = await deploymentWorkflowClient.GetWorkflowInstances(true,  true);
+        const workflowInstances = await deploymentWorkflowClient.GetWorkflowInstances(true, true);
         (workflowInstances as any).should.not.be.undefined;
         (workflowInstances as any).should.not.be.null;
         (workflowInstances as any).page.number.should.equal(0);
@@ -209,9 +197,9 @@ describe("[SDK] DeviceManagementClient.DeploymentWorkflow", () => {
             progress: 100,
             message: "string",
             details: {
-                "userDefined": {}
+                userDefined: {},
             },
-            state: "RUN"
+            state: "RUN",
         };
         // Patch the state info
         const updatedInstance = await deploymentWorkflowClient.PatchWorkflowInstance(
@@ -240,7 +228,6 @@ describe("[SDK] DeviceManagementClient.DeploymentWorkflow", () => {
         (workflowInstance as any).id.should.not.be.null;
     });
 
-
     it("should DELETE workflow model", async () => {
         deploymentWorkflowClient.should.not.be.undefined;
 
@@ -248,6 +235,3 @@ describe("[SDK] DeviceManagementClient.DeploymentWorkflow", () => {
         await deploymentWorkflowClient.DeleteWorkflowModel(workflowModelKey);
     });
 });
-
-
-
