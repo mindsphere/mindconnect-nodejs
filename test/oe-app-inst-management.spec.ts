@@ -87,14 +87,14 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         sdk.should.not.be.undefined;
     });
 
-    it.only("standard properties shoud be defined", async () => {
+    it("standard properties shoud be defined", async () => {
         edgeAppInstanceClient.should.not.be.undefined;
         edgeAppInstanceClient.GetGateway().should.be.equal(auth.gateway);
         (await edgeAppInstanceClient.GetToken()).length.should.be.greaterThan(200);
         (await edgeAppInstanceClient.GetToken()).length.should.be.greaterThan(200);
     });
 
-    it.only("should GET all app instances by deviceId @sanity", async () => {
+    it("should GET all app instances by deviceId @sanity", async () => {
         edgeAppInstanceClient.should.not.be.undefined;
         const apps = await edgeAppInstanceClient.GetAppInstances(deviceId);
         apps.should.not.be.undefined;
@@ -104,7 +104,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         (apps as any).content.length.should.be.gte(0);
     });
 
-    it.only("should GET all app instances by deviceId (with size param)", async () => {
+    it("should GET all app instances by deviceId (with size param)", async () => {
         edgeAppInstanceClient.should.not.be.undefined;
         const apps = await edgeAppInstanceClient.GetAppInstances(deviceId, 100, 0, "ASC");
         apps.should.not.be.undefined;
@@ -114,7 +114,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         (apps as any).content.length.should.be.gte(0);
     });
 
-    it.only("should GET the deployement status of the application instance by id", async () => {
+    it("should GET the deployement status of the application instance by id", async () => {
         edgeAppInstanceClient.should.not.be.undefined;
         const status = await edgeAppInstanceClient.GetAppInstanceLifecycle(appInstanceId);
         status.should.not.be.undefined;
@@ -125,7 +125,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         (status as any).status.should.not.be.null;
     });
 
-    it.only("should POST a new app instance  for the given device id", async () => {
+    it("should POST a new app instance  for the given device id", async () => {
         edgeAppInstanceClient.should.not.be.undefined;
 
         // Add new device
@@ -153,7 +153,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         await edgeAppInstanceClient.DeleteAppInstance(_appInstanceId);
     });
 
-    it.only("should DELETE an app instance", async () => {
+    it("should DELETE an app instance", async () => {
         edgeAppInstanceClient.should.not.be.undefined;
 
         // Create a new app instance
@@ -172,7 +172,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         await edgeAppInstanceClient.DeleteAppInstance(_appInstanceId);
     });
 
-    it.only("should PATCH Status of Application Release Instance", async () => {
+    it("should PATCH Status of Application Release Instance", async () => {
         edgeAppInstanceClient.should.not.be.undefined;
         // Create a new instance
         testAppInstance.name = `testAppInst_${tenant}_${timeOffset}_C`;
@@ -200,7 +200,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         await edgeAppInstanceClient.DeleteAppInstance(_appInstanceId);
     });
 
-    it.only("should GET all application configurations by device id @sanity", async () => {
+    it("should GET all application configurations by device id @sanity", async () => {
         edgeAppInstanceClient.should.not.be.undefined;
         const configurations = await edgeAppInstanceClient.GetAppInstanceConfigurations(deviceId);
         configurations.should.not.be.undefined;
@@ -210,7 +210,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         (configurations as any).content.length.should.be.gte(0);
     });
 
-    it.only("should GET all app instance configurations by deviceId (with size param)", async () => {
+    it("should GET all app instance configurations by deviceId (with size param)", async () => {
         edgeAppInstanceClient.should.not.be.undefined;
         const configurations = await edgeAppInstanceClient.GetAppInstanceConfigurations(deviceId, 10, 0, "ASC");
         configurations.should.not.be.undefined;
@@ -220,7 +220,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         (configurations as any).content.length.should.be.gte(0);
     });
 
-    it.only("should GET an instance configuration by id", async () => {
+    it("should GET an instance configuration by id", async () => {
         edgeAppInstanceClient.should.not.be.undefined;
         console.log(deviceId);
         console.log(deviceTypeId);
@@ -241,7 +241,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         (configuration as any).appInstanceId.should.not.be.null;
     });
 
-    it.only("should POST a new app instance configuration for the given device id and application instance id", async () => {
+    it("should POST a new app instance configuration for the given device id and application instance id", async () => {
         edgeAppInstanceClient.should.not.be.undefined;
 
         // Delete App inst configuration
@@ -270,7 +270,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         (instConfRes as any).appInstanceId.should.not.be.null;
     });
 
-    it.only("should PATCH specified instance configuration", async () => {
+    it("should PATCH specified instance configuration", async () => {
         edgeAppInstanceClient.should.not.be.undefined;
         testConfigurations.deviceId = `${deviceId}`;
         testConfigurations.appId = `${appId}`;
@@ -297,7 +297,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         (instConfRes as any).appInstanceId.should.not.be.null;
     });
     /*
-    it.only("should PATCH all instance configurations", async () => {
+    it("should PATCH all instance configurations", async () => {
         edgeAppInstanceClient.should.not.be.undefined;
         const testAllConfigurations = {
             instanceConfigurations: [
@@ -314,7 +314,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         await edgeAppInstanceClient.PatchAppInstanceConfigurations(testAllConfigurations);
     });
     */
-    it.only("should DELETE an app instance configuration", async () => {
+    it("should DELETE an app instance configuration", async () => {
         // Delete App inst configuration
         await edgeAppInstanceClient.DeleteAppInstanceConfiguration(appInstanceId);
     });
