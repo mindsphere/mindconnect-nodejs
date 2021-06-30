@@ -9,7 +9,7 @@ import { DeviceConfigurationClient } from "../open-edge/open-edge";
 import { DeploymentWorkflowClient } from "../open-edge/open-edge";
 import { EdgeAppInstanceManagementClient } from "../open-edge/open-edge";
 import { EdgeAppDeploymentClient } from "../open-edge/open-edge";
-import { FirmwreDeploymentClient } from "../open-edge/open-edge";
+import { FirmwareDeploymentClient } from "../open-edge/open-edge";
 import { EventAnalyticsClient } from "../event-analytics/eventanalytics";
 import { EventManagementClient } from "../event/event-management";
 import { IdentityManagementClient } from "../identity/identity";
@@ -407,18 +407,18 @@ export class MindSphereSdk extends SdkClient {
         return this._edgeAppDeploymentClient;
     }
 
-    private _firmwareAppDeploymentClient?: FirmwreDeploymentClient;
+    private _firmwareAppDeploymentClient?: FirmwareDeploymentClient;
 
     /**
      * * Edge AppDeployment Client
      *
-     * @returns {FirmwreDeploymentClient}
+     * @returns {FirmwareDeploymentClient}
      *
      * @memberOf MindSphereSdk
      */
-    public GetFirmwareDeploymentClient(): FirmwreDeploymentClient {
+    public GetFirmwareDeploymentClient(): FirmwareDeploymentClient {
         this._firmwareAppDeploymentClient =
-            this._firmwareAppDeploymentClient || new FirmwreDeploymentClient(this._authenticator);
+            this._firmwareAppDeploymentClient || new FirmwareDeploymentClient(this._authenticator);
         return this._firmwareAppDeploymentClient;
     }
 

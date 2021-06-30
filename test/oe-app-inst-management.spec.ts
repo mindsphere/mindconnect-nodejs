@@ -83,7 +83,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
         await tearDownDeviceTestStructure(sdk);
     });
 
-    it.only("SDK should not be undefined", async () => {
+    it("SDK should not be undefined", async () => {
         sdk.should.not.be.undefined;
     });
 

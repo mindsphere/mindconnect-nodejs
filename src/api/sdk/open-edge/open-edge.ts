@@ -2271,7 +2271,7 @@ export class EdgeAppDeploymentClient extends SdkClient {
  * @class FirmwareDeploymentClient
  * @extends {SdkClient}
  */
-export class FirmwreDeploymentClient extends SdkClient {
+export class FirmwareDeploymentClient extends SdkClient {
     private _baseUrl: string = "/api/firmwaredeployment/v3";
 
     /**

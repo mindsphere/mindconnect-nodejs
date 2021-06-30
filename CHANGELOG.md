@@ -4,11 +4,26 @@
 
 ### Bugfixes and Improvements 3.14.0
 
-- CLI: mc data -lake new modes: `--mode subscribe`, `--mode unsubscribe`, `--mode subscriptions` for managing the data lake event subscriptions. [#283]
+- CLI: new command `mc oe-device-types` - list, create or delete device types (open edge)
+- CLI: new command `mc oe-devices` - list, create or delete (open edge) devices
+- CLI: new command `mc oe-device-status` - list get or update device status information (open edge)
+- CLI: new command `mc oe-app-inst` - list, create, configure or delete app instance (open edge)
+- CLI: new command `mc oe-app-deploy` -  list, create, update app installation task(s) (open edge)
+- CLI: new command `mc oe-deploy-workflow` - list, create/instantiate, update or delete/cancel workflow deployment model or instance(s) (open edge)
+- CLI: new command `mc oe-firm-deploy` - list, create, update firmware deployment task(s) (open edge)
+- CLI: mc data-lake new modes: `--mode subscribe`, `--mode unsubscribe`, `--mode subscriptions` for managing the event subscriptions [#283]
 - CLI: the `mc signal-calculation` now has `--on data` and `--on asset` switch [#263]
 - CLI: new `mc asset-lock` command [#271]
+- SDK: Open Edge - FirmwareDeployment Client [#276]
+- SDK: Open Edge - EdgeAppInstanceManagement Cleint [#275]
+- SDK: Open Edge - EdgeAppDeploymentClient [#274]
+- SDK: Open Edge - DeploymentWorkflowClient [#273]
 - SDK: AssetManagement `GetModelLock` and `PutModelLock` Methods
 - Bumped all dependencies
+
+### Contributions 3.14.0
+
+- Thanks to @jupiterbak for his Open Edge Client contributions. <3 :heart:
 
 ## 3.13.0 - (Phlox Vienna) - May 2021
 
