@@ -376,11 +376,11 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 | --- | --- | --- |
 | Device Management   | :heavy_check_mark: | :heavy_check_mark:  |
 | Device Status   | :heavy_check_mark: | :heavy_check_mark: |
-| Deployment Workflow   |  |  |
-| Device Configuration   |  |  |
-| Edge App Deployment   |  |  |
-| Edge App Instance Management   |  |  |
-| Firmware Deployment   |  |  |
+| Deployment Workflow   | :heavy_check_mark: | :heavy_check_mark:  |
+| Device Configuration   | :heavy_check_mark: | :heavy_check_mark:  |
+| Edge App Deployment   | :heavy_check_mark: | :heavy_check_mark:  |
+| Edge App Instance Management   | :heavy_check_mark: | :heavy_check_mark:  |
+| Firmware Deployment   | :heavy_check_mark: | :heavy_check_mark:  |
 
 ### Semantic Data Interconnect
 
@@ -495,30 +495,25 @@ Options:
 
 Commands:
   onboard|ob [options]                onboard the agent with configuration stored in the config file
-  configure-agent|co [options]        create data source configuration and mappings (optional:
-                                      passkey) *
+  configure-agent|co [options]        create data source configuration and mappings (optional: passkey) *
   agent-token|atk [options]           displays the agent token for use in other tools (e.g. postman)
-  upload-timeseries|ts [options]      parse .csv file with timeseriesdata and upload the timeseries data to
-                                      mindsphere
-  upload-file|uf [options]            upload the file to the mindsphere file service (optional:
-                                      passkey) *
+  upload-timeseries|ts [options]      parse .csv file with timeseriesdata and upload the timeseries data to mindsphere
+  upload-file|uf [options]            upload the file to the mindsphere file service (optional: passkey) *
   create-event|ce [options]           create an event in the mindsphere (optional: passkey) *
   agent-status|as [options]           displays the agent status and agent onboarding status *
   create-agent|ca [options]           create an agent in the mindsphere *
   offboard-agent|of [options]         offboards the agent in the mindsphere *
   renew-agent|rn [options]            renews the agent secrets  *
-  service-credentials|sc [options]    provide login for commands which require technical user credentials
-                                      *
+  service-credentials|sc [options]    provide login for commands which require technical user credentials *
   service-token|stk [options]         displays the service token for use in other tools (e.g. postman) *
   register-diagnostic|rd [options]    register agent for diagnostic *
   get-diagnostic|gd [options]         get diagnostic information *
   unregister-diagnostic|ud [options]  unregister agent from diagnostic *
   prepare-bulk|pb [options]           creates a template directory for timeseries (bulk) upload *
-  run-bulk|rb [options]               runs the timeseries (bulk) upload job from <directoryname> directory
-                                      *
-  check-bulk|cb [options]             checks the progress of the upload jobs from <directoryname> directory
-                                      *
+  run-bulk|rb [options]               runs the timeseries (bulk) upload job from <directoryname> directory *
+  check-bulk|cb [options]             checks the progress of the upload jobs from <directoryname> directory *
   download-bulk|db [options]          download the timeseries data in bulk from mindsphere *
+  asset-lock|lck [options]            lock/unlock asset model modifications *
   asset-info|ai [options]             get infos about asset *
   assets|ast [options]                list, create or delete assets *
   asset-types|at [options]            list, create or delete asset types *
@@ -528,9 +523,13 @@ Commands:
   events-bulk|dn [options]            download or delete the events in bulk *
   aggregates|ag [options]             list timeseries aggregates *
   notifications|nt [options]          send email, sms and push notifications *
-  device-types|dt [options]           list, create or delete device types (open edge) *
-  devices|dv [options]                list, create or delete (open edge) devices *
-  device-status|ds [options]          list, get, or update (open edge) device status information *
+  oe-device-types|oedt [options]      list, create or delete device types (open edge) *
+  oe-devices|oed [options]            list, create or delete (open edge) devices *
+  oe-device-status|oeds [options]     list, get, or update (open edge) device status information *
+  oe-app-inst|oeai [options]          list, create, configure or delete app instance (open edge) *
+  oe-app-deploy|oead [options]        list, create, update app installation task(s) (open edge) *
+  oe-deploy-workflow|oedw [options]   list, create/instantiate, update or delete/cancel workflow deployment model or instance(s) (open edge) *
+  oe-firm-deploy|oefd [options]       list, create, update firmware deployment task(s) (open edge) *
   tenant|ti [options]                 create or delete tenant legal configuration and logo *
   subtenants|st [options]             list, create or delete subtenants *
   list-assets|la [options]            list assets in the tenant *
@@ -562,11 +561,9 @@ Commands:
   models|ml [options]                 list, create or delete analytic models *
   jobs|jb [options]                   list, create or stop jobs *
   schedules|js [options]              list, create, start, stop or delete job schedules *
-  data-exchange|dx [options]          list, upload, download and manage data exchange files and directories
-                                      *
+  data-exchange|dx [options]          list, upload, download and manage data exchange files and directories *
   anomaly-detection|ad [options]      train anomaly detection models and detect timeseries anomalies *
-  dev-proxy|px [options]              starts mindsphere development proxy & (optional passkey)
-                                      *
+  dev-proxy|px [options]              starts mindsphere development proxy & (optional passkey) *
   mqtt-createjwt|jw [options]         creates a signed token for opcua pub sub authentication #
   starter-ts|st [options]             creates a starter project in typescript #
   starter-js|sj [options]             creates a starter project in javascript #
@@ -581,7 +578,6 @@ Commands:
     the yellow colored commands & use borrowed mindsphere application cookies
     the credentials and cookies should only be used in secure environments
     Full documentation: https://opensource.mindsphere.io
-
 ```
 
 ## MindSphere Development Proxy

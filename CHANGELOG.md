@@ -2,15 +2,19 @@
 
 ## 3.14.0 - (Cool Grey Vienna) - June 2021
 
+### Announcement 3.14.0
+
+Thanks to the final push of contributions from @jupiterbak, the typescript SDK and the CLI have now support for all publicly avaialable MindSphere APIs.
+
 ### Bugfixes and Improvements 3.14.0
 
-- CLI: new command `mc oe-device-types` - list, create or delete device types (open edge)
-- CLI: new command `mc oe-devices` - list, create or delete (open edge) devices
-- CLI: new command `mc oe-device-status` - list get or update device status information (open edge)
-- CLI: new command `mc oe-app-inst` - list, create, configure or delete app instance (open edge)
-- CLI: new command `mc oe-app-deploy` -  list, create, update app installation task(s) (open edge)
-- CLI: new command `mc oe-deploy-workflow` - list, create/instantiate, update or delete/cancel workflow deployment model or instance(s) (open edge)
-- CLI: new command `mc oe-firm-deploy` - list, create, update firmware deployment task(s) (open edge)
+- CLI: new `mc oe-device-types` command - list, create or delete device types (open edge)
+- CLI: new `mc oe-devices` command - list, create or delete (open edge) devices
+- CLI: new `mc oe-device-status` command - list get or update device status information (open edge)
+- CLI: new `mc oe-app-inst` command - list, create, configure or delete app instance (open edge)
+- CLI: new `mc oe-app-deploy` command -  list, create, update app installation task(s) (open edge)
+- CLI: new `mc oe-deploy-workflow` command - list, create/instantiate, update or delete/cancel workflow deployment model or instance(s) (open edge)
+- CLI: new `mc oe-firm-deploy` command - list, create, update firmware deployment task(s) (open edge)
 - CLI: mc data-lake new modes: `--mode subscribe`, `--mode unsubscribe`, `--mode subscriptions` for managing the event subscriptions [#283]
 - CLI: the `mc signal-calculation` now has `--on data` and `--on asset` switch [#263]
 - CLI: new `mc asset-lock` command [#271]
