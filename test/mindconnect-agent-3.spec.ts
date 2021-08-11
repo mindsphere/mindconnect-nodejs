@@ -362,7 +362,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         log(result);
     });
 
-    it.only("should validate input.", async () => {
+    it("should validate input.", async () => {
         const agent = new MindConnectAgent(agentConfig);
         if (!agent.IsOnBoarded()) {
             await agent.OnBoard();
@@ -575,7 +575,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         });
     });
 
-    it.only("should be able to validate event data", async () => {
+    it("should be able to validate event data", async () => {
         const agent = new MindConnectAgent(agentConfig);
 
         const validator = agent.GetEventValidator();
@@ -632,7 +632,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         log(validator.errors);
         const error: any = (<any>validator).errors[0].message;
         // tslint:disable-next-line: quotemark
-        error.should.be.equal('should match pattern "^[A-Fa-f0-9]*$"');
+        error.should.be.equal('must match pattern "^[A-Fa-f0-9]*$"');
 
         validator({
             entityId: "aaac5ae889a44717b02fa8282a30d1b4",
