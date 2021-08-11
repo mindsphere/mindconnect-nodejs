@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import { MindSphereSdk, TimeSeriesAggregateModelsV4 } from "../../api/sdk";
 import { retry } from "../../api/utils";
@@ -23,7 +23,7 @@ const red = getColor("red");
 const green = getColor("green");
 const cyan = getColor("cyan");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("aggregates")
         .alias("ag")

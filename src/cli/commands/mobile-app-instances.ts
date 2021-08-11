@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
@@ -16,7 +16,7 @@ import {
 } from "./command-utils";
 let color = getColor("magenta");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("mobile-app-instances")
         .alias("mbi")

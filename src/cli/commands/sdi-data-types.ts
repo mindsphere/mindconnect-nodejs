@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import { MindSphereSdk, SemanticDataInterconnectModels } from "../../api/sdk";
 import { throwError } from "../../api/utils";
@@ -19,7 +19,7 @@ import path = require("path");
 let color = getColor("magenta");
 const green = getColor("green");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("sdi-data-types")
         .alias("sdy")

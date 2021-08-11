@@ -1,11 +1,11 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import { deleteAsset } from "./assets";
 import { adjustColor, errorLog, getColor, getSdk, homeDirLog, proxyLog, serviceCredentialLog } from "./command-utils";
 
 let color = getColor("magenta");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("delete-asset")
         .alias("da")

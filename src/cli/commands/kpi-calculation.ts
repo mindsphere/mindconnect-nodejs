@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
@@ -17,7 +17,7 @@ import _ = require("lodash");
 
 let color = getColor("blue");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("kpi-calculation")
         .alias("kp")

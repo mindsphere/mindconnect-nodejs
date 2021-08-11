@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as path from "path";
 import { DataLakeModels, MindSphereSdk } from "../../api/sdk";
@@ -17,7 +17,7 @@ import ora = require("ora");
 
 let color = getColor("magenta");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("data-lake")
         .alias("dlk")

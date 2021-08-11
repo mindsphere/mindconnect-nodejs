@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import { isArray } from "lodash";
@@ -14,12 +14,12 @@ import {
     homeDirLog,
     proxyLog,
     serviceCredentialLog,
-    verboseLog
+    verboseLog,
 } from "./command-utils";
 
 let color = getColor("blue");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("signal-calculation")
         .alias("cal")

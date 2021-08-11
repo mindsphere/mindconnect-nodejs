@@ -33,8 +33,8 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
 
-    let agentConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;
-    let unitTestConfiguration: AgentUnitTestConfiguration = ({} as unknown) as AgentUnitTestConfiguration;
+    let agentConfig: IMindConnectConfiguration = {} as unknown as IMindConnectConfiguration;
+    let unitTestConfiguration: AgentUnitTestConfiguration = {} as unknown as AgentUnitTestConfiguration;
 
     before(async () => {
         unitTestConfiguration = await unitTestSetup(
@@ -362,7 +362,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         log(result);
     });
 
-    it("should validate input.", async () => {
+    it.only("should validate input.", async () => {
         const agent = new MindConnectAgent(agentConfig);
         if (!agent.IsOnBoarded()) {
             await agent.OnBoard();
@@ -575,7 +575,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         });
     });
 
-    it("should be able to validate event data", async () => {
+    it.only("should be able to validate event data", async () => {
         const agent = new MindConnectAgent(agentConfig);
 
         const validator = agent.GetEventValidator();

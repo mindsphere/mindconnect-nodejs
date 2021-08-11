@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as http from "http";
@@ -17,7 +17,7 @@ const mime = require("mime-types");
 
 const color = getColor("magenta");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("service-credentials")
         .alias("sc")
@@ -103,7 +103,7 @@ async function serve(configPort?: number) {
     const port = configPort || 4994;
 
     server.on("request", async (req, res) => {
-        const uri = url.parse(req.url);
+        const uri = url.parse(req.url || "");
 
         // prettier-ignore
         try {

@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as os from "os";
@@ -13,7 +13,7 @@ import ora = require("ora");
 let color = getColor("cyan");
 let adminColor = getColor("magenta");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("create-event")
         .alias("ce")

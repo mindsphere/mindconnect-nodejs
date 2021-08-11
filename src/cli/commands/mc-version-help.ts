@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import { MC_VERSION } from "../../version";
 import { checkForUpdates, getColor } from "./command-utils";
@@ -10,7 +10,7 @@ const red = getColor("red");
 const blue = getColor("blue");
 const yellow = getColor("yellow");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program.version(`MindSphere CLI (mc, mdsp) - Version: ${MC_VERSION}`);
 
     program.on("--help", () => {

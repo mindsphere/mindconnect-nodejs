@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
@@ -8,7 +8,7 @@ import { errorLog, getColor, homeDirLog, proxyLog, retrylog, verboseLog } from "
 
 const color = getColor("cyan");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("onboard")
         .alias("ob")

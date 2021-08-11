@@ -29,8 +29,8 @@ describe("MindConnectApi Version 3 Agent (RSA_3072)", () => {
         basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
 
-    let rsaConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;
-    let unitTestConfiguration: AgentUnitTestConfiguration = ({} as unknown) as AgentUnitTestConfiguration;
+    let rsaConfig: IMindConnectConfiguration = {} as unknown as IMindConnectConfiguration;
+    let unitTestConfiguration: AgentUnitTestConfiguration = {} as unknown as AgentUnitTestConfiguration;
 
     before(async () => {
         unitTestConfiguration = await unitTestSetup(sdk, AgentManagementModels.AgentUpdate.SecurityProfileEnum.RSA3072);
@@ -114,7 +114,7 @@ describe("MindConnectApi Version 3 Agent (RSA_3072)", () => {
         response.scope.length.should.be.greaterThan(0);
     });
 
-    it("should be able to validate the access token for exchange endpoint. @sanity", async () => {
+    it.only("should be able to validate the access token for exchange endpoint. @sanity", async () => {
         const agent = new MindConnectAgent(rsaConfig);
         agent.SetupAgentCertificate(fs.readFileSync("private.key"));
         if (!agent.IsOnBoarded()) {
@@ -371,7 +371,7 @@ describe("MindConnectApi Version 3 Agent (RSA_3072)", () => {
         log(result);
     });
 
-    it("should validate input.", async () => {
+    it.only("should validate input.", async () => {
         const agent = new MindConnectAgent(rsaConfig);
         agent.SetupAgentCertificate(fs.readFileSync("private.key"));
 

@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import { IdentityManagementClient, IdentityManagementModels } from "../../api/sdk";
 import { throwError } from "../../api/utils";
@@ -15,7 +15,7 @@ import {
 
 let color = getColor("magenta");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("identity-management")
         .alias("iam")

@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
@@ -19,7 +19,7 @@ import ora = require("ora");
 const cyan = getColor("cyan");
 let color = getColor("magenta");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("configure-agent")
         .alias("co")
