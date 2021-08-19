@@ -358,13 +358,13 @@ export interface DataPoint {
      * @type {string}
      * @memberof DataPoint
      */
-    description?: string;
+    description?: string | null;
     /**
      *
      * @type {string}
      * @memberof DataPoint
      */
-    type: DataPoint.TypeEnum;
+    type: DataPoint.TypeEnum | DataPoint.DataPointType;
     /**
      * Unit of data point. Can be empty.
      * @type {string}
@@ -395,7 +395,11 @@ export namespace DataPoint {
         DOUBLE = <any>"DOUBLE",
         BOOLEAN = <any>"BOOLEAN",
         STRING = <any>"STRING",
+        BIG_STRING = <any>"BIG_STRING",
+        TIMESTAMP = <any>"TIMESTAMP",
     }
+
+    export type DataPointType = "INT" | "LONG" | "DOUBLE" | "BOOLEAN" | "STRING" | "TIMESTAMP" | "BIG_STRING";
 }
 
 /**
@@ -415,7 +419,7 @@ export interface DataSource {
      * @type {string}
      * @memberof DataSource
      */
-    description?: string;
+    description?: string | null;
     /**
      *
      * @type {Array&lt;DataPoint&gt;}

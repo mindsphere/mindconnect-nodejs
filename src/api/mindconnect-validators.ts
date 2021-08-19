@@ -1,5 +1,5 @@
 // Copyright (C), Siemens AG 2017
-import ajv, { KeywordDefinition, ValidateFunction } from "ajv";
+import ajv, { ValidateFunction } from "ajv";
 import addFormats from "ajv-formats";
 import * as debug from "debug";
 import { DataSourceConfiguration } from "..";
@@ -18,40 +18,62 @@ const log = debug("mindconnect");
 export function dataValidator(model: DataSourceConfiguration): ValidateFunction {
     const dataPointIdArray: string[] = [];
     let valueArray: string[] = [];
-    const schemaValidator = new ajv({ $data: true, allErrors: true });
+    const schemaValidator = new ajv({ $data: true, allErrors: false, verbose: true });
 
     ajvKeywords(schemaValidator, ["uniqueItemProperties", "select"]);
-    schemaValidator.addKeyword("str_number", {
-        validate: function (schema: {}, data: any) {
+
+    schemaValidator.addKeyword({
+        keyword: "str_number",
+        validate: (schema: {}, data: any) => {
             let ret = false;
             Number.isNaN(Number(data)) ? (ret = false) : (ret = true);
             return ret;
         },
         errors: true,
-    } as KeywordDefinition);
+    });
 
-    schemaValidator.addKeyword("str_integer", {
-        validate: function (schema: {}, data: any) {
+    schemaValidator.addKeyword({
+        keyword: "str_integer",
+        validate: (schema: {}, data: any) => {
             if (Number.isNaN(Number(data))) return false;
 
             return Number.isInteger(Number(data));
         },
         errors: true,
-    } as KeywordDefinition);
+    });
 
-    schemaValidator.addKeyword("str_boolean", {
-        validate: function (schema: {}, data: any) {
+    schemaValidator.addKeyword({
+        keyword: "str_boolean",
+        validate: (schema: {}, data: any) => {
             data = data.toLowerCase();
             return data === "true" || data === "false";
         },
         errors: true,
-    } as KeywordDefinition);
-    schemaValidator.addKeyword("str_string", {
-        validate: function (schema: {}, data: any) {
+    });
+
+    schemaValidator.addKeyword({
+        keyword: "str_string",
+        validate: (schema: {}, data: any) => {
             return true;
         },
         errors: true,
-    } as KeywordDefinition);
+    });
+
+    schemaValidator.addKeyword({
+        keyword: "str_bigstring",
+        validate: (schema: {}, data: any) => {
+            return true;
+        },
+        errors: true,
+    });
+
+    schemaValidator.addKeyword({
+        keyword: "str_timestamp",
+        validate: (schema: {}, data: any) => {
+            return new Date(data).toISOString() === data;
+        },
+        errors: true,
+    });
 
     model.dataSources.forEach(function (elem) {
         elem.dataPoints.forEach(function (elem2) {
@@ -77,6 +99,19 @@ export function dataValidator(model: DataSourceConfiguration): ValidateFunction 
             case "STRING":
                 tmp = "str_string";
                 break;
+            case "BIG_STRING":
+                tmp = "str_bigstring";
+                break;
+            case "TIMESTAMP":
+                tmp = "str_timestamp";
+                break;
+            default:
+                console.warn(
+                    "Unknown type: " +
+                        elem +
+                        " in configuration. Supported types: BOOLEAN, INT, LONG, DOUBLE, STRING, BIG_STRING, TIMESTAMP"
+                );
+                tmp = "str_string";
         }
         return tmp;
     });
@@ -87,12 +122,13 @@ export function dataValidator(model: DataSourceConfiguration): ValidateFunction 
         schema.items.selectCases[elem] = JSON.parse(schemaSubTemplateString(valueArray[index]));
     });
 
+    log(JSON.stringify(schema));
     const validate = schemaValidator.compile(schema);
     return validate;
 }
 
 export function eventValidator(): ValidateFunction {
-    const schemaValidator = new ajv({ $data: true, allErrors: true, allowUnionTypes: true });
+    const schemaValidator = new ajv({ $data: true, allErrors: false, verbose: true });
     addFormats(schemaValidator);
     return schemaValidator.compile(eventSchema());
 }
