@@ -222,12 +222,12 @@ describe("[SDK] DeviceManagementClient.EdgeAppInstance", () => {
 
     it("should GET an instance configuration by id", async () => {
         edgeAppInstanceClient.should.not.be.undefined;
-        console.log(deviceId);
-        console.log(deviceTypeId);
-        console.log(appInstanceId);
+        // console.log(deviceId);
+        // console.log(deviceTypeId);
+        // console.log(appInstanceId);
 
         const all = await edgeAppInstanceClient.GetAppInstanceConfigurations(deviceId);
-        console.log(all);
+        // console.log(all);
         const configuration = await edgeAppInstanceClient.GetAppInstanceConfiguration(appInstanceId);
         configuration.should.not.be.undefined;
         configuration.should.not.be.null;
