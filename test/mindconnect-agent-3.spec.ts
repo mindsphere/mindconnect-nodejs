@@ -371,10 +371,12 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             await agent.GetDataSourceConfiguration();
         }
 
+        console.log(agentConfig);
+
         const values: DataPointValue[] = [
             { dataPointId: "DP-Temperature", qualityCode: "0", value: "123.1" },
             { dataPointId: "DP-Pressure", qualityCode: "0", value: "144" },
-            { dataPointId: "DP-Humidity", qualityCode: "0", value: "166.45" },
+            { dataPointId: "DP-Humidity", qualityCode: "0", value: "166" },
             { dataPointId: "DP-NONEXISTANT", qualityCode: "0", value: "166.45" },
         ];
 
@@ -382,7 +384,8 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             await agent.PostData(values);
             throw Error("should never happen");
         } catch (err) {
-            err.toString().should.include("should be equal to one of the allowed values"); // DP-NONEXISTANT
+            // console.log(err);
+            err.toString().should.include("must be equal to one of the allowed values"); // DP-NONEXISTANT
         }
     });
 
