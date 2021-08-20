@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as jwt from "jsonwebtoken";
 import { retry } from "../..";
@@ -15,7 +15,7 @@ import {
 } from "./command-utils";
 let color = getColor("magenta");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("service-token")
         .alias("stk")

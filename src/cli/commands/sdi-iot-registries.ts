@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import { MindSphereSdk, SemanticDataInterconnectModels } from "../../api/sdk";
 import { throwError } from "../../api/utils";
@@ -18,7 +18,7 @@ import path = require("path");
 
 let color = getColor("magenta");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("sdi-iot-registries")
         .alias("sdt")
@@ -124,11 +124,10 @@ async function listIotRegistries(sdk: MindSphereSdk, options: any) {
         `${color("registryId")} ${"sourceName"}  ${color("assetId")}  ${"aspectName"}  ${"dataTag"}  ${"category"}`
     );
     do {
-        const dataRegistries: SemanticDataInterconnectModels.ListOfIoTRegistryResponse = await sdiClient.GetIotDataRegistries(
-            {
+        const dataRegistries: SemanticDataInterconnectModels.ListOfIoTRegistryResponse =
+            await sdiClient.GetIotDataRegistries({
                 pageToken: pageToken,
-            }
-        );
+            });
         dataRegistries.iotDataRegistries?.forEach((registry) => {
             console.log(
                 `${color(registry.registryId)}  ${registry.sourceName}  ${color(registry.assetId)}  ${

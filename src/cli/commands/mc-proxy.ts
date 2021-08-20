@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import fetch from "cross-fetch";
 import * as http from "http";
@@ -29,7 +29,7 @@ const headers = {
     "x-proxied-by": "mindsphere development proxy",
 };
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("dev-proxy")
         .alias("px")

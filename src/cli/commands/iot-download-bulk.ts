@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
@@ -19,7 +19,7 @@ import ora = require("ora");
 
 let color = getColor("magenta");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("download-bulk")
         .alias("db")
@@ -52,11 +52,11 @@ export default (program: CommanderStatic) => {
                     let ts = await retry(
                         options.retry,
                         () =>
-                            (iotTs.GetTimeSeriesBulkStyle(options.assetid, options.aspectname, {
+                            iotTs.GetTimeSeriesBulkStyle(options.assetid, options.aspectname, {
                                 from: new Date(options.from),
                                 to: new Date(options.to),
                                 limit: options.size,
-                            }) as unknown) as TimeSeriesModels.BulkTimeseries
+                            }) as unknown as TimeSeriesModels.BulkTimeseries
                     );
 
                     fs.writeFileSync(

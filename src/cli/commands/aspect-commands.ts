@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import { retry } from "../..";
@@ -12,7 +12,7 @@ import {
     homeDirLog,
     proxyLog,
     serviceCredentialLog,
-    verboseLog
+    verboseLog,
 } from "./command-utils";
 import path = require("path");
 
@@ -73,7 +73,7 @@ interface JSONSchema {
     [index: string]: any;
 }
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("aspects")
         .alias("as")
@@ -388,7 +388,7 @@ function generateVariables(prefix: string, inputSchema: JSONSchema, options: any
         } else {
             generateVariables(
                 options.prefixflattened ? `${prefix}_${key}` : "",
-                (obj as unknown) as JSONSchema,
+                obj as unknown as JSONSchema,
                 options,
                 variables
             );

@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import { retry } from "../..";
@@ -22,7 +22,7 @@ const red = getColor("red");
 const yellow = getColor("yellow");
 const blue = getColor("blue");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("events")
         .alias("ev")

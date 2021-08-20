@@ -33,8 +33,8 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
 
-    let agentConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;
-    let unitTestConfiguration: AgentUnitTestConfiguration = ({} as unknown) as AgentUnitTestConfiguration;
+    let agentConfig: IMindConnectConfiguration = {} as unknown as IMindConnectConfiguration;
+    let unitTestConfiguration: AgentUnitTestConfiguration = {} as unknown as AgentUnitTestConfiguration;
 
     before(async () => {
         unitTestConfiguration = await unitTestSetup(
@@ -371,10 +371,12 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             await agent.GetDataSourceConfiguration();
         }
 
+        console.log(agentConfig);
+
         const values: DataPointValue[] = [
             { dataPointId: "DP-Temperature", qualityCode: "0", value: "123.1" },
             { dataPointId: "DP-Pressure", qualityCode: "0", value: "144" },
-            { dataPointId: "DP-Humidity", qualityCode: "0", value: "166.45" },
+            { dataPointId: "DP-Humidity", qualityCode: "0", value: "166" },
             { dataPointId: "DP-NONEXISTANT", qualityCode: "0", value: "166.45" },
         ];
 
@@ -382,7 +384,8 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             await agent.PostData(values);
             throw Error("should never happen");
         } catch (err) {
-            err.toString().should.include("should be equal to one of the allowed values"); // DP-NONEXISTANT
+            // console.log(err);
+            err.toString().should.include("must be equal to one of the allowed values"); // DP-NONEXISTANT
         }
     });
 
@@ -632,7 +635,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
         log(validator.errors);
         const error: any = (<any>validator).errors[0].message;
         // tslint:disable-next-line: quotemark
-        error.should.be.equal('should match pattern "^[A-Fa-f0-9]*$"');
+        error.should.be.equal('must match pattern "^[A-Fa-f0-9]*$"');
 
         validator({
             entityId: "aaac5ae889a44717b02fa8282a30d1b4",

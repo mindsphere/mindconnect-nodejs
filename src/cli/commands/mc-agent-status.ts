@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
@@ -22,7 +22,7 @@ const green = getColor("green");
 const red = getColor("red");
 const yellow = getColor("yellow");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("agent-status")
         .alias("as")

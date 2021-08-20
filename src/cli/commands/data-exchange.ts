@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
@@ -22,7 +22,7 @@ const mime = require("mime-types");
 const streamPipeline = util.promisify(require("stream").pipeline);
 let color = getColor("blue");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("data-exchange")
         .alias("dx")

@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import { retry } from "../..";
@@ -19,7 +19,7 @@ import path = require("path");
 
 let color = getColor("magenta");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("oe-devices")
         .alias("oed")
@@ -123,8 +123,8 @@ function writeDeviceTypeToFile(options: any, templateType: any) {
     const filePath = path.resolve(fileName);
 
     fs.existsSync(filePath) &&
-    !options.overwrite &&
-    throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+        !options.overwrite &&
+        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
 
     fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
@@ -183,20 +183,20 @@ async function deviceInfo(options: any, sdk: MindSphereSdk) {
 
 function checkRequiredParameters(options: any) {
     options.mode === "create" &&
-    !options.file &&
-    errorLog(
-        "you have to provide a file with device type to create device type (see mc oe-devices --help for more details)",
-        true
-    );
+        !options.file &&
+        errorLog(
+            "you have to provide a file with device type to create device type (see mc oe-devices --help for more details)",
+            true
+        );
 
     options.mode === "delete" &&
-    !options.id &&
-    errorLog(
-        "you have to provide the id of the device type to delete (see mc oe-devices --help for more details)",
-        true
-    );
+        !options.id &&
+        errorLog(
+            "you have to provide the id of the device type to delete (see mc oe-devices --help for more details)",
+            true
+        );
 
     options.mode === "info" &&
-    !options.id &&
-    errorLog("you have to provide the id of the device type (see mc oe-devices --help for more details)", true);
+        !options.id &&
+        errorLog("you have to provide the id of the device type (see mc oe-devices --help for more details)", true);
 }

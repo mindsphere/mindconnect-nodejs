@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import { jstemplate } from "../../../templates/js/js-template";
@@ -7,14 +7,14 @@ import { errorLog, getColor, verboseLog } from "./command-utils";
 
 const color = getColor("green");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("starter-js")
         .alias("sj")
         .option("-d, --dir <directoryname>", "directory name", "starterjs")
         .option("-v, --verbose", "verbose output")
         .description(color("creates a starter project in javascript #"))
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     verboseLog(`Creating directory ${color(options.dir)}`, options.verbose);

@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
@@ -11,7 +11,7 @@ const mime = require("mime-types");
 let color = getColor("cyan");
 let adminColor = getColor("magenta");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("upload-file")
         .alias("uf")

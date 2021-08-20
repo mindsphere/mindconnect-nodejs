@@ -29,8 +29,8 @@ describe("MindConnectApi Version 3 Agent (RSA_3072)", () => {
         basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
 
-    let rsaConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;
-    let unitTestConfiguration: AgentUnitTestConfiguration = ({} as unknown) as AgentUnitTestConfiguration;
+    let rsaConfig: IMindConnectConfiguration = {} as unknown as IMindConnectConfiguration;
+    let unitTestConfiguration: AgentUnitTestConfiguration = {} as unknown as AgentUnitTestConfiguration;
 
     before(async () => {
         unitTestConfiguration = await unitTestSetup(sdk, AgentManagementModels.AgentUpdate.SecurityProfileEnum.RSA3072);
@@ -385,7 +385,7 @@ describe("MindConnectApi Version 3 Agent (RSA_3072)", () => {
         const values: DataPointValue[] = [
             { dataPointId: "DP-Temperature", qualityCode: "0", value: "123.1" },
             { dataPointId: "DP-Pressure", qualityCode: "0", value: "144" },
-            { dataPointId: "DP-Humidity", qualityCode: "0", value: "166.45" },
+            { dataPointId: "DP-Humidity", qualityCode: "0", value: "166" },
             { dataPointId: "DP-NONEXISTANT", qualityCode: "0", value: "166.45" },
         ];
 
@@ -393,7 +393,7 @@ describe("MindConnectApi Version 3 Agent (RSA_3072)", () => {
             await agent.PostData(values);
             throw Error("should never happen");
         } catch (err) {
-            err.toString().should.include("should be equal to one of the allowed values"); // DP-NONEXISTANT
+            err.toString().should.include("must be equal to one of the allowed values"); // DP-NONEXISTANT
         }
     });
 

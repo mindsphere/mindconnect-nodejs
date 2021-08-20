@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
@@ -18,7 +18,7 @@ import ora = require("ora");
 const mime = require("mime-types");
 let color = getColor("blue");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("spectrum-analysis")
         .alias("sp")
@@ -86,7 +86,7 @@ export default (program: CommanderStatic) => {
                         const result = (await retry(options.retry, () =>
                             spectrumAnalysis.CalculateFrequencies(
                                 buffer,
-                                (`${options.windowtype}` as unknown) as SpectrumAnalysisModels.WindowType.WindowTypeEnum,
+                                `${options.windowtype}` as unknown as SpectrumAnalysisModels.WindowType.WindowTypeEnum,
                                 {
                                     filename: path.basename(uploadFile),
                                     mimetype: mimeType,
@@ -112,9 +112,7 @@ export default (program: CommanderStatic) => {
                             verboseLog("creating thresholds.spectrum.json", options.verbose, spinner);
                         }
                     } else {
-                        const fft = (JSON.parse(
-                            buffer.toString("utf-8")
-                        ) as unknown) as SpectrumAnalysisModels.FFTOutput;
+                        const fft = JSON.parse(buffer.toString("utf-8")) as unknown as SpectrumAnalysisModels.FFTOutput;
                         const thresholds = fs.readFileSync(path.resolve(options.thresholds), "utf-8");
 
                         const result = (await retry(options.retry, () =>

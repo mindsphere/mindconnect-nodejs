@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import { DeviceStatusModels, retry } from "../..";
@@ -18,7 +18,7 @@ import path = require("path");
 
 let color = getColor("magenta");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("oe-device-status")
         .alias("oeds")
@@ -227,8 +227,8 @@ function writeDeviceTypeToFile(options: any, templateType: any) {
     const filePath = path.resolve(fileName);
 
     fs.existsSync(filePath) &&
-    !options.overwrite &&
-    throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
+        !options.overwrite &&
+        throwError(`The ${filePath} already exists. (use --overwrite to overwrite) `);
 
     fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
@@ -297,23 +297,23 @@ async function deviceInfo(options: any, sdk: MindSphereSdk) {
 
 function checkRequiredParameters(options: any) {
     options.mode !== "template" &&
-    !options.deviceid &&
-    errorLog(
-        "you have to provide the deviceid to get or update the device status information (see mc oe-device-status --help for more details)",
-        true
-    );
+        !options.deviceid &&
+        errorLog(
+            "you have to provide the deviceid to get or update the device status information (see mc oe-device-status --help for more details)",
+            true
+        );
 
     options.mode === "template" &&
-    !options.target &&
-    errorLog(
-        "you have to provide the status information type to create the corresponding template (see mc oe-device-status --help for more details)",
-        true
-    );
+        !options.target &&
+        errorLog(
+            "you have to provide the status information type to create the corresponding template (see mc oe-device-status --help for more details)",
+            true
+        );
 
     options.mode === "info" &&
-    !options.target &&
-    errorLog(
-        "you have to provide the type of information you want to retrieve (see mc oe-device-status --help for more details)",
-        true
-    );
+        !options.target &&
+        errorLog(
+            "you have to provide the type of information you want to retrieve (see mc oe-device-status --help for more details)",
+            true
+        );
 }

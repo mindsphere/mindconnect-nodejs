@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as csv from "csvtojson";
 import * as fs from "fs";
@@ -10,7 +10,7 @@ const mime = require("mime-types");
 
 const color = getColor("cyan");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("upload-timeseries")
         .alias("ts")

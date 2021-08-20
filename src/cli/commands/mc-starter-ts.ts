@@ -1,20 +1,20 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import { packageTemplateTs } from "../../../templates/ts/package_template";
 import { tsconfigjson, tstemplate } from "../../../templates/ts/ts-template";
-import { getColor, verboseLog, errorLog } from "./command-utils";
+import { errorLog, getColor, verboseLog } from "./command-utils";
 
 const color = getColor("green");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("starter-ts")
         .alias("st")
         .option("-d, --dir <directoryname>", "directory name", "starterts")
         .option("-v, --verbose", "verbose output")
         .description(color("creates a starter project in typescript #"))
-        .action(options => {
+        .action((options) => {
             (async () => {
                 try {
                     verboseLog(`Creating directory ${color(options.dir)}`, options.verbose);

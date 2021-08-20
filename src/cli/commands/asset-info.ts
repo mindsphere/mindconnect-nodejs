@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import { AssetManagementModels } from "../../api/sdk";
 import { retry } from "../../api/utils";
@@ -6,7 +6,7 @@ import { adjustColor, errorLog, getColor, getSdk, homeDirLog, proxyLog, serviceC
 
 let color = getColor("magenta");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("asset-info")
         .alias("ai")

@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import * as program from "commander";
 import aggregatesCommand from "./commands/aggregates";
 import eventAnalyticsCommand from "./commands/analyze-events";
 import anomalydetectionCommand from "./commands/anomaly-detection";
@@ -12,13 +11,6 @@ import dataExchangeCommand from "./commands/data-exchange";
 import dataLakeCommand from "./commands/data-lake";
 import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
-import deviceStatusCommand from "./commands/oe-device-status";
-import deviceTypeCommand from "./commands/oe-device-types";
-import deviceCommand from "./commands/oe-devices";
-import deploymentWorkflowCommand from "./commands/oe-deployment-workflow";
-import appInstCommand from "./commands/oe-app-instance";
-import appDeploymentCommand from "./commands/oe-app-deployment";
-import firmwareDeploymentCommand from "./commands/oe-firmware-deployment";
 import downloadEventsCommand from "./commands/download-events";
 import eventTypesCommand from "./commands/event-types";
 import eventsCommand from "./commands/events";
@@ -57,6 +49,13 @@ import mobileAppsCommand from "./commands/mobile-apps";
 import modelsCommand from "./commands/models";
 import mqttCreateCommand from "./commands/mqtt-create-jwt";
 import notificationCommand from "./commands/notifications";
+import appDeploymentCommand from "./commands/oe-app-deployment";
+import appInstCommand from "./commands/oe-app-instance";
+import deploymentWorkflowCommand from "./commands/oe-deployment-workflow";
+import deviceStatusCommand from "./commands/oe-device-status";
+import deviceTypeCommand from "./commands/oe-device-types";
+import deviceCommand from "./commands/oe-devices";
+import firmwareDeploymentCommand from "./commands/oe-firmware-deployment";
 import sdiDataIngestCommand from "./commands/sdi-data-ingest";
 import sdiDataQueriesCommand from "./commands/sdi-data-queries";
 import sdiDataRegistriesCommand from "./commands/sdi-data-registries";
@@ -74,6 +73,9 @@ import spectrumAnalysisCommand from "./commands/spectrum-analysis";
 import subtenantCommand from "./commands/subtenant";
 import tenantCommand from "./commands/tenant";
 import trendPredictionCommand from "./commands/trend-prediction";
+import { Command } from "commander";
+
+const program = new Command();
 
 // * generic commands
 

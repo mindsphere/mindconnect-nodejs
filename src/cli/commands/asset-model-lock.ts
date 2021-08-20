@@ -1,4 +1,4 @@
-import { CommanderStatic } from "commander";
+import { Command } from "commander";
 import { log } from "console";
 import { AssetManagementModels, MindSphereSdk } from "../../api/sdk";
 import { retry } from "../../api/utils";
@@ -17,7 +17,7 @@ let color = getColor("magenta");
 let green = getColor("green");
 let red = getColor("red");
 
-export default (program: CommanderStatic) => {
+export default (program: Command) => {
     program
         .command("asset-lock")
         .alias("lck")
