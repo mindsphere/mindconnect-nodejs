@@ -1,9 +1,8 @@
 # Changelog
 
-## 3.15.0 - (Pineapple) Vienna) - June 2021
+## 3.15.0 - (Pineapple) Vienna) - August 2021
 
-- changed generated code for the mindconnect agent and agent management client to support BIG_STRING AND TIMESTAMP see MDS-329054 
- 
+- changed generated code for the mindconnect agent and agent management client to support BIG_STRING AND TIMESTAMP see MDS-329054
 - Upgraded validation to newest ajv - the validation of the timeseries had to be rewritten due to deprecation of addKeyword interface in ajv
 - Bumped all dependencies
 
