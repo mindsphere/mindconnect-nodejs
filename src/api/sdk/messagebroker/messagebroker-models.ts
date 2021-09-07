@@ -62,6 +62,9 @@ export namespace MessageBrokerModels {
          * @memberof Messages
          */
         content?: string;
+
+        //! fix: manual fix for the type as the OpenAPI spec was not complete
+        [x: string]: any | undefined;
     }
     /**
      *

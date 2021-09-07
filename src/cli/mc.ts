@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { Command } from "commander";
 import aggregatesCommand from "./commands/aggregates";
 import eventAnalyticsCommand from "./commands/analyze-events";
 import anomalydetectionCommand from "./commands/anomaly-detection";
@@ -44,6 +45,7 @@ import unregisterDiagnoticCommand from "./commands/mc-unregister-diagnostic";
 import uploadFileCommand from "./commands/mc-upload-file";
 import uploadTimeSeriesCommand from "./commands/mc-upload-timeseries";
 import versionAndHelp from "./commands/mc-version-help";
+import messageBrokerCommand from "./commands/messagebroker";
 import mobileAppInstancesCommand from "./commands/mobile-app-instances";
 import mobileAppsCommand from "./commands/mobile-apps";
 import modelsCommand from "./commands/models";
@@ -73,7 +75,6 @@ import spectrumAnalysisCommand from "./commands/spectrum-analysis";
 import subtenantCommand from "./commands/subtenant";
 import tenantCommand from "./commands/tenant";
 import trendPredictionCommand from "./commands/trend-prediction";
-import { Command } from "commander";
 
 const program = new Command();
 
@@ -166,6 +167,10 @@ sdiOntologyJobsCommand(program);
 
 mobileAppsCommand(program);
 mobileAppInstancesCommand(program);
+
+// * messageBroker Command
+
+messageBrokerCommand(program);
 
 // * analytics command
 

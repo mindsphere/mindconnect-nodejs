@@ -2,6 +2,8 @@
 
 ## 3.16.0 - (Tyrian Vienna) - September 2021
 
+- CLI: new `mc message-broker` command - manage message broker subscriptions and webhooks
+- SDK: message broker client
 - Bumped all dependencies
 
 ## 3.15.0 - (Pineapple) Vienna) - August 2021

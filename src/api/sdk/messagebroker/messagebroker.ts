@@ -2,7 +2,7 @@ import { SdkClient } from "../common/sdk-client";
 import { MessageBrokerModels } from "./messagebroker-models";
 
 export class MessageBrokerClient extends SdkClient {
-    private _baseUrl: string = "api/messagebroker/v4";
+    private _baseUrl: string = "/api/messagebroker/v4";
 
     /**
      * * Subscribers
@@ -95,7 +95,7 @@ export class MessageBrokerClient extends SdkClient {
      * @memberOf MessageBrokerClient
      */
     public async DeleteSubscription(id: string, versionId: string, topicId: string) {
-        const result = await this.HttpAction({
+        await this.HttpAction({
             verb: "DELETE",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
@@ -116,7 +116,7 @@ export class MessageBrokerClient extends SdkClient {
      * @memberOf MessageBrokerClient
      */
     public async SendMessage(id: string, message: MessageBrokerModels.Messages) {
-        const result = await this.HttpAction({
+        await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
