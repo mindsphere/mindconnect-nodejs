@@ -3,13 +3,6 @@ import { AnomalyDetectionClient } from "../anomaly-detection/anomaly-detection";
 import { AssetManagementClient } from "../asset/asset-management";
 import { DataExchangeClient } from "../data-exchange/data-exchange";
 import { DataLakeClient } from "../data-lake/data-lake";
-import { DeviceStatusManagementClient } from "../open-edge/open-edge";
-import { DeviceManagementClient } from "../open-edge/open-edge";
-import { DeviceConfigurationClient } from "../open-edge/open-edge";
-import { DeploymentWorkflowClient } from "../open-edge/open-edge";
-import { EdgeAppInstanceManagementClient } from "../open-edge/open-edge";
-import { EdgeAppDeploymentClient } from "../open-edge/open-edge";
-import { FirmwareDeploymentClient } from "../open-edge/open-edge";
 import { EventAnalyticsClient } from "../event-analytics/eventanalytics";
 import { EventManagementClient } from "../event/event-management";
 import { IdentityManagementClient } from "../identity/identity";
@@ -21,8 +14,18 @@ import { IotFileClient } from "../iotfile/iot-file";
 import { JobManagerClient } from "../jobmanager/jobmanager";
 import { KPICalculationClient } from "../kpi/kpi";
 import { MindConnectApiClient } from "../mcapi/mcapi";
+import { MessageBrokerClient } from "../messagebroker/messagebroker";
 import { ModelManagementClient } from "../model/model-management";
 import { NotificationClientV4 } from "../notification-v4/notification-v4";
+import {
+    DeploymentWorkflowClient,
+    DeviceConfigurationClient,
+    DeviceManagementClient,
+    DeviceStatusManagementClient,
+    EdgeAppDeploymentClient,
+    EdgeAppInstanceManagementClient,
+    FirmwareDeploymentClient,
+} from "../open-edge/open-edge";
 import { SemanticDataInterconnectClient } from "../sdi/sdi-v4";
 import { SignalCalculationClient } from "../signal-calculation/signal-calculation";
 import { SignalValidationClient } from "../signal-validation/signal-validation";
@@ -506,5 +509,19 @@ export class MindSphereSdk extends SdkClient {
         this._semanticDataInterConnectClient =
             this._semanticDataInterConnectClient || new SemanticDataInterconnectClient(this._authenticator);
         return this._semanticDataInterConnectClient;
+    }
+
+    private _messageBrokerClient?: MessageBrokerClient;
+
+    /**
+     * * Message Broker Client
+     *
+     * @returns {MessageBrokerClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetMessageBrokerClient(): MessageBrokerClient {
+        this._messageBrokerClient = this._messageBrokerClient || new MessageBrokerClient(this._authenticator);
+        return this._messageBrokerClient;
     }
 }
