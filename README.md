@@ -327,7 +327,10 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 | Oauth Authorization  | :heavy_check_mark: | :heavy_check_mark: |
 | Tenant Management  | :heavy_check_mark: | :heavy_check_mark: |
 | Token Management  | :heavy_check_mark: | :heavy_check_mark: |
+| Message Broker* (preview)  | :heavy_check_mark: | :heavy_check_mark: |
 | Usage Transparency  | :heavy_check_mark: |  |
+
+*) Message Broker is only available on preview tenants
 
 ### IoT and Storage
 

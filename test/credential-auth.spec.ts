@@ -20,7 +20,7 @@ describe("[SDK] Credential Auth", () => {
         nock.cleanAll();
     });
 
-    it.only("should acquire token @sanity @s4f", async () => {
+    it("should acquire token @sanity @s4f", async () => {
         const sdk = new MindSphereSdk({
             ...auth,
             basicAuth: decrypt(auth, getPasskeyForUnitTest()),
@@ -30,7 +30,7 @@ describe("[SDK] Credential Auth", () => {
         token.should.not.be.undefined;
     });
 
-    it.only(
+    it(
         "should validate token during key rotation",
         mochaAsync(async () => {
             const sdk = new MindSphereSdk({
@@ -72,7 +72,7 @@ describe("[SDK] Credential Auth", () => {
         })
     );
 
-    it.only("should use correct URL in tests @sanity @s4f", () => {
+    it("should use correct URL in tests @sanity @s4f", () => {
         const sdk = new MindSphereSdk({
             ...auth,
             basicAuth: decrypt(auth, getPasskeyForUnitTest()),
@@ -82,7 +82,7 @@ describe("[SDK] Credential Auth", () => {
         url.should.contain(".piam.");
     });
 
-    it.only(
+    it(
         "should throw error if there is no key",
         mochaAsync(async () => {
             const sdk = new MindSphereSdk({
@@ -132,7 +132,7 @@ describe("[SDK] Credential Auth", () => {
         })
     );
 
-    it.only("should just work", async () => {
+    it("should just work", async () => {
         const sdk = new MindSphereSdk({
             ...auth,
             basicAuth: decrypt(auth, getPasskeyForUnitTest()),

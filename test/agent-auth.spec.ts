@@ -38,11 +38,11 @@ describe("Agent Auth Rotation", () => {
         await tearDownAgents(sdk, unitTestConfiguration);
     });
 
-    it.only("should use correct url @sanity", async () => {
+    it("should use correct url @sanity", async () => {
         southgateUrl.should.contain("southgate");
     });
 
-    it.only("onboarding should be able to handle internet connection problems @sanity", async () => {
+    it("onboarding should be able to handle internet connection problems @sanity", async () => {
         // respond 3 times with internal server error before returning the correct response
         const scope = (
             nock(`${southgateUrl}:443`, {
@@ -63,7 +63,7 @@ describe("Agent Auth Rotation", () => {
         scope.done();
     });
 
-    it.only("should be able to recover from a problem with key rotation.", async () => {
+    it("should be able to recover from a problem with key rotation.", async () => {
         const agent = new MindConnectAgent(agentConfig);
         agent.should.not.be.undefined;
         nock.cleanAll();
@@ -88,7 +88,7 @@ describe("Agent Auth Rotation", () => {
         await agent.RenewToken();
     });
 
-    it.only("should be able to store old keys", async () => {
+    it("should be able to store old keys", async () => {
         const agent = new MindConnectAgent(agentConfig);
         agent.should.not.be.undefined;
         nock.cleanAll();
@@ -111,7 +111,7 @@ describe("Agent Auth Rotation", () => {
         (agent as any)._configuration.recovery.length.should.be.equal(5);
     });
 
-    it.only("should be able to handle errors in key rotation", async () => {
+    it("should be able to handle errors in key rotation", async () => {
         const agent = new MindConnectAgent(agentConfig);
         agent.should.not.be.undefined;
         nock.cleanAll();
@@ -160,7 +160,7 @@ describe("Agent Auth Rotation", () => {
         scope.done();
     });
 
-    it.only("should handle problems with certificate urls", async () => {
+    it("should handle problems with certificate urls", async () => {
         const agent = new MindConnectAgent(agentConfig);
         agent.should.not.be.undefined;
         nock.cleanAll();
