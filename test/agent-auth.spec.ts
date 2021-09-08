@@ -20,8 +20,8 @@ describe("Agent Auth Rotation", () => {
         basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
 
-    let agentConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;
-    let unitTestConfiguration: AgentUnitTestConfiguration = ({} as unknown) as AgentUnitTestConfiguration;
+    let agentConfig: IMindConnectConfiguration = {} as unknown as IMindConnectConfiguration;
+    let unitTestConfiguration: AgentUnitTestConfiguration = {} as unknown as AgentUnitTestConfiguration;
 
     const southgateUrl = sdk.GetGateway().replace("gateway", "southgate");
 
@@ -38,33 +38,32 @@ describe("Agent Auth Rotation", () => {
         await tearDownAgents(sdk, unitTestConfiguration);
     });
 
-    it("should use correct url @sanity", async () => {
+    it.only("should use correct url @sanity", async () => {
         southgateUrl.should.contain("southgate");
     });
 
-    it("onboarding should be able to handle internet connection problems @sanity", async () => {
+    it.only("onboarding should be able to handle internet connection problems @sanity", async () => {
         // respond 3 times with internal server error before returning the correct response
-        let errors = 0;
-        const scope = (nock(`${southgateUrl}:443`, {
-            encodedQueryParams: true,
-            allowUnmocked: true,
-        }) as any)
+        const scope = (
+            nock(`${southgateUrl}:443`, {
+                encodedQueryParams: true,
+                allowUnmocked: true,
+            }) as any
+        )
             .post("/api/agentmanagement/v3/register", {})
             .thrice()
-            .reply(500, "Internal Server Error")
-            .log(() => errors++);
+            .reply(500, "Internal Server Error");
 
         const agent = new MindConnectAgent(agentConfig);
         agent.should.not.be.undefined;
 
         // try 8 times so that we can be sure that the agent will get onboarded
         const result = await retry(8, () => agent.OnBoard());
-        errors.should.be.equal(3);
         result.should.be.equal(OnboardingStatus.StatusEnum.ONBOARDED);
         scope.done();
     });
 
-    it("should be able to recover from a problem with key rotation.", async () => {
+    it.only("should be able to recover from a problem with key rotation.", async () => {
         const agent = new MindConnectAgent(agentConfig);
         agent.should.not.be.undefined;
         nock.cleanAll();
@@ -89,7 +88,7 @@ describe("Agent Auth Rotation", () => {
         await agent.RenewToken();
     });
 
-    it("should be able to store old keys", async () => {
+    it.only("should be able to store old keys", async () => {
         const agent = new MindConnectAgent(agentConfig);
         agent.should.not.be.undefined;
         nock.cleanAll();
@@ -112,7 +111,7 @@ describe("Agent Auth Rotation", () => {
         (agent as any)._configuration.recovery.length.should.be.equal(5);
     });
 
-    it("should be able to handle errors in key rotation", async () => {
+    it.only("should be able to handle errors in key rotation", async () => {
         const agent = new MindConnectAgent(agentConfig);
         agent.should.not.be.undefined;
         nock.cleanAll();
@@ -122,19 +121,17 @@ describe("Agent Auth Rotation", () => {
 
         (agent as any)._configuration.recovery.length.should.be.greaterThan(1);
 
-        let error = 0;
-        const scope = (nock(`${southgateUrl}:443`, {
-            encodedQueryParams: true,
-            allowUnmocked: true,
-        }) as any)
+        const scope = (
+            nock(`${southgateUrl}:443`, {
+                encodedQueryParams: true,
+                allowUnmocked: true,
+            }) as any
+        )
             .put(`/api/agentmanagement/v3/register/${agent.ClientId()}`, {
                 client_id: `${agent.ClientId()}`,
             })
             .times(24)
-            .reply(500, "Internal Server error")
-            .log(() => {
-                ++error;
-            });
+            .reply(500, "Internal Server error");
 
         const today = new Date();
         const inOneHour = new Date(today);
@@ -150,7 +147,6 @@ describe("Agent Auth Rotation", () => {
         await agent.RenewToken();
         await agent.RenewToken();
         await agent.RenewToken();
-        error.should.be.equal(24); // (5 + 3 failed recovery attempts) * 3
         scope.done();
         nock.cleanAll();
 
@@ -164,28 +160,27 @@ describe("Agent Auth Rotation", () => {
         scope.done();
     });
 
-    it("should handle problems with certificate urls", async () => {
+    it.only("should handle problems with certificate urls", async () => {
         const agent = new MindConnectAgent(agentConfig);
         agent.should.not.be.undefined;
         nock.cleanAll();
 
         if (!agent.IsOnBoarded()) await retry(5, () => agent.OnBoard());
 
-        let error = 0;
-        const scope = (nock(`${southgateUrl}:443`, {
-            encodedQueryParams: true,
-            allowUnmocked: true,
-        }) as any)
+        const scope = (
+            nock(`${southgateUrl}:443`, {
+                encodedQueryParams: true,
+                allowUnmocked: true,
+            }) as any
+        )
             .get(`/api/agentmanagement/v3/oauth/token_key`)
             .times(4)
-            .reply(500, "Internal Server error")
-            .log(() => ++error);
+            .reply(500, "Internal Server error");
 
         await retry(2, () => agent.RenewToken());
         const token = await agent.GetAgentToken();
         token.should.not.be.undefined;
         token.length.should.be.greaterThan(10);
-        error.should.be.equal(4);
         scope.done();
     });
 });
