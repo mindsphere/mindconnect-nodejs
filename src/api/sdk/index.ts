@@ -32,6 +32,8 @@ export * from "./jobmanager/jobmanager";
 export * from "./jobmanager/jobmanager-models";
 export * from "./mcapi/mcapi";
 export * from "./mcapi/mcapi-models";
+export * from "./messagebroker/messagebroker";
+export * from "./messagebroker/messagebroker-models";
 export * from "./model/model-management";
 export * from "./model/model-models";
 export * from "./notification-v4/notification-v4";
