@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.17.0 (Sandstone Vienna) - October 2021
+
+- Bumped all dependencies
+
 ## 3.16.0 - (Tyrian Vienna) - September 2021
 
 - CLI: new `mc message-broker` command - manage message broker subscriptions and webhooks
