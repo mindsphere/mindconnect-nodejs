@@ -1,6 +1,6 @@
 {
     "name": "@mindconnect/mindconnect-nodejs",
-    "version": "3.16.0",
+    "version": "3.17.0-0",
     "description": "NodeJS Library for MindSphere Connectivity - TypeScript SDK for MindSphere - MindSphere Command Line Interface - MindSphere Development Proxy",
     "main": "./dist/src/index.js",
     "browser": "./dist/src/index.bundle.js",
