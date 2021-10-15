@@ -14,6 +14,8 @@ import {
 } from "./command-utils";
 
 let color = getColor("magenta");
+let cyan = getColor("cyan");
+let yellow = getColor("yellow");
 
 export default (program: Command) => {
     program
@@ -77,53 +79,105 @@ export default (program: Command) => {
 };
 
 async function listUsers(iam: IdentityManagementClient, options: any) {
-    const filter: any = { attributes: "userName,groups,name" };
+    let startIndex = 0; // for users the startIndex starts at 0
+    let userCount = 0;
+    let adminCount = 0;
+    let nonAdminCount = 0;
 
-    if (options.user !== true) {
-        filter.filter! = `userName sw "${options.user}"`;
-    }
+    do {
+        const filter: any = { attributes: "userName,groups,name", startIndex: startIndex, sortBy: "userName" };
 
-    const users = await iam.GetUsers(filter);
+        if (options.user !== true) {
+            filter.filter! = `userName sw "${options.user}"`;
+        }
 
-    users.resources?.forEach((user) => {
-        const groups = user.groups?.filter((x) => x.display === "mdsp:core:TenantAdmin");
+        const users = await iam.GetUsers(filter);
 
-        const userColor = groups && groups.length ? color : (x: string) => x;
-        const admin = groups && groups.length > 0 ? color("*") : "-";
+        users.resources?.forEach((user) => {
+            userCount++;
+            const groups = user.groups?.filter((x) => x.display === "mdsp:core:TenantAdmin");
 
-        console.log(`${admin} ${userColor(user.userName)} [${user.groups?.length} groups]`);
-        options.verbose &&
-            user.groups?.forEach((grp) => {
-                console.log(`\t - ${grp.display}`);
-            });
-    });
-    console.log(`Found: ${color(users.totalResults)} users`);
+            const userColor = groups && groups.length ? color : cyan;
+            const admin = groups && groups.length > 0 ? color(`*`) : `-`;
+
+            groups && groups.length > 0 ? adminCount++ : nonAdminCount++;
+
+            console.log(`${admin} ${userColor(user.userName)} [${user.groups?.length} groups]`);
+            options.verbose &&
+                user.groups?.forEach((grp) => {
+                    console.log(`\t - ${grp.display}`);
+                });
+        });
+
+        startIndex = startIndex + users.itemsPerPage! + 1;
+
+        if (users.totalResults === undefined || startIndex > users.totalResults) break;
+    } while (true);
+
+    console.log(
+        `Found: ${userCount} users. [${color(adminCount)} tenant admins and ${cyan(nonAdminCount)} non-admin users]`
+    );
 }
 
 async function listGroups(iam: IdentityManagementClient, options: any) {
-    const filter: any = {};
-    if (options.group !== true) {
-        filter.filter! = `displayName sw "${normalizeGroupName(options.group, options)}"`;
-    }
+    let startIndex = 1; //for groups start index starts at 1 for some reason
+    let totalGroups = 0;
 
-    const groups = await iam.GetGroups(filter);
+    let userGroups = 0;
+    let coreRoles = 0;
+    let otherRoles = 0;
 
-    for await (const group of groups.resources || []) {
-        const userCount = options.verbose ? `[${group.members?.length} users]` : "";
-        console.log(`${color(group.displayName)} ${userCount}`);
-        if (options.verbose) {
-            for await (const member of group.members!) {
-                if (member.type === IdentityManagementModels.ScimGroupMember.TypeEnum.USER) {
-                    const user = await iam.GetUser(member.value);
-                    console.log(`\t ${user.userName}`);
-                } else {
-                    const group = await iam.GetGroup(member.value);
-                    console.log(`\t ${group.displayName}`);
+    do {
+        const filter: any = { startIndex: startIndex, sortBy: "displayName" };
+        if (options.group !== true) {
+            filter.filter! = `displayName sw "${normalizeGroupName(options.group, options)}"`;
+        }
+
+        const groups = await iam.GetGroups(filter);
+
+        for await (const group of groups.resources || []) {
+            const userCount = options.verbose ? `[${group.members?.length} users]` : "";
+
+            let displayName = group.displayName || "";
+
+            if (displayName.startsWith("mdsp_usergroup:")) {
+                displayName = cyan(group.displayName);
+                userGroups++;
+            } else if (displayName.startsWith("mdsp:core:")) {
+                displayName = color(group.displayName);
+                coreRoles++;
+            } else {
+                displayName = yellow(group.displayName);
+                otherRoles++;
+            }
+
+            console.log(`${displayName} ${userCount}`);
+            if (options.verbose) {
+                for await (const member of group.members!) {
+                    if (member.type === IdentityManagementModels.ScimGroupMember.TypeEnum.USER) {
+                        const user = await iam.GetUser(member.value);
+                        console.log(`\t ${user.userName}`);
+                    } else {
+                        const group = await iam.GetGroup(member.value);
+                        console.log(`\t ${group.displayName}`);
+                    }
                 }
             }
         }
-    }
-    console.log(`Found: ${color(groups.totalResults)} groups`);
+
+        // console.log(groups);
+
+        totalGroups = groups.totalResults || 0;
+        startIndex = startIndex + groups.itemsPerPage!;
+        // console.log(startIndex, groups.startIndex, groups.totalResults);
+        if (startIndex > groups.totalResults!) break;
+    } while (true);
+
+    console.log(
+        `Found: ${totalGroups} groups. [${cyan(userGroups)} user groups, ${color(coreRoles)} core roles and ${yellow(
+            otherRoles
+        )} other roles]`
+    );
 }
 
 async function createUser(iam: IdentityManagementClient, options: any) {
