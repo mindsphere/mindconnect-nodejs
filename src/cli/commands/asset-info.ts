@@ -98,13 +98,13 @@ export default (program: Command) => {
                                     .replace("gateway", sdk.GetTenant() + "-assetmanager")}/entity/${asset.assetId!}`
                             )
                     );
-                    console.log("Fleet Manager:");
+                    console.log("\nOperations Insight:");
                     console.log(
                         "\t" +
                             color(
                                 `${sdk
                                     .GetGateway()
-                                    .replace("gateway", sdk.GetTenant() + "-fleetManager")}/?assetid=${asset.assetId!}`
+                                    .replace("gateway", sdk.GetTenant() + "-operationsinsight")}/explore-assets/info?asset=${asset.assetId!}`
                             )
                     );
                 } catch (err) {
