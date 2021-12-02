@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.17.0 - (Sandstone Vienna) - December 2021
+
+- fixed paging issue for `mc iam --group` command [#297]
+
 ## 3.16.0 - (Tyrian Vienna) - September 2021
 
 - CLI: new `mc message-broker` command - manage message broker subscriptions and webhooks

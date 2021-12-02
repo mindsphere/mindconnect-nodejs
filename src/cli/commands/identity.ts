@@ -14,22 +14,25 @@ import {
 } from "./command-utils";
 
 let color = getColor("magenta");
+let groupColor = getColor("green");
+let roleColor = getColor("yellow");
 
 export default (program: Command) => {
     program
         .command("identity-management")
         .alias("iam")
         .option(
-            "-m, --mode [list|create|assign|remove|delete]",
-            "Mode can be list | create | assign | remove | delete",
+            "-m, --mode [list|create|assign|remove|delete|info]",
+            "Mode can be list | create | assign | remove | delete | info",
             "list"
         )
         .option("-u, --user [user]", "user name")
         .option("-g, --group [group]", "user group")
+        .option("-l, --role [role]", "user role")
         .option("-m, --membergroup [membergroup]", "member group")
         .option("-r, --raw", "don't automatically preceed group names with mdsp_usergroup")
         .option("-k, --passkey <passkey>", "passkey")
-        .option("-v, --verbose", "verbose output")
+        .option("-v, --verbose", "verbose output (includes assigned users or groups and roles)")
         .description(color("manage mindsphere users and groups *"))
         .action((options) => {
             (async () => {
@@ -42,12 +45,24 @@ export default (program: Command) => {
 
                     const iam = sdk.GetIdentityManagementClient();
 
+                    if (options.mode === "info") {
+                        options.verbose = true;
+                    }
+
+                    options.mode === "info" && options.user && (await listUsers(iam, options));
+                    options.mode === "info" && options.group && (await listGroupsOrRoles(iam, options));
+                    options.mode === "info" && options.role && (await listGroupsOrRoles(iam, options));
+
                     options.mode === "list" && options.user && (await listUsers(iam, options));
-                    options.mode === "list" && options.group && (await listGroups(iam, options));
+                    options.mode === "list" && options.group && (await listGroupsOrRoles(iam, options));
+                    options.mode === "list" && options.role && (await listGroupsOrRoles(iam, options));
+
                     options.mode === "create" && options.user && (await createUser(iam, options));
                     options.mode === "create" && options.group && (await createGroup(iam, options));
+
                     options.mode === "delete" && options.user && (await deleteUser(iam, options));
                     options.mode === "delete" && options.group && (await deleteGroup(iam, options));
+
                     options.mode === "assign" && (await assign(iam, options));
                     options.mode === "remove" && (await remove(iam, options));
                 } catch (err) {
@@ -85,32 +100,77 @@ async function listUsers(iam: IdentityManagementClient, options: any) {
 
     const users = await iam.GetUsers(filter);
 
+    let tenantAdmins = 0;
     users.resources?.forEach((user) => {
         const groups = user.groups?.filter((x) => x.display === "mdsp:core:TenantAdmin");
 
         const userColor = groups && groups.length ? color : (x: string) => x;
         const admin = groups && groups.length > 0 ? color("*") : "-";
+        if (groups && groups.length > 0) tenantAdmins++;
 
-        console.log(`${admin} ${userColor(user.userName)} [${user.groups?.length} groups]`);
-        options.verbose &&
-            user.groups?.forEach((grp) => {
-                console.log(`\t - ${grp.display}`);
-            });
+        let userGroups: IdentityManagementModels.Group[] = [],
+            userRoles: IdentityManagementModels.Group[] = [];
+
+        user.groups?.forEach((grp) => {
+            if (grp.display.startsWith("mdsp_usergroup:")) {
+                userGroups.push(grp);
+            } else {
+                userRoles.push(grp);
+            }
+        });
+
+        console.log(
+            `${admin} ${userColor(user.userName)} [${groupColor(userGroups.length)} user groups, ${roleColor(
+                userRoles.length
+            )} roles]`
+        );
+
+        if (options.verbose) {
+            userGroups
+                .sort((x, y) => {
+                    return x.display.localeCompare(y.display);
+                })
+                .forEach((x) => console.log(`\t - ${formatGroupOrRole(x.display)}`));
+            userRoles
+                .sort((x, y) => {
+                    return x.display.localeCompare(y.display);
+                })
+                .forEach((x) => console.log(`\t - ${formatGroupOrRole(x.display)}`));
+        }
     });
-    console.log(`Found: ${color(users.totalResults)} users`);
+    console.log(
+        `Total Users: ${users.totalResults} total users. [${color(tenantAdmins + " tenant admins")}, ${
+            (users.totalResults || 0) - tenantAdmins
+        } other users.]`
+    );
 }
 
-async function listGroups(iam: IdentityManagementClient, options: any) {
+function formatGroupOrRole(groupName: string) {
+    return groupName.startsWith("mdsp_usergroup:") ? groupColor(groupName) : roleColor(groupName);
+}
+
+async function listGroupsOrRoles(iam: IdentityManagementClient, options: any) {
     const filter: any = {};
-    if (options.group !== true) {
-        filter.filter! = `displayName sw "${normalizeGroupName(options.group, options)}"`;
+    if (options.group) {
+        filter.filter! = `displayName sw "${normalizeGroupName(options.group === true ? "" : options.group, options)}"`;
     }
 
+    if (options.role && options.role !== true) {
+        filter.filter! = `displayName sw "${options.role}"`;
+    }
+
+    let count = 0;
     const groups = await iam.GetGroups(filter);
 
-    for await (const group of groups.resources || []) {
+    for await (const group of (groups.resources || []).sort((x, y) => {
+        return x.displayName!.localeCompare(y.displayName!);
+    })) {
+        if (group.displayName!.startsWith("mdsp_usergroup:") && options.role) {
+            continue;
+        }
+        count++;
         const userCount = options.verbose ? `[${group.members?.length} users]` : "";
-        console.log(`${color(group.displayName)} ${userCount}`);
+        console.log(`${formatGroupOrRole(group.displayName!)} ${userCount}`);
         if (options.verbose) {
             for await (const member of group.members!) {
                 if (member.type === IdentityManagementModels.ScimGroupMember.TypeEnum.USER) {
@@ -123,7 +183,12 @@ async function listGroups(iam: IdentityManagementClient, options: any) {
             }
         }
     }
-    console.log(`Found: ${color(groups.totalResults)} groups`);
+
+    if (options.group) {
+        console.log(`Found: ${groupColor(count)} groups`);
+    } else {
+        console.log(`Found: ${roleColor(count)} roles`);
+    }
 }
 
 async function createUser(iam: IdentityManagementClient, options: any) {
@@ -141,8 +206,8 @@ async function createGroup(iam: IdentityManagementClient, options: any) {
 }
 
 function normalizeGroupName(name: string, options: any) {
-    if (name === undefined) {
-        return name;
+    if (name === "" || name === "true") {
+        return "mdsp_usergroup:";
     }
     if (!options.raw && !name.startsWith("mdsp_usergroup:")) {
         name = `mdsp_usergroup:${name}`;
@@ -239,20 +304,43 @@ async function remove(iam: IdentityManagementClient, options: any) {
 }
 
 function checkRequiredParameters(options: any) {
-    !(["list", "create", "assign", "remove", "delete"].indexOf(options.mode) >= 0) &&
+    !(["list", "create", "assign", "remove", "delete", "info"].indexOf(options.mode) >= 0) &&
         throwError(`invalid mode ${options.mode} (must be config, list, select or add)`);
 
-    ["list", "create", "delete"].forEach((x) => {
+    ["create", "delete"].forEach((x) => {
+        options.mode === x &&
+            options.role &&
+            throwError(
+                `CREATE ROLE and DELETE ROLE operations are not public APIs in MindSphere. Please use the developer cockpit to create roles instead.`
+            );
+
         options.mode === x &&
             !options.user &&
             !options.group &&
-            throwError(`you have to specify either --user [user] or --group [group]  for mc iam --mode ${x} command`);
+            throwError(`you have to specify either --user [user] or --group [group] for mc iam --mode ${x} command`);
+    });
+
+    ["list", "info"].forEach((x) => {
+        options.mode === x &&
+            !options.user &&
+            !options.group &&
+            !options.role &&
+            throwError(
+                `you have to specify either --user [user] or --group [group] or --role [role] for mc iam --mode ${x} command`
+            );
 
         options.mode === x &&
-            options.user &&
-            options.group &&
+            +!!options.user + +!!options.group + +!!options.role > 1 &&
             throwError(
-                `you have to specify either --user [user] or --group [group]  for mc iam --mode ${x} command but not both`
+                `you have to specify either --user [user] or --group [group] or --role [role]  for mc iam --mode ${x} command but not more than one`
+            );
+    });
+
+    ["info"].forEach((x) => {
+        options.mode === x &&
+            +!!options.user + +!!options.group + +!!options.role > 1 &&
+            throwError(
+                `you have to specify either --user [user] or --group [group] or --role [role]  for mc iam --mode ${x} command but not more than one`
             );
     });
 
@@ -265,7 +353,7 @@ function checkRequiredParameters(options: any) {
         options.mode === x &&
             options.group &&
             options.group === true &&
-            throwError(`you have to specify full user name for iam --mode ${x} command`);
+            throwError(`you have to specify full group name for iam --mode ${x} command`);
     });
 
     ["assign", "remove"].forEach((x) => {
