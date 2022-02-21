@@ -1,7 +1,9 @@
 # Changelog
 
-## 3.17.0 - (Sandstone Vienna) - December 2021
+## 3.17.0 - (Sandstone Vienna) - February 2022
 
+- CLI: completely new `mc iam` command with support for user, roles, and user groups management
+- SDK: Tenant Management added paging to the Tenant Management Client
 - fixed paging issue for `mc iam --group` command [#297]
 
 ## 3.16.0 - (Tyrian Vienna) - September 2021
