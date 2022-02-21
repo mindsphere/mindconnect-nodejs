@@ -1,3 +1,4 @@
+import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
 import { TenantManagementModels } from "./tenant-management-models";
 
@@ -269,12 +270,15 @@ export class TenantManagementClient extends SdkClient {
      *
      * @memberOf TenantManagementClient
      */
-    public async GetSubtenants(): Promise<TenantManagementModels.PageSubtenantResource> {
+    public async GetSubtenants(params?: {
+        page?: number;
+        size?: number;
+    }): Promise<TenantManagementModels.PageSubtenantResource> {
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/subtenants`,
+            baseUrl: `${this._baseUrl}/subtenants?${toQueryString(params)}`,
         });
         return result as TenantManagementModels.PageSubtenantResource;
     }
