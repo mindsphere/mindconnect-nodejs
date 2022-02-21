@@ -15,7 +15,6 @@ import {
 let color = getColor("magenta");
 let groupColor = getColor("green");
 let roleColor = getColor("yellow");
-let customRoleColor = getColor("cyan");
 
 export default (program: Command) => {
     program
@@ -58,11 +57,11 @@ export default (program: Command) => {
 
                     (options.mode === "list" || options.mode === "info") &&
                         options.group &&
-                        printGroups(await groups(), await users(), await roles(), options);
+                        printGroups(await users(), await groups(), await roles(), options);
 
                     (options.mode === "list" || options.mode === "info") &&
                         options.role &&
-                        printRoles(await roles(), options);
+                        printRoles(await users(), await groups(), await roles(), options);
 
                     // options.mode === "create" && options.user && (await createUser(iam, options));
                     // options.mode === "create" && options.group && (await createGroup(iam, options));
@@ -153,8 +152,8 @@ function printUsers(
 }
 
 function printGroups(
-    groups: IdentityManagementModels.ScimGroup[],
     users: IdentityManagementModels.ScimUserResponse[],
+    groups: IdentityManagementModels.ScimGroup[],
     roles: IdentityManagementModels.ScimGroup[],
     options: any
 ) {
@@ -187,8 +186,10 @@ function prettyPrintMembers(
         .filter((role) => role.members?.map((y) => y.value).includes(group.id!))
         .map((role) => role.displayName);
 
+    const groupOrRoleColor = options.role ? roleColor : groupColor;
+
     console.log(
-        `${groupColor(group.displayName)} [${assignedUsers.length + " users"} , ${groupColor(
+        `${groupOrRoleColor(group.displayName)} [${assignedUsers.length + " users"} , ${groupColor(
             assignedGroups.length + " subgroups"
         )}, ${roleColor(assignedRoles.length + " roles")}]`
     );
@@ -211,15 +212,20 @@ function prettyPrintMembers(
     }
 }
 
-function printRoles(roles: IdentityManagementModels.ScimGroup[], options: any) {
-    if (typeof options.role === "string") {
-        roles = roles.filter((group) => group.displayName?.includes(options.role));
-    }
+function printRoles(
+    users: IdentityManagementModels.ScimUserResponse[],
+    groups: IdentityManagementModels.ScimGroup[],
+    roles: IdentityManagementModels.ScimGroup[],
+    options: any
+) {
+    const selected =
+        typeof options.role === "string" ? roles.filter((role) => role.displayName?.includes(options.role)) : roles;
 
-    roles.forEach((role) => {
-        console.log(roleColor(role.displayName));
+    selected.forEach((role) => {
+        prettyPrintMembers(role, users, groups, roles, options);
+        options.meta && printObjectInfo("Meta:", role.meta || {}, options, ["lastModified"], color, 0);
     });
-    console.log(`\n${roleColor(roles.length)} roles found.`);
+    console.log(`\n${roleColor(selected.length)} roles found.`);
 }
 
 async function getAllUsers(iam: IdentityManagementClient, options: any) {
