@@ -371,7 +371,7 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
             await agent.GetDataSourceConfiguration();
         }
 
-        console.log(agentConfig);
+        // console.log(agentConfig);
 
         const values: DataPointValue[] = [
             { dataPointId: "DP-Temperature", qualityCode: "0", value: "123.1" },
@@ -671,28 +671,6 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {
 
         const result = await agent.Upload("./images/environmentdata.PNG", "", "desc");
         result.should.be.equal("59d9c81f4082c55cbc744fa41cc722be");
-    });
-
-    it("should be able to retry an operation before throwing an error", async () => {
-        const agent = new MindConnectAgent(agentConfig);
-        (<any>agent)._proxyHttpAgent = new HttpsProxyAgent("http://localhost:65535");
-        if (!agent.IsOnBoarded()) {
-            await agent.OnBoard();
-        }
-        let logCount = 0;
-        try {
-            await retry(
-                5,
-                () => agent.Upload("LICENSE.md", "text/plain", "blubb", true),
-                300,
-                () => {
-                    logCount++;
-                }
-            );
-        } catch (err) {
-            err.message.should.contain("ECONNREFUSED");
-        }
-        logCount.should.be.equal(5);
     });
 
     it("should be to upload file in 5 retries", async () => {
