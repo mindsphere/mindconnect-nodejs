@@ -5,6 +5,7 @@
 - CLI: completely new `mc iam` command with support for user, roles, and user groups management
 - SDK: Tenant Management added paging to the Tenant Management Client
 - fixed paging issue for `mc iam --group` command [#297]
+- Bumped all dependencies
 
 ## 3.16.0 - (Tyrian Vienna) - September 2021
 
