@@ -56,6 +56,10 @@ export default (program: Command) => {
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
 
+                    if (options.mode === "credentials") {
+                        options.passkey = options.passkey || process.env.MDSP_PASSKEY; 
+                    }
+
                     if (options.mode === "session") {
                         options.session = options.session || process.env.MDSP_SESSION;
                         options.xsrftoken = options.xsrftoken || process.env.MDSP_XSRF_TOKEN;
