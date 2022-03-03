@@ -324,13 +324,15 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 | Name |SDK - Client | Command |
 | --- | --- | --- |
 | Identity Management  | :heavy_check_mark: | :heavy_check_mark: |
+| Resource Access Management<sup>1</sup>  | :heavy_check_mark: | :heavy_check_mark: |
 | Oauth Authorization  | :heavy_check_mark: | :heavy_check_mark: |
 | Tenant Management  | :heavy_check_mark: | :heavy_check_mark: |
 | Token Management  | :heavy_check_mark: | :heavy_check_mark: |
-| Message Broker* (preview)  | :heavy_check_mark: | :heavy_check_mark: |
+| Message Broker<sup>2</sup> (preview)  | :heavy_check_mark: | :heavy_check_mark: |
 | Usage Transparency  | :heavy_check_mark: |  |
 
-*) Message Broker is only available on preview tenants
+<sup>1</sup> In the first stage of the availability Resource Access Management must be enabled for the tenant via MindSphere support team.
+<sup>2</sup> Message Broker is only available on preview tenants
 
 ### IoT and Storage
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.18.0 - (Hazelwood Vienna) - March 2022
+
+- SDK: ResourceAccessManagement Client [[#308](https://github.com/mindsphere/mindconnect-nodejs/issues/308)]
+- CLI: new `mc policy` command to manage policies [[#308](https://github.com/mindsphere/mindconnect-nodejs/issues/308)]
+
 ## 3.17.0 - (Sandstone Vienna) - February 2022
 
 - CLI: completely new `mc iam` command with support for user, roles, and user groups management

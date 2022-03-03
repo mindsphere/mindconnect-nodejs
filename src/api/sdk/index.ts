@@ -40,6 +40,8 @@ export * from "./notification-v4/notification-v4";
 export * from "./notification-v4/notification-v4-models";
 export * from "./open-edge/open-edge";
 export * from "./open-edge/open-edge-models";
+export * from "./policy/policy";
+export * from "./policy/policy-models";
 export * from "./sdi/sdi-models";
 export * from "./sdi/sdi-v4";
 export * from "./signal-calculation/signal-calculation";

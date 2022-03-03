@@ -26,6 +26,7 @@ import {
     EdgeAppInstanceManagementClient,
     FirmwareDeploymentClient,
 } from "../open-edge/open-edge";
+import { ResourceAccessManagementClient } from "../policy/policy";
 import { SemanticDataInterconnectClient } from "../sdi/sdi-v4";
 import { SignalCalculationClient } from "../signal-calculation/signal-calculation";
 import { SignalValidationClient } from "../signal-validation/signal-validation";
@@ -523,5 +524,20 @@ export class MindSphereSdk extends SdkClient {
     public GetMessageBrokerClient(): MessageBrokerClient {
         this._messageBrokerClient = this._messageBrokerClient || new MessageBrokerClient(this._authenticator);
         return this._messageBrokerClient;
+    }
+
+    private _resourceAccessManagementClient?: ResourceAccessManagementClient;
+
+    /**
+     * * Resource Acess Management Client
+     *
+     * @returns {ResourceAccessManagementClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetResourceManagementClient(): ResourceAccessManagementClient {
+        this._resourceAccessManagementClient =
+            this._resourceAccessManagementClient || new ResourceAccessManagementClient(this._authenticator);
+        return this._resourceAccessManagementClient;
     }
 }
