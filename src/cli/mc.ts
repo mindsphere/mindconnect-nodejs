@@ -58,6 +58,7 @@ import deviceStatusCommand from "./commands/oe-device-status";
 import deviceTypeCommand from "./commands/oe-device-types";
 import deviceCommand from "./commands/oe-devices";
 import firmwareDeploymentCommand from "./commands/oe-firmware-deployment";
+import policyCommand from "./commands/policy";
 import sdiDataIngestCommand from "./commands/sdi-data-ingest";
 import sdiDataQueriesCommand from "./commands/sdi-data-queries";
 import sdiDataRegistriesCommand from "./commands/sdi-data-registries";
@@ -146,6 +147,7 @@ deleteFileCommand(program);
 // * identity access management commands
 
 identityCommand(program);
+policyCommand(program);
 
 // * data lake
 dataLakeCommand(program);
