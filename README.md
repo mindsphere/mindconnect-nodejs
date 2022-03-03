@@ -332,6 +332,7 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 | Usage Transparency  | :heavy_check_mark: |  |
 
 <sup>1</sup> In the first stage of the availability Resource Access Management must be enabled for the tenant via MindSphere support team.
+
 <sup>2</sup> Message Broker is only available on preview tenants
 
 ### IoT and Storage
