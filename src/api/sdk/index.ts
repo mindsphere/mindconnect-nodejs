@@ -4,6 +4,8 @@ export * from "./anomaly-detection/anomaly-detection";
 export * from "./anomaly-detection/anomaly-detection-models";
 export * from "./asset/asset-management";
 export * from "./asset/asset-models";
+export * from "./commanding/commanding";
+export * from "./commanding/commanding-models";
 export * from "./common/credentials";
 export * from "./common/mindsphere-sdk";
 export * from "./common/sdk-client";
