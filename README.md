@@ -351,6 +351,7 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 | --- | --- | --- |
 | Agent Management   | :heavy_check_mark: | :heavy_check_mark: |
 | MindConnect API   | :heavy_check_mark: | :heavy_check_mark: |
+| Commanding API (sync) | :heavy_check_mark: | :heavy_check_mark: |
 | OPC UA PubSub    |  | :heavy_check_mark: |
 
 ### Advanced Services
