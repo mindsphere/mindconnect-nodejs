@@ -1,3 +1,4 @@
+import { AdvancedTokenExchangeClient } from "../advanced-token/advanced-token";
 import { AgentManagementClient } from "../agent/agent-management";
 import { AnomalyDetectionClient } from "../anomaly-detection/anomaly-detection";
 import { AssetManagementClient } from "../asset/asset-management";
@@ -554,5 +555,20 @@ export class MindSphereSdk extends SdkClient {
     public GetCommandingClient(): CommandingClient {
         this._commandingClient = this._commandingClient || new CommandingClient(this._authenticator);
         return this._commandingClient;
+    }
+
+    private _advancedTokenExchangeClient?: AdvancedTokenExchangeClient;
+
+    /**
+     * Advanced Token Exchange Client
+     *
+     * @returns {AdvancedTokenExchangeClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetAdvancedTokenExchangeClient(): AdvancedTokenExchangeClient {
+        this._advancedTokenExchangeClient =
+            this._advancedTokenExchangeClient || new AdvancedTokenExchangeClient(this._authenticator);
+        return this._advancedTokenExchangeClient;
     }
 }

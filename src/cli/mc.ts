@@ -75,6 +75,7 @@ import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
 import subtenantCommand from "./commands/subtenant";
 import tenantCommand from "./commands/tenant";
+import tokenExchangeCommand from "./commands/token-exchange";
 import trendPredictionCommand from "./commands/trend-prediction";
 
 const program = new Command();
@@ -98,8 +99,6 @@ agentStatusCommand(program);
 createAgentCommand(program);
 offboardCommand(program);
 renewAgentCommand(program);
-serviceCredentialsCommand(program);
-serviceTokenCommand(program);
 registerDiagnosticCommand(program);
 getDiagnosticCommand(program);
 unregisterDiagnoticCommand(program);
@@ -148,6 +147,9 @@ deleteFileCommand(program);
 
 identityCommand(program);
 policyCommand(program);
+serviceCredentialsCommand(program);
+serviceTokenCommand(program);
+tokenExchangeCommand(program);
 
 // * data lake
 dataLakeCommand(program);
