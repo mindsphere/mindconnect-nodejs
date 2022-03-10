@@ -414,9 +414,17 @@ export namespace CommandingModels {
         };
     }
 
+    /**
+     * Response of the GetDeliveryJobCommands operation.
+     *
+     * !fix: manually fixed on 3/4/2022 the swagger documentation is using inline response typing which is contrary to the API guideline.
+     *
+     * @export
+     * @interface DeliveryJobsResponse
+     */
     export interface CommandsResponse {
         _embedded: {
-            deliveryJobs: Array<CommandListView>;
+            commands: Array<CommandListView>;
         };
 
         page: Page;
