@@ -7,6 +7,7 @@ import {
     getColor,
     getSdk,
     homeDirLog,
+    humanReadableDate,
     printObjectInfo,
     proxyLog,
     serviceCredentialLog,
@@ -448,6 +449,10 @@ function printUser(
     }) ${user.active ? "" : color("inactive")} [${groupColor((userGroups?.length || 0) + " groups")}, ${roleColor(
         (userRoles?.length || 0) + " roles"
     )}]`;
+
+    userInfo += ` Last Login: ${
+        (user as any).lastLogonTime ? humanReadableDate(new Date((user as any).lastLogonTime!)) : color("never")
+    }`;
 
     console.log(userInfo);
 
