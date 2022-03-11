@@ -185,7 +185,7 @@ async function listJobs(sdk: MindSphereSdk, options: any) {
 
         for (const job of jobs._embedded.deliveryJobs || []) {
             jobCount++;
-            console.log(`${job.id}  ${color(job.status)}  ${job.name || ""}  ${job.createdAt}}`);
+            console.log(`${job.id}  ${color(job.status)}  ${job.name || ""} ${job.createdAt}`);
 
             verboseLog(JSON.stringify(job, null, 2), options.verbose);
         }
