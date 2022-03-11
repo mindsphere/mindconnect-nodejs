@@ -12,6 +12,7 @@ import dataExchangeCommand from "./commands/data-exchange";
 import dataLakeCommand from "./commands/data-lake";
 import deleteAssetCommand from "./commands/delete-asset";
 import deleteFileCommand from "./commands/delete-file";
+import deliveryJobsCommand from "./commands/delivery-jobs";
 import downloadEventsCommand from "./commands/download-events";
 import eventTypesCommand from "./commands/event-types";
 import eventsCommand from "./commands/events";
@@ -98,8 +99,6 @@ agentStatusCommand(program);
 createAgentCommand(program);
 offboardCommand(program);
 renewAgentCommand(program);
-serviceCredentialsCommand(program);
-serviceTokenCommand(program);
 registerDiagnosticCommand(program);
 getDiagnosticCommand(program);
 unregisterDiagnoticCommand(program);
@@ -109,6 +108,8 @@ iotBulkDirCommand(program);
 iotBulkRunCommand(program);
 iotCheckBulkComand(program);
 iotDownloadBulkCommand(program);
+
+deliveryJobsCommand(program);
 
 // * assets files and event handling commands
 assetModelLockCommand(program);
@@ -148,6 +149,9 @@ deleteFileCommand(program);
 
 identityCommand(program);
 policyCommand(program);
+serviceCredentialsCommand(program);
+serviceTokenCommand(program);
+// tokenExchangeCommand(program);
 
 // * data lake
 dataLakeCommand(program);

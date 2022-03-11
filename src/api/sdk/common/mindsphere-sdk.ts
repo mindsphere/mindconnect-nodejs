@@ -1,6 +1,8 @@
+import { AdvancedTokenExchangeClient } from "../advanced-token/advanced-token";
 import { AgentManagementClient } from "../agent/agent-management";
 import { AnomalyDetectionClient } from "../anomaly-detection/anomaly-detection";
 import { AssetManagementClient } from "../asset/asset-management";
+import { CommandingClient } from "../commanding/commanding";
 import { DataExchangeClient } from "../data-exchange/data-exchange";
 import { DataLakeClient } from "../data-lake/data-lake";
 import { EventAnalyticsClient } from "../event-analytics/eventanalytics";
@@ -539,5 +541,34 @@ export class MindSphereSdk extends SdkClient {
         this._resourceAccessManagementClient =
             this._resourceAccessManagementClient || new ResourceAccessManagementClient(this._authenticator);
         return this._resourceAccessManagementClient;
+    }
+
+    private _commandingClient?: CommandingClient;
+
+    /**
+     * Commanding Client
+     *
+     * @returns {CommandingClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetCommandingClient(): CommandingClient {
+        this._commandingClient = this._commandingClient || new CommandingClient(this._authenticator);
+        return this._commandingClient;
+    }
+
+    private _advancedTokenExchangeClient?: AdvancedTokenExchangeClient;
+
+    /**
+     * Advanced Token Exchange Client
+     *
+     * @returns {AdvancedTokenExchangeClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetAdvancedTokenExchangeClient(): AdvancedTokenExchangeClient {
+        this._advancedTokenExchangeClient =
+            this._advancedTokenExchangeClient || new AdvancedTokenExchangeClient(this._authenticator);
+        return this._advancedTokenExchangeClient;
     }
 }

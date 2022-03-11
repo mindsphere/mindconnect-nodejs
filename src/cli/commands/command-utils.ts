@@ -1,5 +1,6 @@
 import * as chalk from "chalk";
 import { log } from "console";
+import { isAfter, isSameDay, subDays } from "date-fns";
 import * as updateNotifier from "update-notifier";
 import { FrontendAuth } from "../../api/frontend-auth";
 import { AssetManagementModels, MindSphereSdk } from "../../api/sdk";
@@ -365,4 +366,32 @@ export function printObjectInfo(
 
 export function isPrimitive(x: any) {
     return x !== Object(x);
+}
+
+export function humanReadableDate(comparisonDate: Date) {
+    const today = new Date();
+    const yesterday = subDays(today, 1);
+    const aWeekAgo = subDays(today, 7);
+    const twoWeeksAgo = subDays(today, 14);
+    const threeWeeksAgo = subDays(today, 21);
+
+    // Get the date in English locale to match English day of week keys
+    const compare = comparisonDate;
+
+    const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+
+    let result = "";
+    if (isSameDay(compare, today)) {
+        result = rtf.format(0, "day");
+    } else if (isSameDay(compare, yesterday)) {
+        result = rtf.format(-1, "day");
+    } else if (isAfter(compare, aWeekAgo)) {
+        result = rtf.format(0, "week");
+    } else if (isAfter(compare, twoWeeksAgo)) {
+        result = rtf.format(-1, "week");
+    } else if (isAfter(compare, threeWeeksAgo)) {
+        result = rtf.format(-2, "week");
+    }
+
+    return `${compare.toLocaleDateString()} ${result ? "(" + result + ") " : ""}`;
 }

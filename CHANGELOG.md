@@ -3,7 +3,12 @@
 ## 3.18.0 - (Hazelwood Vienna) - March 2022
 
 - SDK: ResourceAccessManagement Client [[#308](https://github.com/mindsphere/mindconnect-nodejs/issues/308)]
+- SDK: CommandingAPI - Commanding Client [[#307](https://github.com/mindsphere/mindconnect-nodejs/issues/307)]
 - CLI: new `mc policy` command to manage policies [[#308](https://github.com/mindsphere/mindconnect-nodejs/issues/308)]
+- CLI: new `mc delivery-jobs` command to manage mqtt delivery jobs [[#307](https://github.com/mindsphere/mindconnect-nodejs/issues/307)]
+- CLI: fixed double use of `as` shortcut in `mc aspects` and `mc agent-status` command. The `mc aspects` command now uses the `asp` shortcut.
+- CLI: added last login information to `mc iam --user` command
+- Bumped most depenedencies to `^` version.
 
 ## 3.17.0 - (Sandstone Vienna) - February 2022
 

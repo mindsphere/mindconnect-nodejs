@@ -76,7 +76,7 @@ interface JSONSchema {
 export default (program: Command) => {
     program
         .command("aspects")
-        .alias("as")
+        .alias("asp")
         .option(
             "-m, --mode [list|create|delete|convert|template|info]",
             "list | create | delete | convert | template | info",
