@@ -104,7 +104,10 @@ export default (program: Command) => {
                             color(
                                 `${sdk
                                     .GetGateway()
-                                    .replace("gateway", sdk.GetTenant() + "-operationsinsight")}/explore-assets/info?asset=${asset.assetId!}`
+                                    .replace(
+                                        "gateway",
+                                        sdk.GetTenant() + "-operationsinsight"
+                                    )}/explore-assets/info?asset=${asset.assetId!}`
                             )
                     );
                 } catch (err) {
@@ -120,5 +123,5 @@ export default (program: Command) => {
 };
 
 function checkRequiredParameters(options: any) {
-    !options.assetid && errorLog("you have to provide a assetid", true);
+    !options.assetid && errorLog("you have to provide an assetid", true);
 }

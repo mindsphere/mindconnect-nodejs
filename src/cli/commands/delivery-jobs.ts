@@ -88,9 +88,6 @@ export default (program: Command) => {
             log("\n  Examples:\n");
             log(`    mc delivery-jobs --mode list \t\t\t\t\t list all jobs`);
             log(
-                `    mc delivery-jobs --mode list --status FAILED --message import \t list all mqtt delivery jobs which failed on import`
-            );
-            log(
                 `    mc delivery-jobs --mode list --name <name> \t\t\t\t list all mqtt delivery jobs with the given name`
             );
             log(
@@ -117,7 +114,7 @@ async function createJob(options: any, sdk: MindSphereSdk) {
     const job = JSON.parse(file.toString());
 
     const result = await sdk.GetCommandingClient().PostDeliveryJob(job);
-    console.log(`created job ${color(result.id)} with status ${color(result.status)} and message \n`);
+    console.log(`created job ${color(result.id)} with status ${color(result.status)} \n`);
 }
 
 function createTemplate(options: any) {
