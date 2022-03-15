@@ -43,7 +43,6 @@
     "author": "@sn0wcat",
     "license": "MIT",
     "dependencies": {
-        "@mindconnect/mindconnect-nodejs": "file:mindconnect-mindconnect-nodejs-3.18.0.tgz",
         "ajv": "^8.10.0",
         "ajv-formats": "^2.1.1",
         "ajv-keywords": "^5.1.0",

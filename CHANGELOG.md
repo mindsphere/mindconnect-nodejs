@@ -1,8 +1,12 @@
 # Changelog
 
-## 3.18.1 - (Hazelwood Vienna) - March 2022
+## 3.18.2 - (Hazelwood Vienna) - March 2022
 
 - fixed missing date-fns dependency in package.json
+
+## 3.18.1 - (Hazelwood Vienna) - March 2022
+
+- broken dependency in package.json
 
 ## 3.18.0 - (Hazelwood Vienna) - March 2022
 
