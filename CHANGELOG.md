@@ -1,9 +1,9 @@
 # Changelog
 
-
 ## 3.18.1 - (Hazelwood Vienna) - March 2022
 
-- added fixed missing date-fns dependency in package.json
+- fixed missing date-fns dependency in package.json
+
 ## 3.18.0 - (Hazelwood Vienna) - March 2022
 
 - SDK: ResourceAccessManagement Client [[#308](https://github.com/mindsphere/mindconnect-nodejs/issues/308)]
