@@ -24,6 +24,7 @@ import iotBulkDirCommand from "./commands/iot-prepare-bulk-dir";
 import jobsCommand from "./commands/jobmanager-jobs";
 import scheduleCommand from "./commands/jobmanager-schedules";
 import kpicalculationCommand from "./commands/kpi-calculation";
+import markdownHelpCommand from "./commands/markdown-help";
 import agentStatusCommand from "./commands/mc-agent-status";
 import agentTokenCommand from "./commands/mc-agent-token";
 import agentAutoConfigCommand from "./commands/mc-automap";
@@ -110,6 +111,7 @@ iotCheckBulkComand(program);
 iotDownloadBulkCommand(program);
 
 deliveryJobsCommand(program);
+
 
 // * assets files and event handling commands
 assetModelLockCommand(program);
@@ -204,6 +206,10 @@ mqttCreateCommand(program);
 // * cli for starter projects
 starterTsCommand(program);
 starterJsCommand(program);
+
+// * markdown help command
+
+markdownHelpCommand(program);
 
 program.on("command:*", function () {
     console.error("Invalid command: %s\nSee --help for a list of available commands.", program.args.join(" "));
