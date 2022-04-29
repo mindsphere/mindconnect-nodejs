@@ -149,8 +149,17 @@ export class DataLakeClient extends SdkClient {
         const proxy = process.env.http_proxy || process.env.HTTP_PROXY;
         const proxyHttpAgent: any = proxy ? new HttpsProxyAgent(proxy) : null;
 
-        // x-ms-blob is necessary on eu2 and is ignored on eu1
-        const request: any = { method: "PUT", headers: { "x-ms-blob-type": "BlockBlob" }, agent: proxyHttpAgent };
+        let headers;
+
+        // in china the Object Storage Service needs Content-Type to be application/octet-stream
+        if (this.GetGateway().toLowerCase().includes("mindsphere-in.cn")) {
+            headers = { "Content-Type": "application/octet-stream" };
+        } else {
+            // x-ms-blob is necessary on eu2 and is ignored on eu1
+            headers = { "x-ms-blob-type": "BlockBlob" };
+        }
+
+        const request: any = { method: "PUT", headers: headers, agent: proxyHttpAgent };
         request.body = myBuffer;
         const response = await fetch(signedUrl, request);
         return response.headers;
