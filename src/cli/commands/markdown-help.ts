@@ -71,8 +71,6 @@ function extractExamples(cmd: Command) {
     return text;
 }
 
-function checkRequiredParameters(options: any) {}
-
 const commandTemplate = (name: string, description: string, help: string, examples: string) => {
     return `
 ---
