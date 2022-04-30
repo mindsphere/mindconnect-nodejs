@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.19.0 - (Dove Vienna) - April 2022
+
+- CLI: new `mdsp markdown-help` command to generate markdown help available at [opensource.mindsphere.io](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html#tab1anchor2)
+- SDK: Data Lake - added support for mindsphere data upload in CN1 (on alibaba cloud) [[#316](https://github.com/mindsphere/mindconnect-nodejs/issues/316)]
+- Bumped most depedencies
+
 ## 3.18.2 - (Hazelwood Vienna) - March 2022
 
 - fixed missing date-fns dependency in package.json

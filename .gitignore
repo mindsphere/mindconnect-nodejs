@@ -106,3 +106,6 @@ mindconnect-nodejs-win.exe
 
 # Webstorm
 .idea
+
+# markdown-help
+markdown-help/**

@@ -63,3 +63,6 @@ mindconnect-nodejs-win.exe
 
 # Spellchecker files
 .spelling
+
+# markdown-help
+markdown-help/**
