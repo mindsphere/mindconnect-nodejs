@@ -184,6 +184,9 @@ describe("[SDK] AnomalyDetectionClient", () => {
             "EUCLIDEAN",
             `xyz_${tenant}_${timeOffset}_ano_B`
         );
+
+        // console.log(JSON.stringify(model));
+
         model.should.not.be.undefined;
         model.should.not.be.null;
         (model as any).id.should.not.be.undefined;
@@ -202,11 +205,18 @@ describe("[SDK] AnomalyDetectionClient", () => {
                 author: "analytics-amm-client",
             }),
         });
+
+        // console.log(models);
+
         await sleep(3000);
 
         for await (const x of models.models || []) {
             if ((x as any)?.lastVersion?.io?.optionalParameters?.modelName?.startsWith("xyz")) {
-                await mm.DeleteModel(x.id!);
+                // broken model for some reason!
+
+                if (x?.id !== "05eab675-d968-4c48-a169-35af4c442975") {
+                    await mm.DeleteModel(x.id!);
+                }
             }
 
             await sleep(1000);
