@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.20.0 - (Spring Green Vienna) - June 2022
+
+- Bumped most depedencies
+
 ## 3.19.0 - (Dove Vienna) - April 2022
 
 - CLI: new `mdsp markdown-help` command to generate markdown help available at [opensource.mindsphere.io](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html#tab1anchor2)
