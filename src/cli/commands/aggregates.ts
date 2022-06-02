@@ -75,7 +75,14 @@ export default (program: Command) => {
             );
 
             log(
-                `    see https://documentation.mindsphere.io/MindSphere/apis/iot-iottsaggregates/api-iottsaggregates-samples-v4.html for documentation about the aggregate parameters`
+                `    mc aggregates --asssetid 1234567..ef --aspectname Environment --intervalunit hour --intervalvalue 2 \n\t\t\t\t\t\t\t\t\tlist all recent temperatre aggregates over every 2 hours`
+            );
+
+            log("\n  Important:\n");
+            log(
+                `    see ${color(
+                    "https://documentation.mindsphere.io/MindSphere/apis/iot-iottsaggregates/api-iottsaggregates-samples-v4.html"
+                )} for documentation about the aggregate parameters\n`
             );
 
             serviceCredentialLog();
