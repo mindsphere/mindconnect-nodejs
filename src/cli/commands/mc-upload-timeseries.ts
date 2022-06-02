@@ -13,7 +13,7 @@ const color = getColor("cyan");
 export default (program: Command) => {
     program
         .command("upload-timeseries")
-        .alias("ts")
+        .alias("uts")
         .option("-c, --config <agentconfig>", "config file with agent configuration", "agentconfig.json")
         .option(
             "-r, --cert [privatekey]",

@@ -2,6 +2,8 @@
 
 ## 3.20.0 - (Spring Green Vienna) - June 2022
 
+- added default value (`aggregates.mdsp.json`) for `mdsp aggregates --download` parameter
+- Created a new `mdsp timeseries` command to match the `mdsp aggregates` command. [#318](https://github.com/mindsphere/mindconnect-nodejs/issues/318)
 - Bumped most depedencies
 
 ## 3.19.0 - (Dove Vienna) - April 2022
