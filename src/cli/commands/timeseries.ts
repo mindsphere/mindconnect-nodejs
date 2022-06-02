@@ -81,7 +81,7 @@ export default (program: Command) => {
             );
 
             log(
-                `    mc timeseries --asssetid 1234567..ef --aspectname Environment --download \t download the recent timeseries data for the Environment aspect`
+                `    mc timeseries --asssetid 1234567..ef --aspectname Environment --download \n\t\t\t\t\t\t\t\t\tdownload the recent timeseries data for the Environment aspect`
             );
 
             log("\n  Important:\n");
@@ -102,7 +102,7 @@ async function listTimeSeries(options: any, sdk: MindSphereSdk) {
             from: fromDate,
             to: toDate,
             select: options.select,
-            limit: options.count || 1000,
+            limit: options.count || 2000,
         })
     );
 

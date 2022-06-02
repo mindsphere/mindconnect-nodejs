@@ -23,21 +23,26 @@ const red = getColor("red");
 const green = getColor("green");
 const cyan = getColor("cyan");
 
+const today = new Date();
+const yesterday = new Date();
+yesterday.setDate(yesterday.getDate() - 1);
+
 export default (program: Command) => {
     program
         .command("aggregates")
         .alias("ag")
         .option("-i, --assetid <assetid>", "mindsphere asset id ")
         .option("-n, --aspectname <aspectname>", "mindsphere aspect name")
-        .option("-f, --from <from>", "begining of the time range to read")
+        .option("-f, --from <from>", "begining of the time range to read", yesterday.toISOString())
         .option("-t, --to <to>", "end of the time range to read")
         .option("-r, --intervalvalue <intervalvalue>", "interval duration for the aggregates in interval units")
         .option("-u, --intervalunit <intervalunit>", "interval duration unit [minute |hour |day |week | month]")
         .option("-s, --select <select>", "comma separated list of variable names")
-        .option("-d, --download <download>", "download aggregates to specified file")
+        .option("-d, --download [download]", "download aggregates to specified file")
         .option("-a, --all", "show all aggregates not just average, min, max, sum and sd")
         .option("-l, --local", "use localtime in aggregate list")
         .option("-c, --count <count>", "number of aggregates in response ")
+        .option("-h, --formatted", "write JSON strings with indentation")
         .option("-p, --passkey <passkey>", `passkey`)
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
@@ -69,6 +74,10 @@ export default (program: Command) => {
                 `    mc aggregates --asssetid 1234567..ef --aspectname Environment --select Temperature --all \n\t\t\t\t\t\t\t\t\tlist all recent temperature aggregates`
             );
 
+            log(
+                `    see https://documentation.mindsphere.io/MindSphere/apis/iot-iottsaggregates/api-iottsaggregates-samples-v4.html for documentation about the aggregate parameters`
+            );
+
             serviceCredentialLog();
         });
 };
@@ -76,23 +85,29 @@ export default (program: Command) => {
 async function listAggregates(options: any, sdk: MindSphereSdk) {
     const aggregatesV4Client = sdk.GetTimeSeriesAggregateClientV4();
 
+    const fromDate = new Date(options.from).toISOString();
+    const toDate: string | undefined = options.to ? new Date(options.to).toISOString() : undefined;
+
     const aggregates = (await retry(options.retry, () =>
         aggregatesV4Client.GetAggregates({
             assetId: options.assetid,
             aspectName: options.aspectname,
-            from: options.from,
-            to: options.to,
-            intervalValue: options.intervalValue,
-            intervalUnit: options.intervalUnit,
+            from: fromDate,
+            to: toDate,
+            intervalValue: options.intervalvalue,
+            intervalUnit: options.intervalunit,
             select: options.select,
             count: options.count,
         })
     )) as TimeSeriesAggregateModelsV4.Aggregates;
 
     if (options.download) {
-        const download = options.download || "aggregates.mdsp.json";
+        const download = options.download === true ? "aggregates.mdsp.json" : options.download;
         const downloadPath = path.resolve(download);
-        fs.writeFileSync(downloadPath, JSON.stringify(aggregates));
+        fs.writeFileSync(
+            downloadPath,
+            options.formatted ? JSON.stringify(aggregates, null, 2) : JSON.stringify(aggregates)
+        );
         console.log(`The aggregates were downloaded to ${color(downloadPath)}.`);
         return;
     }
