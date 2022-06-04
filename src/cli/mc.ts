@@ -77,6 +77,7 @@ import signalValidationCommand from "./commands/signal-validation";
 import spectrumAnalysisCommand from "./commands/spectrum-analysis";
 import subtenantCommand from "./commands/subtenant";
 import tenantCommand from "./commands/tenant";
+import timeseriesCommand from "./commands/timeseries";
 import trendPredictionCommand from "./commands/trend-prediction";
 
 const program = new Command();
@@ -112,7 +113,6 @@ iotDownloadBulkCommand(program);
 
 deliveryJobsCommand(program);
 
-
 // * assets files and event handling commands
 assetModelLockCommand(program);
 assetInfoCommand(program);
@@ -123,6 +123,7 @@ eventTypesCommand(program);
 eventsCommand(program);
 downloadEventsCommand(program);
 aggregatesCommand(program);
+timeseriesCommand(program);
 notificationCommand(program);
 
 // * open-edge commands
