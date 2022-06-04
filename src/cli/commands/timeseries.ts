@@ -12,7 +12,6 @@ import {
     serviceCredentialLog,
     verboseLog,
 } from "./command-utils";
-import path = require("path");
 import fs = require("fs");
 import ora = require("ora");
 

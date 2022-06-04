@@ -10,7 +10,7 @@ import {
     homeDirLog,
     proxyLog,
     serviceCredentialLog,
-    verboseLog,
+    verboseLog
 } from "./command-utils";
 import path = require("path");
 import fs = require("fs");
@@ -23,7 +23,6 @@ const red = getColor("red");
 const green = getColor("green");
 const cyan = getColor("cyan");
 
-const today = new Date();
 const yesterday = new Date();
 yesterday.setDate(yesterday.getDate() - 1);
 
