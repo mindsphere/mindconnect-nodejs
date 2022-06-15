@@ -109,3 +109,7 @@ mindconnect-nodejs-win.exe
 
 # markdown-help
 markdown-help/**
+
+## downloaded assets models
+
+*.mdsp.assetmodel/**
