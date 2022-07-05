@@ -71,6 +71,27 @@ export class TokenManagerAuth extends AuthBase implements TokenRotation {
     }
 
     /**
+     * User Tenant
+     *
+     * @returns {string}
+     *
+     * @memberOf TokenManagerAuth
+     */
+    public GetUserTenant(): string {
+        return this._userTenant;
+    }
+
+    /**
+     * HostTenant
+     *
+     * @returns {string}
+     *
+     * @memberOf TokenManagerAuth
+     */
+    public GetHostTenant(): string {
+        return this._hostTenant;
+    }
+    /**
      * Creates an instance of TokenManagerAuth.
      * @param {string} _gateway
      * @param {string} _basicAuth

@@ -1,10 +1,12 @@
 # Changelog
 
-## 3.20.0 - (Spring Green Vienna) - June 2022
+## 3.20.0 - (Spring Green Vienna) - July 2022
 
-- added default value (`aggregates.mdsp.json`) for `mdsp aggregates --download` parameter
-- improved `mdsp aggregates` command. all parameters, including intervalunit and intervalvalue can be specified.
-- Created a new `mdsp timeseries` command to match the `mdsp aggregates` command. [#318](https://github.com/mindsphere/mindconnect-nodejs/issues/318)
+- SDK: added GetUserTenant() method to SDK Level read out the user tenant from the current configuration (if token manager authentication is used)
+- CLI: new mode `--mode tree` for `mdsp assets` command provides tree visualization of mindsphere assets in the tenant
+- CLI: added default value (`aggregates.mdsp.json`) for `mdsp aggregates --download` parameter
+- CLI: improved `mdsp aggregates` command. all parameters, including intervalunit and intervalvalue can be specified.
+- CLI: Created a new `mdsp timeseries` command to match the `mdsp aggregates` command. [#318](https://github.com/mindsphere/mindconnect-nodejs/issues/318)
 - Bumped most depedencies
 
 ## 3.19.0 - (Dove Vienna) - April 2022

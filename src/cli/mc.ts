@@ -114,6 +114,8 @@ iotDownloadBulkCommand(program);
 deliveryJobsCommand(program);
 
 // * assets files and event handling commands
+// TODO: @sn0wcat
+// assetModelCommand(program);
 assetModelLockCommand(program);
 assetInfoCommand(program);
 assetsCommand(program);

@@ -27,6 +27,13 @@ export abstract class SdkClient {
         return this._authenticator.GetTenant();
     }
 
+    public GetUserTenant(): string | undefined {
+        if (this._authenticator instanceof TokenManagerAuth) {
+            return this._authenticator.GetUserTenant();
+        }
+        return undefined;
+    }
+
     protected _authenticator: TokenRotation;
 
     public async HttpAction({
