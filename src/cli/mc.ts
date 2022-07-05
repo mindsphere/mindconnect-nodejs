@@ -5,7 +5,6 @@ import eventAnalyticsCommand from "./commands/analyze-events";
 import anomalydetectionCommand from "./commands/anomaly-detection";
 import aspectCommands from "./commands/aspect-commands";
 import assetInfoCommand from "./commands/asset-info";
-import assetModelCommand from "./commands/asset-model";
 import assetModelLockCommand from "./commands/asset-model-lock";
 import assetTypeCommand from "./commands/asset-types";
 import assetsCommand from "./commands/assets";
@@ -115,7 +114,8 @@ iotDownloadBulkCommand(program);
 deliveryJobsCommand(program);
 
 // * assets files and event handling commands
-assetModelCommand(program);
+// TODO: @sn0wcat
+// assetModelCommand(program);
 assetModelLockCommand(program);
 assetInfoCommand(program);
 assetsCommand(program);

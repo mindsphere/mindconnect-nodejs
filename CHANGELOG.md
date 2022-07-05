@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.20.0 - (Spring Green Vienna) - June 2022
+## 3.20.0 - (Spring Green Vienna) - July 2022
 
 - SDK: added GetUserTenant() method to SDK Level read out the user tenant from the current configuration (if token manager authentication is used)
 - CLI: new mode `--mode tree` for `mdsp assets` command provides tree visualization of mindsphere assets in the tenant
