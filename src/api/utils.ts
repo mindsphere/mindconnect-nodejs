@@ -2,6 +2,7 @@
 import * as crypto from "crypto";
 import * as fs from "fs";
 import * as os from "os";
+import { TreeItem } from "performant-array-to-tree";
 import { URL } from "url";
 import { TimeStampedDataPoint } from "..";
 import { IMindConnectConfiguration } from "./mindconnect-models";
@@ -326,7 +327,7 @@ export function addAndStoreConfiguration(configuration: any) {
     (!configuration || !configuration.credentials) && throwError("invalid configuration!");
     configuration.credentials.forEach((element: credentialEntry) => {
         element.gateway = isUrl(element.gateway) ? element.gateway : `https://gateway.${element.gateway}.mindsphere.io`;
-        newConfiguration.credentials.push(element.passkey ? encrypt(element) : ((element as unknown) as authJson));
+        newConfiguration.credentials.push(element.passkey ? encrypt(element) : (element as unknown as authJson));
     });
     checkList(newConfiguration.credentials);
     storeAuth(newConfiguration);
@@ -405,4 +406,14 @@ export function convertToDataPoints(
 export function isGuid(x: string): boolean {
     const guidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     return guidRegex.test(x);
+}
+
+export function printTree(treeItem: TreeItem, level: number, color: (x: string) => string) {
+    const prefix = level == 0 ? "" : "│   ".repeat(level) + "├─";
+
+    console.log(`${prefix}[${color(treeItem.data.assetId)}] ${treeItem.data.name} [${treeItem.data.typeId}]`);
+
+    treeItem.children.forEach((child: TreeItem) => {
+        printTree(child, level + 1, color);
+    });
 }

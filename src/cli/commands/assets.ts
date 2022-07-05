@@ -2,8 +2,9 @@ import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
+import { arrayToTree } from "performant-array-to-tree";
 import { AssetManagementModels, MindSphereSdk } from "../../api/sdk";
-import { retry } from "../../api/utils";
+import { printTree, retry } from "../../api/utils";
 import {
     adjustColor,
     errorLog,
@@ -21,7 +22,11 @@ export default (program: Command) => {
     program
         .command("assets")
         .alias("ast")
-        .option("-m, --mode [list|create|delete|template]", "mode [list | create | delete | template]", "list")
+        .option(
+            "-m, --mode [list|create|delete|template|tree]",
+            "mode [list | create | delete | template | tree]",
+            "list"
+        )
         .option("-f, --file <file>", ".mdsp.json file with asset definition")
         .option("-n, --assetname <assetname>", "assetname")
         .option("-p, --parentid <parentid>", "parentid")
@@ -53,6 +58,9 @@ export default (program: Command) => {
                             break;
                         case "list":
                             await listAssets(options, sdk);
+                            break;
+                        case "tree":
+                            await getTree(sdk);
                             break;
                         case "delete":
                             await deleteAsset(options, sdk);
@@ -135,6 +143,28 @@ export async function listAssets(options: any, sdk: MindSphereSdk) {
     } while (page++ < (assets.page.totalPages || 0));
 
     console.log(`${color(assetCount)} assets listed.\n`);
+}
+
+export async function getTree(sdk: MindSphereSdk, assetId?: string) {
+    const assetList: AssetManagementModels.AssetListResource[] = [];
+    const assetMgmt = sdk.GetAssetManagementClient();
+    let assets: AssetManagementModels.AssetListResource;
+    let page = 0;
+    do {
+        assets = await assetMgmt.GetAssets({ page: page, size: 2000 });
+
+        assets._embedded?.assets?.forEach((asset) => {
+            // ignore types coming from core or from shared tenants
+            assetList.push(asset);
+        });
+
+        page++;
+    } while (page < assets!.page!.totalPages!);
+
+    const tree = arrayToTree(assetList, { id: "assetId" });
+
+    console.log(tree[0]);
+    printTree(tree[0], 0, color);
 }
 
 function createTemplate(options: any, rootid: string, tenant: string) {
