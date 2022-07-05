@@ -5,7 +5,7 @@ import * as path from "path";
 import { arrayToTree } from "performant-array-to-tree";
 import * as util from "util";
 import { AssetManagementModels, MindSphereSdk } from "../../api/sdk";
-import { printTree } from "../../api/utils";
+import { printTree, throwError } from "../../api/utils";
 import {
     adjustColor,
     errorLog,
@@ -53,42 +53,36 @@ export default (program: Command) => {
                     homeDirLog(options.verbose, color);
                     proxyLog(options.verbose, color);
 
-                    getAssetTreeStructure(sdk);
-                    // console.log("HER");
-                    // process.exit(0);
+                    const model: ModelDefinition = {
+                        assetTypes: [],
+                        aspectTypes: [],
+                        assets: [],
+                        files: {},
+                    };
+                    const spinner = ora(`Downloading asset model of ${color(tenantName)} tenant`);
+                    !options.verbose && spinner.start();
 
-                    // const model: ModelDefinition = {
-                    //     assetTypes: [],
-                    //     aspectTypes: [],
-                    //     assets: [],
-                    //     files: {},
-                    // };
-                    // const spinner = ora(`Downloading asset model of ${color(tenantName)} tenant`);
-                    // !options.verbose && spinner.start();
+                    const directoryName = path.resolve(options.directory);
+                    fs.existsSync(directoryName) &&
+                        !options.overwrite &&
+                        throwError(`The folder ${directoryName} already exists. (use --overwrite to overwrite) `);
 
-                    // const directoryName = path.resolve(options.directory);
-                    // fs.existsSync(directoryName) &&
-                    //     !options.overwrite &&
-                    //     throwError(`The folder ${directoryName} already exists. (use --overwrite to overwrite) `);
+                    !fs.existsSync(directoryName) && fs.mkdirSync(directoryName);
 
-                    // !fs.existsSync(directoryName) && fs.mkdirSync(directoryName);
+                    await addAssetTypes(sdk, options, model, spinner);
+                    await addAspectTypes(sdk, options, model, spinner);
+                    await addAssets(sdk, options, model, spinner);
 
-                    // await addAssetTypes(sdk, options, model, spinner);
-                    // await addAspectTypes(sdk, options, model, spinner);
-                    // await addAssets(sdk, options, model, spinner);
+                    fs.writeFileSync(
+                        path.resolve(`${directoryName}/${tenantName}}.model.mdsp.json`),
+                        JSON.stringify(model, null, 2)
+                    );
 
-                    // console.log(arrayToTree(model.assets as unknown as TreeItem[]));
-
-                    // fs.writeFileSync(
-                    //     path.resolve(`${directoryName}/${tenantName}}.model.mdsp.json`),
-                    //     JSON.stringify(model, null, 2)
-                    // );
-
-                    // spinner.succeed(`Done. The asset model is in ${color(directoryName)} folder.`);
-                    // switch (options.mode) {
-                    //     default:
-                    //         throw Error(`no such option: ${options.mode}`);
-                    // }
+                    spinner.succeed(`Done. The asset model is in ${color(directoryName)} folder.`);
+                    switch (options.mode) {
+                        default:
+                            throw Error(`no such option: ${options.mode}`);
+                    }
                 } catch (err) {
                     errorLog(err, options.verbose);
                 }
