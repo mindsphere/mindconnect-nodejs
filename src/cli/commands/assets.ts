@@ -163,7 +163,7 @@ export async function getTree(sdk: MindSphereSdk, assetId?: string) {
 
     const tree = arrayToTree(assetList, { id: "assetId" });
 
-    console.log(tree[0]);
+    // console.log(tree[0]);
     printTree(tree[0], 0, color);
 }
 
