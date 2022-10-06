@@ -1,5 +1,9 @@
 
+
 <!-- markdownlint-disable MD033 MD041 -->
+<p align=center>
+<a href="https://github.com/mindsphere/mindconnect-nodejs/issues/330"><b>We are looking for Contributors and Maintainers!</b></a>
+</p>
 <p align="center">
 <img src="images/mindconnect-nodejs-new-logo.svg" alt="mindconnect-nodejs" width="300px"/>
 </p>
