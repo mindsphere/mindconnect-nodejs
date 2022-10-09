@@ -36,6 +36,7 @@ import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
 import { TenantManagementClient } from "../tenant/tenant-management";
 import { TrendPredictionClient } from "../trend/trend-prediction";
 import { UsageTransparencyClient } from "../utc/utc";
+import { WorkOrderManagementClient } from "../workorder/workorder";
 import { SdkClient } from "./sdk-client";
 
 /**
@@ -570,5 +571,20 @@ export class MindSphereSdk extends SdkClient {
         this._advancedTokenExchangeClient =
             this._advancedTokenExchangeClient || new AdvancedTokenExchangeClient(this._authenticator);
         return this._advancedTokenExchangeClient;
+    }
+
+    private _workOrderManagementClient?: WorkOrderManagementClient;
+
+    /**
+     * Work Order Management Client
+     *
+     * @returns {WorkOrderManagementClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetWorkOrderManagementClient(): WorkOrderManagementClient {
+        this._workOrderManagementClient =
+            this._workOrderManagementClient || new WorkOrderManagementClient(this._authenticator);
+        return this._workOrderManagementClient;
     }
 }
