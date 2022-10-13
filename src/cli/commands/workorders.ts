@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { log } from "console";
 import * as fs from "fs";
-import { MindSphereSdk } from "../../api/sdk";
+import { MindSphereSdk, WorkOrderModels } from "../../api/sdk";
 import { retry, throwError } from "../../api/utils";
 import {
     adjustColor,
@@ -12,7 +12,7 @@ import {
     printObjectInfo,
     proxyLog,
     serviceCredentialLog,
-    verboseLog
+    verboseLog,
 } from "./command-utils";
 import path = require("path");
 
@@ -31,7 +31,7 @@ export default (program: Command) => {
         )
         .option("-f, --file <file>", ".mdsp.json file with workorder definition", "workorder.mdsp.json")
         .option("-n, --workorder <workorder>", "the workorder name")
-        .option("-i, --workorderid <workorderid>", "the workorder id")
+        .option("-i, --handle <handle>", "the workorder id")
         .option("-o, --overwrite", "overwrite template file if it already exists")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
@@ -84,9 +84,9 @@ export default (program: Command) => {
             log(`    mc workorder --mode list \t\t\t\tlist all workorders`);
             log(`    mc workorder --mode template --workorder <workorder> \tcreate a template file for <workorder>`);
             log(`    mc workorder --mode create --file <workorder> \t\tcreate workorder `);
-            log(`    mc workorder --mode update --file <workorder> --workorderid <workorderid> \t update workorder `);
-            log(`    mc workorder --mode info --workorderid <workorderid> \tworkorder info for specified id`);
-            log(`    mc workorder --mode delete --workorderid <workorderid> \tdelete workorder with specified id`);
+            log(`    mc workorder --mode update --file <workorder> --handle <handle> \t update workorder `);
+            log(`    mc workorder --mode info --handle <handle> \tworkorder info for specified id`);
+            log(`    mc workorder --mode delete --handle <handle> \tdelete workorder with specified id`);
 
             serviceCredentialLog();
         });
@@ -104,26 +104,32 @@ async function updateWorkOrder(options: any, sdk: MindSphereSdk) {
     const filePath = path.resolve(options.file);
     const file = fs.readFileSync(filePath);
     const workorder = JSON.parse(file.toString());
-    const oldWorkOrder = await sdk.GetWorkOrderManagementClient().GetWorkOrder(options.workorderid);
-    const result = await sdk.GetWorkOrderManagementClient().PutWorkOrder(options.workorderid!, workorder);
+    await sdk.GetWorkOrderManagementClient().GetWorkOrder(options.handle);
+    const result = await sdk.GetWorkOrderManagementClient().PutWorkOrder(options.handle!, workorder);
     console.log(`updated workorder : ${color(result.woHandle)} message: ${color(result.message)}`);
 }
 
 function createTemplate(options: any, tenant: string) {
     const workorder = {
-        name: "WorkOrder",
-        description: "Created with MindSphere CLI",
-        active: true,
-        subjects: [`mdsp:core:identitymanagement:eu1:${tenant}:user:test@example.com`],
-        rules: [
+        notifyAssignee: false,
+        dueDate: "2021-11-25",
+        title: "templateWorkrder",
+        assignedTo: null,
+        priority: "LOW",
+        status: "OPEN",
+        type: "PLANNED",
+        description: "template",
+        attachments: [
             {
-                name: "Rule1",
-                comment:
-                    "see https://developer.mindsphere.io/apis/core-resourceaccessmanagement/api-resourceaccessmanagement-actions-list.html for actions",
-                actions: ["mdsp:core:assetmanagement:asset:read"],
-
-                resources: [`mdsp:core:assetmanagement:eu1:${tenant}:asset:dfb0d2961a224a259c44d8c3f76204fe`],
-                propagationDepth: -1,
+                name: "iris.csv",
+                assetId: "cb72dfd7400e4fc6a275f22e6751cce6",
+                path: "AA-019/2021-11-26T04:27:15.933Z",
+            },
+        ],
+        associations: [
+            {
+                id: "cb72dfd7400e4fc6a275f22e6751cce6",
+                type: "ASSET",
             },
         ],
     };
@@ -149,41 +155,37 @@ function writeworkorderToFile(options: any, workorder: any) {
 }
 
 async function deleteWorkOrder(options: any, sdk: MindSphereSdk) {
-    const id = options.workorderid;
+    const id = options.handle;
     await retry(options.retry, () => sdk.GetWorkOrderManagementClient().DeleteWorkOrder(id));
     console.log(`workorder with id ${color(id)} deleted.`);
 }
 
 async function listWorkOrders(sdk: MindSphereSdk, options: any) {
-    const workorders = [];
-    let startIndex = 0;
-    let count = 500;
-    let workorderPage;
+    const workorders = (await retry(options.retry, () =>
+        sdk.GetWorkOrderManagementClient().GetWorkOrders()
+    )) as WorkOrderModels.WorkOrderListResponse;
 
-    do {
-        workorderPage = await retry(options.retry, () => sdk.GetWorkOrderManagementClient().GetWorkOrders());
-        workorders.push(...workorderPage.workorders!);
-        startIndex += count;
-    } while (startIndex < (workorderPage.page?.totalElements || 1));
+    // console.log(workorders);
 
-    workorders.forEach((workorder) => {
+    console.log(
+        `${color("handle")} title type dueDate ${color("status")} priority createdBy ->  ${color("assignedTo")} `
+    );
+    workorders.workOrders?.forEach((workorder) => {
         console.log(
-            `${color(workorder.id)} ${color(workorder.name)} [${workorder.eTag}] ${
-                workorder.active ? green("active") : red("inactive")
-            }`
+            `${color(workorder.woHandle)} ${workorder.title} ${workorder.type} ${workorder.dueDate} ${color(
+                workorder.status
+            )} ${workorder.priority} ${workorder.createdBy} -> ${color(workorder.assignedTo || "<none>")}`
         );
     });
 
-    console.log(`${color(workorders.length)} workorders listed.\n`);
+    console.log(`${color(workorders.workOrders?.length || 0)} workorders listed.\n`);
 }
 
 async function workorderInfo(options: any, sdk: MindSphereSdk) {
-    const workorder = (await retry(options.retry, () =>
-        sdk.GetWorkOrderManagementClient().GetWorkOrder(options.workorderid)
-    ));
+    const workorder = await retry(options.retry, () => sdk.GetWorkOrderManagementClient().GetWorkOrder(options.handle));
     verboseLog(JSON.stringify(workorder, null, 2), options.verbose);
 
-    printObjectInfo("WorkOrder", workorder, options, ["owner", "id", "active"], color);
+    printObjectInfo("WorkOrder", workorder, options, ["woHandle", "id", "status", "type", "priority"], color);
 }
 
 function checkRequiredParamaters(options: any) {
@@ -195,14 +197,14 @@ function checkRequiredParamaters(options: any) {
         );
 
     options.mode === "delete" &&
-        !options.workorderid &&
-        errorLog("you have to provide the workorderid to delete (see mc workorder --help for more details)", true);
+        !options.handle &&
+        errorLog("you have to provide the handle to delete (see mc workorder --help for more details)", true);
 
     options.mode === "delete" &&
-        !options.workorderid &&
-        errorLog("you have to provide the workorderid to delete (see mc workorder --help for more details)", true);
+        !options.handle &&
+        errorLog("you have to provide the handle to delete (see mc workorder --help for more details)", true);
 
     options.mode === "info" &&
-        !options.workorderid &&
-        errorLog("you have to provide the workorderid (see mc workorder --help for more details)", true);
+        !options.handle &&
+        errorLog("you have to provide the handle (see mc workorder --help for more details)", true);
 }
