@@ -79,6 +79,7 @@ import subtenantCommand from "./commands/subtenant";
 import tenantCommand from "./commands/tenant";
 import timeseriesCommand from "./commands/timeseries";
 import trendPredictionCommand from "./commands/trend-prediction";
+import workOrdersCommand from "./commands/workorders";
 
 const program = new Command();
 
@@ -182,6 +183,7 @@ mobileAppInstancesCommand(program);
 // * messageBroker Command
 
 messageBrokerCommand(program);
+workOrdersCommand(program);
 
 // * analytics command
 
