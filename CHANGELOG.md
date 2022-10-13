@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.21.0 - Sunset Orange Vienna - October 2022
+
+- SDK: workorder management client
+- CLI: `mdsp workorder` command
+- Bumped most dependencies
+
 ## 3.20.0 - (Spring Green Vienna) - July 2022
 
 - SDK: added GetUserTenant() method to SDK Level read out the user tenant from the current configuration (if token manager authentication is used)

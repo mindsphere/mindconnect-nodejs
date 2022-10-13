@@ -1,5 +1,4 @@
 
-
 <!-- markdownlint-disable MD033 MD041 -->
 <p align=center>
 <a href="https://github.com/mindsphere/mindconnect-nodejs/issues/330"><b>We are looking for Contributors and Maintainers!</b></a>
@@ -365,6 +364,7 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 | Asset Management   | :heavy_check_mark: | :heavy_check_mark: |
 | Event Management   | :heavy_check_mark: | :heavy_check_mark: |
 | Notification   | :heavy_check_mark: | :heavy_check_mark: |
+| WorkOrder Management   | :heavy_check_mark: | :heavy_check_mark: |
 
 ### Analytics Services
 
