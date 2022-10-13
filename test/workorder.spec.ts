@@ -15,12 +15,12 @@ describe("[SDK] WorkOrderManagementClient", () => {
         await deleteWorkorders(sdk);
     });
 
-    it.only("should instantiate", async () => {
+    it("should instantiate", async () => {
         const client = sdk.GetWorkOrderManagementClient();
         client.should.not.be.undefined;
     });
 
-    it.only("should get workorders", async () => {
+    it("should get workorders", async () => {
         const client = sdk.GetWorkOrderManagementClient();
 
         const workorders = await client.GetWorkOrders();
@@ -28,7 +28,7 @@ describe("[SDK] WorkOrderManagementClient", () => {
         // console.log(workorders);
     });
 
-    it.only("should create update and delete workorder", async () => {
+    it("should create update and delete workorder", async () => {
         const client = sdk.GetWorkOrderManagementClient();
 
         const workorder = {
@@ -56,7 +56,7 @@ describe("[SDK] WorkOrderManagementClient", () => {
         await client.DeleteWorkOrder(status.woHandle!);
     });
 
-    it.only("should create attachment", async () => {
+    it("should create attachment", async () => {
         const client = sdk.GetWorkOrderManagementClient();
 
         const workorder = {
