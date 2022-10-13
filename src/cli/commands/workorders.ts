@@ -17,8 +17,6 @@ import {
 import path = require("path");
 
 let color = getColor("magenta");
-const green = getColor("green");
-const red = getColor("red");
 
 export default (program: Command) => {
     program
