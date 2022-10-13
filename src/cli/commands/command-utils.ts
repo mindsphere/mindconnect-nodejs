@@ -1,11 +1,12 @@
 import * as chalk from "chalk";
 import { log } from "console";
 import { isAfter, isSameDay, subDays } from "date-fns";
-import * as updateNotifier from "update-notifier";
 import { FrontendAuth } from "../../api/frontend-auth";
 import { AssetManagementModels, MindSphereSdk } from "../../api/sdk";
 import { decrypt, getHomeDotMcDir, loadAuth } from "../../api/utils";
 import { MC_NAME, MC_VERSION } from "../../version";
+
+const updateNotifier = require("update-notifier");
 
 const magenta = getColor("magenta");
 const yellow = getColor("yellow");
