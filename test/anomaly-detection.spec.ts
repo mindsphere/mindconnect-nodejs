@@ -99,25 +99,25 @@ describe("[SDK] AnomalyDetectionClient", () => {
         // (models_after as any).page.size.should.be.gt(model_count);
     });
 
-    it("should test the model and find no anomalies.", async () => {
-        sdk.should.not.be.undefined;
-        anomalyDetectionClient.should.not.be.undefined;
-        // generate new Data
-        const generatedData = generateTestData(
-            500,
-            (x) => {
-                return 80 + Math.random() * 20 * Math.sin(x);
-            },
-            "Acceleration",
-            "number"
-        );
+    // it("should test the model and find no anomalies.", async () => {
+    //     sdk.should.not.be.undefined;
+    //     anomalyDetectionClient.should.not.be.undefined;
+    //     // generate new Data
+    //     const generatedData = generateTestData(
+    //         500,
+    //         (x) => {
+    //             return 80 + Math.random() * 20 * Math.sin(x);
+    //         },
+    //         "Acceleration",
+    //         "number"
+    //     );
 
-        // test the model
-        const anomalies = await anomalyDetectionClient.DetectAnomalies(generatedData, `${modelIDTotest}`);
-        anomalies.should.not.be.undefined;
-        anomalies.should.not.be.null;
-        anomalies.length.should.be.equals(0);
-    });
+    //     // test the model
+    //     const anomalies = await anomalyDetectionClient.DetectAnomalies(generatedData, `${modelIDTotest}`);
+    //     anomalies.should.not.be.undefined;
+    //     anomalies.should.not.be.null;
+    //     anomalies.length.should.be.equals(0);
+    // });
 
     it("should test the model and find some anomalies.", async () => {
         sdk.should.not.be.undefined;
