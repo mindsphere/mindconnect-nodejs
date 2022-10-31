@@ -36,6 +36,7 @@ import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
 import { TenantManagementClient } from "../tenant/tenant-management";
 import { TrendPredictionClient } from "../trend/trend-prediction";
 import { UsageTransparencyClient } from "../utc/utc";
+import { VisualFlowCreatorClient } from "../vfc/vfc";
 import { WorkOrderManagementClient } from "../workorder/workorder";
 import { SdkClient } from "./sdk-client";
 
@@ -586,5 +587,20 @@ export class MindSphereSdk extends SdkClient {
         this._workOrderManagementClient =
             this._workOrderManagementClient || new WorkOrderManagementClient(this._authenticator);
         return this._workOrderManagementClient;
+    }
+
+    private _visualFlowCreatorClient?: VisualFlowCreatorClient;
+
+    /**
+     * Visual Flow Creator Client
+     *
+     * @returns {VisualFlowCreatorClient}
+     *
+     * @memberOf MindSphereSdk
+     */
+    public GetVisualFlowCreatorClient(): VisualFlowCreatorClient {
+        this._visualFlowCreatorClient =
+            this._visualFlowCreatorClient || new VisualFlowCreatorClient(this._authenticator);
+        return this._visualFlowCreatorClient;
     }
 }
