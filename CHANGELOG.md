@@ -2,6 +2,7 @@
 
 ## 3.22.0 - Tuscan Sun Vienna - November 2022
 
+- SDK: Visual Flow Creator Client [#334]
 - Fixed Unit Tests
 
 ## 3.21.0 - Sunset Orange Vienna - October 2022
