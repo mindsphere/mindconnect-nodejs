@@ -66,13 +66,126 @@ export class VisualFlowCreatorClient extends SdkClient {
      * Returns a list of projects of the given user. If no user is specified, an error will be returned.
      * @memberOf VisualFlowCreatorClient
      */
-    public async GetProjects(params: { userId: string }): Promise<VisualFlowCreatorModels.Project> {
+    public async GetProjects(params: { userId: string }): Promise<VisualFlowCreatorModels.Projects> {
         const result = await this.HttpAction({
             verb: "GET",
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
-            baseUrl: `${this._baseUrl}/projects/${toQueryString(params)}`,
+            baseUrl: `${this._baseUrl}/projects?${toQueryString(params)}`,
+        });
+        return result as VisualFlowCreatorModels.Projects;
+    }
+
+    /**
+     * * Projects
+     *
+     * Create new project.
+     *
+     * Creates a project with the provided project name.
+     * If no name is given in the request, then an error will be returned. The userId parameter is required. The name default is not allowed to be used.
+     *
+     * @param {VisualFlowCreatorModels.ProjectName} project
+     * Name of the project
+     * @param {{ userId: string }} params
+     * The id of the user. Usually this is the user's email address.
+     * If this parameter does not exist the API tries to extract it from the impersonated token.
+     * @returns {Promise<VisualFlowCreatorModels.Project>}
+     *
+     * @memberOf VisualFlowCreatorClient
+     */
+    public async PostProject(
+        project: VisualFlowCreatorModels.ProjectName,
+        params: { userId: string }
+    ): Promise<VisualFlowCreatorModels.Project> {
+        const result = await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            body: project,
+            baseUrl: `${this._baseUrl}/projects?${toQueryString(params)}`,
         });
         return result as VisualFlowCreatorModels.Project;
+    }
+
+    /**
+     * * Projects
+     *
+     * Rename a project
+     *
+     * Update the project properties of the project with project id id and user user. Currently only the name property can be updated (so currently PATCH can be used to rename projects).
+     *
+     * @param {string} id
+     * id of a project
+     * @param {VisualFlowCreatorModels.ProjectName} project
+     * project name in
+     * @param {{ userId: string }} params
+     * The id of the user. Usually this is the user's email address.
+     * If this parameter does not exist the API tries to extract it from the impersonated token.
+     * @returns {Promise<VisualFlowCreatorModels.Project>}
+     *
+     * @memberOf VisualFlowCreatorClient
+     */
+    public async PatchProject(
+        id: string,
+        project: VisualFlowCreatorModels.ProjectName,
+        params: { userId: string }
+    ): Promise<VisualFlowCreatorModels.Project> {
+        const result = await this.HttpAction({
+            verb: "PATCH",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            body: project,
+            baseUrl: `${this._baseUrl}/projects/${id}?${toQueryString(params)}`,
+        });
+        return result as VisualFlowCreatorModels.Project;
+    }
+
+    /**
+     * * Projects
+     *
+     * Read the project.
+     *
+     * Read the specified project information belonging to the specified user.
+     * The project information consists of the id, name, user and tenant. To get the nodes which belong to the project, use the "nodes" endpoint
+     * @param {string} id
+     * project id
+     * @param {{ userId: string }} params
+     * The id of the user. Usually this is the user's email address.
+     * If this parameter does not exist the API tries to extract it from the impersonated token.
+     * @returns {Promise<VisualFlowCreatorModels.Project>}
+     *
+     * @memberOf VisualFlowCreatorClient
+     */
+    public async GetProject(id: string, params: { userId: string }): Promise<VisualFlowCreatorModels.Project> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/projects/${id}?${toQueryString(params)}`,
+        });
+
+        return result as VisualFlowCreatorModels.Project;
+    }
+
+    /**
+     * * Projects
+     *
+     * Delete the project
+     *
+     * @param {string} id
+     * project id
+     * @param {{ userId: string }} params
+     * The id of the user. Usually this is the user's email address.
+     * If this parameter does not exist the API tries to extract it from the impersonated token.
+     * @memberOf VisualFlowCreatorClient
+     */
+    public async DeleteProject(id: string, params: { userId: string }) {
+        await this.HttpAction({
+            verb: "DELETE",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            noResponse: true,
+            baseUrl: `${this._baseUrl}/projects/${id}?${toQueryString(params)}`,
+        });
     }
 }
