@@ -188,4 +188,91 @@ export class VisualFlowCreatorClient extends SdkClient {
             baseUrl: `${this._baseUrl}/projects/${id}?${toQueryString(params)}`,
         });
     }
+
+    /**
+     * * Nodes
+     * Read all nodes of the specified project.
+     * After getting the nodes you can inspect them, import them into new projects (see PUT endpoint) or transfer them to a different tenant.
+     *
+     * @param {string} id
+     * project id
+     * @param {{ userId: string }} params
+     * @returns {Promise<VisualFlowCreatorModels.NodesArray>}
+     *
+     * @memberOf VisualFlowCreatorClient
+     */
+    public async GetProjecNodes(id: string, params: { userId: string }): Promise<VisualFlowCreatorModels.NodesArray> {
+        const result = await this.HttpAction({
+            verb: "GET",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            baseUrl: `${this._baseUrl}/projects/${id}/nodes?${toQueryString(params)}`,
+        });
+
+        return result as VisualFlowCreatorModels.NodesArray;
+    }
+
+    /**
+     * * Nodes
+     *
+     * Create nodes or replace existing nodes belonging to a project with new nodes. When executing this request,
+     * all existing nodes of the project will be removed. All the nodes included in the request will be added to the project.
+     *
+     * @param {string} id
+     * project id
+     * @param {VisualFlowCreatorModels.NodesArray} nodes
+     * list of nodes
+     *
+     * @param {{ userId: string }} params
+     *  The id of the user. Usually this is the user's email address.
+     * If this parameter does not exist the API tries to extract it from the impersonated token.
+     * @returns
+     *
+     * @memberOf VisualFlowCreatorClient
+     */
+    public async PutProjectNodes(id: string, nodes: VisualFlowCreatorModels.NodesArray, params: { userId: string }) {
+        await this.HttpAction({
+            verb: "PUT",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            body: nodes,
+            baseUrl: `${this._baseUrl}/projects/${id}/nodes?${toQueryString(params)}`,
+            noResponse: true,
+        });
+    }
+
+    /**
+     * * Flow
+     *
+     * When calling this endpoint with a node id of a node of type inject, t
+     * his inject node gets triggered and starts the flow.
+     * Subsequent nodes of the inject node will receive the message created by the inject node and can again send messages to subsequent nodes.
+     *
+     * @param {string} id
+     * project id
+     * @param {string} nodeId
+     * id of the inject Node
+     * @param {VisualFlowCreatorModels.TriggerNode} triggerNode
+     * the message to be sent
+     * @example {"topic": "MyTopic","payload": 1660739931990,"_msgid": "8d015cc1.c4418","_starttime": 1660739931990}
+     * @param {{ userId: string }} params
+     * The id of the user. Usually this is the user's email address.
+     * If this parameter does not exist the API tries to extract it from the impersonated token.
+     * @memberOf VisualFlowCreatorClient
+     */
+    public async TriggerFlow(
+        id: string,
+        nodeId: string,
+        triggerNode: VisualFlowCreatorModels.TriggerNode,
+        params: { userId: string }
+    ) {
+        await this.HttpAction({
+            verb: "POST",
+            gateway: this.GetGateway(),
+            authorization: await this.GetToken(),
+            body: triggerNode,
+            baseUrl: `${this._baseUrl}/projects/${id}/nodes/${nodeId}/trigger?${toQueryString(params)}`,
+            noResponse: true,
+        });
+    }
 }
