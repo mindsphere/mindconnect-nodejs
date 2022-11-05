@@ -365,6 +365,7 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 | Event Management   | :heavy_check_mark: | :heavy_check_mark: |
 | Notification   | :heavy_check_mark: | :heavy_check_mark: |
 | WorkOrder Management   | :heavy_check_mark: | :heavy_check_mark: |
+| Visual Flow Creator    | :heavy_check_mark: | :heavy_check_mark: |
 
 ### Analytics Services
 
