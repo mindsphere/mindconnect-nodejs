@@ -79,12 +79,12 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc workorder --mode list \t\t\t\tlist all workorders`);
-            log(`    mc workorder --mode template --workorder <workorder> \tcreate a template file for <workorder>`);
-            log(`    mc workorder --mode create --file <workorder> \t\tcreate workorder `);
-            log(`    mc workorder --mode update --file <workorder> --handle <handle> \t update workorder `);
-            log(`    mc workorder --mode info --handle <handle> \tworkorder info for specified id`);
-            log(`    mc workorder --mode delete --handle <handle> \tdelete workorder with specified id`);
+            log(`    mdsp workorder --mode list \t\t\t\tlist all workorders`);
+            log(`    mdsp workorder --mode template --workorder <workorder> \tcreate a template file for <workorder>`);
+            log(`    mdsp workorder --mode create --file <workorder> \t\tcreate workorder `);
+            log(`    mdsp workorder --mode update --file <workorder> --handle <handle> \t update workorder `);
+            log(`    mdsp workorder --mode info --handle <handle> \tworkorder info for specified id`);
+            log(`    mdsp workorder --mode delete --handle <handle> \tdelete workorder with specified id`);
 
             serviceCredentialLog();
         });
@@ -148,7 +148,7 @@ function writeworkorderToFile(options: any, workorder: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc workorder --mode create --file ${fileName} \n\nto create the workorder`
+        )} run \n\n\tmdsp workorder --mode create --file ${fileName} \n\nto create the workorder`
     );
 }
 
@@ -190,19 +190,19 @@ function checkRequiredParamaters(options: any) {
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with workorder definition to create an workorder (see mc workorder --help for more details)",
+            "you have to provide a file with workorder definition to create an workorder (see mdsp workorder --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.handle &&
-        errorLog("you have to provide the handle to delete (see mc workorder --help for more details)", true);
+        errorLog("you have to provide the handle to delete (see mdsp workorder --help for more details)", true);
 
     options.mode === "delete" &&
         !options.handle &&
-        errorLog("you have to provide the handle to delete (see mc workorder --help for more details)", true);
+        errorLog("you have to provide the handle to delete (see mdsp workorder --help for more details)", true);
 
     options.mode === "info" &&
         !options.handle &&
-        errorLog("you have to provide the handle (see mc workorder --help for more details)", true);
+        errorLog("you have to provide the handle (see mdsp workorder --help for more details)", true);
 }

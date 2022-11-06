@@ -128,12 +128,12 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc uf -f CHANGELOG.md   \t\t\t\t\t\t\t upload file CHANGELOG.md to the agent`);
+            log(`    mdsp uf -f CHANGELOG.md   \t\t\t\t\t\t\t upload file CHANGELOG.md to the agent`);
             log(
-                `    mc upload-file --file  CHANGELOG.md  --assetid 5...f --mime text/plain \t upload file to a specified asset with custom mime type`
+                `    mdsp upload-file --file  CHANGELOG.md  --assetid 5...f --mime text/plain \t upload file to a specified asset with custom mime type`
             );
             log(
-                `    mc upload-file --file  CHANGELOG.md  --chunked \t\t\t\t upload file using experimental chunked upload`
+                `    mdsp upload-file --file  CHANGELOG.md  --chunked \t\t\t\t upload file using experimental chunked upload`
             );
         });
 };
@@ -166,7 +166,7 @@ export async function getMindConnectAgent(assetid: any, options: any, spinner: a
 
 function checkParameters(options: any) {
     !options.file &&
-        errorLog("Missing file name for upload-file command. Run mc uf --help for full syntax and examples.", true);
+        errorLog("Missing file name for upload-file command. Run mdsp uf --help for full syntax and examples.", true);
     !options.config &&
         !options.assetid &&
         errorLog(" You have to specify assetid when using service credential upload", true);

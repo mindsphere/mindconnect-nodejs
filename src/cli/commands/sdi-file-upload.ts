@@ -72,11 +72,11 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc sdi-file-upload --file <file> \t\t\t upload file to SDI`);
+            log(`    mdsp sdi-file-upload --file <file> \t\t\t upload file to SDI`);
             log(`\n  Restriction:\n`);
             log(`    This works only for SDI only tenants (without Integrated Data Lake)`);
             log(
-                `    If you are MindSphere Integrated Data Lake Customer use mc data-lake --mode upload command instead. `
+                `    If you are MindSphere Integrated Data Lake Customer use mdsp data-lake --mode upload command instead. `
             );
             serviceCredentialLog();
         });
@@ -85,7 +85,7 @@ export default (program: Command) => {
 function checkParameters(options: any) {
     !options.file &&
         errorLog(
-            "Missing file name for sdi-file-upload command. Run mc sdi-file-upload --help for full syntax and examples.",
+            "Missing file name for sdi-file-upload command. Run mdsp sdi-file-upload --help for full syntax and examples.",
             true
         );
 }

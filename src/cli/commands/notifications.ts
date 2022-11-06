@@ -69,10 +69,10 @@ export default (program: Command) => {
 function printHelp() {
     log("\n  Examples:\n");
     log(
-        `    mc notifications --mode template --type [mail|sms|push] \t create template file with notification metadata`
+        `    mdsp notifications --mode template --type [mail|sms|push] \t create template file with notification metadata`
     );
     log(
-        `    mc notifications --mode send --metadata <[mail|sms|push].metadata.mdsp.json> --type [mail|sms|push] \n\t\t\t\t\t send notifications (mail, sms, push) to recipients`
+        `    mdsp notifications --mode send --metadata <[mail|sms|push].metadata.mdsp.json> --type [mail|sms|push] \n\t\t\t\t\t send notifications (mail, sms, push) to recipients`
     );
     serviceCredentialLog();
 }
@@ -128,7 +128,7 @@ async function createTemplate(options: any) {
     console.log(
         `The ${options.mode} metadata was written into ${color(
             fileName
-        )}. Run \n\n\t mc notifications --mode send --metadata ${fileName} --type ${options.type} \n\nto send ${color(
+        )}. Run \n\n\t mdsp notifications --mode send --metadata ${fileName} --type ${options.type} \n\nto send ${color(
             options.type
         )} notifications.`
     );
@@ -175,7 +175,7 @@ async function sendMessage(options: any, sdk: MindSphereSdk) {
     verboseLog(JSON.stringify(result, null, 2), options.verbose);
     console.log(`the ${color(options.type)} notification job with id ${result.id} was created`);
     console.log(
-        `Run \n\n\t mc notifications --mode status --jobid ${result.id} --type ${
+        `Run \n\n\t mdsp notifications --mode status --jobid ${result.id} --type ${
             options.type
         } \n\nto check the status of the ${color(options.type)} job.`
     );
@@ -232,17 +232,17 @@ async function getStatus(options: any, sdk: MindSphereSdk) {
 function checkRequiredParameters(options: any) {
     options.mode === "status" &&
         !options.jobid &&
-        errorLog("You have to specify the job id for mc nt --mode status command ", true);
+        errorLog("You have to specify the job id for mdsp nt --mode status command ", true);
 
     options.mode === "status" &&
         !options.type &&
-        errorLog("You have to specify the job id for mc nt --mode status command ", true);
+        errorLog("You have to specify the job id for mdsp nt --mode status command ", true);
 
     options.mode === "send" &&
         !options.type &&
-        errorLog("You have to specify the --type [email|sms|push] option for mc nt --mode send command ", true);
+        errorLog("You have to specify the --type [email|sms|push] option for mdsp nt --mode send command ", true);
 
     options.mode === "send" &&
         !options.metadata &&
-        errorLog("You have to specify the template file (--metadata path) for mc nt --mode send command ", true);
+        errorLog("You have to specify the template file (--metadata path) for mdsp nt --mode send command ", true);
 }

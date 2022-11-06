@@ -62,9 +62,9 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc agent-token   \t\t\t\tuses default ${color("agentconfig.json")}`);
-            log(`    mc agent-token --config agent.json \t\tuses specified configuration file`);
-            log(`    mc agent-token --cert private.key \t\tuses specified key for RSA_3072 profile`);
-            log(`    mc agent-token --verbose \t\t\tdisplays encoded and decoded version of the token`);
+            log(`    mdsp agent-token   \t\t\t\tuses default ${color("agentconfig.json")}`);
+            log(`    mdsp agent-token --config agent.json \t\tuses specified configuration file`);
+            log(`    mdsp agent-token --cert private.key \t\tuses specified key for RSA_3072 profile`);
+            log(`    mdsp agent-token --verbose \t\t\tdisplays encoded and decoded version of the token`);
         });
 };

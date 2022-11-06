@@ -58,8 +58,8 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log(`\n  Examples:\n`);
-            log(`    mc rd -k mypasskey`);
-            log(`    mc register-diagnostic --config someagent.json -passkey mypasskey`);
+            log(`    mdsp rd -k mypasskey`);
+            log(`    mdsp register-diagnostic --config someagent.json -passkey mypasskey`);
             serviceCredentialLog();
         });
 };

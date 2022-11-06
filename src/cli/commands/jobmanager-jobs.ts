@@ -73,15 +73,15 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc jobs --mode list \t\t\t\t\t list all jobs`);
-            log(`    mc jobs --mode list --status FAILED --message import \t list all jobs which failed on import`);
-            log(`    mc jobs --mode list --modelid <modelid> \t\t\t list all jobs for specified model`);
-            log(`    mc jobs --mode list --modelid <modelid> \t\t\t list all jobs for specified model`);
-            log(`    mc jobs --mode list --modelid <modelid> \t\t\t list all jobs for specified model`);
-            log(`    mc jobs --mode template \t\t\t\t\t create template file for job creation`);
-            log(`    mc jobs --mode create --file <templatefile> \t\t create job`);
-            log(`    mc jobs --mode info --jobid <jobid> \t\t\t get infos about the job`);
-            log(`    mc jobs --mode stop --jobid <jobid> \t\t\t stop job with job id`);
+            log(`    mdsp jobs --mode list \t\t\t\t\t list all jobs`);
+            log(`    mdsp jobs --mode list --status FAILED --message import \t list all jobs which failed on import`);
+            log(`    mdsp jobs --mode list --modelid <modelid> \t\t\t list all jobs for specified model`);
+            log(`    mdsp jobs --mode list --modelid <modelid> \t\t\t list all jobs for specified model`);
+            log(`    mdsp jobs --mode list --modelid <modelid> \t\t\t list all jobs for specified model`);
+            log(`    mdsp jobs --mode template \t\t\t\t\t create template file for job creation`);
+            log(`    mdsp jobs --mode create --file <templatefile> \t\t create job`);
+            log(`    mdsp jobs --mode info --jobid <jobid> \t\t\t get infos about the job`);
+            log(`    mdsp jobs --mode stop --jobid <jobid> \t\t\t stop job with job id`);
             serviceCredentialLog();
         });
 };
@@ -119,7 +119,7 @@ function writejobToFile(options: any, job: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc jobs --mode create --file ${fileName} \n\nto create the job`
+        )} run \n\n\tmdsp jobs --mode create --file ${fileName} \n\nto create the job`
     );
 }
 
@@ -203,21 +203,21 @@ function checkRequiredParamaters(options: any) {
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with job parameters to create an job (see mc jobs --help for more details)",
+            "you have to provide a file with job parameters to create an job (see mdsp jobs --help for more details)",
             true
         );
 
     options.mode === "stop" &&
         !options.jobid &&
         errorLog(
-            "you have to provide the jobid of the job you want to stop (see mc jobs --help for more details)",
+            "you have to provide the jobid of the job you want to stop (see mdsp jobs --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.jobid &&
         errorLog(
-            "you have to provide the jobid to get infos about the job (see mc jobs --help for more details)",
+            "you have to provide the jobid to get infos about the job (see mdsp jobs --help for more details)",
             true
         );
 }

@@ -81,12 +81,12 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc policy --mode list \t\t\t\tlist all policies`);
-            log(`    mc policy --mode template --policy <policy> \tcreate a template file for <policy>`);
-            log(`    mc policy --mode create --file <policy> \t\tcreate policy `);
-            log(`    mc policy --mode update --file <policy> --policyid <policyid> \t update policy `);
-            log(`    mc policy --mode info --policyid <policyid> \tpolicy info for specified id`);
-            log(`    mc policy --mode delete --policyid <policyid> \tdelete policy with specified id`);
+            log(`    mdsp policy --mode list \t\t\t\tlist all policies`);
+            log(`    mdsp policy --mode template --policy <policy> \tcreate a template file for <policy>`);
+            log(`    mdsp policy --mode create --file <policy> \t\tcreate policy `);
+            log(`    mdsp policy --mode update --file <policy> --policyid <policyid> \t update policy `);
+            log(`    mdsp policy --mode info --policyid <policyid> \tpolicy info for specified id`);
+            log(`    mdsp policy --mode delete --policyid <policyid> \tdelete policy with specified id`);
 
             serviceCredentialLog();
         });
@@ -146,7 +146,7 @@ function writepolicyToFile(options: any, policy: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc policy --mode create --file ${fileName} \n\nto create the policy`
+        )} run \n\n\tmdsp policy --mode create --file ${fileName} \n\nto create the policy`
     );
 }
 
@@ -194,19 +194,19 @@ function checkRequiredParamaters(options: any) {
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with policy definition to create an policy (see mc policy --help for more details)",
+            "you have to provide a file with policy definition to create an policy (see mdsp policy --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.policyid &&
-        errorLog("you have to provide the policyid to delete (see mc policy --help for more details)", true);
+        errorLog("you have to provide the policyid to delete (see mdsp policy --help for more details)", true);
 
     options.mode === "delete" &&
         !options.policyid &&
-        errorLog("you have to provide the policyid to delete (see mc policy --help for more details)", true);
+        errorLog("you have to provide the policyid to delete (see mdsp policy --help for more details)", true);
 
     options.mode === "info" &&
         !options.policyid &&
-        errorLog("you have to provide the policyid (see mc policy --help for more details)", true);
+        errorLog("you have to provide the policyid (see mdsp policy --help for more details)", true);
 }

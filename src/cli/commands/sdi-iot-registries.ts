@@ -73,13 +73,13 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc sdi-iot-registries --mode list \t\t list all sdi dataregistries`);
-            log(`    mc sdi-iot-registries --mode template \t create template file`);
-            log(`    mc sdi-iot-registries --mode create --iotregistry <iotregistryfile> \t create sdi iot registry`);
-            log(`    mc sdi-iot-registries --mode update --iotregistry <iotregistryfile> --registryid <registryid> \
+            log(`    mdsp sdi-iot-registries --mode list \t\t list all sdi dataregistries`);
+            log(`    mdsp sdi-iot-registries --mode template \t create template file`);
+            log(`    mdsp sdi-iot-registries --mode create --iotregistry <iotregistryfile> \t create sdi iot registry`);
+            log(`    mdsp sdi-iot-registries --mode update --iotregistry <iotregistryfile> --registryid <registryid> \
                                                                                              \t\t update sdi iot registry`);
-            log(`    mc sdi-iot-registries --mode info --registryid <registryid>   \t\t get sdi iot registry info`);
-            log(`    mc sdi-iot-registries --mode delete --registryid <registryid> \t\t delete sdi iot registry`);
+            log(`    mdsp sdi-iot-registries --mode info --registryid <registryid>   \t\t get sdi iot registry info`);
+            log(`    mdsp sdi-iot-registries --mode delete --registryid <registryid> \t\t delete sdi iot registry`);
 
             serviceCredentialLog();
         });
@@ -89,28 +89,28 @@ function checkRequiredParamaters(options: any) {
     options.mode === "create" &&
         !options.iotregistry &&
         errorLog(
-            "you have to provide a iotregistry template file to create a sdi iotregistry (see mc sdi-iot-registries --help for more details)",
+            "you have to provide a iotregistry template file to create a sdi iotregistry (see mdsp sdi-iot-registries --help for more details)",
             true
         );
 
     options.mode === "update" &&
         !options.registryid &&
         errorLog(
-            "you have to provide the registryid of the iotregistry you want to update (see mc sdi-iot-registries --help for more details)",
+            "you have to provide the registryid of the iotregistry you want to update (see mdsp sdi-iot-registries --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.registryid &&
         errorLog(
-            "you have to provide the registryid to get infos about the sdi iot registry (see mc sdi-iot-registries --help for more details)",
+            "you have to provide the registryid to get infos about the sdi iot registry (see mdsp sdi-iot-registries --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.registryid &&
         errorLog(
-            "you have to provide the registryid to delete the sdi iot registry (see mc sdi-iot-registries --help for more details)",
+            "you have to provide the registryid to delete the sdi iot registry (see mdsp sdi-iot-registries --help for more details)",
             true
         );
 }
@@ -174,7 +174,7 @@ function writeToFile(options: any, dataRegistry: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc sdi-iot-registries --mode create --iotregistry ${fileName} \n\nto create the sdi iot registry`
+        )} run \n\n\tmdsp sdi-iot-registries --mode create --iotregistry ${fileName} \n\nto create the sdi iot registry`
     );
 }
 async function createIotRegistry(options: any, sdk: MindSphereSdk) {

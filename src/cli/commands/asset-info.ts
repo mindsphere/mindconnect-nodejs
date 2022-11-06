@@ -117,7 +117,7 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc asset-info --assetid 123456...ef \t print out infos about asset with id 132456...ef`);
+            log(`    mdsp asset-info --assetid 123456...ef \t print out infos about asset with id 132456...ef`);
             serviceCredentialLog();
         });
 };

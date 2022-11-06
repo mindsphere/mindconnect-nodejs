@@ -59,22 +59,22 @@ export default (program: Command) => {
         .on("--help", () => {
             log(`\n  Example:\n`);
             log(
-                `    mc service-credentials --mode config \t\t\t start configuration web server on ${color(
+                `    mdsp service-credentials --mode config \t\t\t start configuration web server on ${color(
                     "http://localhost:4994"
                 )}`
             );
             log(
-                `    mc service-credentials --mode config --port 10000 \t\t start configuration web server on ${color(
+                `    mdsp service-credentials --mode config --port 10000 \t start configuration web server on ${color(
                     "http://localhost:10000"
                 )}`
             );
 
-            log(`    mc service-credentials --mode list  \t\t\t list all configured credentials`);
+            log(`    mdsp service-credentials --mode list  \t\t\t list all configured credentials`);
             log(
-                `    mc service-credentials --mode select --index <index> \t select credentials with index <index> from the list`
+                `    mdsp service-credentials --mode select --index <index> \t select credentials with index <index> from the list`
             );
 
-            log(`    mc service-credentials --mode add --type APP ... \t\t add new APP credentials`);
+            log(`    mdsp service-credentials --mode add --type APP ... \t\t add new APP credentials`);
             serviceCredentialLog();
         });
 };

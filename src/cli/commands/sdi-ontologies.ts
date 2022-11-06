@@ -75,11 +75,11 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc sdi-ontologies --mode list \t\t list all sdi ontologies`);
-            log(`    mc sdi-ontologies --mode template \t\t create template file`);
-            log(`    mc sdi-ontologies --mode infer --ontology <ontologyfile> \t\t infer sdi  ontology`);
-            log(`    mc sdi-ontologies --mode info --ontologyid <ontologyid>   \t\t get sdi ontology info`);
-            log(`    mc sdi-ontologies --mode delete --ontologyid <ontologyid> \t\t delete sdi ontology`);
+            log(`    mdsp sdi-ontologies --mode list \t\t list all sdi ontologies`);
+            log(`    mdsp sdi-ontologies --mode template \t\t create template file`);
+            log(`    mdsp sdi-ontologies --mode infer --ontology <ontologyfile> \t\t infer sdi  ontology`);
+            log(`    mdsp sdi-ontologies --mode info --ontologyid <ontologyid>   \t\t get sdi ontology info`);
+            log(`    mdsp sdi-ontologies --mode delete --ontologyid <ontologyid> \t\t delete sdi ontology`);
 
             serviceCredentialLog();
         });
@@ -89,28 +89,28 @@ function checkRequiredParamaters(options: any) {
     options.mode === "create" &&
         !options.ontology &&
         errorLog(
-            "you have to provide a ontology template file to create a sdi ontology (see mc sdi-ontologies --help for more details)",
+            "you have to provide a ontology template file to create a sdi ontology (see mdsp sdi-ontologies --help for more details)",
             true
         );
 
     options.mode === "update" &&
         !options.ontologyid &&
         errorLog(
-            "you have to provide the ontologyid of the ontology you want to update (see mc sdi-ontologies --help for more details)",
+            "you have to provide the ontologyid of the ontology you want to update (see mdsp sdi-ontologies --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.ontologyid &&
         errorLog(
-            "you have to provide the ontologyid to get infos about the sdi  ontology (see mc sdi-ontologies --help for more details)",
+            "you have to provide the ontologyid to get infos about the sdi  ontology (see mdsp sdi-ontologies --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.ontologyid &&
         errorLog(
-            "you have to provide the ontologyid to delete the sdi ontology (see mc sdi-ontologies --help for more details)",
+            "you have to provide the ontologyid to delete the sdi ontology (see mdsp sdi-ontologies --help for more details)",
             true
         );
 }
@@ -188,7 +188,7 @@ function writeToFile(options: any, dataOntology: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc sdi-ontologies --mode create --ontology ${fileName} \n\nto create the sdi ontology`
+        )} run \n\n\tmdsp sdi-ontologies --mode create --ontology ${fileName} \n\nto create the sdi ontology`
     );
 }
 async function createDataOntology(options: any, sdk: MindSphereSdk) {

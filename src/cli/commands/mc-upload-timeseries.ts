@@ -30,7 +30,7 @@ export default (program: Command) => {
                 try {
                     if (!options.file) {
                         errorLog(
-                            "Missing file name for upload-timeseries command. Run mc ts --help for full syntax and examples.",
+                            "Missing file name for upload-timeseries command. Run mdsp ts --help for full syntax and examples.",
                             true
                         );
                         process.exit(1);

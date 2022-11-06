@@ -77,16 +77,16 @@ export default (program: Command) => {
 
 function printHelp() {
     log("\n  Examples:\n");
-    log(`    mc mobile-app-instances --appid <appid> --mode list \tlist mobile apps`);
-    log(`    mc mobile-app-instances --appid <appid> --mode template \tcreate template file for mobile app instance`);
+    log(`    mdsp mobile-app-instances --appid <appid> --mode list \tlist mobile apps`);
+    log(`    mdsp mobile-app-instances --appid <appid> --mode template \tcreate template file for mobile app instance`);
     log(
-        `    mc mobile-app-instances --appid <appid> --mode create --file mobileapp.instance.mdsp.json \n\t\t\t\t\t\tcreate mobile app instance`
+        `    mdsp mobile-app-instances --appid <appid> --mode create --file mobileapp.instance.mdsp.json \n\t\t\t\t\t\tcreate mobile app instance`
     );
     log(
-        `    mc mobile-app-instances --appid <appid> --mode info --instanceid <instanceid>\n\t\t\t\t\t\tmobile app instance info`
+        `    mdsp mobile-app-instances --appid <appid> --mode info --instanceid <instanceid>\n\t\t\t\t\t\tmobile app instance info`
     );
     log(
-        `    mc mobile-app-instances --appid <appid> --mode delete --instanceid <instanceid>\n\t\t\t\t\t\tdelete mobile app instance`
+        `    mdsp mobile-app-instances --appid <appid> --mode delete --instanceid <instanceid>\n\t\t\t\t\t\tdelete mobile app instance`
     );
     serviceCredentialLog();
 }
@@ -143,7 +143,7 @@ async function createAppInstanceTemplate(options: any) {
     fs.writeFileSync(filePath, JSON.stringify(template, null, 2));
     console.log(`The ${color(options.type)} template file was written into ${color(fileName)}`);
     console.log(`Run:\n\n\
-              \tmc mobile-app-instances --mode create --file ${fileName} --appid ${options.appid}
+              \tmdsp mobile-app-instances --mode create --file ${fileName} --appid ${options.appid}
               \nto create mobile app instance in mindsphere.`);
 }
 

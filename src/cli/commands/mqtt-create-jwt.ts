@@ -58,7 +58,7 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc mqtt-createjwt --clientid "12345...ef" \\`);
+            log(`    mdsp mqtt-createjwt --clientid "12345...ef" \\`);
             log(`    --rootca path/to/root.cer.pem \\`);
             log(`    --devicecrt path/to/device.cer.pem \\`);
             log(`    --devicekey path/to/devicekey.pem \\`);
@@ -76,22 +76,22 @@ export default (program: Command) => {
 function checkParameters(options: any) {
     !options.rootca &&
         errorLog(
-            "You have to specify the path to the root certificate. Run mc jw --help for full syntax and examples.",
+            "You have to specify the path to the root certificate. Run mdsp jw --help for full syntax and examples.",
             options.verbose
         );
     !options.devicecrt &&
         errorLog(
-            "You have to specify the path to the device certificate. Run mc jw --help for full syntax and examples.",
+            "You have to specify the path to the device certificate. Run mdsp jw --help for full syntax and examples.",
             options.verbose
         );
     !options.devicekey &&
         errorLog(
-            "You have to specify the path to the device key. Run mc jw --help for full syntax and examples.",
+            "You have to specify the path to the device key. Run mdsp jw --help for full syntax and examples.",
             options.verbose
         );
     !options.tenant &&
         errorLog(
-            "You have to specify the name of your tenant. Run mc jw --help for full syntax and examples.",
+            "You have to specify the name of your tenant. Run mdsp jw --help for full syntax and examples.",
             options.verbose
         );
 }

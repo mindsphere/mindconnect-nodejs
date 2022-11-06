@@ -87,15 +87,15 @@ export default (program: Command) => {
 function printHelp() {
     log("\n  Examples:\n");
     log(
-        `    mc models --mode template --modeltype core.basicmodel --modelname MyModel \t creates a template for model`
+        `    mdsp models --mode template --modeltype core.basicmodel --modelname MyModel \t creates a template for model`
     );
     log(
-        `    mc models --mode create --metadata model.metadata.mdsp.json --payload model.payload.mdsp.json \n\t\t\t\t\t\t\t creates a model from specified files`
+        `    mdsp models --mode create --metadata model.metadata.mdsp.json --payload model.payload.mdsp.json \n\t\t\t\t\t\t\t creates a model from specified files`
     );
-    log(`    mc models --mode list \t\t\t\t lists all models in mindsphere`);
-    log(`    mc models --mode delete --modelid 1234567..ef \t deletes model with specified id`);
-    log(`    mc models --mode info --modelid 123456...ef \t print out infos about model with id 132456...ef`);
-    log(`    mc models --mode download --modelid 123456...ef \t download model with id 132456...ef`);
+    log(`    mdsp models --mode list \t\t\t\t lists all models in mindsphere`);
+    log(`    mdsp models --mode delete --modelid 1234567..ef \t deletes model with specified id`);
+    log(`    mdsp models --mode info --modelid 123456...ef \t print out infos about model with id 132456...ef`);
+    log(`    mdsp models --mode download --modelid 123456...ef \t download model with id 132456...ef`);
     serviceCredentialLog();
 }
 
@@ -212,7 +212,7 @@ async function createTemplate(options: any, sdk: MindSphereSdk) {
     console.log(
         `The model metadata was written into ${color(fileName)} and empty model file ${color(
             payloadFile
-        )} was created.\nRun \n\n\tmc models --mode create --metadata ${fileName} --payload ${payloadFile} \n\nto create the model.`
+        )} was created.\nRun \n\n\tmdsp models --mode create --metadata ${fileName} --payload ${payloadFile} \n\nto create the model.`
     );
 }
 

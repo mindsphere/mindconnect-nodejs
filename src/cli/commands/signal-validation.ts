@@ -132,11 +132,11 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc signal-validation --mode range --lowerlimit \ -1 --upperlimit 1  \t performes the range validation for range [-1..1]`
+                `    mdsp signal-validation --mode range --lowerlimit \ -1 --upperlimit 1  \t performes the range validation for range [-1..1]`
             );
-            log(`    mc signal-validation -mode jumps --windowsize 12  \t\t\t searches for jumps in the data`);
+            log(`    mdsp signal-validation -mode jumps --windowsize 12  \t\t\t searches for jumps in the data`);
             log(
-                `    mc signal-validation --mode interpolate --threshold 1000  \t\t interpolates a value for every gap > 1000ms`
+                `    mdsp signal-validation --mode interpolate --threshold 1000  \t\t interpolates a value for every gap > 1000ms`
             );
             log("\n  Additional Documentation:\n");
             log(
@@ -163,7 +163,10 @@ function createFile(options: any) {
 
 function checkRequiredParameters(options: any) {
     !options.mode &&
-        errorLog("You have to provide the mode for the command. Run mc sv --help for full syntax and examples.", true);
+        errorLog(
+            "You have to provide the mode for the command. Run mdsp sv --help for full syntax and examples.",
+            true
+        );
     options.mode !== "testdata" &&
         !options.variablename &&
         errorLog("You have to provide the variable name for signal validation operation", true);

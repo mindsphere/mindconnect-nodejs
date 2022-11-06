@@ -99,24 +99,28 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc data-exchange --mode list \t\t\t\t\t  list all entries in public data exchange root`);
+            log(`    mdsp data-exchange --mode list \t\t\t\t\t  list all entries in public data exchange root`);
             log(
-                `    mc data-exchange --mode list --dirid private \t\t\t  list all entries in private data exchange root`
+                `    mdsp data-exchange --mode list --dirid private \t\t\t  list all entries in private data exchange root`
             );
-            log(`    mc data-exchange --mode info --dirid <dirid> \t\t\t  get full info about the specified directory`);
-            log(`    mc data-exchange --mode info --fileid <fileid> \t\t\t  get full info about the specified`);
-            log(`    mc data-exchange --mode download --fileid <fileid> \t\t\t  download file with specified id`);
             log(
-                `    mc data-exchange --mode upload --file <file> --dirid <dirid> \t  upload file to specified directory`
+                `    mdsp data-exchange --mode info --dirid <dirid> \t\t\t  get full info about the specified directory`
             );
-            log(`    mc data-exchange --mode rename --fileid <fileid> --newname <newname>  rename the specified file`);
+            log(`    mdsp data-exchange --mode info --fileid <fileid> \t\t\t  get full info about the specified`);
+            log(`    mdsp data-exchange --mode download --fileid <fileid> \t\t\t  download file with specified id`);
             log(
-                `    mc data-exchange --mode renamedir --dirid <dirid> --newname <newname> rename the specified directory`
+                `    mdsp data-exchange --mode upload --file <file> --dirid <dirid> \t  upload file to specified directory`
             );
-            log(`    mc data-exchange --mode delete --fileid <fileid> \t\t\t  delete file with specified id`);
-            log(`    mc data-exchange --mode rmdir --dirid <dirid> \t\t\t  delete directory with specified id`);
             log(
-                `    mc data-exchange --mode rmdir --dirid <dirid> --recursive \t\t  delete directory with specified id recrusively`
+                `    mdsp data-exchange --mode rename --fileid <fileid> --newname <newname>  rename the specified file`
+            );
+            log(
+                `    mdsp data-exchange --mode renamedir --dirid <dirid> --newname <newname> rename the specified directory`
+            );
+            log(`    mdsp data-exchange --mode delete --fileid <fileid> \t\t\t  delete file with specified id`);
+            log(`    mdsp data-exchange --mode rmdir --dirid <dirid> \t\t\t  delete directory with specified id`);
+            log(
+                `    mdsp data-exchange --mode rmdir --dirid <dirid> --recursive \t\t  delete directory with specified id recrusively`
             );
             serviceCredentialLog();
         });

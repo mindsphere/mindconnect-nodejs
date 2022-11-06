@@ -72,13 +72,13 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc asset-types --mode list \t\t\t\t\t list all asset types`);
-            log(`    mc asset-types --mode list --assettype Pump\t\t list all asset types which are named Pump`);
+            log(`    mdsp asset-types --mode list \t\t\t\t\t list all asset types`);
+            log(`    mdsp asset-types --mode list --assettype Pump\t\t list all asset types which are named Pump`);
             log(
-                `    mc asset-types --mode template --assettype Pump \n\tcreate a template file (Enironment.assettype.mdsp.json) for assettype Pump`
+                `    mdsp asset-types --mode template --assettype Pump \n\tcreate a template file (Enironment.assettype.mdsp.json) for assettype Pump`
             );
             log(
-                `    mc asset-types --mode create --file Pump.assettype.mdsp.json \n\tcreate asset type Pump in MindSphere`
+                `    mdsp asset-types --mode create --file Pump.assettype.mdsp.json \n\tcreate asset type Pump in MindSphere`
             );
 
             serviceCredentialLog();
@@ -136,7 +136,7 @@ function writeAssetTypeToFile(options: any, AssetType: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc asset-types --mode create --file ${fileName} \n\nto create the asset type`
+        )} run \n\n\t mdsp asset-types --mode create --file ${fileName} \n\nto create the asset type`
     );
 }
 
@@ -226,22 +226,22 @@ function checkRequiredParamaters(options: any) {
     options.mode === "template" &&
         !options.assettype &&
         errorLog(
-            "you have to provide asset type to create a template (see mc asset-types --help for more details)",
+            "you have to provide asset type to create a template (see mdsp asset-types --help for more details)",
             true
         );
 
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with asset type to create an asset type (see mc asset-types --help for more details)",
+            "you have to provide a file with asset type to create an asset type (see mdsp asset-types --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.assettype &&
-        errorLog("you have to provide the asset type to delete (see mc asset-types --help for more details)", true);
+        errorLog("you have to provide the asset type to delete (see mdsp asset-types --help for more details)", true);
 
     options.mode === "info" &&
         !options.assettype &&
-        errorLog("you have to provide the asset type (see mc asset-types --help for more details)", true);
+        errorLog("you have to provide the asset type (see mdsp asset-types --help for more details)", true);
 }

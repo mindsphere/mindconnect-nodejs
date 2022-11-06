@@ -93,13 +93,13 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc events --mode list \t\t\t\t list last <size> events (default:100)`);
-            log(`    mc events --mode list --eventtype PumpEvent\t\t list last <size> PumpEvents (default: 100)`);
-            log(`    mc events --mode info --eventid <eventid>\t\t get info about event with specified id`);
-            log(`    mc events --mode delete --eventid <eventid>\t\t delete event with specified id`);
-            log(`    mc events --mode filtertemplate \t\t\t create filter template for --mode list command`);
-            log(`    mc events --mode template --eventtype PumpEvent \t create a template file for event `);
-            log(`    mc events --mode create --file PumpEvent.eventtype.mdsp.json \t create event`);
+            log(`    mdsp events --mode list \t\t\t\t list last <size> events (default:100)`);
+            log(`    mdsp events --mode list --eventtype PumpEvent\t\t list last <size> PumpEvents (default: 100)`);
+            log(`    mdsp events --mode info --eventid <eventid>\t\t get info about event with specified id`);
+            log(`    mdsp events --mode delete --eventid <eventid>\t\t delete event with specified id`);
+            log(`    mdsp events --mode filtertemplate \t\t\t create filter template for --mode list command`);
+            log(`    mdsp events --mode template --eventtype PumpEvent \t create a template file for event `);
+            log(`    mdsp events --mode create --file PumpEvent.eventtype.mdsp.json \t create event`);
 
             serviceCredentialLog();
         });
@@ -150,7 +150,7 @@ function writeEventToFile(options: any, templateType: EventManagementModels.Even
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc events --mode create --file ${fileName} \n\nto create the event.`
+        )} run \n\n\tmdsp events --mode create --file ${fileName} \n\nto create the event.`
     );
 }
 
@@ -170,7 +170,7 @@ async function deleteEvent(options: any, sdk: MindSphereSdk) {
     );
     console.log(`Deletion job with id ${color(result.id)} is in state ${color(result.state)}.`);
     result.details && console.log(`Details: ${JSON.stringify(result.details)}.`);
-    console.log(`Run\n\n\tmc events-bulk --mode check --jobid ${result.id}\n\nto check the state of the job.\n `);
+    console.log(`Run\n\n\tmdsp events-bulk --mode check --jobid ${result.id}\n\nto check the state of the job.\n `);
 }
 
 async function listEvents(sdk: MindSphereSdk, options: any) {
@@ -254,15 +254,15 @@ function checkRequiredParamaters(options: any) {
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with event type to create an event type (see mc events --help for more details)",
+            "you have to provide a file with event type to create an event type (see mdsp events --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.eventid &&
-        errorLog("you have to provide the eventid to delete (see mc events --help for more details)", true);
+        errorLog("you have to provide the eventid to delete (see mdsp events --help for more details)", true);
 
     options.mode === "info" &&
         !options.eventid &&
-        errorLog("you have to provide the eventid  (see mc events --help for more details)", true);
+        errorLog("you have to provide the eventid  (see mdsp events --help for more details)", true);
 }

@@ -72,9 +72,9 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc asset-lock --mode info \t\t\t\t print out the asset model lock state`);
-            log(`    mc asset-lock --mode lock \t\t\t\t lock the asset model and disable modifications`);
-            log(`    mc asset-lock --mode unlock \t\t\t unlock the asset model and enable modifications`);
+            log(`    mdsp asset-lock --mode info \t\t\t\t print out the asset model lock state`);
+            log(`    mdsp asset-lock --mode lock \t\t\t\t lock the asset model and disable modifications`);
+            log(`    mdsp asset-lock --mode unlock \t\t\t unlock the asset model and enable modifications`);
             serviceCredentialLog();
         });
 };

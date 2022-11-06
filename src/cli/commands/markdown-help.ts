@@ -37,7 +37,7 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc mdhelp`);
+            log(`    mdsp mdhelp`);
             serviceCredentialLog();
         });
 };

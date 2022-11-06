@@ -92,7 +92,7 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc download-bulk --assetid 12345..ef --from 12/10/2019 --to 12/16/2019  \t\t download timeseries from specified asset`
+                `    mdsp download-bulk --assetid 12345..ef --from 12/10/2019 --to 12/16/2019  \t\t download timeseries from specified asset`
             );
             serviceCredentialLog();
         });
@@ -100,14 +100,15 @@ export default (program: Command) => {
 
 function checkParameters(options: any) {
     !options.dir &&
-        errorLog("Missing dir name for download-bulk command. Run mc db --help for full syntax and examples.", true);
+        errorLog("Missing dir name for download-bulk command. Run mdsp db --help for full syntax and examples.", true);
 
-    !options.assetid && errorLog(" You have to specify assetid. Run  mc db --help for full syntax and examples.", true);
+    !options.assetid &&
+        errorLog(" You have to specify assetid. Run mdsp db --help for full syntax and examples.", true);
 
     !options.aspectname &&
-        errorLog(" You have to specify aspectname. Run  mc db --help for full syntax and examples.", true);
+        errorLog(" You have to specify aspectname. Run mdsp db --help for full syntax and examples.", true);
 
-    !options.from && errorLog(" You have to specify from date. Run  mc db --help for full syntax and examples.", true);
+    !options.from && errorLog(" You have to specify from date. Run mdsp db --help for full syntax and examples.", true);
 
-    !options.to && errorLog(" You have to specify to date. Run  mc db --help for full syntax and examples.", true);
+    !options.to && errorLog(" You have to specify to date. Run mdsp db --help for full syntax and examples.", true);
 }

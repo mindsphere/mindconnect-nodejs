@@ -140,12 +140,12 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc spectrum-analysis -f machine.wav  \t Decomposes the sound file into frequency components`);
+            log(`    mdsp spectrum-analysis -f machine.wav  \t Decomposes the sound file into frequency components`);
             log(
-                `    mc spectrum-analysis -f machine.wav --windowtype blackman \t use blackman window type for FFT preprocessing`
+                `    mdsp spectrum-analysis -f machine.wav --windowtype blackman \t use blackman window type for FFT preprocessing`
             );
             log(
-                `    mc spectrum-analysis --mode threshold \t detect threshold violations for thresholds stored in ${color(
+                `    mdsp spectrum-analysis --mode threshold \t detect threshold violations for thresholds stored in ${color(
                     "thresholds.spectrum.json"
                 )}`
             );
@@ -158,7 +158,7 @@ function checkRequiredParameters(options: any) {
     options.mode === "fft" &&
         !options.file &&
         errorLog(
-            "Missing file name for spectrum-analytics command. Run mc sp --help for full syntax and examples.",
+            "Missing file name for spectrum-analytics command. Run mdsp sp --help for full syntax and examples.",
             true
         );
 

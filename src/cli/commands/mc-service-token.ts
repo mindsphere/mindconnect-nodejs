@@ -57,9 +57,9 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc service-token --passkey mypasskey \t\tdisplays the service token (encoded only)`);
+            log(`    mdsp service-token --passkey mypasskey \t\tdisplays the service token (encoded only)`);
             log(
-                `    mc service-token --passkey mypasskey --verbose \tdisplays the service token (encoded and decoded)`
+                `    mdsp service-token --passkey mypasskey --verbose \tdisplays the service token (encoded and decoded)`
             );
             serviceCredentialLog();
         });

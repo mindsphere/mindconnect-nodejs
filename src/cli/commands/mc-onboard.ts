@@ -63,8 +63,8 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc ob   \t\t\t\tuses default ${color("agentconfig.json")}`);
-            log(`    mc onboard --config agent.json \tuses specified configuration file`);
-            log(`    mc onboard --config agent.json --cert private.key \tuses specified key for RSA_3072 profile`);
+            log(`    mdsp ob   \t\t\t\tuses default ${color("agentconfig.json")}`);
+            log(`    mdsp onboard --config agent.json \tuses specified configuration file`);
+            log(`    mdsp onboard --config agent.json --cert private.key \tuses specified key for RSA_3072 profile`);
         });
 };

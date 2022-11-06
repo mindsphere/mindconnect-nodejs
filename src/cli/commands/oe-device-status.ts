@@ -75,45 +75,45 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc oe-device-status --mode list --deviceid <deviceid>\n\
+                `    mdsp oe-device-status --mode list --deviceid <deviceid>\n\
                             list all installed software on the device`
             );
             log(
-                `    mc oe-device-status --mode list --deviceid 12345... --softwaretype APP\n \
+                `    mdsp oe-device-status --mode list --deviceid 12345... --softwaretype APP\n \
                             list all apps installed on the device`
             );
             log(
-                `    mc oe-device-status --mode info --target health --deviceid <deviceid>\n \
+                `    mdsp oe-device-status --mode info --target health --deviceid <deviceid>\n \
                             get the device health status`
             );
             log(
-                `    mc oe-device-status --mode info --target health-config-data --deviceid <deviceid>\n \
+                `    mdsp oe-device-status --mode info --target health-config-data --deviceid <deviceid>\n \
                             get the device health config data`
             );
 
             log(
-                `    mc oe-device-status --mode info --target inventory --deviceid <deviceid>\n \
+                `    mdsp oe-device-status --mode info --target inventory --deviceid <deviceid>\n \
                             get the software inventory of the device`
             );
 
             log(
-                `    mc oe-device-status --mode info --target connection-status --deviceid <deviceid>\n \
+                `    mdsp oe-device-status --mode info --target connection-status --deviceid <deviceid>\n \
                             get the device connection status`
             );
             log(
-                `    mc oe-device-status --mode template --target inventory\n \
+                `    mdsp oe-device-status --mode template --target inventory\n \
                             create template file for software inventory`
             );
             log(
-                `    mc oe-device-status --mode template --target connection-status \n \
+                `    mdsp oe-device-status --mode template --target connection-status \n \
                             create template file for connection status`
             );
             log(
-                `    mc oe-device-status --mode update --target inventory --file openedge.inventory.mdsp.json --deviceid <deviceid>\n \
+                `    mdsp oe-device-status --mode update --target inventory --file openedge.inventory.mdsp.json --deviceid <deviceid>\n \
                             update the software inventory of the device`
             );
             log(
-                `    mc oe-device-status --mode update --target connection-status --deviceid <deviceid>\n \
+                `    mdsp oe-device-status --mode update --target connection-status --deviceid <deviceid>\n \
                             send a heartbeat to the device`
             );
             serviceCredentialLog();
@@ -211,7 +211,7 @@ async function createTemplate(options: any) {
             break;
         case "connection-status":
             errorLog(
-                `option --target ${options.target} is not supported for the mode template (see mc oe-device-status --help for more details)`,
+                `option --target ${options.target} is not supported for the mode template (see mdsp oe-device-status --help for more details)`,
                 true
             );
             break;
@@ -232,7 +232,7 @@ function writeDeviceTypeToFile(options: any, templateType: any) {
 
     fs.writeFileSync(filePath, JSON.stringify(templateType, null, 2));
     console.log(
-        `The data was written into ${color(fileName)} run \n\n\tmc oe-device-status --mode update --deviceid ${
+        `The data was written into ${color(fileName)} run \n\n\tmdsp oe-device-status --mode update --deviceid ${
             options.deviceid || "<deviceid>"
         } --target ${options.target} ${
             options.softwaretype ? "--softwaretype " + options.softwaretype : ""
@@ -299,21 +299,21 @@ function checkRequiredParameters(options: any) {
     options.mode !== "template" &&
         !options.deviceid &&
         errorLog(
-            "you have to provide the deviceid to get or update the device status information (see mc oe-device-status --help for more details)",
+            "you have to provide the deviceid to get or update the device status information (see mdsp oe-device-status --help for more details)",
             true
         );
 
     options.mode === "template" &&
         !options.target &&
         errorLog(
-            "you have to provide the status information type to create the corresponding template (see mc oe-device-status --help for more details)",
+            "you have to provide the status information type to create the corresponding template (see mdsp oe-device-status --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.target &&
         errorLog(
-            "you have to provide the type of information you want to retrieve (see mc oe-device-status --help for more details)",
+            "you have to provide the type of information you want to retrieve (see mdsp oe-device-status --help for more details)",
             true
         );
 }

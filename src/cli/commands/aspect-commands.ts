@@ -142,24 +142,24 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc aspects --mode list \t\t\t\t\t list all aspect types`);
+            log(`    mdsp aspects --mode list \t\t\t\t\t list all aspect types`);
             log(
-                `    mc aspects --mode list --aspect Environment\t\t list all aspect types which are named Environment`
+                `    mdsp aspects --mode list --aspect Environment\t\t list all aspect types which are named Environment`
             );
             log(
-                `    mc aspects --mode template --aspect Environment \n\tcreate a template file (Enironment.aspect.mdsp.json) for aspect Environment`
+                `    mdsp aspects --mode template --aspect Environment \n\tcreate a template file (Enironment.aspect.mdsp.json) for aspect Environment`
             );
             log(
-                `    mc aspects --mode create --file Environment.aspects.mdsp.json \n\tcreate aspect type Environment in MindSphere`
+                `    mdsp aspects --mode create --file Environment.aspects.mdsp.json \n\tcreate aspect type Environment in MindSphere`
             );
             log(
-                `    mc aspects --mode convert --schema Environment.schema.json --aspect Environment \n\t create a template file for aspect type Environment from JSON schema`
+                `    mdsp aspects --mode convert --schema Environment.schema.json --aspect Environment \n\t create a template file for aspect type Environment from JSON schema`
             );
             log(
-                `    mc aspects --mode convert --schema Environment.schema.json --aspect Environment --prefixflattened \n\t prefixes the variable names with parent object names (e.g. Environment_Temperature)`
+                `    mdsp aspects --mode convert --schema Environment.schema.json --aspect Environment --prefixflattened \n\t prefixes the variable names with parent object names (e.g. Environment_Temperature)`
             );
             log(
-                `    mc aspects --mode convert --schema Environment.schema.json --aspect Environment --targetonly \n\t select only variables from json schema with target property equal to assettype`
+                `    mdsp aspects --mode convert --schema Environment.schema.json --aspect Environment --targetonly \n\t select only variables from json schema with target property equal to assettype`
             );
 
             serviceCredentialLog();
@@ -253,7 +253,7 @@ function writeAspectTypeToFile(
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc aspects --mode create --file ${fileName} \n\nto create the aspect`
+        )} run \n\n\t mdsp aspects --mode create --file ${fileName} \n\nto create the aspect`
     );
 }
 
@@ -406,22 +406,25 @@ async function aspectTypeInfo(options: any, sdk: MindSphereSdk) {
 function checkRequiredParamaters(options: any) {
     options.mode === "template" &&
         !options.aspect &&
-        errorLog("you have to provide aspect type to create a template (see mc aspects --help for more details)", true);
+        errorLog(
+            "you have to provide aspect type to create a template (see mdsp aspects --help for more details)",
+            true
+        );
 
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with aspect type to create an aspect type (see mc aspects --help for more details)",
+            "you have to provide a file with aspect type to create an aspect type (see mdsp aspects --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.aspect &&
-        errorLog("you have to provide the aspect type to delete (see mc aspects --help for more details)", true);
+        errorLog("you have to provide the aspect type to delete (see mdsp aspects --help for more details)", true);
     options.mode === "convert" &&
         !options.schema &&
-        errorLog("you have to provide the json schema to convert (see mc aspects --help for more details)", true);
+        errorLog("you have to provide the json schema to convert (see mdsp aspects --help for more details)", true);
     options.mode === "convert" &&
         !options.aspect &&
-        errorLog("you have to provide the aspect name for the schema (see mc aspects --help for more details)", true);
+        errorLog("you have to provide the aspect name for the schema (see mdsp aspects --help for more details)", true);
 }

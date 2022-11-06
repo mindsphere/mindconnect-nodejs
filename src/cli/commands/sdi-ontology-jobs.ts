@@ -59,8 +59,8 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc sdi-ontology-jobs --mode submit --ontology <ontologyfile>\t upload ontology`);
-            log(`    mc sdi-ontology-jobs --mode info --jobid <jobid>   \t\t\t get sdi ontology upload job info`);
+            log(`    mdsp sdi-ontology-jobs --mode submit --ontology <ontologyfile>\t upload ontology`);
+            log(`    mdsp sdi-ontology-jobs --mode info --jobid <jobid>   \t\t\t get sdi ontology upload job info`);
 
             serviceCredentialLog();
         });
@@ -70,14 +70,14 @@ function checkRequiredParamaters(options: any) {
     options.mode === "submit" &&
         !options.ontology &&
         errorLog(
-            "you have to provide a ontology file to submit a sdi ontology upload job (see mc sdi-ontology-jobs --help for more details)",
+            "you have to provide a ontology file to submit a sdi ontology upload job (see mdsp sdi-ontology-jobs --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.jobid &&
         errorLog(
-            "you have to provide the jobid to get infos about the sdi ontology upload job (see mc sdi-ontology-jobs --help for more details)",
+            "you have to provide the jobid to get infos about the sdi ontology upload job (see mdsp sdi-ontology-jobs --help for more details)",
             true
         );
 }

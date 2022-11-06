@@ -87,8 +87,8 @@ export const subtractSecond = (date: Date, seconds: number): Date => {
 export const displayCsvHelp = (color: (chalk: string) => string) => {
     const now = new Date();
     log("\n  Examples:\n");
-    log(`    mc ts -f timeseries.csv \t\t\t\t\t upload timeseries from the csv file to mindsphere `);
-    log(`    mc upload-timeseries --file timeseries.csv  --size 100  \t use http post size of 100 records `);
+    log(`    mdsp ts -f timeseries.csv \t\t\t\t\t upload timeseries from the csv file to mindsphere `);
+    log(`    mdsp upload-timeseries --file timeseries.csv  --size 100  \t use http post size of 100 records `);
 
     log(`\n  ${color("Data Format:")} (use your own data point ids from mindsphere)\n`);
     log(`  timestamp, ${color("dataPointId")}, ${green("qualityCode")}, ${yellow("value")}`);
@@ -126,9 +126,9 @@ export const directoryReadyLog = ({
     log(`\nthe directory ${green(path)} is ${green("ready")}`);
     log(`you can now edit the template files in the directory`);
     log(`\nwhen you are done run:`);
-    log(`\tmc ${runCommand} command to upload files and start the job`);
+    log(`\t mdsp ${runCommand} command to upload files and start the job`);
     log(`\nchecking progress:`);
-    log(`\tmc ${jobCommand} to check the progress of the job`);
+    log(`\t mdsp ${jobCommand} to check the progress of the job`);
 };
 
 export function modeInformation(asset: AssetManagementModels.AssetResourceWithHierarchyPath, options: any, color: any) {

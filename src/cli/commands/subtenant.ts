@@ -70,11 +70,11 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc subtenants --mode list \t\t\t\t\tlist all subtenants`);
-            log(`    mc subtenants --mode template --subtenant <subtenant> \tcreate a template file for <subtenant>`);
-            log(`    mc subtenants --mode create --file <subtenant> \t\tcreate subtenant `);
-            log(`    mc subtenants --mode info --subtenantid <subtenantid> \tsubtenant info for specified id`);
-            log(`    mc subtenants --mode delete --subtenantid <subtenantid> \tdelete subtenant with specified id`);
+            log(`    mdsp subtenants --mode list \t\t\t\t\tlist all subtenants`);
+            log(`    mdsp subtenants --mode template --subtenant <subtenant> \tcreate a template file for <subtenant>`);
+            log(`    mdsp subtenants --mode create --file <subtenant> \t\tcreate subtenant `);
+            log(`    mdsp subtenants --mode info --subtenantid <subtenantid> \tsubtenant info for specified id`);
+            log(`    mdsp subtenants --mode delete --subtenantid <subtenantid> \tdelete subtenant with specified id`);
 
             serviceCredentialLog();
         });
@@ -105,7 +105,7 @@ function writesubtenantToFile(options: any, subtenant: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc subtenants --mode create --file ${fileName} \n\nto create the subtenant`
+        )} run \n\n\tmdsp subtenants --mode create --file ${fileName} \n\nto create the subtenant`
     );
 }
 
@@ -155,22 +155,22 @@ function checkRequiredParamaters(options: any) {
     options.mode === "template" &&
         !options.subtenant &&
         errorLog(
-            "you have to provide subtenant to create a template (see mc subtenants --help for more details)",
+            "you have to provide subtenant to create a template (see mdsp subtenants --help for more details)",
             true
         );
 
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with subtenant definition to create an subtenant (see mc subtenants --help for more details)",
+            "you have to provide a file with subtenant definition to create an subtenant (see mdsp subtenants --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.subtenantid &&
-        errorLog("you have to provide the subtenantid to delete (see mc subtenants --help for more details)", true);
+        errorLog("you have to provide the subtenantid to delete (see mdsp subtenants --help for more details)", true);
 
     options.mode === "info" &&
         !options.subtenantid &&
-        errorLog("you have to provide the subtenantid (see mc subtenants --help for more details)", true);
+        errorLog("you have to provide the subtenantid (see mdsp subtenants --help for more details)", true);
 }

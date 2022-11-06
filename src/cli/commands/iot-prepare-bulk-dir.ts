@@ -97,17 +97,17 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc prepare-bulk  --typeid castidev.Engine \t this creates a directory called ${color(
+                `    mdsp prepare-bulk  --typeid castidev.Engine \t this creates a directory called ${color(
                     "bulkimport"
                 )} for new asset of type castidev.Engine`
             );
             log(
-                `    mc pb --dir asset1 -i 123456...abc \t\t this creates a directory called ${color(
+                `    mdsp pb --dir asset1 -i 123456...abc \t\t this creates a directory called ${color(
                     "asset1"
                 )} for existing asset`
             );
 
-            log(`    mc pb -of 3 -t castidev.Engine \t\t start data creation template 3 days before now`);
+            log(`    mdsp pb -of 3 -t castidev.Engine \t\t start data creation template 3 days before now`);
             log(
                 `\n\tuse --mode ${color("performance")} for standard data generation or --mode ${color(
                     "simulation"

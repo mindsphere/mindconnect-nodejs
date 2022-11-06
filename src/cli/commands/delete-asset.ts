@@ -31,7 +31,7 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc delete-asset --assetid 123456...ef \t\tdelete asset with id 132456...ef`);
+            log(`    mdsp delete-asset --assetid 123456...ef \t\tdelete asset with id 132456...ef`);
             serviceCredentialLog();
         });
 };

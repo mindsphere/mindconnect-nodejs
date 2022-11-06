@@ -52,7 +52,11 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc starter-ts \t\t\t this creates a directory called ${color("starterts")}`);
-            log(`    mc st --dir mindconnect-agent \t this creates a directory called ${color("mindconnect-agent")}`);
+            log(`    mdsp starter-ts \t\t\t\t this creates a directory called ${color("starterts")}`);
+            log(
+                `    mdsp starter-ts --dir mindconnect-agent \t this creates a directory called ${color(
+                    "mindconnect-agent"
+                )}`
+            );
         });
 };

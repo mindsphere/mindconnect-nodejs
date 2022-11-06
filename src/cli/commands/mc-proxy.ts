@@ -57,7 +57,7 @@ export default (program: Command) => {
                     proxyLog(options.verbose, color);
 
                     if (options.mode === "credentials") {
-                        options.passkey = options.passkey || process.env.MDSP_PASSKEY; 
+                        options.passkey = options.passkey || process.env.MDSP_PASSKEY;
                     }
 
                     if (options.mode === "session") {
@@ -97,9 +97,9 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc dev-proxy  \t\t\t\t runs on default port (7707) using ${yellow("cookies")}`);
+            log(`    mdsp dev-proxy  \t\t\t\t runs on default port (7707) using ${yellow("cookies")}`);
             log(
-                `    mc dev-proxy --mode credentials --port 7777 --passkey $MDSP_PASSKEY 
+                `    mdsp dev-proxy --mode credentials --port 7777 --passkey $MDSP_PASSKEY 
                                         \t runs on port 7777 using ${magenta("app/service credentials")}`
             );
 

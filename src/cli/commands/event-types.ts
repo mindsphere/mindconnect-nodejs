@@ -72,15 +72,15 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc event-types --mode list \t\t\t\t\t list all event types`);
+            log(`    mdsp event-types --mode list \t\t\t\t\t list all event types`);
             log(
-                `    mc event-types --mode list --eventtype PumpEvent\t\t list all event types which are named PumpEvent`
+                `    mdsp event-types --mode list --eventtype PumpEvent\t\t list all event types which are named PumpEvent`
             );
             log(
-                `    mc event-types --mode template --eventtype PumpEvent \n\tcreate a template file (PumpEvent.eventtype.mdsp.json) for event type PumpEvent`
+                `    mdsp event-types --mode template --eventtype PumpEvent \n\tcreate a template file (PumpEvent.eventtype.mdsp.json) for event type PumpEvent`
             );
             log(
-                `    mc event-types --mode create --file PumpEvent.eventtype.mdsp.json \n\tcreate event type PumpEvent in MindSphere`
+                `    mdsp event-types --mode create --file PumpEvent.eventtype.mdsp.json \n\tcreate event type PumpEvent in MindSphere`
             );
 
             serviceCredentialLog();
@@ -129,7 +129,7 @@ function writeEventTypeToFile(options: any, EventType: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc event-types --mode create --file ${fileName} \n\nto create the event type`
+        )} run \n\n\tmdsp event-types --mode create --file ${fileName} \n\nto create the event type`
     );
 }
 
@@ -217,22 +217,22 @@ function checkRequiredParamaters(options: any) {
     options.mode === "template" &&
         !options.eventtype &&
         errorLog(
-            "you have to provide event type to create a template (see mc event-types --help for more details)",
+            "you have to provide event type to create a template (see mdsp event-types --help for more details)",
             true
         );
 
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with event type to create an event type (see mc event-types --help for more details)",
+            "you have to provide a file with event type to create an event type (see mdsp event-types --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.eventtype &&
-        errorLog("you have to provide the event type to delete (see mc event-types --help for more details)", true);
+        errorLog("you have to provide the event type to delete (see mdsp event-types --help for more details)", true);
 
     options.mode === "info" &&
         !options.eventtype &&
-        errorLog("you have to provide the event type  (see mc event-types --help for more details)", true);
+        errorLog("you have to provide the event type  (see mdsp event-types --help for more details)", true);
 }
