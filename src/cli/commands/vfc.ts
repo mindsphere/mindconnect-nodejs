@@ -23,15 +23,17 @@ export default (program: Command) => {
         .command("visual-flow-creator")
         .alias("vfc")
         .option(
-            "-m, --mode [list|create|update|delete|template|get-nodes|put-nodes|info]",
-            "list | create | update | delete | template | get-nodes | put-nodes | info",
+            "-m, --mode [list|create|update|delete|template|get-nodes|put-nodes|info|trigger]",
+            "list | create | update | delete | template | get-nodes | put-nodes | info | trigger",
             "list"
         )
-        .option("-u, --user <user>", "user email")
+        .option("-u, --userid <userid>", "user email")
         .option("-f, --file <file>", ".mdsp.json file with vfc project definition", "vfc.project.mdsp.json")
         .option("-n, --nodes <nodes>", ".mdsp.json file with vfc project nodes", "vfc.nodes.mdsp.json")
         .option("-p, --project <project>", "the project name", `vfc-project-${new Date().getTime()}`)
         .option("-i, --id <id>", "the vfc project id")
+        .option("-t, --nodeid <nodeid>", "trigger the inject node")
+        .option("-m, --message <message>", ".mdsp.json file with trigger message", "vfc.message.mdsp.json")
         .option("-o, --overwrite", "overwrite template file if it already exists")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
@@ -78,6 +80,9 @@ export default (program: Command) => {
                         case "put-nodes":
                             await putNodes(options, sdk);
                             break;
+                        case "trigger":
+                            await trigger(options, sdk);
+                            break;
 
                         default:
                             throw Error(`no such option: ${options.mode}`);
@@ -96,7 +101,16 @@ export default (program: Command) => {
             log(`    mdsp vfc --user <email> --mode create --file <vfc project> \t\tcreate vfc project `);
             log(`    mdsp vfc --user <email> --mode update --file <vfc project> --id <id> \t update project `);
             log(`    mdsp vfc --user <email> --mode info --id <id> \tvfc project info for specified id`);
-            log(`    mdsp vfc --user <email> --mode delete --handle <handle> \tdelete vfc project with specified id`);
+            log(`    mdsp vfc --user <email> --mode delete --id <id> \tdelete vfc project with specified id`);
+            log(
+                `    mdsp vfc --user <email> --mode get-nodes --id <id> \tget vfc nodes for the specified project (using default file)`
+            );
+            log(
+                `    mdsp vfc --user <email> --mode put-nodes --id <id> \tstore vfc nodes to the specified project (using default file)`
+            );
+            log(
+                `    mdsp vfc --user <email> --mode trigger --id <id> --nodeid <nodeid> \ttrigger flow by sending the message to specified node (using default file)`
+            );
 
             serviceCredentialLog();
         });
@@ -106,7 +120,7 @@ async function createVfcProject(options: any, sdk: MindSphereSdk) {
     const filePath = path.resolve(options.file);
     const file = fs.readFileSync(filePath);
     const project = JSON.parse(file.toString());
-    const result = await sdk.GetVisualFlowCreatorClient().PostProject(project, { userId: options.user });
+    const result = await sdk.GetVisualFlowCreatorClient().PostProject(project, { userId: options.userid });
     console.log(`creted vfc project with id: ${color(result.id)}`);
 }
 
@@ -114,8 +128,8 @@ async function updateVfcProject(options: any, sdk: MindSphereSdk) {
     const filePath = path.resolve(options.file);
     const file = fs.readFileSync(filePath);
     const project = JSON.parse(file.toString());
-    await sdk.GetVisualFlowCreatorClient().GetProject(options.id, { userId: options.user });
-    const result = await sdk.GetVisualFlowCreatorClient().PatchProject(options.id, project, { userId: options.user });
+    await sdk.GetVisualFlowCreatorClient().GetProject(options.id, { userId: options.userid });
+    const result = await sdk.GetVisualFlowCreatorClient().PatchProject(options.id, project, { userId: options.userid });
     console.log(`updated vfc project with id: ${color(result.id)}`);
 }
 
@@ -139,7 +153,7 @@ function writeVfcProjectToFile(options: any, project: any) {
     fs.writeFileSync(fileName, JSON.stringify(project, null, 2));
     console.log(
         `The data was written into ${color(fileName)} run \n\n\tmdsp vfc --mode create --file ${fileName} --user ${
-            options.user || "<user email>"
+            options.userid || "<user email>"
         } \n\nto create the vfc project`
     );
 }
@@ -158,16 +172,14 @@ function writeNodesToFile(options: any, nodes: any) {
 
 async function deleteVfcProject(options: any, sdk: MindSphereSdk) {
     const id = options.handle;
-    await retry(options.retry, () => sdk.GetVisualFlowCreatorClient().DeleteProject(id, { userId: options.user }));
+    await retry(options.retry, () => sdk.GetVisualFlowCreatorClient().DeleteProject(id, { userId: options.userid }));
     console.log(`vfc project with id ${color(id)} deleted.`);
 }
 
 async function listVfcProjects(sdk: MindSphereSdk, options: any) {
     const projects = (await retry(options.retry, () =>
-        sdk.GetVisualFlowCreatorClient().GetProjects({ userId: options.user })
+        sdk.GetVisualFlowCreatorClient().GetProjects({ userId: options.userid })
     )) as VisualFlowCreatorModels.Projects;
-
-    // console.log(projects);
 
     console.log(`${color("id")} name ${color("userId")} tenant `);
     projects.projects?.forEach((project) => {
@@ -179,13 +191,13 @@ async function listVfcProjects(sdk: MindSphereSdk, options: any) {
 
 async function vfcProjectInfo(options: any, sdk: MindSphereSdk) {
     const project = await retry(options.retry, () =>
-        sdk.GetVisualFlowCreatorClient().GetProject(options.id, { userId: options.user })
+        sdk.GetVisualFlowCreatorClient().GetProject(options.id, { userId: options.userid })
     );
     verboseLog(JSON.stringify(project, null, 2), options.verbose);
     printObjectInfo("Visual Flow Creator Project", project, options, ["id", "userId"], color);
 
     const nodes = (await retry(options.retry, () =>
-        sdk.GetVisualFlowCreatorClient().GetProjecNodes(options.id, { userId: options.user })
+        sdk.GetVisualFlowCreatorClient().GetProjecNodes(options.id, { userId: options.userid })
     )) as VisualFlowCreatorModels.Nodes;
 
     console.log(`The project has ${color(nodes.nodes?.length || 0)} vfc nodes`);
@@ -193,7 +205,7 @@ async function vfcProjectInfo(options: any, sdk: MindSphereSdk) {
 
 async function getNodes(options: any, sdk: MindSphereSdk) {
     const nodes = (await retry(options.retry, () =>
-        sdk.GetVisualFlowCreatorClient().GetProjecNodes(options.id, { userId: options.user })
+        sdk.GetVisualFlowCreatorClient().GetProjecNodes(options.id, { userId: options.userid })
     )) as VisualFlowCreatorModels.Nodes;
 
     verboseLog(JSON.stringify(nodes, null, 2), options.verbose);
@@ -211,12 +223,23 @@ async function putNodes(options: any, sdk: MindSphereSdk) {
 
     !Array.isArray(nodes) && throwError("the nodes must be an array");
 
-    await sdk.GetVisualFlowCreatorClient().PutProjectNodes(options.id, nodes, { userId: options.user });
+    await sdk.GetVisualFlowCreatorClient().PutProjectNodes(options.id, nodes, { userId: options.userid });
     console.log(`updated nodes of the vfc project with id: ${color(options.id)}`);
 }
 
+async function trigger(options: any, sdk: MindSphereSdk) {
+    const filePath = path.resolve(options.message);
+    const file = fs.readFileSync(filePath);
+    const message = JSON.parse(file.toString());
+    const result = await sdk
+        .GetVisualFlowCreatorClient()
+        .TriggerFlow(options.id, options.nodeid, message, { userId: options.userid });
+
+    console.log(`${JSON.stringify(message)} was sent to ${options.nodeid} in ${options.id} flow`);
+}
+
 function checkRequiredParamaters(options: any) {
-    !options.user &&
+    !options.userid &&
         options.mode !== "template" &&
         errorLog("You must specify the user id (email) (see mdsp vfc --help for more details)", true);
 
@@ -231,7 +254,15 @@ function checkRequiredParamaters(options: any) {
         !options.nodes &&
         errorLog("you have to provide a file with vfc nodes (see mdsp vfc --help for more details)", true);
 
-    ["info", "update", "delete", "get-nodes", "put-nodes"].indexOf(options.mode) > 0 &&
+    ["info", "update", "delete", "get-nodes", "put-nodes", "trigger"].indexOf(options.mode) > 0 &&
         !options.id &&
         errorLog("you have to provide the vfc project id (see mdsp vfc --help for more details)", true);
+
+    options.mode === "trigger" &&
+        !options.nodeid &&
+        errorLog("you have to provide the nodeid to trigger (see mdsp vfc --help for more details)", true);
+
+    options.mode === "trigger" &&
+        !options.message &&
+        errorLog("you have to provide the file with the message to send (see mdsp vfc --help for more details)", true);
 }

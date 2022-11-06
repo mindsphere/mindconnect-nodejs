@@ -2,7 +2,9 @@
 
 ## 3.22.0 - Tuscan Sun Vienna - November 2022
 
+- CLI: `mdsp visual-flow-creator` - command
 - SDK: Visual Flow Creator Client [#334]
+- The CLI documentation and help are now showing `mdsp` as default command instead of `mc`
 - Fixed Unit Tests
 
 ## 3.21.0 - Sunset Orange Vienna - October 2022
