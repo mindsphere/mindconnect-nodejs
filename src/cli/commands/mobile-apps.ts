@@ -82,11 +82,11 @@ export default (program: Command) => {
 
 function printHelp() {
     log("\n  Examples:\n");
-    log(`    mc mobile-apps --mode list \t\t\t\t\tlist mobile apps`);
-    log(`    mc mobile-apps --mode template --type [android|ios] \tcreate template file for mobileapp`);
-    log(`    mc mobile-apps --mode create --file [android|ios].mobileapp.mdsp.json\tcreate mobileapp`);
-    log(`    mc mobile-apps --mode info --appid <appid>\t\t\tmobile app info`);
-    log(`    mc mobile-apps --mode delete --appid <appid>\t\tdelete mobile app`);
+    log(`    mdsp mobile-apps --mode list \t\t\t\t\tlist mobile apps`);
+    log(`    mdsp mobile-apps --mode template --type [android|ios] \tcreate template file for mobileapp`);
+    log(`    mdsp mobile-apps --mode create --file [android|ios].mobileapp.mdsp.json\tcreate mobileapp`);
+    log(`    mdsp mobile-apps --mode info --appid <appid>\t\t\tmobile app info`);
+    log(`    mdsp mobile-apps --mode delete --appid <appid>\t\tdelete mobile app`);
     serviceCredentialLog();
 }
 
@@ -160,7 +160,7 @@ async function createAppTemplate(options: any) {
     fs.writeFileSync(filePath, JSON.stringify(template, null, 2));
     console.log(`The ${color(options.type)} template file was written into ${color(fileName)}`);
     console.log(`Run:\n\n\
-              \tmc mobile-apps --mode create --file ${fileName}
+              \tmdsp mobile-apps --mode create --file ${fileName}
               \nto create mobile app in mindsphere.`);
 }
 

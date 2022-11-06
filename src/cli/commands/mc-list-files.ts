@@ -75,9 +75,9 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc ls --assetid 1234...ef --passkey mypasskey \t\t\t\tlist all files for assetid`);
+            log(`    mdsp ls --assetid 1234...ef --passkey mypasskey \t\t\t\tlist all files for assetid`);
             log(
-                `    mc ls --assetid 1234...ef --filter "path=upload*" --passkey mypasskey \tlist all files where path contains upload`
+                `    mdsp ls --assetid 1234...ef --filter "path=upload*" --passkey mypasskey \tlist all files where path contains upload`
             );
             serviceCredentialLog();
         });

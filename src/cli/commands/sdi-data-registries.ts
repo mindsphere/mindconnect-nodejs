@@ -80,15 +80,15 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc sdi-data-registries --mode list \t\t list all sdi dataregistries`);
-            log(`    mc sdi-data-registries --mode template \t create template file`);
+            log(`    mdsp sdi-data-registries --mode list \t\t list all sdi dataregistries`);
+            log(`    mdsp sdi-data-registries --mode template \t create template file`);
             log(
-                `    mc sdi-data-registries --mode create --dataregistry <dataregistryfile> \t create sdi data registry`
+                `    mdsp sdi-data-registries --mode create --dataregistry <dataregistryfile> \t create sdi data registry`
             );
-            log(`    mc sdi-data-registries --mode update --dataregistry <dataregistryfile> --registryid <registryid> \
+            log(`    mdsp sdi-data-registries --mode update --dataregistry <dataregistryfile> --registryid <registryid> \
                                                                                              \t\t update sdi data registry`);
-            log(`    mc sdi-data-registries --mode info --registryid <registryid>   \t\t get sdi data registry info`);
-            log(`    mc sdi-data-registries --mode delete --registryid <registryid> \t\t delete sdi data registry`);
+            log(`    mdsp sdi-data-registries --mode info --registryid <registryid>   \t\t get sdi data registry info`);
+            log(`    mdsp sdi-data-registries --mode delete --registryid <registryid> \t\t delete sdi data registry`);
 
             serviceCredentialLog();
         });
@@ -98,28 +98,28 @@ function checkRequiredParamaters(options: any) {
     options.mode === "create" &&
         !options.dataregistry &&
         errorLog(
-            "you have to provide a dataregistry template file to create a sdi dataregistry (see mc sdi-data-registries --help for more details)",
+            "you have to provide a dataregistry template file to create a sdi dataregistry (see mdsp sdi-data-registries --help for more details)",
             true
         );
 
     options.mode === "update" &&
         !options.registryid &&
         errorLog(
-            "you have to provide the registryid of the dataregistry you want to update (see mc sdi-data-registries --help for more details)",
+            "you have to provide the registryid of the dataregistry you want to update (see mdsp sdi-data-registries --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.registryid &&
         errorLog(
-            "you have to provide the registryid to get infos about the sdi data registry (see mc sdi-data-registries --help for more details)",
+            "you have to provide the registryid to get infos about the sdi data registry (see mdsp sdi-data-registries --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.registryid &&
         errorLog(
-            "you have to provide the registryid to delete the sdi data registry (see mc sdi-data-registries --help for more details)",
+            "you have to provide the registryid to delete the sdi data registry (see mdsp sdi-data-registries --help for more details)",
             true
         );
 }
@@ -192,7 +192,7 @@ function writeToFile(options: any, dataRegistry: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc sdi-data-registries --mode create --dataregistry ${fileName} \n\nto create the sdi data registry`
+        )} run \n\n\tmdsp sdi-data-registries --mode create --dataregistry ${fileName} \n\nto create the sdi data registry`
     );
 }
 async function createDataRegistry(options: any, sdk: MindSphereSdk) {

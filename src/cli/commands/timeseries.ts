@@ -66,21 +66,21 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc timeseries --asssetid 1234567..ef --aspectname Environment   \tlist recent timeseries for aspect Environment`
+                `    mdsp timeseries --asssetid 1234567..ef --aspectname Environment   \tlist recent timeseries for aspect Environment`
             );
             log(
-                `    mc timeseries --asssetid 1234567..ef --aspectname Environment --select Temperature \n\t\t\t\t\t\t\t\t\tlist recent temperature timeseries `
+                `    mdsp timeseries --asssetid 1234567..ef --aspectname Environment --select Temperature \n\t\t\t\t\t\t\t\t\tlist recent temperature timeseries `
             );
             log(
-                `    mc timeseries --asssetid 1234567..ef --aspectname Environment --select Temperature --all \n\t\t\t\t\t\t\t\t\tlist all recent temperature timeseries`
-            );
-
-            log(
-                `    mc timeseries --asssetid 1234567..ef --aspectname Environment --select Temperature --all \n\t\t\t\t\t\t\t\t\tlist all recent temperature timeseries`
+                `    mdsp timeseries --asssetid 1234567..ef --aspectname Environment --select Temperature --all \n\t\t\t\t\t\t\t\t\tlist all recent temperature timeseries`
             );
 
             log(
-                `    mc timeseries --asssetid 1234567..ef --aspectname Environment --download \n\t\t\t\t\t\t\t\t\tdownload the recent timeseries data for the Environment aspect`
+                `    mdsp timeseries --asssetid 1234567..ef --aspectname Environment --select Temperature --all \n\t\t\t\t\t\t\t\t\tlist all recent temperature timeseries`
+            );
+
+            log(
+                `    mdsp timeseries --asssetid 1234567..ef --aspectname Environment --download \n\t\t\t\t\t\t\t\t\tdownload the recent timeseries data for the Environment aspect`
             );
 
             log("\n  Important:\n");
@@ -164,12 +164,12 @@ async function listTimeSeries(options: any, sdk: MindSphereSdk) {
 function checkParameters(options: any) {
     !options.assetid &&
         errorLog(
-            "Missing assetid for timeseries command. Run mc timeseries --help for full syntax and examples.",
+            "Missing assetid for timeseries command. Run mdsp timeseries --help for full syntax and examples.",
             true
         );
     !options.aspectname &&
         errorLog(
-            "Missing aspectname for timeseries command. Run mc timeseries --help for full syntax and examples.",
+            "Missing aspectname for timeseries command. Run mdsp timeseries --help for full syntax and examples.",
             true
         );
 }

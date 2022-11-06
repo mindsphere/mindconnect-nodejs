@@ -91,9 +91,9 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log(`\n  Examples: \n`);
-            log(`    mc gd -k mypasskey`);
-            log(`    mc get-diagnostic --config someagent.json --passkey mypasskey`);
-            log(`    mc get-diagnostic --passkey mypasskey --text --all > log.csv`);
+            log(`    mdsp gd -k mypasskey`);
+            log(`    mdsp get-diagnostic --config someagent.json --passkey mypasskey`);
+            log(`    mdsp get-diagnostic --passkey mypasskey --text --all > log.csv`);
             serviceCredentialLog();
         });
 };

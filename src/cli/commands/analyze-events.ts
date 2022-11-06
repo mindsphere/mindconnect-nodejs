@@ -93,10 +93,10 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc event-analytics --mode top --file events.json --property description \t\t find the top 10 events in events.json`
+                `    mdsp event-analytics --mode top --file events.json --property description \t\t find the top 10 events in events.json`
             );
             log(
-                `    mc event-analytics --mode duplicate --file events.json --property description --split 5000 \t\t remove all duplicate events`
+                `    mdsp event-analytics --mode duplicate --file events.json --property description --split 5000 \t\t remove all duplicate events`
             );
             log("\n  Additional Documentation:\n");
             log(

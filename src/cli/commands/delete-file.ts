@@ -76,17 +76,17 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc delete-file -f CHANGELOG.md  --assetid 5..f  \t\t\t\t delete file ${color(
+                `    mdsp delete-file -f CHANGELOG.md  --assetid 5..f  \t\t\t\t delete file ${color(
                     "CHANGELOG.md"
                 )} from specified asset`
             );
             log(
-                `    mc delete-file --file  CHANGELOG.md  --assetid 5...f --filepath upload \t delete file ${color(
+                `    mdsp delete-file --file  CHANGELOG.md  --assetid 5...f --filepath upload \t delete file ${color(
                     "upload/CHANGELOG.md"
                 )} from specified asset`
             );
             log(
-                `    mc delete-file --file  upload/CHANGELOG.md  --assetid 5...f \t\t delete file ${color(
+                `    mdsp delete-file --file  upload/CHANGELOG.md  --assetid 5...f \t\t delete file ${color(
                     "upload/CHANGELOG.md"
                 )} from specified asset`
             );
@@ -96,7 +96,8 @@ export default (program: Command) => {
 
 function checkRequiredParameters(options: any) {
     !options.file &&
-        errorLog("Missing file name for delete-file command. Run mc de --help for full syntax and examples.", true);
+        errorLog("Missing file name for delete-file command. Run mdsp de --help for full syntax and examples.", true);
 
-    !options.assetid && errorLog(" You have to specify assetid. Run  mc de --help for full syntax and examples.", true);
+    !options.assetid &&
+        errorLog(" You have to specify assetid. Run  mdsp de --help for full syntax and examples.", true);
 }

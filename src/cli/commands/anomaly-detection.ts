@@ -79,23 +79,23 @@ export default (program: Command) => {
 
 function printHelp() {
     log("\n  Examples:\n");
-    log(`    mc ad --mode template --data timeseries.data.mdsp.json \n \
+    log(`    mdsp ad --mode template --data timeseries.data.mdsp.json \n \
                 creates a template for a time series data file`);
     log(
-        `    mc ad --mode train --on data --data timeseries.data.mdsp.json --epsilon 0.5 \n
+        `    mdsp ad --mode train --on data --data timeseries.data.mdsp.json --epsilon 0.5 \n
                 trains a model on the timeserie specified in the data file`
     );
     log(
-        `    mc ad --mode detect --on data --data timeseries.data.mdsp.json --modelid <modelid>\n \
+        `    mdsp ad --mode detect --on data --data timeseries.data.mdsp.json --modelid <modelid>\n \
                 detects anomalities of the timeseries in the data file using the model with specified id`
     );
 
     log(
-        `    mc ad --mode train --on asset --assetid <assetid> --aspectname Environment --epsilon 0.5\n\
+        `    mdsp ad --mode train --on asset --assetid <assetid> --aspectname Environment --epsilon 0.5\n\
                 trains a model on the time series of the aspect "Environment" of the asset with the id <assetid>`
     );
     log(
-        `    mc ad --mode detect --on asset --modelid <modelid> --assetid <assetid> --aspectname Environment --epsilon 0.5\n\
+        `    mdsp ad --mode detect --on asset --modelid <modelid> --assetid <assetid> --aspectname Environment --epsilon 0.5\n\
                 detect anomalities of the timeseries on the specified asset and aspect with selected model`
     );
 
@@ -128,7 +128,7 @@ async function createTemplate(options: any, sdk: MindSphereSdk) {
     console.log(
         `The time series data was written into ${color(
             fileName
-        )}.\nRun \n\n\tmc ad --mode train --on data --data ${fileName} --epsilon 50.0 \n\nto create the model.\n`
+        )}.\nRun \n\n\t mdsp ad --mode train --on data --data ${fileName} --epsilon 50.0 \n\nto create the model.\n`
     );
 }
 

@@ -80,18 +80,22 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc events-bulk --mode download  --asssetid 1234567..ef  \t download events from specified asset`);
-            log(`    mc events-bulk --mode download --dir newdir  \t\t download last 7 days of events to <dir> folder`);
             log(
-                `    mc events-bulk --mode template --assetid 1234576..ef  \t create template file event.filter.mdsp.json`
+                `    mdsp events-bulk --mode download  --asssetid 1234567..ef  \t download events from specified asset`
             );
             log(
-                `    mc events-bulk --mode download --filter event.filter.mdsp.json \t\t download events using configured filter`
+                `    mdsp events-bulk --mode download --dir newdir  \t\t download last 7 days of events to <dir> folder`
             );
             log(
-                `    mc events-bulk --mode delete --filter event.filter.mdsp.json \t\t delete events using configured filter`
+                `    mdsp events-bulk --mode template --assetid 1234576..ef  \t create template file event.filter.mdsp.json`
             );
-            log(`    mc events-bulk --mode check --jobid <jobid> \t\t check the state of bulk deleting job`);
+            log(
+                `    mdsp events-bulk --mode download --filter event.filter.mdsp.json \t\t download events using configured filter`
+            );
+            log(
+                `    mdsp events-bulk --mode delete --filter event.filter.mdsp.json \t\t delete events using configured filter`
+            );
+            log(`    mdsp events-bulk --mode check --jobid <jobid> \t\t check the state of bulk deleting job`);
             serviceCredentialLog();
         });
 };
@@ -152,7 +156,7 @@ async function deleteEvents(options: any, sdk: MindSphereSdk) {
     const result = await retry(options.retry, () => eventManagement.PostDeleteEventsJob({ filter: filter }));
     console.log(`Deletion job with id ${color(result.id)} is in state ${color(result.state)}.`);
     result.details && console.log(`Details: ${JSON.stringify(result.details)}.`);
-    console.log(`Run\n\n\tmc events-bulk --mode check --jobid ${result.id}\n\nto check the state of the job.\n `);
+    console.log(`Run\n\n\tmdsp events-bulk --mode check --jobid ${result.id}\n\nto check the state of the job.\n `);
 }
 
 async function checkDeleteJob(options: any, sdk: MindSphereSdk) {
@@ -184,21 +188,21 @@ export function createFilter(options: any) {
     console.log(
         `The filter was written into ${color(
             resolvedPath
-        )} run \n\n\tmc events-bulk --mode download --filter ${pathString} \t ${color(" to download events")}`
+        )} run \n\n\tmdsp events-bulk --mode download --filter ${pathString} \t ${color(" to download events")}`
     );
-    console.log(`\tmc events-bulk --mode delete --filter ${pathString} \t ${color(" to delete events")}`);
-    console.log(`\tmc events --mode list --filter ${pathString} \t\t ${color(" to list events")}`);
+    console.log(`\tmdsp events-bulk --mode delete --filter ${pathString} \t ${color(" to delete events")}`);
+    console.log(`\tmdsp events --mode list --filter ${pathString} \t\t ${color(" to list events")}`);
     console.log("\nEdit the filter before downloading or deleting the events.");
 }
 
 function checkParameters(options: any) {
     !options.dir &&
-        errorLog("Missing dir name for events-bulk command. Run mc dn --help for full syntax and examples.", true);
+        errorLog("Missing dir name for events-bulk command. Run mdsp dn --help for full syntax and examples.", true);
 
     options.mode === "delete" &&
         !options.filter &&
         errorLog(
-            "You must specifify a filter when deleting the events. Create one with  mc events-bulk --mode template.",
+            "You must specifify a filter when deleting the events. Create one with  mdsp events-bulk --mode template.",
             true
         );
 

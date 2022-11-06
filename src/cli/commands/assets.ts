@@ -81,18 +81,18 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc assets --mode create --typeid core.basicarea --assetname MyArea \t creates an asset in mindsphere of type basicarea`
+                `    mdsp assets --mode create --typeid core.basicarea --assetname MyArea \t creates an asset in mindsphere of type basicarea`
             );
             log(
-                `    mc assets --mode create --file MyPump.asset.mdsp.json \t\t creates an asset from specified file template`
+                `    mdsp assets --mode create --file MyPump.asset.mdsp.json \t\t creates an asset from specified file template`
             );
-            log(`    mc assets --mode list \t\t\t\t\t\t lists all assets in mindsphere`);
-            log(`    mc assets --mode list --typeid mclib\t\t\t\t lists all assets in mindsphere of type core.mclib`);
+            log(`    mdsp assets --mode list \t\t\t\t\t\t lists all assets in mindsphere`);
+            log(`    mdsp assets --mode list --typeid mclib\t\t\t\t lists all assets in mindsphere of type core.mclib`);
             log(
-                `    mc assets --mode delete --assetid 1234567..ef \t\t\t deletes asset with specified id from mindsphere`
+                `    mdsp assets --mode delete --assetid 1234567..ef \t\t\t deletes asset with specified id from mindsphere`
             );
             log(
-                `    mc assets --mode template --typeid <mytenant>.Pump --assetname MyPump \n\t\tcreates a file template MyPump.asset.mdsp.json which can be use in create command`
+                `    mdsp assets --mode template --typeid <mytenant>.Pump --assetname MyPump \n\t\tcreates a file template MyPump.asset.mdsp.json which can be use in create command`
             );
 
             serviceCredentialLog();
@@ -198,7 +198,7 @@ function createTemplate(options: any, rootid: string, tenant: string) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc aspects --mode create --file ${fileName} \n\nto create the aspect`
+        )} run \n\n\t mdsp aspects --mode create --file ${fileName} \n\nto create the aspect`
     );
 }
 

@@ -69,12 +69,12 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc tenant \t\t\t\t\t prints out the tenant information`);
-            log(`    mc tenant --mode info \t\t\t prints out the tenant information`);
-            log(`    mc tenant --mode template \t\t\t creates template file with legal configuration`);
-            log(`    mc tenant --mode delete \t\t\t deletes legal configuration`);
-            log(`    mc tenant --mode create --file <filename> \t creates legal configuration`);
-            log(`    mc tenant --mode upload --file <filename> \t uploads the company logo`);
+            log(`    mdsp tenant \t\t\t\t\t prints out the tenant information`);
+            log(`    mdsp tenant --mode info \t\t\t prints out the tenant information`);
+            log(`    mdsp tenant --mode template \t\t\t creates template file with legal configuration`);
+            log(`    mdsp tenant --mode delete \t\t\t deletes legal configuration`);
+            log(`    mdsp tenant --mode create --file <filename> \t creates legal configuration`);
+            log(`    mdsp tenant --mode upload --file <filename> \t uploads the company logo`);
             serviceCredentialLog();
         });
 };
@@ -125,7 +125,7 @@ function writeTemplate(sdk: MindSphereSdk, options: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc tenant --mode create --file ${fileName} \n\nto create the legal information of the tenant`
+        )} run \n\n\tmdsp tenant --mode create --file ${fileName} \n\nto create the legal information of the tenant`
     );
 }
 

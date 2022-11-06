@@ -70,20 +70,20 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc signal-calculation --mode template \t create template file for signal calculation`);
-            log(`    mc signal-calculation --mode template --on asset --assetid <assetid> --aspect <aspect> --variable variable\n\
+            log(`    mdsp signal-calculation --mode template \t create template file for signal calculation`);
+            log(`    mdsp signal-calculation --mode template --on asset --assetid <assetid> --aspect <aspect> --variable variable\n\
                                             \t creates template for calculation using mindsphere timeseries data`);
-            log(`    mc signal-calculation --mode calculate --template <filename> \n\
+            log(`    mdsp signal-calculation --mode calculate --template <filename> \n\
                                             \t calculates new signal from the timeseries specified in template file`);
 
-            log(`    mc signal-calculation --mode calculate \\
+            log(`    mdsp signal-calculation --mode calculate \\
                      --template <filename> \\
                      --timeseries <timeseriesfile> \\
                      --assetid <assetid> \\
                      --aspect <aspect>\n\
                                             \t calculates new signal from the timeseries specified in external file`);
 
-            log(`    mc signal-calculation --mode calculate --on asset --template <filename> \n\
+            log(`    mdsp signal-calculation --mode calculate --on asset --template <filename> \n\
                                             \t calculates new signal from the mindsphere timeseries`);
 
             log(`\n  Operation List: \n`);
@@ -100,7 +100,7 @@ function checkRequiredParamaters(options: any) {
     options.mode === "calculate" &&
         !options.template &&
         errorLog(
-            "you have to provide a file with signal calculation parameters (see mc signal-calculation --help for more details)",
+            "you have to provide a file with signal calculation parameters (see mdsp signal-calculation --help for more details)",
             true
         );
 
@@ -146,7 +146,7 @@ function createTemplate(options: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc signal-calculation --mode calculate --on data --template ${fileName} \n\nto calculate the signal.`
+        )} run \n\n\tmdsp signal-calculation --mode calculate --on data --template ${fileName} \n\nto calculate the signal.`
     );
 }
 
@@ -184,7 +184,7 @@ function createTemplateDirect(options: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc signal-calculation --mode calculate --on asset --template ${fileName} \n\nto calculate the signal.`
+        )} run \n\n\tmdsp signal-calculation --mode calculate --on asset --template ${fileName} \n\nto calculate the signal.`
     );
 }
 

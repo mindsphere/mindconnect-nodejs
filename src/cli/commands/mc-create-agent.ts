@@ -107,7 +107,9 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc create-agent --config agent.json --passkey passkey... \t create agent with default parameters`);
+            log(
+                `    mdsp create-agent --config agent.json --passkey passkey... \t create agent with default parameters`
+            );
             serviceCredentialLog();
         });
 };

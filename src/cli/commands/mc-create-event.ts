@@ -97,9 +97,9 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc create-event \t\t\t\t create error event with default values and current timestamp`);
-            log(`    mc ce --desc Warning! --severity 30 \t create warning with description warning`);
-            log(`    mc ce --desc \"custom event\" --i 123....4 \t create error event for asset with id 123....4`);
+            log(`    mdsp create-event \t\t\t\t create error event with default values and current timestamp`);
+            log(`    mdsp ce --desc Warning! --severity 30 \t create warning with description warning`);
+            log(`    mdsp ce --desc \"custom event\" --i 123....4 \t create error event for asset with id 123....4`);
         });
 };
 

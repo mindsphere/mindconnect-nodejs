@@ -101,24 +101,24 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc oe-deploy-workflow --mode list \t\t\tlist all workflow instances descriptions belonging to the caller's tenant.`
+                `    mdsp oe-deploy-workflow --mode list \t\t\tlist all workflow instances descriptions belonging to the caller's tenant.`
             );
             log(
-                `    mc oe-deploy-workflow --mode template \t\tcreate a template files to define the workflow state machine model.`
+                `    mdsp oe-deploy-workflow --mode template \t\tcreate a template files to define the workflow state machine model.`
             );
             log(
-                `    mc oe-deploy-workflow --mode create --file edge.app.model.mdsp.json \n\tcreates a new workflow model from template file.`
+                `    mdsp oe-deploy-workflow --mode create --file edge.app.model.mdsp.json \n\tcreates a new workflow model from template file.`
             );
             log(
-                `    mc oe-deploy-workflow --mode instantiate --file edge.app.instance.mdsp.json \n\tcreates a new workflow instance from template file.`
+                `    mdsp oe-deploy-workflow --mode instantiate --file edge.app.instance.mdsp.json \n\tcreates a new workflow instance from template file.`
             );
             log(
-                `    mc oe-deploy-workflow --mode update --id "7d018c..." --file edge.app.status.mdsp.json \n\tupdate a workflow instance.`
+                `    mdsp oe-deploy-workflow --mode update --id "7d018c..." --file edge.app.status.mdsp.json \n\tupdate a workflow instance.`
             );
-            log(`    mc oe-deploy-workflow --mode info --id <id>\t\tget details of a deployment workflow instance.`);
-            log(`    mc oe-deploy-workflow --mode info --key <key>\tget details of a deployment workflow model.`);
-            log(`    mc oe-deploy-workflow --mode cancel --id <id> \tcancel a deployment workflow.`);
-            log(`    mc oe-deploy-workflow --mode delete --key <key> \tdelete a deployment workflow model.`);
+            log(`    mdsp oe-deploy-workflow --mode info --id <id>\t\tget details of a deployment workflow instance.`);
+            log(`    mdsp oe-deploy-workflow --mode info --key <key>\tget details of a deployment workflow model.`);
+            log(`    mdsp oe-deploy-workflow --mode cancel --id <id> \tcancel a deployment workflow.`);
+            log(`    mdsp oe-deploy-workflow --mode delete --key <key> \tdelete a deployment workflow model.`);
 
             serviceCredentialLog();
         });
@@ -128,14 +128,14 @@ function checkRequiredParameters(options: any) {
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with the model data to create a new model (see mc oe-deploy-workflow --help for more details)",
+            "you have to provide a file with the model data to create a new model (see mdsp oe-deploy-workflow --help for more details)",
             true
         );
 
     options.mode === "instantiate" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with the instance data to create a new deployment workflow (see mc oe-deploy-workflow --help for more details)",
+            "you have to provide a file with the instance data to create a new deployment workflow (see mdsp oe-deploy-workflow --help for more details)",
             true
         );
 
@@ -143,27 +143,27 @@ function checkRequiredParameters(options: any) {
         !options.id &&
         !options.key &&
         errorLog(
-            "you have to provide the id of the workflow instance or the key of the worflow moel (see mc oe-deploy-workflow --help for more details)",
+            "you have to provide the id of the workflow instance or the key of the worflow moel (see mdsp oe-deploy-workflow --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.key &&
         errorLog(
-            "you have to provide the key of the workflow model to delete it (see mc oe-deploy-workflow --help for more details)",
+            "you have to provide the key of the workflow model to delete it (see mdsp oe-deploy-workflow --help for more details)",
             true
         );
     options.mode === "cancel" &&
         !options.id &&
         errorLog(
-            "you have to provide the id of the workflow instance to cancel it (see mc oe-deploy-workflow --help for more details)",
+            "you have to provide the id of the workflow instance to cancel it (see mdsp oe-deploy-workflow --help for more details)",
             true
         );
 
     options.mode === "update" &&
         !options.id &&
         errorLog(
-            "you have to provide the id of the workflow instance to update it (see mc oe-deploy-workflow --help for more details)",
+            "you have to provide the id of the workflow instance to update it (see mdsp oe-deploy-workflow --help for more details)",
             true
         );
 }
@@ -199,6 +199,7 @@ async function listInstances(sdk: MindSphereSdk, options: any) {
             );
             verboseLog(JSON.stringify(inst, null, 2), options.verbose);
         }
+        console.log(page, instancePage.page.totalPages);
     } while (page++ < (instancePage.page.totalPages || 0));
 
     console.log(`${color(instanceCount)} worflow instance(s) listed.\n`);
@@ -245,7 +246,7 @@ function writeWFModelTemplateToFile(options: any, templateType: any) {
     console.log(
         `The deployment workflow template was written into ${color(
             filePath
-        )} run \n\n\tmc oe-deploy-workflow --mode create --file ${fileName} \n\nto create a new workflow model.\n`
+        )} run \n\n\tmdsp oe-deploy-workflow --mode create --file ${fileName} \n\nto create a new workflow model.\n`
     );
 }
 async function createTemplateWorkflowInstance(options: any, sdk: MindSphereSdk) {
@@ -283,7 +284,7 @@ function writeWFInstTemplateToFile(options: any, templateType: any) {
     console.log(
         `The workflow instance template was written into ${color(
             filePath
-        )} run \n\n\tmc oe-deploy-workflow --mode instantiate --file ${fileName} \n\nto create a workflow instance\n`
+        )} run \n\n\tmdsp oe-deploy-workflow --mode instantiate --file ${fileName} \n\nto create a workflow instance\n`
     );
 }
 async function createTemplateWorkflowStatus(options: any, sdk: MindSphereSdk) {
@@ -310,7 +311,7 @@ function writeWFStatusTemplateToFile(options: any, templateType: any) {
     console.log(
         `The workflow status template was written into ${color(
             filePath
-        )} run \n\n\tmc oe-deploy-workflow --mode update --id <id> --file ${fileName} \n\nto update a workflow instance.\n`
+        )} run \n\n\tmdsp oe-deploy-workflow --mode update --id <id> --file ${fileName} \n\nto update a workflow instance.\n`
     );
 }
 async function workflowDeploymentInstInfo(options: any, sdk: MindSphereSdk) {

@@ -76,12 +76,12 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc oe-devices --mode list --assetid <assetid>\tlist all devices linked to the asset`);
-            log(`    mc oe-devices --mode info --id <deviceid>\t\tget device details`);
-            log(`    mc oe-devices --mode template \t\t\tcreate a template file for a new device`);
-            log(`    mc oe-devices --mode delete --id <devieceid>\tdelete the device with the specified id`);
+            log(`    mdsp oe-devices --mode list --assetid <assetid>\tlist all devices linked to the asset`);
+            log(`    mdsp oe-devices --mode info --id <deviceid>\t\tget device details`);
+            log(`    mdsp oe-devices --mode template \t\t\tcreate a template file for a new device`);
+            log(`    mdsp oe-devices --mode delete --id <devieceid>\tdelete the device with the specified id`);
             log(
-                `    mc oe-devices --mode create --file openedge.device.mdsp.json \n \
+                `    mdsp oe-devices --mode create --file openedge.device.mdsp.json \n \
                             create new device using the file openedge.device.mdsp.json`
             );
 
@@ -130,7 +130,7 @@ function writeDeviceTypeToFile(options: any, templateType: any) {
     console.log(
         `The data was written into ${color(
             filePath
-        )} run \n\n\tmc oe-devices --mode create --file ${fileName} \n\nto create the device`
+        )} run \n\n\tmdsp oe-devices --mode create --file ${fileName} \n\nto create the device`
     );
 }
 
@@ -185,18 +185,18 @@ function checkRequiredParameters(options: any) {
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with device type to create device type (see mc oe-devices --help for more details)",
+            "you have to provide a file with device type to create device type (see mdsp oe-devices --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.id &&
         errorLog(
-            "you have to provide the id of the device type to delete (see mc oe-devices --help for more details)",
+            "you have to provide the id of the device type to delete (see mdsp oe-devices --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.id &&
-        errorLog("you have to provide the id of the device type (see mc oe-devices --help for more details)", true);
+        errorLog("you have to provide the id of the device type (see mdsp oe-devices --help for more details)", true);
 }

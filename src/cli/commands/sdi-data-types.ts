@@ -97,20 +97,20 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc sdi-data-types --mode list \t\t\t\t list all sdi data types`);
+            log(`    mdsp sdi-data-types --mode list \t\t\t\t list all sdi data types`);
             log(
-                `    mc sdi-data-types --mode template --for datatype \t\t create template file for --mode create command`
+                `    mdsp sdi-data-types --mode template --for datatype \t\t create template file for --mode create command`
             );
             log(
-                `    mc sdi-data-types --mode template --for pattern \t\t create pattern file for --mode addpattern command`
+                `    mdsp sdi-data-types --mode template --for pattern \t\t create pattern file for --mode addpattern command`
             );
             log(
-                `    mc sdi-data-types --mode template --for suggest \t\t create samples files for --mode suggest command`
+                `    mdsp sdi-data-types --mode template --for suggest \t\t create samples files for --mode suggest command`
             );
-            log(`    mc sdi-data-types --mode create --datatype <datatypefile> \t create sdi data type`);
-            log(`    mc sdi-data-types --mode info --datatypename <datatypename>   \t\t get sdi data type info`);
-            log(`    mc sdi-data-types --mode delete --datatypename <datatypename> \t\t delete sdi data type`);
-            log(`    mc sdi-data-types --mode suggest --samplevalues <samplesfile> --testvalues <testfile> \
+            log(`    mdsp sdi-data-types --mode create --datatype <datatypefile> \t create sdi data type`);
+            log(`    mdsp sdi-data-types --mode info --datatypename <datatypename>   \t\t get sdi data type info`);
+            log(`    mdsp sdi-data-types --mode delete --datatypename <datatypename> \t\t delete sdi data type`);
+            log(`    mdsp sdi-data-types --mode suggest --samplevalues <samplesfile> --testvalues <testfile> \
                                                                              \t\t suggest patterns from sample data`);
 
             serviceCredentialLog();
@@ -121,49 +121,49 @@ function checkRequiredParamaters(options: any) {
     options.mode === "create" &&
         !options.datatype &&
         errorLog(
-            "you have to provide a datatype template file to create a sdi datatype (see mc sdi-data-types --help for more details)",
+            "you have to provide a datatype template file to create a sdi datatype (see mdsp sdi-data-types --help for more details)",
             true
         );
 
     options.mode === "addpatterns" &&
         !options.pattern &&
         errorLog(
-            "you have to provide a pattern template file to add patterns to sdi datatype (see mc sdi-data-types --help for more details)",
+            "you have to provide a pattern template file to add patterns to sdi datatype (see mdsp sdi-data-types --help for more details)",
             true
         );
 
     options.mode === "addpatterns" &&
         !options.datatypename &&
         errorLog(
-            "you have to provide data type name to add patterns to sdi datatype (see mc sdi-data-types --help for more details)",
+            "you have to provide data type name to add patterns to sdi datatype (see mdsp sdi-data-types --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.datatypename &&
         errorLog(
-            "you have to provide the data type name to get infos about the sdi data type (see mc sdi-data-types --help for more details)",
+            "you have to provide the data type name to get infos about the sdi data type (see mdsp sdi-data-types --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.datatypename &&
         errorLog(
-            "you have to provide the data type name to delete the sdi data type (see mc sdi-data-types --help for more details)",
+            "you have to provide the data type name to delete the sdi data type (see mdsp sdi-data-types --help for more details)",
             true
         );
 
     options.mode === "suggest" &&
         !options.samplevalues &&
         errorLog(
-            "you have to provide the samplevalues for pattern suggestion (see mc sdi-data-types --help for more details)",
+            "you have to provide the samplevalues for pattern suggestion (see mdsp sdi-data-types --help for more details)",
             true
         );
 
     options.mode === "suggest" &&
         !options.testvalues &&
         errorLog(
-            "you have to provide the testvalues for pattern suggestion (see mc sdi-data-types --help for more details)",
+            "you have to provide the testvalues for pattern suggestion (see mdsp sdi-data-types --help for more details)",
             true
         );
 }
@@ -210,7 +210,7 @@ function createTemplate(options: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc sdi-data-types --mode create --datatype ${fileName} \n\nto create the sdi data type`
+        )} run \n\n\tmdsp sdi-data-types --mode create --datatype ${fileName} \n\nto create the sdi data type`
     );
 }
 
@@ -224,7 +224,7 @@ function createPatternTemplate(options: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc sdi-data-types --mode addpatterns --datatypename <name> --pattern ${fileName} \n\nto create the sdi data type`
+        )} run \n\n\tmdsp sdi-data-types --mode addpatterns --datatypename <name> --pattern ${fileName} \n\nto create the sdi data type`
     );
 }
 
@@ -243,7 +243,7 @@ function createSampleValues(options: any) {
     console.log(
         `The data was written into ${color(fileNameSamples)} and  ${color(
             fileNameTest
-        )} run \n\n\tmc sdi-data-types --mode suggest --samplevalues ${fileNameSamples} --testvalues ${fileNameTest} \n\nto suggest patterns`
+        )} run \n\n\tmdsp sdi-data-types --mode suggest --samplevalues ${fileNameSamples} --testvalues ${fileNameTest} \n\nto suggest patterns`
     );
 }
 

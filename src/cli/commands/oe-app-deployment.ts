@@ -29,7 +29,7 @@ export default (program: Command) => {
         )
         .option("-i, --id <id>", "the installation task id")
         .option("-d, --deviceid <deviceid>", "deviceid to filter")
-        .option("-r, --realeaseid <realeaseid>", "software realease id")
+        .option("-r, --releaseid <releaseid>", "software release id")
         .option("-f, --file <file>", ".mdsp.json file with app data")
         .option("-s, --status <status> [closed|open]", "closed | open")
 
@@ -92,26 +92,26 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc oe-app-deploy --mode list --deviceid "7d018c..." \n\tlist all installation and removal tasks of a specified device.`
+                `    mdsp oe-app-deploy --mode list --deviceid "7d018c..." \n\tlist all installation and removal tasks of a specified device.`
             );
             log(
-                `    mc oe-app-deploy --mode template \n\tcreate template files to define an app installation/removal task.`
+                `    mdsp oe-app-deploy --mode template \n\tcreate template files to define an app installation/removal task.`
             );
             log(
-                `    mc oe-app-deploy --mode create --file edge.install.app.mdsp.json \n\tcreates a new installation app taks.`
+                `    mdsp oe-app-deploy --mode create --file edge.install.app.mdsp.json \n\tcreates a new installation app taks.`
             );
             log(
-                `    mc oe-app-deploy --mode remove --file edge.remove.app.mdsp.json \n\tcreates a new removal app task.`
+                `    mdsp oe-app-deploy --mode remove --file edge.remove.app.mdsp.json \n\tcreates a new removal app task.`
             );
             log(
-                `    mc oe-app-deploy --mode update --id "7d018c..." --file edge.app.status.mdsp.json \n\tupdate an installation/removal task from status template file.`
+                `    mdsp oe-app-deploy --mode update --id "7d018c..." --file edge.app.status.mdsp.json \n\tupdate an installation/removal task from status template file.`
             );
-            log(`    mc oe-app-deploy --mode info --id <id>\n\tget details of an installation task.`);
+            log(`    mdsp oe-app-deploy --mode info --id <id>\n\tget details of an installation task.`);
             log(
-                `    mc oe-app-deploy --mode check --deviceid <deviceid> --realeaseid <realeaseid>  \n\tcheck terms and condition of a software realease on a a specific device.`
+                `    mdsp oe-app-deploy --mode check --deviceid <deviceid> --releaseid <releaseid>  \n\tcheck terms and condition of a software release on a a specific device.`
             );
             log(
-                `    mc oe-app-deploy --mode accept --deviceid <deviceid> --realeaseid <realeaseid> \n\taccept terms and condition of a software realease on a a specific device.`
+                `    mdsp oe-app-deploy --mode accept --deviceid <deviceid> --releaseid <releaseid> \n\taccept terms and condition of a software release on a a specific device.`
             );
 
             serviceCredentialLog();
@@ -122,61 +122,61 @@ function checkRequiredParameters(options: any) {
     options.mode === "list" &&
         !options.deviceid &&
         errorLog(
-            "you have to provide the device id to list all the app installation/removal tasks (see mc oe-app-deploy --help for more details)",
+            "you have to provide the device id to list all the app installation/removal tasks (see mdsp oe-app-deploy --help for more details)",
             true
         );
 
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with the task data to create a new installation task (see mc oe-app-deploy --help for more details)",
+            "you have to provide a file with the task data to create a new installation task (see mdsp oe-app-deploy --help for more details)",
             true
         );
 
     options.mode === "remove" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with the task data to create a new deployment workflow (see mc oe-app-deploy --help for more details)",
+            "you have to provide a file with the task data to create a new deployment workflow (see mdsp oe-app-deploy --help for more details)",
             true
         );
 
     options.mode === "update" &&
         !options.id &&
         errorLog(
-            "you have to provide the id of the installation/removal task to update it (see mc oe-app-deploy --help for more details)",
+            "you have to provide the id of the installation/removal task to update it (see mdsp oe-app-deploy --help for more details)",
             true
         );
 
     options.mode === "check" &&
         !options.deviceid &&
         errorLog(
-            "you have to provide the deviceid to check for terms and conditions (see mc oe-app-deploy --help for more details)",
+            "you have to provide the deviceid to check for terms and conditions (see mdsp oe-app-deploy --help for more details)",
             true
         );
     options.mode === "check" &&
-        !options.realeaseid &&
+        !options.releaseid &&
         errorLog(
-            "you have to provide the realeaseid to check for terms and conditions (see mc oe-app-deploy --help for more details)",
+            "you have to provide the releaseid to check for terms and conditions (see mdsp oe-app-deploy --help for more details)",
             true
         );
 
     options.mode === "accept" &&
         !options.deviceid &&
         errorLog(
-            "you have to provide the deviceid to accept the terms and conditions (see mc oe-app-deploy --help for more details)",
+            "you have to provide the deviceid to accept the terms and conditions (see mdsp oe-app-deploy --help for more details)",
             true
         );
     options.mode === "accept" &&
-        !options.realeaseid &&
+        !options.releaseid &&
         errorLog(
-            "you have to provide the realeaseid to accept the terms and conditions (see mc oe-app-deploy --help for more details)",
+            "you have to provide the releaseid to accept the terms and conditions (see mdsp oe-app-deploy --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.id &&
         errorLog(
-            "you have to provide the id of the installation task (see mc oe-app-deploy --help for more details)",
+            "you have to provide the id of the installation task (see mdsp oe-app-deploy --help for more details)",
             true
         );
 }
@@ -248,7 +248,7 @@ function writeInstallTaskTemplateToFile(options: any, templateType: any) {
     console.log(
         `The app installation task template was written into ${color(
             filePath
-        )} run \n\n\tmc oe-app-deploy --mode create --file ${fileName} \n\nto create a new instalation task.\n`
+        )} run \n\n\tmdsp oe-app-deploy --mode create --file ${fileName} \n\nto create a new instalation task.\n`
     );
 }
 async function createTemplateRemovalTask(options: any, sdk: MindSphereSdk) {
@@ -276,7 +276,7 @@ function writeRemovalTaskTemplateToFile(options: any, templateType: any) {
     console.log(
         `The workflow instance template was written into ${color(
             filePath
-        )} run \n\n\tmc oe-app-deploy --mode remove --file ${fileName} \n\nto create a new removal task.\n`
+        )} run \n\n\tmdsp oe-app-deploy --mode remove --file ${fileName} \n\nto create a new removal task.\n`
     );
 }
 async function createTemplateTaskStatus(options: any, sdk: MindSphereSdk) {
@@ -304,7 +304,7 @@ function writeTaskStatusTemplateToFile(options: any, templateType: any) {
     console.log(
         `The app installation task status template was written into ${color(
             filePath
-        )} run \n\n\tmc oe-app-deploy --mode update --id <id> --file ${fileName} \n\nto update the instalation task.\n`
+        )} run \n\n\tmdsp oe-app-deploy --mode update --id <id> --file ${fileName} \n\nto update the instalation task.\n`
     );
 }
 async function taskInstInfo(options: any, sdk: MindSphereSdk) {
@@ -328,23 +328,23 @@ async function updateTaskStatus(options: any, sdk: MindSphereSdk) {
 async function checkTermAndConditions(options: any, sdk: MindSphereSdk) {
     let info = null;
     const deviceid = (options.deviceid! as string) ? options.deviceid : `${options.deviceid}`;
-    const realeaseid = (options.realeaseid! as string) ? options.realeaseid : `${options.realeaseid}`;
+    const releaseid = (options.releaseid! as string) ? options.releaseid : `${options.releaseid}`;
     info = (await retry(options.retry, () =>
-        sdk.GetEdgeDeploymentClient().GetTermsAndConditions(deviceid, realeaseid)
+        sdk.GetEdgeDeploymentClient().GetTermsAndConditions(deviceid, releaseid)
     )) as EdgeAppDeploymentModels.TermsAndConditionsResource;
     if (info.firstAccepted) {
         console.log(`Terms and conditions accepted on ${color(info.firstAccepted)}.\n`);
     } else {
-        console.log(`Terms and conditions are not ccepted for deviceid: ${deviceid} and realeaseid: ${realeaseid}.\n`);
+        console.log(`Terms and conditions are not ccepted for deviceid: ${deviceid} and releaseid: ${releaseid}.\n`);
     }
 }
 async function acceptTermAndConditions(options: any, sdk: MindSphereSdk) {
     const deviceid = (options.deviceid! as string) ? options.deviceid : `${options.deviceid}`;
-    const realeaseid = (options.realeaseid! as string) ? options.realeaseid : `${options.realeaseid}`;
+    const releaseid = (options.releaseid! as string) ? options.releaseid : `${options.releaseid}`;
     await retry(options.retry, () =>
         sdk.GetEdgeDeploymentClient().PostAcceptTermsAndConditions({
             deviceId: deviceid,
-            releaseId: realeaseid,
+            releaseId: releaseid,
         })
     );
 }

@@ -89,14 +89,14 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc vfc --user <email> --mode list \t\t\t\tlist all vfc projects`);
+            log(`    mdsp vfc --user <email> --mode list \t\t\t\tlist all vfc projects`);
             log(
-                `    mc vfc --user <email> --mode template --project <projectname> \tcreate a template file for vfc project <project>`
+                `    mdsp vfc --user <email> --mode template --project <projectname> \tcreate a template file for vfc project <project>`
             );
-            log(`    mc vfc --user <email> --mode create --file <vfc project> \t\tcreate vfc project `);
-            log(`    mc vfc --user <email> --mode update --file <vfc project> --id <id> \t update project `);
-            log(`    mc vfc --user <email> --mode info --id <id> \tvfc project info for specified id`);
-            log(`    mc vfc --user <email> --mode delete --handle <handle> \tdelete vfc project with specified id`);
+            log(`    mdsp vfc --user <email> --mode create --file <vfc project> \t\tcreate vfc project `);
+            log(`    mdsp vfc --user <email> --mode update --file <vfc project> --id <id> \t update project `);
+            log(`    mdsp vfc --user <email> --mode info --id <id> \tvfc project info for specified id`);
+            log(`    mdsp vfc --user <email> --mode delete --handle <handle> \tdelete vfc project with specified id`);
 
             serviceCredentialLog();
         });
@@ -138,7 +138,7 @@ function writeVfcProjectToFile(options: any, project: any) {
 
     fs.writeFileSync(fileName, JSON.stringify(project, null, 2));
     console.log(
-        `The data was written into ${color(fileName)} run \n\n\tmc vfc --mode create --file ${fileName} --user ${
+        `The data was written into ${color(fileName)} run \n\n\tmdsp vfc --mode create --file ${fileName} --user ${
             options.user || "<user email>"
         } \n\nto create the vfc project`
     );
@@ -218,20 +218,20 @@ async function putNodes(options: any, sdk: MindSphereSdk) {
 function checkRequiredParamaters(options: any) {
     !options.user &&
         options.mode !== "template" &&
-        errorLog("You must specify the user id (email) (see mc vfc --help for more details)", true);
+        errorLog("You must specify the user id (email) (see mdsp vfc --help for more details)", true);
 
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with vfc project definition to create a vfc project (see mc vfc --help for more details)",
+            "you have to provide a file with vfc project definition to create a vfc project (see mdsp vfc --help for more details)",
             true
         );
 
     options.mode === "put-nodes" &&
         !options.nodes &&
-        errorLog("you have to provide a file with vfc nodes (see mc vfc --help for more details)", true);
+        errorLog("you have to provide a file with vfc nodes (see mdsp vfc --help for more details)", true);
 
     ["info", "update", "delete", "get-nodes", "put-nodes"].indexOf(options.mode) > 0 &&
         !options.id &&
-        errorLog("you have to provide the vfc project id (see mc vfc --help for more details)", true);
+        errorLog("you have to provide the vfc project id (see mdsp vfc --help for more details)", true);
 }

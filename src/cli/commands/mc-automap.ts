@@ -96,21 +96,21 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc configure-agent --config agent.json -assetid 1234567...89 \tconfigures agent for specified assetid`
+                `    mdsp configure-agent --config agent.json -assetid 1234567...89 \tconfigures agent for specified assetid`
             );
             log(
-                `    mc configure-agent --config agent.json --mode print \t\tprints data source configuration and mappings`
+                `    mdsp configure-agent --config agent.json --mode print \t\tprints data source configuration and mappings`
             );
             log(
-                `    mc configure-agent --agentid 12345..ef --typeid <tenant>.Engine  \tcreates the data source configuration`
+                `    mdsp configure-agent --agentid 12345..ef --typeid <tenant>.Engine  \tcreates the data source configuration`
             );
             log(
-                `    mc configure-agent --mode map --agentid 12345..ef --assetid 1234567 creates the mappings for assetid`
+                `    mdsp configure-agent --mode map --agentid 12345..ef --assetid 1234567 creates the mappings for assetid`
             );
 
-            log(`    mc configure-agent --mode delete --agentid 12345..ef \t\tdeletes the mappings for agentid`);
-            log(`    mc configure-agent --config agent.json --mode test \t\t\tsends test data to mindsphere`);
-            log(`    mc configure-agent --mode template \\`);
+            log(`    mdsp configure-agent --mode delete --agentid 12345..ef \t\tdeletes the mappings for agentid`);
+            log(`    mdsp configure-agent --config agent.json --mode test \t\t\tsends test data to mindsphere`);
+            log(`    mdsp configure-agent --mode template \\`);
             log(`    \t--typeid castidev.Pump --language python \t\t\tcreate mapping template and function in python`);
         });
 };

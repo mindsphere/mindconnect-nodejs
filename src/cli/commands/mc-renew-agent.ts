@@ -68,7 +68,7 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc renew-agent --config agent.json --passkey passkey... \t renew agent secrets in agent.json configuration`
+                `    mdsp renew-agent --config agent.json --passkey passkey... \t renew agent secrets in agent.json configuration`
             );
             serviceCredentialLog();
         });
@@ -77,7 +77,7 @@ export default (program: Command) => {
 function checkRequiredParamaters(options: any) {
     !options.passkey &&
         errorLog(
-            "you have to provide a passkey to get the service token (run mc rn --help for full description)",
+            "you have to provide a passkey to get the service token (run mdsp rn --help for full description)",
             true
         );
     !options.config && errorLog("you have to provide a filename for the agent configuration", true);

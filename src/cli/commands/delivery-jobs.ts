@@ -86,21 +86,21 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc delivery-jobs --mode list \t\t\t\t\t list all jobs`);
+            log(`    mdsp delivery-jobs --mode list \t\t\t\t\t list all jobs`);
             log(
-                `    mc delivery-jobs --mode list --name <name> \t\t\t\t list all mqtt delivery jobs with the given name`
+                `    mdsp delivery-jobs --mode list --name <name> \t\t\t\t list all mqtt delivery jobs with the given name`
             );
             log(
-                `    mc delivery-jobs --mode list --filter '{"createdAt": {"after": "2021-11-06T13:46:00Z"}}' \ 
+                `    mdsp delivery-jobs --mode list --filter '{"createdAt": {"after": "2021-11-06T13:46:00Z"}}' \ 
                                                                          list all mqtt delivery jobs created after the specified date`
             );
-            log(`    mc delivery-jobs --mode template \t\t\t\t\t create template file for job creation`);
-            log(`    mc delivery-jobs --mode create --file <templatefile> \t\t create job`);
-            log(`    mc delivery-jobs --mode info --jobid <jobid> \t\t\t get infos about the job`);
-            log(`    mc delivery-jobs --mode delete --jobid <jobid> \t\t\t delete job with job id`);
-            log(`    mc delivery-jobs --mode commands --jobid <jobid> \t\t\t list all commands for specified job id`);
+            log(`    mdsp delivery-jobs --mode template \t\t\t\t\t create template file for job creation`);
+            log(`    mdsp delivery-jobs --mode create --file <templatefile> \t\t create job`);
+            log(`    mdsp delivery-jobs --mode info --jobid <jobid> \t\t\t get infos about the job`);
+            log(`    mdsp delivery-jobs --mode delete --jobid <jobid> \t\t\t delete job with job id`);
+            log(`    mdsp delivery-jobs --mode commands --jobid <jobid> \t\t\t list all commands for specified job id`);
             log(
-                `    mc delivery-jobs --mode commandinfo --jobid <jobid> --commandid <commandid> \ 
+                `    mdsp delivery-jobs --mode commandinfo --jobid <jobid> --commandid <commandid> \ 
                                                                          get info for selected command`
             );
 
@@ -144,7 +144,7 @@ function writejobToFile(options: any, job: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc delivery-jobs --mode create --file ${fileName} \n\nto create the job`
+        )} run \n\n\tmdsp delivery-jobs --mode create --file ${fileName} \n\nto create the job`
     );
 }
 
@@ -270,42 +270,42 @@ function checkRequiredParamaters(options: any) {
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with job parameters to create an job (see mc delivery-jobs --help for more details)",
+            "you have to provide a file with job parameters to create an job (see mdsp delivery-jobs --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.jobid &&
         errorLog(
-            "you have to provide the jobid of the job you want to delete (see mc delivery-jobs --help for more details)",
+            "you have to provide the jobid of the job you want to delete (see mdsp delivery-jobs --help for more details)",
             true
         );
 
     options.mode === "commands" &&
         !options.jobid &&
         errorLog(
-            "you have to provide the jobid of the job to see the list of commands (see mc delivery-jobs --help for more details)",
+            "you have to provide the jobid of the job to see the list of commands (see mdsp delivery-jobs --help for more details)",
             true
         );
 
     options.mode === "commandinfo" &&
         !options.jobid &&
         errorLog(
-            "you have to provide the jobid of the job for commandifo command (see mc delivery-jobs --help for more details)",
+            "you have to provide the jobid of the job for commandifo command (see mdsp delivery-jobs --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.jobid &&
         errorLog(
-            "you have to provide the jobid to get infos about the job (see mc delivery-jobs --help for more details)",
+            "you have to provide the jobid to get infos about the job (see mdsp delivery-jobs --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.commandid &&
         errorLog(
-            "you have to provide the commandid to get infos about the command (see mc delivery-jobs --help for more details)",
+            "you have to provide the commandid to get infos about the command (see mdsp delivery-jobs --help for more details)",
             true
         );
 }

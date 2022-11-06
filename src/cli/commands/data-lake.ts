@@ -97,35 +97,35 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc data-lake --mode list \t\t\tlists all configured permissions for data lake`);
-            log(`    mc data-lake --mode write \t\t\tallow writing to the data lake`);
-            log(`    mc data-lake --mode write --path data/ \tallow writing to the data lake from data/ folder`);
-            log(`    mc data-lake --mode meta --path data/ \tget metadata for path`);
-            log(`    mc data-lake --mode readtoken \t\tcreate AWS STS Token with read rights`);
-            log(`    mc data-lake --mode writetoken \t\tcreate AWS STS Token with write rights from data lake root`);
+            log(`    mdsp data-lake --mode list \t\t\tlists all configured permissions for data lake`);
+            log(`    mdsp data-lake --mode write \t\t\tallow writing to the data lake`);
+            log(`    mdsp data-lake --mode write --path data/ \tallow writing to the data lake from data/ folder`);
+            log(`    mdsp data-lake --mode meta --path data/ \tget metadata for path`);
+            log(`    mdsp data-lake --mode readtoken \t\tcreate AWS STS Token with read rights`);
+            log(`    mdsp data-lake --mode writetoken \t\tcreate AWS STS Token with write rights from data lake root`);
             log(
-                `    mc data-lake --mode writetoken --path data/ create AWS STS Token with write rights from data/ folder`
+                `    mdsp data-lake --mode writetoken --path data/ create AWS STS Token with write rights from data/ folder`
             );
 
             log(
-                `    mc data-lake --mode delete --permissionid  <permissionid>\t\t\t delete writing permission with selected permissionid`
+                `    mdsp data-lake --mode delete --permissionid  <permissionid>\t\t\t delete writing permission with selected permissionid`
             );
 
             log(
-                `    mc data-lake --mode upload --file CHANGELOG.md --path uploads/CHANGELOG.md \t upload file to data lake`
+                `    mdsp data-lake --mode upload --file CHANGELOG.md --path uploads/CHANGELOG.md \t upload file to data lake`
             );
 
             log(
-                `    mc data-lake --mode downloadurl --path uploads/CHANGELOG.md \t\t generate download url for the path`
+                `    mdsp data-lake --mode downloadurl --path uploads/CHANGELOG.md \t\t generate download url for the path`
             );
 
-            log(`    mc data-lake --mode subscriptions \t\t\t\t\t\t list all data lake event subscriptions`);
+            log(`    mdsp data-lake --mode subscriptions \t\t\t\t\t\t list all data lake event subscriptions`);
 
             log(
-                `    mc data-lake --mode subscribe --path <datalakepath> --destination aws-sns://<aws sns topic> \t subscribe an AWS SNS topic to folder changes`
+                `    mdsp data-lake --mode subscribe --path <datalakepath> --destination aws-sns://<aws sns topic> \t subscribe an AWS SNS topic to folder changes`
             );
 
-            log(`    mc data-lake --mode unsubscribe --subscriptionid <id>  \t\t\t delete event subscription`);
+            log(`    mdsp data-lake --mode unsubscribe --subscriptionid <id>  \t\t\t delete event subscription`);
 
             log("\n  Additional Information:\n");
             log(
@@ -357,11 +357,11 @@ export async function listPermissions(options: any, sdk: MindSphereSdk) {
 function checkRequiredParameters(options: any) {
     ["upload", "uploadurl", "downloadurl", "meta", "subscribe"].includes(options.mode) &&
         !options.path &&
-        errorLog(`You have to specify --path for mc data-lake --mode ${options.mode} command.`, true);
+        errorLog(`You have to specify --path for mdsp data-lake --mode ${options.mode} command.`, true);
 
     ["upload", "uploadurl"].includes(options.mode) &&
         !options.file &&
-        errorLog(`You have to specify --file for mc data-lake --mode ${options.mode} command.`, true);
+        errorLog(`You have to specify --file for mdsp data-lake --mode ${options.mode} command.`, true);
 
     options.mode === "delete" &&
         !options.permissionid &&

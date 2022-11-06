@@ -89,17 +89,17 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc download-file -f CHANGELOG.md  --assetid 5..f  \t\t\t\t download file ${color(
+                `    mdsp download-file -f CHANGELOG.md  --assetid 5..f  \t\t\t download file ${color(
                     "CHANGELOG.md"
                 )} from specified asset`
             );
             log(
-                `    mc download-file --file  CHANGELOG.md  --assetid 5...f --filepath upload \t download file ${color(
+                `    mdsp download-file --file  CHANGELOG.md  --assetid 5...f --filepath upload \t download file ${color(
                     "upload/CHANGELOG.md"
                 )} from specified asset`
             );
             log(
-                `    mc download-file --file  upload/CHANGELOG.md  --assetid 5...f \t\t download file ${color(
+                `    mdsp download-file --file  upload/CHANGELOG.md  --assetid 5...f \t\t download file ${color(
                     "upload/CHANGELOG.md"
                 )} from specified asset`
             );
@@ -109,7 +109,8 @@ export default (program: Command) => {
 
 function checkParameters(options: any) {
     !options.file &&
-        errorLog("Missing file name for download-file command. Run mc df --help for full syntax and examples.", true);
+        errorLog("Missing file name for download-file command. Run mdsp df --help for full syntax and examples.", true);
 
-    !options.assetid && errorLog(" You have to specify assetid. Run  mc df --help for full syntax and examples.", true);
+    !options.assetid &&
+        errorLog(" You have to specify assetid. Run  mdsp df --help for full syntax and examples.", true);
 }

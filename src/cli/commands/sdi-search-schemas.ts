@@ -60,9 +60,9 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc sdi-search-schemas --mode template \t create template file`);
+            log(`    mdsp sdi-search-schemas --mode template \t create template file`);
             log(
-                `    mc sdi-search-schemas --mode search --searchrequest <searchrequestfile> \t search for sdi schemas`
+                `    mdsp sdi-search-schemas --mode search --searchrequest <searchrequestfile> \t search for sdi schemas`
             );
             serviceCredentialLog();
         });
@@ -72,7 +72,7 @@ function checkRequiredParamaters(options: any) {
     options.mode === "search" &&
         !options.searchrequest &&
         errorLog(
-            "you have to provide a searchrequest file to search the SDI schemas (see mc sdi-search-schemas --help for more details)",
+            "you have to provide a searchrequest file to search the SDI schemas (see mdsp sdi-search-schemas --help for more details)",
             true
         );
 }
@@ -138,6 +138,6 @@ function writeToFile(options: any, schema: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc sdi-search-schemas --mode search --searchrequest ${fileName} \n\nto search the schemas`
+        )} run \n\n\tmdsp sdi-search-schemas --mode search --searchrequest ${fileName} \n\nto search the schemas`
     );
 }

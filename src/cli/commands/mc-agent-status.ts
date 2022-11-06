@@ -100,12 +100,12 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc agent-status   \t\t\t\t\tuses default ${color("agentconfig.json")}`);
-            log(`    mc agent-status --config agent.json \t\tuses specified configuration file`);
-            log(`    mc agent-status --cert private.key \t\t\tuses specified key for RSA_3072 profile`);
-            log(`    mc agent-status --passkey mypasskey \t\tdisplays also the online agent information`);
+            log(`    mdsp agent-status   \t\t\t\t\tuses default ${color("agentconfig.json")}`);
+            log(`    mdsp agent-status --config agent.json \t\tuses specified configuration file`);
+            log(`    mdsp agent-status --cert private.key \t\t\tuses specified key for RSA_3072 profile`);
+            log(`    mdsp agent-status --passkey mypasskey \t\tdisplays also the online agent information`);
             log(
-                `    mc agent-status --passkey mypasskey --verbose \tdisplays additionally the mappings and configuration`
+                `    mdsp agent-status --passkey mypasskey --verbose \tdisplays additionally the mappings and configuration`
             );
             serviceCredentialLog();
         });

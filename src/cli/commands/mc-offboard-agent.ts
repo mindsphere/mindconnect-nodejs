@@ -57,9 +57,9 @@ export default (program: Command) => {
                     );
 
                     console.log(`\nAgent offboarded`);
-                    console.log(`Run ${color("mc agent-status")} command to see the status of your agent`);
+                    console.log(`Run ${color("mdsp agent-status")} command to see the status of your agent`);
                     console.log(
-                        `You have to run ${color("mc renew-agent")} command before you can onboard this agent again!`
+                        `You have to run ${color("mdsp renew-agent")} command before you can onboard this agent again!`
                     );
 
                     agentConfigLog({
@@ -77,10 +77,10 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc offboard-agent --config agent.json --passkey passkey... \t offboard agent with agent.json configuration`
+                `    mdsp offboard-agent --config agent.json --passkey passkey... \t offboard agent with agent.json configuration`
             );
             log(
-                `    mc offboard-agent --agentid 12345..ef --passkey passkey... \t offboard agent with 12345..ef agentid`
+                `    mdsp offboard-agent --agentid 12345..ef --passkey passkey... \t offboard agent with 12345..ef agentid`
             );
             serviceCredentialLog();
         });

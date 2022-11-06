@@ -77,13 +77,13 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc sdi-data-lakes --mode list \t\t list all sdi datalakes`);
-            log(`    mc sdi-data-lakes --mode template \t\t create template file`);
-            log(`    mc sdi-data-lakes --mode create --datalake <datalakefile> \t\t create sdi data lake`);
-            log(`    mc sdi-data-lakes --mode update --datalake <datalakefile> --datalakeid <datalakeid> \
+            log(`    mdsp sdi-data-lakes --mode list \t\t list all sdi datalakes`);
+            log(`    mdsp sdi-data-lakes --mode template \t\t create template file`);
+            log(`    mdsp sdi-data-lakes --mode create --datalake <datalakefile> \t\t create sdi data lake`);
+            log(`    mdsp sdi-data-lakes --mode update --datalake <datalakefile> --datalakeid <datalakeid> \
                                                                               \t\t update sdi data lake`);
-            log(`    mc sdi-data-lakes --mode info --datalakeid <datalakeid>   \t\t get sdi data lake info`);
-            log(`    mc sdi-data-lakes --mode delete --datalakeid <datalakeid> \t\t delete sdi data lake`);
+            log(`    mdsp sdi-data-lakes --mode info --datalakeid <datalakeid>   \t\t get sdi data lake info`);
+            log(`    mdsp sdi-data-lakes --mode delete --datalakeid <datalakeid> \t\t delete sdi data lake`);
 
             serviceCredentialLog();
         });
@@ -93,28 +93,28 @@ function checkRequiredParamaters(options: any) {
     options.mode === "create" &&
         !options.datalake &&
         errorLog(
-            "you have to provide a datalake template file to create a sdi datalake (see mc sdi-data-lakes --help for more details)",
+            "you have to provide a datalake template file to create a sdi datalake (see mdsp sdi-data-lakes --help for more details)",
             true
         );
 
     options.mode === "update" &&
         !options.datalakeid &&
         errorLog(
-            "you have to provide the datalakeid of the datalake you want to update (see mc sdi-data-lakes --help for more details)",
+            "you have to provide the datalakeid of the datalake you want to update (see mdsp sdi-data-lakes --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.datalakeid &&
         errorLog(
-            "you have to provide the datalakeid to get infos about the sdi data lake (see mc sdi-data-lakes --help for more details)",
+            "you have to provide the datalakeid to get infos about the sdi data lake (see mdsp sdi-data-lakes --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.datalakeid &&
         errorLog(
-            "you have to provide the datalakeid to delete the sdi data lake (see mc sdi-data-lakes --help for more details)",
+            "you have to provide the datalakeid to delete the sdi data lake (see mdsp sdi-data-lakes --help for more details)",
             true
         );
 }
@@ -168,7 +168,7 @@ function writeToFile(options: any, dataLake: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc sdi-data-lakes --mode create --datalake ${fileName} \n\nto create the sdi data lake`
+        )} run \n\n\tmdsp sdi-data-lakes --mode create --datalake ${fileName} \n\nto create the sdi data lake`
     );
 }
 async function createDataLake(options: any, sdk: MindSphereSdk) {

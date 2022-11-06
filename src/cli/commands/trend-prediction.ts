@@ -109,24 +109,24 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc trend-prediction --mode list \t\t\t\t lists all trend prediction models`);
+            log(`    mdsp trend-prediction --mode list \t\t\t\t lists all trend prediction models`);
             log(
-                `    mc trend-prediction --mode get --modelid 12345..ef \t\t retrieves the trend prediction model from the mindsphere`
+                `    mdsp trend-prediction --mode get --modelid 12345..ef \t\t retrieves the trend prediction model from the mindsphere`
             );
             log(
-                `    mc trend-prediction --mode delete --modelid 12345..ef \t deletes the trend prediction model from the mindsphere`
-            );
-
-            log(
-                `    mc tp --mode trendandpredict \t\t\t\t training and prediction in one single step (see parameters below)`
+                `    mdsp trend-prediction --mode delete --modelid 12345..ef \t deletes the trend prediction model from the mindsphere`
             );
 
             log(
-                `\n    mc tp --mode train -f data.json -i "temp,vibration" -o "quality" -d 2 \t\t   trains quadratic fit function for f(temp, vibration) = quality `
+                `    mdsp tp --mode trendandpredict \t\t\t\t training and prediction in one single step (see parameters below)`
             );
 
             log(
-                `    mc tp --mode predict --modelid 12345..ef -i "temp,vibration" -o "quality" -p "30,0.01" predict the quality with temp=30, vibration=0.01 using trained model`
+                `\n    mdsp tp --mode train -f data.json -i "temp,vibration" -o "quality" -d 2 \t\t   trains quadratic fit function for f(temp, vibration) = quality `
+            );
+
+            log(
+                `    mdsp tp --mode predict --modelid 12345..ef -i "temp,vibration" -o "quality" -p "30,0.01" predict the quality with temp=30, vibration=0.01 using trained model`
             );
 
             log("\n  Additional Documentation:\n");
@@ -227,7 +227,10 @@ async function listModels(trendPrediction: TrendPredictionClient, options: any) 
 
 function checkRequiredParameters(options: any) {
     !options.mode &&
-        errorLog("You have to provide the mode for the command. Run mc tp --help for full syntax and examples.", true);
+        errorLog(
+            "You have to provide the mode for the command. Run mdsp tp --help for full syntax and examples.",
+            true
+        );
 
     !["train", "predict", "trainandpredict", "list", "get", "delete"].includes(options.mode) &&
         errorLog(

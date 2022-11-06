@@ -32,7 +32,7 @@ export default (program: Command) => {
 
     program.on("command:*", function () {
         console.error(red(`Invalid command: ${program.args.join(" ")}`));
-        console.error("Use mc --help for a list of available commands");
+        console.error("Use mdsp --help for a list of available commands");
         process.exit(1);
     });
 };

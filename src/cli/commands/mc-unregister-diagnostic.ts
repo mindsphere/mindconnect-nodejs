@@ -59,8 +59,8 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log(`\n  Examples:\n`);
-            log(`    mc ud -k mypasskey`);
-            log(`    mc unregister-diagnostic --config someagent.json -passkey mypasskey`);
+            log(`    mdsp ud -k mypasskey`);
+            log(`    mdsp unregister-diagnostic --config someagent.json -passkey mypasskey`);
             serviceCredentialLog();
         });
 };

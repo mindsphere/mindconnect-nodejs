@@ -118,25 +118,22 @@ export default (program: Command) => {
 function printHelp() {
     log("\n  Examples:\n");
     log(
-        `    mc message-broker --mode info   --subscriptionid <subscriptionid> --versionid <versionid> --topicid <topicid> \t get subscription webhook uri`
+        `    mdsp message-broker --mode info   --subscriptionid <subscriptionid> --versionid <versionid> --topicid <topicid> \t get subscription webhook uri`
     );
     log(
-        `    mc message-broker --mode delete --subscriptionid <subscriptionid> --versionid <versionid> --topicid <topicid> \t delete webhook `
+        `    mdsp message-broker --mode delete --subscriptionid <subscriptionid> --versionid <versionid> --topicid <topicid> \t delete webhook `
     );
     log(
-        `    mc message-broker --mode modify --subscriptionid <subscriptionid> --versionid <versionid> --topicid <topicid> --webhook <uri> \t configure webhook `
+        `    mdsp message-broker --mode modify --subscriptionid <subscriptionid> --versionid <versionid> --topicid <topicid> --webhook <uri> \t configure webhook `
     );
     log(
-        `    mc message-broker --mode template --file messagebroker.message.mdsp.json \t\t\t create template message file `
+        `    mdsp message-broker --mode template --file messagebroker.message.mdsp.json \t\t\t create template message file `
     );
 
     log(
-        `    mc message-broker --mode send --file messagebroker.message.mdsp.json --topicid <topicid> \t send message to the topic `
+        `    mdsp message-broker --mode send --file messagebroker.message.mdsp.json --topicid <topicid> \t send message to the topic `
     );
 
-    // log(`    mc mobile-apps --mode create --file [android|ios].mobileapp.mdsp.json\tcreate mobileapp`);
-    // log(`    mc mobile-apps --mode info --appid <appid>\t\t\tmobile app info`);
-    // log(`    mc mobile-apps --mode delete --appid <appid>\t\tdelete mobile app`);
     serviceCredentialLog();
 }
 
@@ -158,7 +155,7 @@ function writeTemplateToFile(options: any, job: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc message-broker --mode send --file ${fileName} \n\nto send the message`
+        )} run \n\n\tmdsp message-broker --mode send --file ${fileName} \n\nto send the message`
     );
 }
 function checkRequiredParameters(options: any) {

@@ -66,10 +66,10 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc sdi-ingest-jobs --mode list \t\t\t\t\t list all sdi data ingest jobs`);
-            log(`    mc sdi-ingest-jobs --mode template \t\t\t\t\t create template file`);
-            log(`    mc sdi-ingest-jobs --mode create --ingestjob <ingestjobfile> \t create sdi ingest job`);
-            log(`    mc sdi-ingest-jobs --mode info --jobid <jobid>   \t\t\t get sdi ingest job info`);
+            log(`    mdsp sdi-ingest-jobs --mode list \t\t\t\t\t list all sdi data ingest jobs`);
+            log(`    mdsp sdi-ingest-jobs --mode template \t\t\t\t create template file`);
+            log(`    mdsp sdi-ingest-jobs --mode create --ingestjob <ingestjobfile> \t create sdi ingest job`);
+            log(`    mdsp sdi-ingest-jobs --mode info --jobid <jobid>   \t\t\t get sdi ingest job info`);
 
             serviceCredentialLog();
         });
@@ -79,14 +79,14 @@ function checkRequiredParamaters(options: any) {
     options.mode === "create" &&
         !options.ingestjob &&
         errorLog(
-            "you have to provide a ingestjob template file to create a sdi ingestjob (see mc sdi-ingest-jobs --help for more details)",
+            "you have to provide a ingestjob template file to create a sdi ingestjob (see mdsp sdi-ingest-jobs --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.jobid &&
         errorLog(
-            "you have to provide the jobid to get infos about the sdi ingest job (see mc sdi-ingest-jobs --help for more details)",
+            "you have to provide the jobid to get infos about the sdi ingest job (see mdsp sdi-ingest-jobs --help for more details)",
             true
         );
 }
@@ -150,7 +150,7 @@ function writeToFile(options: any, ingestJob: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc sdi-ingest-jobs --mode create --ingestjob ${fileName} \n\nto create the sdi ingest job`
+        )} run \n\n\tmdsp sdi-ingest-jobs --mode create --ingestjob ${fileName} \n\nto create the sdi ingest job`
     );
 }
 async function createIngestJob(options: any, sdk: MindSphereSdk) {

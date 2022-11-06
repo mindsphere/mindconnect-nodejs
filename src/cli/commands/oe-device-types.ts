@@ -75,20 +75,20 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc oe-device-types --mode list \t\t\t list all device types`);
+            log(`    mdsp oe-device-types --mode list \t\t\t list all device types`);
             log(
-                `    mc oe-device-types --mode list --tenant siemens\t list all device types which belongs to the tenant \"siemens\"`
+                `    mdsp oe-device-types --mode list --tenant siemens\t list all device types which belongs to the tenant \"siemens\"`
             );
             log(
-                `    mc oe-device-types --mode info --id <deviceid>\t get details of device type with the specified device id`
+                `    mdsp oe-device-types --mode info --id <deviceid>\t get details of device type with the specified device id`
             );
             log(
-                `    mc oe-device-types --mode template --devicetype board \n\tcreate a template file for specified device type`
+                `    mdsp oe-device-types --mode template --devicetype board \n\tcreate a template file for specified device type`
             );
             log(
-                `    mc oe-device-types --mode create --file board.devicetype.mdsp.json \n\tcreate device type board in MindSphere`
+                `    mdsp oe-device-types --mode create --file board.devicetype.mdsp.json \n\tcreate device type board in MindSphere`
             );
-            log(`    mc oe-device-types --mode delete --id <devicetype>\t delete the device type with the device id`);
+            log(`    mdsp oe-device-types --mode delete --id <devicetype>\t delete the device type with the device id`);
             serviceCredentialLog();
         });
 };
@@ -132,7 +132,7 @@ function writeDeviceTypeToFile(options: any, templateType: any) {
     console.log(
         `The data was written into ${color(
             filePath
-        )} run \n\n\tmc oe-device-types --mode create --file ${fileName} \n\nto create the device type`
+        )} run \n\n\tmdsp oe-device-types --mode create --file ${fileName} \n\nto create the device type`
     );
 }
 
@@ -190,21 +190,21 @@ function checkRequiredParameters(options: any) {
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with device type to create device type (see mc oe-device-types --help for more details)",
+            "you have to provide a file with device type to create device type (see mdsp oe-device-types --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.id &&
         errorLog(
-            "you have to provide the id of the device type to delete (see mc oe-device-types --help for more details)",
+            "you have to provide the id of the device type to delete (see mdsp oe-device-types --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.id &&
         errorLog(
-            "you have to provide the id of the device type (see mc oe-device-types --help for more details)",
+            "you have to provide the id of the device type (see mdsp oe-device-types --help for more details)",
             true
         );
 }

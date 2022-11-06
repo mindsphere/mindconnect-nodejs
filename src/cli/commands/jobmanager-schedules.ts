@@ -84,14 +84,14 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc schedules --mode list \t\t\t\t\t list all job schedules`);
-            log(`    mc schedules --mode list --status RUNNING \t list all RUNNING job schedules`);
-            log(`    mc schedules --mode list --modelid <modelid> \t\t\t list all job schedules for specified model`);
-            log(`    mc schedules --mode template \t\t\t\t\t create template file for job schedule creation`);
-            log(`    mc schedules --mode create --file <templatefile> \t\t create job schedule`);
-            log(`    mc schedules --mode info --scheduleid <scheduleid> \t\t\t get infos about the job schedule`);
-            log(`    mc schedules --mode start --scheduleid <scheduleid> \t\t\t start job schedule with job id`);
-            log(`    mc schedules --mode stop --scheduleid <scheduleid> \t\t\t stop job schedule with job id`);
+            log(`    mdsp schedules --mode list \t\t\t\t\t list all job schedules`);
+            log(`    mdsp schedules --mode list --status RUNNING \t list all RUNNING job schedules`);
+            log(`    mdsp schedules --mode list --modelid <modelid> \t\t\t list all job schedules for specified model`);
+            log(`    mdsp schedules --mode template \t\t\t\t\t create template file for job schedule creation`);
+            log(`    mdsp schedules --mode create --file <templatefile> \t\t create job schedule`);
+            log(`    mdsp schedules --mode info --scheduleid <scheduleid> \t\t\t get infos about the job schedule`);
+            log(`    mdsp schedules --mode start --scheduleid <scheduleid> \t\t\t start job schedule with job id`);
+            log(`    mdsp schedules --mode stop --scheduleid <scheduleid> \t\t\t stop job schedule with job id`);
             serviceCredentialLog();
         });
 };
@@ -131,7 +131,7 @@ function writescheduleToFile(options: any, job: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc schedules --mode create --file ${fileName} \n\nto create the job schedule`
+        )} run \n\n\tmdsp schedules --mode create --file ${fileName} \n\nto create the job schedule`
     );
 }
 
@@ -232,34 +232,34 @@ function checkRequiredParamaters(options: any) {
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with schedule parameters to create a schedule (see mc schedules --help for more details)",
+            "you have to provide a file with schedule parameters to create a schedule (see mdsp schedules --help for more details)",
             true
         );
 
     options.mode === "stop" &&
         !options.scheduleid &&
         errorLog(
-            "you have to provide the scheduleid of the schedule you want to stop (see mc schedules --help for more details)",
+            "you have to provide the scheduleid of the schedule you want to stop (see mdsp schedules --help for more details)",
             true
         );
     options.mode === "start" &&
         !options.scheduleid &&
         errorLog(
-            "you have to provide the scheduleid of the schedule you want to start (see mc schedules --help for more details)",
+            "you have to provide the scheduleid of the schedule you want to start (see mdsp schedules --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.scheduleid &&
         errorLog(
-            "you have to provide the scheduleid to get infos about the schedule (see mc schedules --help for more details)",
+            "you have to provide the scheduleid to get infos about the schedule (see mdsp schedules --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.scheduleid &&
         errorLog(
-            "you have to provide the scheduleid to delete the schedule (see mc schedules --help for more details)",
+            "you have to provide the scheduleid to delete the schedule (see mdsp schedules --help for more details)",
             true
         );
 }

@@ -171,13 +171,13 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc kpi-calculation --mode states --file timeseries.mdsp.json --calendar calendar.mdsp.json  --target rpm --threshold 30 \n \t\tcalculate kpi states based on rpm`
+                `    mdsp kpi-calculation --mode states --file timeseries.mdsp.json --calendar calendar.mdsp.json  --target rpm --threshold 30 \n \t\tcalculate kpi states based on rpm`
             );
             log(
-                `    mc kpi-calculation --mode direct --target rpm --assetid 123...ef --aspectname EngineParameters  --from <date> --to <date> \n \t\tcalculate kpi states based on asset data in MindSphere`
+                `    mdsp kpi-calculation --mode direct --target rpm --assetid 123...ef --aspectname EngineParameters  --from <date> --to <date> \n \t\tcalculate kpi states based on asset data in MindSphere`
             );
             log(
-                `    mc kpi-calculation --mode kpis --file states.mdsp.json --target state \n \t\tcalculate kpis for state timeseries`
+                `    mdsp kpi-calculation --mode kpis --file states.mdsp.json --target state \n \t\tcalculate kpis for state timeseries`
             );
 
             log("\n  State KPIs:\n");
@@ -213,7 +213,10 @@ function readDataFromFile(filename: string, verbose: any) {
 
 function checkParameters(options: any) {
     !options.mode &&
-        errorLog("You have to provide the mode for the command. Run mc kp --help for full syntax and examples.", true);
+        errorLog(
+            "You have to provide the mode for the command. Run mdsp kp --help for full syntax and examples.",
+            true
+        );
 
     options.mode !== "direct" &&
         !options.file &&

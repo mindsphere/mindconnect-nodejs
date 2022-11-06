@@ -140,121 +140,121 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             console.log(`\n  Example:\n`);
-            console.log(`    mc iam --mode list --user \t\t list all ${color("users")}`);
+            console.log(`    mdsp iam --mode list --user \t\t list all ${color("users")}`);
             console.log(
-                `    mc iam --mode list --user [user] \t list all ${color("users")} which contain ${color(
+                `    mdsp iam --mode list --user [user] \t list all ${color("users")} which contain ${color(
                     "[user]"
                 )} in the login name`
             );
 
-            console.log(`    mc iam --mode list --group \t\t list all ${groupColor("groups")}`);
+            console.log(`    mdsp iam --mode list --group \t\t list all ${groupColor("groups")}`);
             console.log(
-                `    mc iam --mode list --group [group] \t list all ${groupColor("groups")} which contain ${groupColor(
-                    "[group]"
-                )} in the name`
+                `    mdsp iam --mode list --group [group] \t list all ${groupColor(
+                    "groups"
+                )} which contain ${groupColor("[group]")} in the name`
             );
 
-            console.log(`    mc iam --mode list --role \t\t list all ${groupColor("roles")}`);
+            console.log(`    mdsp iam --mode list --role \t\t list all ${groupColor("roles")}`);
             console.log(
-                `    mc iam --mode list --role [role] \t list all ${roleColor("roles")} which contain ${roleColor(
+                `    mdsp iam --mode list --role [role] \t list all ${roleColor("roles")} which contain ${roleColor(
                     "[role]"
                 )} in the name`
             );
 
             console.log(
-                `\n    mc iam --mode info --user [user] --meta \t get all infos about ${color(
+                `\n    mdsp iam --mode info --user [user] --meta \t get all infos about ${color(
                     "users"
                 )} which contain ${color("[user]")} in the login name`
             );
 
             console.log(
-                `    mc iam --mode info --group [group] --meta \t get all infos about ${groupColor(
+                `    mdsp iam --mode info --group [group] --meta \t get all infos about ${groupColor(
                     "groups"
                 )} which contain ${groupColor("[group]")} in the name`
             );
 
             console.log(
-                `    mc iam --mode info --role [role]  --meta \t get all infos about ${roleColor(
+                `    mdsp iam --mode info --role [role]  --meta \t get all infos about ${roleColor(
                     "roles"
                 )} which contain ${roleColor("[role]")} in the name`
             );
 
-            console.log(`\n    mc iam --mode create|delete --user <user> \t create or delete ${color("user")}`);
-            console.log(`    mc iam --mode create|delete --group <group>  create or delete ${groupColor("group")}`);
-            console.log(`    mc iam --mode create|delete --role  <role> \t create or delete ${roleColor("role")}`);
+            console.log(`\n    mdsp iam --mode create|delete --user <user> \t create or delete ${color("user")}`);
+            console.log(`    mdsp iam --mode create|delete --group <group>  create or delete ${groupColor("group")}`);
+            console.log(`    mdsp iam --mode create|delete --role  <role> \t create or delete ${roleColor("role")}`);
             console.log(
-                `    mc iam --mode create --user <user> --subtenant subtenant \t create ${color(
+                `    mdsp iam --mode create --user <user> --subtenant subtenant \t create ${color(
                     "user"
                 )} in specified subtenant`
             );
             console.log(
-                `\n    mc iam --mode assign --user <user> --group <group> \t assign ${color(
+                `\n    mdsp iam --mode assign --user <user> --group <group> \t assign ${color(
                     "user"
                 )} to user group ${groupColor("group")}`
             );
 
             console.log(
-                `    mc iam --mode assign --user <user> --role <role> \t assign ${roleColor("role")} to user ${color(
+                `    mdsp iam --mode assign --user <user> --role <role> \t assign ${roleColor("role")} to user ${color(
                     "user"
                 )}`
             );
 
             console.log(
-                `    mc iam --mode assign --user <user> --group <group> \t assign ${color(
+                `    mdsp iam --mode assign --user <user> --group <group> \t assign ${color(
                     "user"
                 )} to user group ${groupColor("group")}`
             );
 
             console.log(
-                `    mc iam --mode assign --group <group> --membergroup <membergroup> \t assign ${groupColor(
+                `    mdsp iam --mode assign --group <group> --membergroup <membergroup> \t assign ${groupColor(
                     "membergroup"
                 )} to user group ${groupColor("group")}`
             );
 
             console.log(
-                `    mc iam --mode assign --group <group> --role <role> \t\t\t assign ${roleColor(
+                `    mdsp iam --mode assign --group <group> --role <role> \t\t\t assign ${roleColor(
                     "role"
                 )} to user group ${groupColor("group")}`
             );
 
             console.log(
-                `    mc iam --mode assign --role <role> --memberrole <memberrole> \t assign ${roleColor(
+                `    mdsp iam --mode assign --role <role> --memberrole <memberrole> \t assign ${roleColor(
                     "member role"
                 )} to custom role ${roleColor("role")}`
             );
 
             console.log(
-                `\n    mc iam --mode remove --user <user> --group <group> \t remove ${color(
+                `\n    mdsp iam --mode remove --user <user> --group <group> \t remove ${color(
                     "user"
                 )} from user group ${groupColor("group")}`
             );
 
             console.log(
-                `    mc iam --mode remove --user <user> --role <role> \t remove ${roleColor("role")} from user ${color(
-                    "user"
-                )}`
+                `    mdsp iam --mode remove --user <user> --role <role> \t remove ${roleColor(
+                    "role"
+                )} from user ${color("user")}`
             );
 
             console.log(
-                `    mc iam --mode remove --user <user> --group <group> \t remove ${color(
+                `    mdsp iam --mode remove --user <user> --group <group> \t remove ${color(
                     "user"
                 )} from user group ${groupColor("group")}`
             );
 
             console.log(
-                `    mc iam --mode remove --group <group> --membergroup <membergroup> \t remove ${groupColor(
+                `    mdsp iam --mode remove --group <group> --membergroup <membergroup> \t remove ${groupColor(
                     "membergroup"
                 )} from user group ${groupColor("group")}`
             );
 
             console.log(
-                `    mc iam --mode remove --group <group> --role <role> \t\t\t remove ${roleColor(
+                `    mdsp iam --mode remove --group <group> --role <role> \t\t\t remove ${roleColor(
                     "role"
                 )} from user group ${groupColor("group")}`
             );
 
             console.log(
-                `    mc iam --mode remove --role <role> --memberrole <memberrole> \t remove ${roleColor(
+                `    mdsp iam --mode remove --role <role> --memberrole <memberrole> \t remove ${roleColor(
                     "member role"
                 )} from custom role ${roleColor("role")}`
             );
@@ -890,7 +890,7 @@ function checkRequiredParameters(options: any) {
             !options.group &&
             !options.role &&
             throwError(
-                `you have to specify either --user [user] or --group [group] or --role [role] for mc iam --mode ${x} command`
+                `you have to specify either --user [user] or --group [group] or --role [role] for mdsp iam --mode ${x} command`
             );
     });
 
@@ -900,7 +900,7 @@ function checkRequiredParameters(options: any) {
             !(typeof options.group === "string") &&
             !(typeof options.role === "string") &&
             throwError(
-                `you have to specify either --user [user] or --group [group] or --role [role] for mc iam --mode ${x} command`
+                `you have to specify either --user [user] or --group [group] or --role [role] for mdsp iam --mode ${x} command`
             );
     });
 

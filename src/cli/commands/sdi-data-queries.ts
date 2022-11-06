@@ -81,14 +81,15 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc sdi-data-queries --mode list \t\t list all sdi dataqueries`);
-            log(`    mc sdi-data-queries --mode template \t create template file`);
-            log(`    mc sdi-data-queries --mode create --query <queryfile> \t create sdi data query`);
-            log(`    mc sdi-data-queries --mode update --query <queryfile> --queryid <queryid> \
-                                                                                             \t\t update sdi data query`);
-            log(`    mc sdi-data-queries --mode info --queryid <queryid>   \t\t get sdi data query info`);
-            log(`    mc sdi-data-queries --mode latest --queryid <queryid>   \t\t get latest query results`);
-            log(`    mc sdi-data-queries --mode delete --queryid <queryid> \t\t delete sdi data query`);
+            log(`    mdsp sdi-data-queries --mode list \t\t list all sdi dataqueries`);
+            log(`    mdsp sdi-data-queries --mode template \t create template file`);
+            log(`    mdsp sdi-data-queries --mode create --query <queryfile> \t create sdi data query`);
+            log(
+                `    mdsp sdi-data-queries --mode update --query <queryfile> --queryid <queryid> \tupdate sdi data query`
+            );
+            log(`    mdsp sdi-data-queries --mode info --queryid <queryid>   \t\t get sdi data query info`);
+            log(`    mdsp sdi-data-queries --mode latest --queryid <queryid>   \t\t get latest query results`);
+            log(`    mdsp sdi-data-queries --mode delete --queryid <queryid> \t\t delete sdi data query`);
 
             serviceCredentialLog();
         });
@@ -98,28 +99,28 @@ function checkRequiredParamaters(options: any) {
     options.mode === "create" &&
         !options.query &&
         errorLog(
-            "you have to provide a query template file to create a sdi query (see mc sdi-data-queries --help for more details)",
+            "you have to provide a query template file to create a sdi query (see mdsp sdi-data-queries --help for more details)",
             true
         );
 
     options.mode === "update" &&
         !options.queryid &&
         errorLog(
-            "you have to provide the queryid of the query you want to update (see mc sdi-data-queries --help for more details)",
+            "you have to provide the queryid of the query you want to update (see mdsp sdi-data-queries --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.queryid &&
         errorLog(
-            "you have to provide the queryid to get infos about the sdi data query (see mc sdi-data-queries --help for more details)",
+            "you have to provide the queryid to get infos about the sdi data query (see mdsp sdi-data-queries --help for more details)",
             true
         );
 
     options.mode === "delete" &&
         !options.queryid &&
         errorLog(
-            "you have to provide the queryid to delete the sdi data query (see mc sdi-data-queries --help for more details)",
+            "you have to provide the queryid to delete the sdi data query (see mdsp sdi-data-queries --help for more details)",
             true
         );
 }
@@ -181,7 +182,7 @@ function writeToFile(options: any, query: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc sdi-data-queries --mode create --query ${fileName} \n\nto create the sdi data query`
+        )} run \n\n\tmdsp sdi-data-queries --mode create --query ${fileName} \n\nto create the sdi data query`
     );
 }
 async function createQuery(options: any, sdk: MindSphereSdk) {

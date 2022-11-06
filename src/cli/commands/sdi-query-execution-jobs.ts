@@ -80,16 +80,16 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc sdi-execution-jobs --mode list \t\t list all sdi data execution jobs`);
-            log(`    mc sdi-execution-jobs --mode template \t create template file`);
+            log(`    mdsp sdi-execution-jobs --mode list \t\t list all sdi data execution jobs`);
+            log(`    mdsp sdi-execution-jobs --mode template \t create template file`);
             log(
-                `    mc sdi-execution-jobs --mode create --executionjob <executionjobfile> \t create sdi data execution job`
+                `    mdsp sdi-execution-jobs --mode create --executionjob <executionjobfile> \t create sdi data execution job`
             );
-            log(`    mc sdi-execution-jobs --mode update --executionjob <executionjobfile> --jobid <jobid> \
+            log(`    mdsp sdi-execution-jobs --mode update --executionjob <executionjobfile> --jobid <jobid> \
                                                                                     \t\t update sdi data executionjob`);
-            log(`    mc sdi-execution-jobs --mode info --jobid <jobid>   \t\t get sdi data execution job info`);
-            log(`    mc sdi-execution-jobs --mode result --jobid <jobid>   \t\t get execution job results`);
-            log(`    mc sdi-execution-jobs --mode delete --jobid <jobid> \t\t delete sdi data execution job`);
+            log(`    mdsp sdi-execution-jobs --mode info --jobid <jobid>   \t\t get sdi data execution job info`);
+            log(`    mdsp sdi-execution-jobs --mode result --jobid <jobid>   \t\t get execution job results`);
+            log(`    mdsp sdi-execution-jobs --mode delete --jobid <jobid> \t\t delete sdi data execution job`);
 
             serviceCredentialLog();
         });
@@ -99,34 +99,34 @@ function checkRequiredParamaters(options: any) {
     options.mode === "create" &&
         !options.executionjob &&
         errorLog(
-            "you have to provide a executionjob template file to create a sdi execution job (see mc sdi-execution-jobs --help for more details)",
+            "you have to provide a executionjob template file to create a sdi execution job (see mdsp sdi-execution-jobs --help for more details)",
             true
         );
 
     options.mode === "create" &&
         !options.queryid &&
         errorLog(
-            "you have to provide a query id template file to create a sdi execution job (see mc sdi-execution-jobs --help for more details)",
+            "you have to provide a query id template file to create a sdi execution job (see mdsp sdi-execution-jobs --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.jobid &&
         errorLog(
-            "you have to provide the jobid to get infos about the sdi execution job (see mc sdi-execution-jobs --help for more details)",
+            "you have to provide the jobid to get infos about the sdi execution job (see mdsp sdi-execution-jobs --help for more details)",
             true
         );
 
     options.mode === "result" &&
         !options.jobid &&
         errorLog(
-            "you have to provide the jobid to get the sdi execution job result (see mc sdi-execution-jobs --help for more details)",
+            "you have to provide the jobid to get the sdi execution job result (see mdsp sdi-execution-jobs --help for more details)",
             true
         );
     options.mode === "delete" &&
         !options.jobid &&
         errorLog(
-            "you have to provide the jobid to delete the sdi execution job (see mc sdi-execution-jobs --help for more details)",
+            "you have to provide the jobid to delete the sdi execution job (see mdsp sdi-execution-jobs --help for more details)",
             true
         );
 }
@@ -199,7 +199,7 @@ function writeToFile(options: any, executionjob: any) {
     console.log(
         `The data was written into ${color(
             fileName
-        )} run \n\n\tmc sdi-execution-jobs --mode create --executionjob ${fileName} \n\nto create the sdi data executionjob`
+        )} run \n\n\tmdsp sdi-execution-jobs --mode create --executionjob ${fileName} \n\nto create the sdi data executionjob`
     );
 }
 async function createExecutionJob(options: any, sdk: MindSphereSdk) {

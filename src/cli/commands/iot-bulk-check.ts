@@ -83,9 +83,9 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc check-bulk \t displays job progress of ${color("bulkimport")} directory`);
+            log(`    mdsp check-bulk \t displays job progress of ${color("bulkimport")} directory`);
             log(
-                `    mc check-bulk --dir asset1 --verbose \tdisplays job progress of ${color(
+                `    mdsp check-bulk --dir asset1 --verbose \tdisplays job progress of ${color(
                     "asset1"
                 )} directory with verbose output`
             );
@@ -102,23 +102,23 @@ function checkRequiredParamaters(options: any) {
 
     !fs.existsSync(`${options.dir}/asset.json`) &&
         throwError(
-            `the directory ${color(options.dir)} must contain the asset.json file. run mc prepare-bulk command first!`
+            `the directory ${color(options.dir)} must contain the asset.json file. run mdsp prepare-bulk command first!`
         );
 
     !fs.existsSync(`${options.dir}/json/`) &&
         throwError(
-            `the directory ${color(options.dir)} must contain the json/ folder. run mc prepare-bulk command first!`
+            `the directory ${color(options.dir)} must contain the json/ folder. run mdsp prepare-bulk command first!`
         );
 
     !fs.existsSync(`${options.dir}/csv/`) &&
         throwError(
-            `the directory ${color(options.dir)} must contain the csv/ folder. run mc prepare-bulk command first!`
+            `the directory ${color(options.dir)} must contain the csv/ folder. run mdsp prepare-bulk command first!`
         );
 
     !fs.existsSync(`${options.dir}/jobstate.json`) &&
         throwError(
             `the directory ${color(
                 options.dir
-            )} must contain the jobstate.json file. run mc run-bulk --start command first!`
+            )} must contain the jobstate.json file. run mdsp run-bulk --start command first!`
         );
 }

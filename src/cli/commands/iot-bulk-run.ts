@@ -108,7 +108,7 @@ export default (program: Command) => {
                     !options.verbose && spinner.succeed("Done converting files to json.");
                     !options.start &&
                         console.log(
-                            `\nrun mc run-bulk with ${color("--start")} option to start sending data to mindsphere\n`
+                            `\nrun mdsp run-bulk with ${color("--start")} option to start sending data to mindsphere\n`
                         );
 
                     // *
@@ -134,7 +134,7 @@ export default (program: Command) => {
                         log(`Run time: ${(endDate.getTime() - startDate.getTime()) / 1000} seconds`);
 
                         asset.twinType === AssetManagementModels.TwinType.Simulation &&
-                            console.log(`\t run mc ${color("check-bulk")} command to check the progress of the job`);
+                            console.log(`\t run mdsp ${color("check-bulk")} command to check the progress of the job`);
                     }
                 } catch (err) {
                     errorLog(err, options.verbose);
@@ -143,9 +143,9 @@ export default (program: Command) => {
         })
         .on("--help", () => {
             log("\n  Examples:\n");
-            log(`    mc run-bulk runs the upload job from the  ${color("bulkimport")} directory`);
+            log(`    mdsp run-bulk runs the upload job from the  ${color("bulkimport")} directory`);
             log(
-                `    mc run-bulk --dir asset1 --verbose runs the upload job from the ${color(
+                `    mdsp run-bulk --dir asset1 --verbose runs the upload job from the ${color(
                     "asset1"
                 )} with verbose output`
             );
@@ -461,17 +461,17 @@ function checkRequiredParamaters(options: any) {
 
     !fs.existsSync(`${options.dir}/asset.json`) &&
         throwError(
-            `the directory ${color(options.dir)} must contain the asset.json file. run mc prepare-bulk command first!`
+            `the directory ${color(options.dir)} must contain the asset.json file. run mdsp prepare-bulk command first!`
         );
 
     !fs.existsSync(`${options.dir}/json/`) &&
         throwError(
-            `the directory ${color(options.dir)} must contain the json/ folder. run mc prepare-bulk command first!`
+            `the directory ${color(options.dir)} must contain the json/ folder. run mdsp prepare-bulk command first!`
         );
 
     !fs.existsSync(`${options.dir}/csv/`) &&
         throwError(
-            `the directory ${color(options.dir)} must contain the csv/ folder. run mc prepare-bulk command first!`
+            `the directory ${color(options.dir)} must contain the csv/ folder. run mdsp prepare-bulk command first!`
         );
 }
 

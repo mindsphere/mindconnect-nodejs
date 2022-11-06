@@ -89,23 +89,23 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc oe-firm-deploy --mode list --deviceid "7d018c..." \n\tlist all firmware deployment taks on a specified device.`
+                `    mdsp oe-firm-deploy --mode list --deviceid "7d018c..." \n\tlist all firmware deployment taks on a specified device.`
             );
             log(
-                `    mc oe-firm-deploy --mode template \n\tcreate template files to define an firmware installation/update task.`
+                `    mdsp oe-firm-deploy --mode template \n\tcreate template files to define an firmware installation/update task.`
             );
             log(
-                `    mc oe-firm-deploy --mode create --file edge.install.firmware.mdsp.json \n\tcreates a new firmware installtion tak.`
+                `    mdsp oe-firm-deploy --mode create --file edge.install.firmware.mdsp.json \n\tcreates a new firmware installtion tak.`
             );
             log(
-                `    mc oe-firm-deploy --mode update --id "7d018c..." --file edge.firmware.status.mdsp.json \n\tupdate a firmware installation task from status template file.`
+                `    mdsp oe-firm-deploy --mode update --id "7d018c..." --file edge.firmware.status.mdsp.json \n\tupdate a firmware installation task from status template file.`
             );
-            log(`    mc oe-firm-deploy --mode info --id <id>\n\tget details of a firmware installation task.`);
+            log(`    mdsp oe-firm-deploy --mode info --id <id>\n\tget details of a firmware installation task.`);
             log(
-                `    mc oe-firm-deploy --mode check --deviceid <deviceid> --realeaseid <realeaseid>  \n\tcheck terms and condition of a firmware realease on a a specific device.`
+                `    mdsp oe-firm-deploy --mode check --deviceid <deviceid> --realeaseid <realeaseid>  \n\tcheck terms and condition of a firmware realease on a a specific device.`
             );
             log(
-                `    mc oe-firm-deploy --mode accept --deviceid <deviceid> --realeaseid <realeaseid> \n\taccept terms and condition of a firmware realease on a a specific device.`
+                `    mdsp oe-firm-deploy --mode accept --deviceid <deviceid> --realeaseid <realeaseid> \n\taccept terms and condition of a firmware realease on a a specific device.`
             );
 
             serviceCredentialLog();
@@ -116,61 +116,61 @@ function checkRequiredParameters(options: any) {
     options.mode === "list" &&
         !options.deviceid &&
         errorLog(
-            "you have to provide the device id to list all the app installation/removal tasks (see mc oe-firm-deploy --help for more details)",
+            "you have to provide the device id to list all the app installation/removal tasks (see mdsp oe-firm-deploy --help for more details)",
             true
         );
 
     options.mode === "create" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with the task data to create a new installation task (see mc oe-firm-deploy --help for more details)",
+            "you have to provide a file with the task data to create a new installation task (see mdsp oe-firm-deploy --help for more details)",
             true
         );
 
     options.mode === "update" &&
         !options.file &&
         errorLog(
-            "you have to provide a file with the update data to update the status of the firmware installation task (see mc oe-firm-deploy --help for more details)",
+            "you have to provide a file with the update data to update the status of the firmware installation task (see mdsp oe-firm-deploy --help for more details)",
             true
         );
 
     options.mode === "update" &&
         !options.id &&
         errorLog(
-            "you have to provide the id of the installation/removal task to update it (see mc oe-firm-deploy --help for more details)",
+            "you have to provide the id of the installation/removal task to update it (see mdsp oe-firm-deploy --help for more details)",
             true
         );
 
     options.mode === "check" &&
         !options.deviceid &&
         errorLog(
-            "you have to provide the deviceid to check for terms and conditions (see mc oe-firm-deploy --help for more details)",
+            "you have to provide the deviceid to check for terms and conditions (see mdsp oe-firm-deploy --help for more details)",
             true
         );
     options.mode === "check" &&
         !options.realeaseid &&
         errorLog(
-            "you have to provide the realeaseid to check for terms and conditions (see mc oe-firm-deploy --help for more details)",
+            "you have to provide the realeaseid to check for terms and conditions (see mdsp oe-firm-deploy --help for more details)",
             true
         );
 
     options.mode === "accept" &&
         !options.deviceid &&
         errorLog(
-            "you have to provide the deviceid to accept the terms and conditions (see mc oe-firm-deploy --help for more details)",
+            "you have to provide the deviceid to accept the terms and conditions (see mdsp oe-firm-deploy --help for more details)",
             true
         );
     options.mode === "accept" &&
         !options.realeaseid &&
         errorLog(
-            "you have to provide the realeaseid to accept the terms and conditions (see mc oe-firm-deploy --help for more details)",
+            "you have to provide the realeaseid to accept the terms and conditions (see mdsp oe-firm-deploy --help for more details)",
             true
         );
 
     options.mode === "info" &&
         !options.id &&
         errorLog(
-            "you have to provide the id of the installation task (see mc oe-firm-deploy --help for more details)",
+            "you have to provide the id of the installation task (see mdsp oe-firm-deploy --help for more details)",
             true
         );
 }
@@ -248,7 +248,7 @@ function writeInstallTaskTemplateToFile(options: any, templateType: any) {
     console.log(
         `The firmware installation task template was written into ${color(
             filePath
-        )} run \n\n\tmc oe-firm-deploy --mode create --file ${fileName} \n\nto create a new instalation task.\n`
+        )} run \n\n\tmdsp oe-firm-deploy --mode create --file ${fileName} \n\nto create a new instalation task.\n`
     );
 }
 async function createTemplateTaskStatus(options: any, sdk: MindSphereSdk) {
@@ -273,7 +273,7 @@ function writeTaskStatusTemplateToFile(options: any, templateType: any) {
     console.log(
         `The firmware installation task status template was written into ${color(
             filePath
-        )} run \n\n\tmc oe-firm-deploy --mode update --id <id> --file ${fileName} \n\nto update the instalation task.\n`
+        )} run \n\n\tmdsp oe-firm-deploy --mode update --id <id> --file ${fileName} \n\nto update the instalation task.\n`
     );
 }
 async function taskInstInfo(options: any, sdk: MindSphereSdk) {

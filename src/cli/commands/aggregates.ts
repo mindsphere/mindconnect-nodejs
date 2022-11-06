@@ -10,7 +10,7 @@ import {
     homeDirLog,
     proxyLog,
     serviceCredentialLog,
-    verboseLog
+    verboseLog,
 } from "./command-utils";
 import path = require("path");
 import fs = require("fs");
@@ -64,17 +64,17 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mc aggregates --asssetid 1234567..ef --aspectname Environment   \tlist recent aggregates for aspect Environment`
+                `    mdsp aggregates --asssetid 1234567..ef --aspectname Environment   \tlist recent aggregates for aspect Environment`
             );
             log(
-                `    mc aggregates --asssetid 1234567..ef --aspectname Environment --select Temperature \n\t\t\t\t\t\t\t\t\tlist recent temperature aggregates `
+                `    mdsp aggregates --asssetid 1234567..ef --aspectname Environment --select Temperature \n\t\t\t\t\t\t\t\t\tlist recent temperature aggregates `
             );
             log(
-                `    mc aggregates --asssetid 1234567..ef --aspectname Environment --select Temperature --all \n\t\t\t\t\t\t\t\t\tlist all recent temperature aggregates`
+                `    mdsp aggregates --asssetid 1234567..ef --aspectname Environment --select Temperature --all \n\t\t\t\t\t\t\t\t\tlist all recent temperature aggregates`
             );
 
             log(
-                `    mc aggregates --asssetid 1234567..ef --aspectname Environment --intervalunit hour --intervalvalue 2 \n\t\t\t\t\t\t\t\t\tlist all recent temperatre aggregates over every 2 hours`
+                `    mdsp aggregates --asssetid 1234567..ef --aspectname Environment --intervalunit hour --intervalvalue 2 \n\t\t\t\t\t\t\t\t\tlist all recent temperatre aggregates over every 2 hours`
             );
 
             log("\n  Important:\n");
@@ -162,7 +162,7 @@ async function listAggregates(options: any, sdk: MindSphereSdk) {
 
 function checkParameters(options: any) {
     !options.assetid &&
-        errorLog("Missing assetid for aggregates command. Run mc ag --help for full syntax and examples.", true);
+        errorLog("Missing assetid for aggregates command. Run mdsp ag --help for full syntax and examples.", true);
     !options.aspectname &&
-        errorLog("Missing aspectname for aggregates command. Run mc ag --help for full syntax and examples.", true);
+        errorLog("Missing aspectname for aggregates command. Run mdsp ag --help for full syntax and examples.", true);
 }
