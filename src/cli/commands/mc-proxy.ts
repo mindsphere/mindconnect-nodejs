@@ -3,6 +3,7 @@ import { log } from "console";
 import fetch from "cross-fetch";
 import * as http from "http";
 import * as https from "https";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import * as url from "url";
 import * as util from "util";
 import { MindSphereSdk } from "../../api/sdk";
@@ -11,7 +12,6 @@ import { errorLog, getColor, homeDirLog, proxyLog, verboseLog } from "./command-
 import chalk = require("chalk");
 
 const streamPipeline = util.promisify(require("stream").pipeline);
-const HttpsProxyAgent = require("https-proxy-agent");
 
 const magenta = getColor("magenta");
 const red = getColor("red");

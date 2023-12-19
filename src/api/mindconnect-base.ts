@@ -1,8 +1,8 @@
 import fetch from "cross-fetch";
 import * as debug from "debug";
-import { removeUndefined, throwError } from "./utils";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import { MC_NAME, MC_VERSION } from "../version";
-const HttpsProxyAgent = require("https-proxy-agent");
+import { removeUndefined, throwError } from "./utils";
 const log = debug("mindconnect");
 
 /**
