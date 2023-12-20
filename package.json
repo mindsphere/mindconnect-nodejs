@@ -55,7 +55,7 @@
         "debug": "^4.3.4",
         "https-proxy-agent": "^7.0.2",
         "json-groupby": "^1.1.0",
-        "jsonwebtoken": "^8.5.1",
+        "jsonwebtoken": "^9.0.2",
         "lodash": "^4.17.21",
         "mime-types": "^2.1.35",
         "ora": "^5.4.1",
