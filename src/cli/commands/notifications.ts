@@ -86,8 +86,8 @@ async function createTemplate(options: any) {
     switch (options.type) {
         case "email":
             metadata = {
-                subject: "[Status] Demo Mail Notificationfrom MindSphere CLI",
-                message: `This is a demo mail notification from MindSphere CLI. See more at https://opensource.mindsphere.io`,
+                subject: "[Status] Demo Mail Notification from MindSphere CLI",
+                message: `This is a demo mail notification from MindSphere CLI. See more at https://developer.siemens.com/industrial-iot-open-source/index.html`,
                 fromApplication: "CLI",
                 priority: "Normal",
                 recipients: ["<recipient1>@<email>", "<recipient2>@<email>"],

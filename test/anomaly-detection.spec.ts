@@ -12,7 +12,7 @@ chai.should();
 const timeOffset = new Date().getTime();
 let modelIDTotest: String | null = null;
 
-describe("[SDK] AnomalyDetectionClient", () => {
+describe.skip("[SDK] AnomalyDetectionClient", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,

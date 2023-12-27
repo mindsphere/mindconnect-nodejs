@@ -1,7 +1,7 @@
 {
     "name": "@mindconnect/mindconnect-nodejs",
     "version": "3.22.0",
-    "description": "NodeJS Library for MindSphere Connectivity - TypeScript SDK for MindSphere - MindSphere Command Line Interface - MindSphere Development Proxy",
+    "description": "NodeJS Library for Siemens Insights Hub Connectivity - TypeScript SDK for Insights Hub and Industrial IoT -  Command Line Interface - Insights Hub Development Proxy (Siemens Insights Hub was formerly known as MindSphere)",
     "main": "./dist/src/index.js",
     "browser": "./dist/src/index.bundle.js",
     "types": "./dist/src/index.d.ts",
@@ -35,6 +35,11 @@
         "pkg": "npm run prepare && pkg ."
     },
     "keywords": [
+        "Siemens",
+        "Siemens Xcelerator",
+        "Insights Hub",
+        "Industrial IoT",
+        "IIOT",
         "MindConnect",
         "NodeJS",
         "Client",

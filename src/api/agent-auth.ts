@@ -5,11 +5,17 @@ import * as jwt from "jsonwebtoken";
 import "url-search-params-polyfill";
 import * as uuid from "uuid";
 import { MindConnectBase, TokenRotation } from "./mindconnect-base";
-import { DefaultStorage, IsConfigurationStorage, IConfigurationStorage } from "./mindconnect-storage";
+import {
+    AccessToken,
+    IMindConnectConfiguration,
+    OnboardingStatus,
+    SelfSignedClientAssertion,
+    TokenKey,
+} from "./mindconnect-models";
+import { DefaultStorage, IConfigurationStorage, IsConfigurationStorage } from "./mindconnect-storage";
+import { retry } from "./utils";
 
 import _ = require("lodash");
-import { AccessToken, OnboardingStatus, TokenKey, SelfSignedClientAssertion, IMindConnectConfiguration } from "./mindconnect-models";
-import { retry } from "./utils";
 const log = debug("mindconnect-agentauth");
 const rsaPemToJwk = require("rsa-pem-to-jwk");
 
@@ -322,7 +328,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
                 : "possible cause for this error is invalid date/time on the device";
 
             throw new Error(
-                `Network error occured ${err.message} (hint: ${hint}) see also: https://opensource.mindsphere.io/docs/mindconnect-nodejs/troubleshooting.html`
+                `Network error occured ${err.message} (hint: ${hint}) see also: https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/troubleshooting.html`
             );
         }
     }

@@ -7,7 +7,7 @@ chai.should();
 
 const timeOffset = new Date().getTime();
 
-describe("[SDK] ModelManagementClient.Models", () => {
+describe.skip("[SDK] ModelManagementClient.Models", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,

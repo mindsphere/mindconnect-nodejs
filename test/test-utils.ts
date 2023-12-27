@@ -31,7 +31,9 @@ export function getPasskeyForUnitTest(): string {
             "\x1b[31m%s\x1b[0m",
             "\nPlease set the MDSP_PASSKEY environment variable for your passkey before running unit tests."
         );
-        console.error("\nsee: https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/setting-up-the-cli.html\n");
+        console.error(
+            "\nsee: https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/cli/setting-up-the-cli.html\n"
+        );
         console.error("--------------------------------------------------------------------------------------------");
         process.exit(-1);
     }

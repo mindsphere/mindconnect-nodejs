@@ -62,9 +62,9 @@ describe("[SDK] using agent authorization", () => {
 
     it("should determine if something implements TokenRotation", async () => {
         const agent = new MindConnectAgent(agentConfig);
-        const credentialAuth = new CredentialAuth("https://opensource.mindsphere.io", "Basic: test", "test");
+        const credentialAuth = new CredentialAuth("https://developer.siemens.com", "Basic: test", "test");
         const tokenManagerAuth = new TokenManagerAuth(
-            "https://opensource.mindsphere.io",
+            "https://developer.siemens.com",
             "Basic: test",
             "test",
             "test",

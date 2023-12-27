@@ -16,7 +16,7 @@ import {
 import { bulkDataTemplate, dataTemplate } from "./mindconnect-template";
 import { dataValidator, eventValidator } from "./mindconnect-validators";
 import { MindSphereSdk } from "./sdk";
-import { fileUploadOptionalParameters, MultipartUploader } from "./sdk/common/multipart-uploader";
+import { MultipartUploader, fileUploadOptionalParameters } from "./sdk/common/multipart-uploader";
 import { retry, throwError } from "./utils";
 import _ = require("lodash");
 const log = debug("mindconnect-agent");
@@ -26,7 +26,7 @@ const log = debug("mindconnect-agent");
  *  * The synchronous methods (IsOnBoarded, HasConfiguration, HasDataMapping...) are operating on agent state storage only.
  *  * The asynchronous methods (GetDataSourceConfiguration, BulkPostData...)  are calling MindSphere APIs.
  *
- * @see https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
+ * @see https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/agent-development/agent-state-storage.html
  *
  * @export
  * @class MindConnectAgent
@@ -42,7 +42,7 @@ export class MindConnectAgent extends AgentAuth {
      *
      * * This is a local agent state storage setting only. MindSphere API is not called.
      *
-     * @see https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
+     * @see https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/agent-development/agent-state-storage.html
      *
      * @returns {boolean}
      * @memberof MindConnectAgent
@@ -57,7 +57,7 @@ export class MindConnectAgent extends AgentAuth {
      * * This is a local agent state storage setting only. MindSphere API is not called.
      * * Call await GetDataSourceConfiguration() if you want to check if there is configuration in the mindsphere.
      *
-     * @see https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
+     * @see https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/agent-development/agent-state-storage.html
      *
      * @returns {boolean}
      * @memberof MindConnectAgent
@@ -78,7 +78,7 @@ export class MindConnectAgent extends AgentAuth {
      * * This is a local agent state storage setting only. MindSphere API is not called.
      * * Call await GetDataMappings() to check if the agent has configured mappings in the MindSphere.
      *
-     * @see https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
+     * @see https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/agent-development/agent-state-storage.html
      *
      * @returns {boolean}
      * @memberof MindConnectAgent
@@ -146,7 +146,7 @@ export class MindConnectAgent extends AgentAuth {
     /**
      * Acquire DataSource Configuration and store it in the Agent Storage.
      *
-     * @see https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
+     * @see https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/agent-development/agent-state-storage.html
      *
      * @returns {Promise<DataSourceConfiguration>}
      *
@@ -173,7 +173,7 @@ export class MindConnectAgent extends AgentAuth {
     /**
      * Acquire the data mappings from the MindSphere and store them in the agent state storage.
      *
-     * @see https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
+     * @see https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/agent-development/agent-state-storage.html
      *
      * @returns {Promise<Array<Mapping>>}
      *
@@ -208,7 +208,7 @@ export class MindConnectAgent extends AgentAuth {
     /**
      * Store data mappings in the mindsphere and also in the local agent state storage.
      *
-     * @see https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
+     * @see https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/agent-development/agent-state-storage.html
      *
      * @param {Mapping[]} mappings
      * @returns {Promise<boolean>}
@@ -609,7 +609,7 @@ export class MindConnectAgent extends AgentAuth {
         overwrite: boolean = true
     ) {
         const asset = await this.Sdk().GetAssetManagementClient().GetAsset(targetAssetId);
-        const configuration = await this.GenerateDataSourceConfiguration((asset.typeId as unknown) as string, mode);
+        const configuration = await this.GenerateDataSourceConfiguration(asset.typeId as unknown as string, mode);
         if (overwrite) {
             await this.GetDataSourceConfiguration();
         }
@@ -683,7 +683,7 @@ export class MindConnectAgent extends AgentAuth {
      *
      * * This is a local agent state storage setting only. MindSphere API is not called.
      *
-     * @see https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
+     * @see https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/agent-development/agent-state-storage.html
      *
      * @returns {IMindConnectConfiguration}
      *

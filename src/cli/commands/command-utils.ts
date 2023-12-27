@@ -57,7 +57,11 @@ export const serviceCredentialLog = (color: Function = magenta) => {
         )} using borrowed cookies `
     );
     log(`\n  Full Documentation: \n`);
-    log(`    ${color("https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/setting-up-the-cli.html")}\n`);
+    log(
+        `    ${color(
+            "https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/cli/setting-up-the-cli.html"
+        )}\n`
+    );
 
     checkForUpdates();
 };

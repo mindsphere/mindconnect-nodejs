@@ -112,7 +112,7 @@ export default (program: Command) => {
 
             log(
                 `\n    see more documentation at ${color(
-                    "https://opensource.mindsphere.io/docs/mindconnect-nodejs/development-proxy.html"
+                    "https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/development-proxy.html"
                 )}\n`
             );
         });

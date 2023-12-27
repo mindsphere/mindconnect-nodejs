@@ -3,27 +3,33 @@
 <p align=center>
 <a href="https://github.com/mindsphere/mindconnect-nodejs/issues/330"><b>We are looking for Contributors and Maintainers!</b></a>
 </p>
+
+<p align="center">
+
+</p>
+
 <p align="center">
 <img src="images/mindconnect-nodejs-new-logo.svg" alt="mindconnect-nodejs" width="300px"/>
 </p>
 <h1 align="center">MindConnect-NodeJS</h1>
 <p align="center">
-<a href="#getting-started">NodeJS Library for MindSphere Connectivity</a> - <a href="#mindsphere-typescript-sdk">TypeScript SDK for MindSphere</a> - <a href="#command-line-interface">MindSphere Command Line Interface</a> - <a href="#mindsphere-development-proxy">MindSphere Development Proxy</a>
+<b>MindSphere has <a href="https://plm.sw.siemens.com/en-US/insights-hub/">evolved into Insights Hub</a>. This library still uses the name MindSphere in class names etc. for compatibility reasons. </b><br/>
+<a href="#getting-started">NodeJS Library for Insights Hub and Industrial IoT Connectivity</a> - <a href="#mindsphere-typescript-sdk">TypeScript SDK for Insights Hub</a> - <a href="#command-line-interface">Insights Hub Command Line Interface</a> - <a href="#mindsphere-development-proxy">Insights Hub Development Proxy</a>
 
 <!-- markdownlint-enableMD033 -->
 
 [![Build](https://github.com/mindsphere/mindconnect-nodejs/actions/workflows/build.yml/badge.svg)](https://github.com/mindsphere/mindconnect-nodejs/actions/workflows/build.yml) [![The MIT License](https://img.shields.io/badge/license-MIT-009999.svg?style=flat)](./LICENSE.md)
 [![npm](https://img.shields.io/npm/v/@mindconnect/mindconnect-nodejs/latest.svg?style=flat)](https://www.npmjs.com/package/@mindconnect/mindconnect-nodejs) ![downloads](https://img.shields.io/npm/dw/@mindconnect/mindconnect-nodejs.svg?colorB=009999)
-[![Documentation](https://img.shields.io/badge/mindsphere-documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/index.html)
-[![SDK](https://img.shields.io/badge/SDK-full%20documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/sdk/index.html)
-[![Documentation](https://img.shields.io/badge/cli-full%20documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html)
+[![Documentation](https://img.shields.io/badge/mindsphere-documentation-%23009999.svg)](https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/index.html)
+[![SDK](https://img.shields.io/badge/SDK-full%20documentation-%23009999.svg)](https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/sdk/index.html)
+[![Documentation](https://img.shields.io/badge/cli-full%20documentation-%23009999.svg)](https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/cli/index.html)
 [![Forum](https://img.shields.io/badge/mindsphere-community-%23009999.svg)](https://community.plm.automation.siemens.com/t5/Developer-Space/bd-p/MindSphere-platform-forum) [![StartForFree](https://img.shields.io/badge/mindsphere-%23startForFree!-%23005578.svg)](https://siemens.mindsphere.io/en/start) [![Contributors](https://img.shields.io/badge/shoutout-thank%20you%21-%23faa50a.svg)](#community)  [![GitHub release](https://img.shields.io/github/release/mindsphere/mindconnect-nodejs.svg)](https://github.com/mindsphere/mindconnect-nodejs/releases/latest)
 
 </p>
 
 ## Full documentation
 
-The full documentation can be found at [https://opensource.mindsphere.io/docs/mindconnect-nodejs/index.html](https://opensource.mindsphere.io/docs/mindconnect-nodejs/index.html)
+The full documentation can be found at [https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/index.html](https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/index.html)
 
 ## Installing the library
 
@@ -38,7 +44,7 @@ npm install @mindconnect/mindconnect-nodejs@alpha --save
 
 ## Getting started
 
-[![Documentation](https://img.shields.io/badge/cli-documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html)
+[![Documentation](https://img.shields.io/badge/cli-documentation-%23009999.svg)](https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/cli/index.html)
 
 The easiest way to start is to use the provided command line interface to create a starter project:
 
@@ -50,23 +56,23 @@ npx @mindconnect/mindconnect-nodejs starter-ts
 npx @mindconnect/mindconnect-nodejs starter-js
 ```
 
-## How to create a nodejs MindSphere agent
+## How to create a nodejs Insights Hub agent
 
 The following steps describe the easiest way to test the library. You can of course create the required dependencies also programmatically via API calls.
 
 ### Step 0: Create an asset type and aspect types
 
-MindSphere V3 IoT model requires that you create an asset type and aspect types to describe your assets. For the example we will create an asset type of type Engine with two aspect types: Environment and Vibration. (Note that my tenant is called castidev, you will have to use your own tenant name)
+Insights Hub V3 IoT model requires that you create an asset type and aspect types to describe your assets. For the example we will create an asset type of type Engine with two aspect types: Environment and Vibration. (Note that my tenant is called castidev, you will have to use your own tenant name)
 
 ![assetype](images/types.png)
 
-More information about [MindSphere Data Model](https://siemens.mindsphere.io/en/docs/tutorials/asset-manager).
+More information about [Insights Hub Data Model](https://siemens.mindsphere.io/en/docs/tutorials/asset-manager).
 
 ### Step 1: Create an asset
 
 Create an asset (In example it is called **AcmeMotor**) of type Engine in AssetManager for your data.
 
-### Step 2: Create an agent of type MindConnectLib in MindSphere
+### Step 2: Create an agent of type MindConnectLib in Insights Hub
 
 Create an agent in Asset Manager of type core.MindConnectLib create initial JSON token and store it to file (e.g. agentconfig.json)
 
@@ -106,7 +112,7 @@ agent.SetupAgentCertificate(fs.readFileSync("private.key"));
 
 ### Step 4: Onboard the agent
 
-The first operation is onboarding of the agent. This creates a client secret which is used for the communication with MindSphere.
+The first operation is onboarding of the agent. This creates a client secret which is used for the communication with Insights Hub.
 
 This data is stored by default in the .mc folder in your application if you don't change the base path in the constructor of the agent.
 
@@ -137,11 +143,11 @@ const mappings = await agent.GenerateMappings(targetAssetId);
 await agent.PutDataMappings(mappings);
 ```
 
-The agents have now access to MindSphere TypeScript SDK (in beta)
+The agents have now access to Insights Hub TypeScript SDK (in beta)
 
 ```typescript
 agent.Sdk();
-// the sdk gives you access to e.g. asset management client with which you can get asset types or assets from mindsphere
+// the sdk gives you access to e.g. asset management client with which you can get asset types or assets from Insights Hub
 // which can be used for automatic data source configuration and automatic mappings
 
 const assetMgmt = agent.Sdk().GetAssetManagementClient();
@@ -150,7 +156,7 @@ await assetMgmt.GetAspectTypes(...);
 
 ```
 
-If you take a look at the MindSphere configuration of your agent now it should look like this:
+If you take a look at the Insights Hub configuration of your agent now it should look like this:
 
 ![datasources](images/datasources.png)
 
@@ -233,7 +239,7 @@ await agent.PostEvent(event);
 
 Files can now be uploaded via the library. You can upload files for your agent or for your entities. In order to create an event for your entity you need to know the assetid of the asset.
 
-Since version 3.5.1. the agents are using the multipart upload API of the MindSphere. This means that the agents can upload files also bigger > 8 MB, The
+Since version 3.5.1. the agents are using the multipart upload API of the Insights Hub. This means that the agents can upload files also bigger > 8 MB, The
 multipart upload must be switched on (chunk:true) if you want to activate this behavior. The parameter parallelUploads determine the maximal number of parallel uploads. You can increase this on a powerful computer to speed up the upload or decrease to prevent network congestion.
 
 ```javascript
@@ -292,7 +298,7 @@ await retry(5, () => agent.BulkPostData(bulk));
 
 ```
 
-The data in the MindSphere can be observed in the fleet manager.
+The data in the Insights Hub can be observed in the fleet manager.
 
 ## Proxy support
 
@@ -304,13 +310,13 @@ Set the http_proxy or HTTP_PROXY environment variable if you need to connect via
 export HTTP_PROXY=http://localhost:8888
 ```
 
-## MindSphere TypeScript SDK
+## Insights Hub TypeScript SDK
 
-The library comes with the typescript SDK which can be used to access MindSphere APIs
+The library comes with the typescript SDK which can be used to access Insights Hub APIs
 
-[![SDK](https://img.shields.io/badge/SDK-full%20documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/sdk/index.html)
+[![SDK](https://img.shields.io/badge/SDK-full%20documentation-%23009999.svg)](https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/sdk/index.html)
 
-It implements support for both frontend (browser e.g. angular, react...) and backend development in node.js. and different MindSphere authentication types:
+It implements support for both frontend (browser e.g. angular, react...) and backend development in node.js. and different Insights Hub authentication types:
 
 **Frontend:**
     - Browser (Session, Cookies)
@@ -319,7 +325,7 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
     - UserCredentials
     - AppCredentials
     - ServiceCredentials
-    - MindSphere Agents
+    - Insights Hub Agents
 
 ### Platform Core APIs
 
@@ -333,7 +339,7 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 | Message Broker<sup>2</sup> (preview)  | :heavy_check_mark: | :heavy_check_mark: |
 | Usage Transparency  | :heavy_check_mark: |  |
 
-<sup>1</sup> In the first stage of the availability Resource Access Management must be enabled for the tenant via MindSphere support team.
+<sup>1</sup> In the first stage of the availability Resource Access Management must be enabled for the tenant via Insights Hub support team.
 
 <sup>2</sup> Message Broker is only available on preview tenants
 
@@ -406,9 +412,9 @@ It implements support for both frontend (browser e.g. angular, react...) and bac
 The example below shows how to use the sdk.
 
 ``` typescript
-// The example shows how to  Get Assets from MindSphere with custom AssetType using frontend authentication
+// The example shows how to  Get Assets from Insights Hub with custom AssetType using frontend authentication
 // you can pass an instance an Authorizer (BrowserAuth, UserAuth, CredentialsAuth, TokenManagerAuth, MindConnectAgent)
-// to use different authorization types in MindSphere or implement the TokenRotation interface if you want to
+// to use different authorization types in Insights Hub or implement the TokenRotation interface if you want to
 // provide your own authorizer.
 //
 // The default constructor uses frontend authorization.
@@ -433,9 +439,9 @@ If an API is missing and you would like to contribute a Client for it take a loo
 
 The full documentation for the command line interface can be found at
 
-[![Documentation](https://img.shields.io/badge/cli-full%20documentation-%23009999.svg)](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html)
+[![Documentation](https://img.shields.io/badge/cli-full%20documentation-%23009999.svg)](https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/cli/index.html)
 
-The library comes with a command line interface which can also be installed globally. You can use the command line mode to upload timeseries, files and create events in the MindSphere.
+The library comes with a command line interface which can also be installed globally. You can use the command line mode to upload timeseries, files and create events in the Insights Hub.
 
 ```bash
 # install the library globaly if you want to use its command line interface.
@@ -456,7 +462,7 @@ Linux, macOS: Rename the file to `mc` and make sure that the file is marked as e
 
 ### Configuring CLI
 
-First step is to configure the CLI. For this you will need a session cookie from MindSphere, service credentials (which have been deprecated) or application credentials from your developer cockpit.
+First step is to configure the CLI. For this you will need a session cookie from Insights Hub, service credentials (which have been deprecated) or application credentials from your developer cockpit.
 
 - [SESSION and XSRF-TOKEN cookie](https://developer.mindsphere.io/howto/howto-local-development.html#generate-user-credentials)
 - [Application Credentials](https://documentation.mindsphere.io/resources/html/developer-cockpit/en-US/124342231819.html)
@@ -473,13 +479,13 @@ press CTRL + C to exit
 
 ```
 
-Navigate to [http://localhost:4994](http://localhost:4994) to configure the CLI. (see [full documentation](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html) for XSRF-TOKEN and SESSION)
+Navigate to [http://localhost:4994](http://localhost:4994) to configure the CLI. (see [full documentation](https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/cli/index.html) for XSRF-TOKEN and SESSION)
 
 The image below shows the dialog for adding new credentials (press on the + sign in the upper left corner)
 
 ![CLI](images/servicecredentials.png)
 
-You can get the application credentials from your developer or operator cockpit in MindSphere. (if you don't have any application you can register a dummy one just for CLI)
+You can get the application credentials from your developer or operator cockpit in Insights Hub. (if you don't have any application you can register a dummy one just for CLI)
 
 ![CLI](images/cockpit.png)
 
@@ -584,21 +590,21 @@ Commands:
 
     the magenta colored commands * use app or service credentials or borrowed mindsphere cookies
     the cyan colored commands require mindconnectlib (agent) credentials
-    the blue colored commands @ use analytical functions of MindSphere
+    the blue colored commands @ use analytical functions of Insights Hub
     the green colored commands # are used as setup and utility commands
     the yellow colored commands & use borrowed mindsphere application cookies
     the credentials and cookies should only be used in secure environments
-    Full documentation: https://opensource.mindsphere.io
+    Full documentation: developer.siemens.com/industrial-iot-open-source/index.html
 ```
 
-## MindSphere Development Proxy
+## Insights Hub Development Proxy
 
-The CLI comes with a development proxy which can be used to kickstart your MindSphere development. It provides an endpoint
+The CLI comes with a development proxy which can be used to kickstart your Insights Hub development. It provides an endpoint
 at your local machine at
 
 [http://localhost:7707](http://localhost:7707)
 
-which will authenticate all requests using either [a borrowed SESSION and XSRF-TOKEN cookie from MindSphere](https://developer.mindsphere.io/howto/howto-local-development.html#generate-user-credentials) or the the configured app credentials or service credentials.
+which will authenticate all requests using either [a borrowed SESSION and XSRF-TOKEN cookie from Insights Hub](https://developer.mindsphere.io/howto/howto-local-development.html#generate-user-credentials) or the the configured app credentials or service credentials.
 
 The command below will start your development proxy without any installation and configuration (you just need the cookies from an existing app):
 
@@ -639,7 +645,7 @@ Options:
 
         - create environment variables: MDSP_HOST, MDSP_SESSION and MDSP_XSRF_TOKEN using borrowed cookies
 
-    see more documentation at https://opensource.mindsphere.io/docs/mindconnect-nodejs/development-proxy.html
+    see more documentation at https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/development-proxy.html
 
 ````
 

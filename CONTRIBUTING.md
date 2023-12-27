@@ -40,7 +40,7 @@ Please follow the typescript code style which is established in tslint.json. (Wo
 
 ## Setting up the local development environment
 
-You will need a MindSphere Account to setup the development environment.
+You will need a Insights Hub Account to setup the development environment.
 If you don't have an account yet, you can [register here for a free account](https://siemens.mindsphere.io/en/start). (that is free as in a beer :)
 
 ### Executing unit tests
@@ -65,7 +65,7 @@ mc service-credentials
 
 Here is a step by step description how to set up the app or service credentials:
 
-[Setting up the MindSphere CLI](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/setting-up-the-cli.html)
+[Setting up the Insights Hub CLI](https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/cli/setting-up-the-cli.html)
 
 After that you have to configure the MDSP_PASSKEY variable in your environment:
 
@@ -96,7 +96,7 @@ After setting up the CLI, you will need a 3072 bit certificate. (make sure that 
 npm run createkey
 ```
 
-You are now all set and should be able to run the unit tests locally. Please note that not all tests will run on your machine if you have a start-for-free account due to MindSphere restrictions. There is a special set of unit tests which you can call with `npm run s4f` if you want to
+You are now all set and should be able to run the unit tests locally. Please note that not all tests will run on your machine if you have a start-for-free account due to Insights Hub restrictions. There is a special set of unit tests which you can call with `npm run s4f` if you want to
 sanity-check the library before creating a pull request.
 
 ```bash
@@ -218,7 +218,7 @@ Prints out a license summary for the whole dependency tree.
 
 Creates the binary files with the CLI for Windows, Linux and MacOS.
 
-## Contributing to MindSphere TypeScript SDK
+## Contributing to Insights Hub TypeScript SDK
 
 If you want to contribute with a new Client Implementation to typescript SDK here are some guidelines
 
