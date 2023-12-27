@@ -8,7 +8,7 @@ import { MindConnectAgent } from "../../api/mindconnect-agent";
 import { EventManagementClient } from "../../api/sdk";
 import { adjustColor, errorLog, getColor, getSdk, homeDirLog, proxyLog, retrylog, verboseLog } from "./command-utils";
 import { getMindConnectAgent } from "./mc-upload-file";
-import ora = require("ora");
+import ora = require("ora-classic");
 
 let color = getColor("cyan");
 let adminColor = getColor("magenta");

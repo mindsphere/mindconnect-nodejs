@@ -13,7 +13,7 @@ import {
     verboseLog,
 } from "./command-utils";
 import fs = require("fs");
-import ora = require("ora");
+import ora = require("ora-classic");
 
 let color = getColor("magenta");
 const magenta = getColor("magenta");

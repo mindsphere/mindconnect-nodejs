@@ -14,7 +14,7 @@ import {
     proxyLog,
     verboseLog,
 } from "./command-utils";
-import ora = require("ora");
+import ora = require("ora-classic");
 
 const cyan = getColor("cyan");
 let color = getColor("magenta");
