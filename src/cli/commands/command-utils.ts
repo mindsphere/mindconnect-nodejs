@@ -6,7 +6,7 @@ import { AssetManagementModels, MindSphereSdk } from "../../api/sdk";
 import { decrypt, getHomeDotMcDir, loadAuth } from "../../api/utils";
 import { MC_NAME, MC_VERSION } from "../../version";
 
-const updateNotifier = require("update-notifier");
+const updateNotifier = require("update-notifier-cjs");
 
 const magenta = getColor("magenta");
 const yellow = getColor("yellow");
