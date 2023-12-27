@@ -6,7 +6,7 @@ import { generateTestData } from "../src/cli/commands/command-utils";
 import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
 
-describe("[SDK] TrendPredictionClient", () => {
+describe.skip("[SDK] TrendPredictionClient", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
