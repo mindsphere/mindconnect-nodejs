@@ -16,7 +16,7 @@ import {
     serviceCredentialLog,
     verboseLog,
 } from "./command-utils";
-import ora = require("ora");
+import ora = require("ora-classic");
 const streamPipeline = util.promisify(require("stream").pipeline);
 
 let color = getColor("magenta");

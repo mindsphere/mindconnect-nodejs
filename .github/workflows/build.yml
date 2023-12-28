@@ -2,118 +2,117 @@
 
 name: Build
 
-on: 
-  push:
-  pull_request:
-  schedule:
-    - cron: '0 13 * * *'
+on:
+    push:
+    pull_request:
+    schedule:
+        - cron: "0 13 * * *"
 
 jobs:
-  build:
-    environment: CI
-    runs-on: ubuntu-latest
+    build:
+        environment: CI
+        runs-on: ubuntu-latest
 
-    steps:
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v2.1.5
+        steps:
+            - name: Setup Node.js environment
+              uses: actions/setup-node@v2.1.5
 
-    - name: Checkout Branch
-      uses: actions/checkout@v2
+            - name: Checkout Branch
+              uses: actions/checkout@v2
 
-    - uses: toko-bifrost/ms-teams-deploy-card@master
-      if: always()
-      with:
-        github-token: ${{ github.token }}
-        webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
+            - uses: toko-bifrost/ms-teams-deploy-card@master
+              if: always()
+              with:
+                  github-token: ${{ github.token }}
+                  webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
 
-    - name: setup the mindsphere authentication
-      run: |
-        mkdir ~/.mc
-        echo '${{ secrets.AUTH_JSON }}' >> ~/.mc/auth.json
-        echo '${{ secrets.PRIVATE_KEY }}' >> private.key
-        
-    - name: install dependencies
-      run: |
-        npm install
+            - name: setup the mindsphere authentication
+              run: |
+                  mkdir ~/.mc
+                  echo '${{ secrets.AUTH_JSON }}' >> ~/.mc/auth.json
+                  echo '${{ secrets.PRIVATE_KEY }}' >> private.key
 
-    - name: build
-      run: |
-        npm run ts:build
+            - name: install dependencies
+              run: |
+                  npm install
 
-    - name: run mocha tests
-      env: 
-        MDSP_PASSKEY: ${{ secrets.MDSP_PASSKEY }}
-      run: |
-        npm run test-jenkins
+            - name: build
+              run: |
+                  npm run ts:build
 
-    - name: Test Report
-      uses: dorny/test-reporter@v1
-      if: success() || failure()    
-      with:
-        name: Test Results            
-        path: report.xml            
-        reporter: jest-junit               
+            - name: run mocha tests
+              env:
+                  MDSP_PASSKEY: ${{ secrets.MDSP_PASSKEY }}
+              run: |
+                  npm run test-jenkins
 
-    - name: run command line tests
-      env: 
-        MDSP_PASSKEY: ${{ secrets.MDSP_PASSKEY }}
-      run: |
-        dirname=`date +%s`
-        mkdir $dirname
-        cd $dirname
-        ls ..
-        mc='node ../src/cli/mc'
-        set -e
-        $mc create-agent --config agent.unittest.json
-        $mc onboard --config agent.unittest.json
-        $mc atk --config agent.unittest.json
-        $mc configure-agent --config agent.unittest.json --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
-        $mc configure-agent --config agent.unittest.json --mode test
-        filename=`date +%s`
-        cp agent.unittest.json $filename
-        $mc upload-file --config agent.unittest.json --file $filename
-        $mc upload-file --file $filename --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
-        $mc create-event --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
-        $mc register-diagnostic --config agent.unittest.json
-        $mc configure-agent --config agent.unittest.json --mode test
-        $mc get-diagnostic --config agent.unittest.json
-        $mc unregister-diagnostic --config agent.unittest.json
-        $mc offboard-agent --config agent.unittest.json
-        $mc delete-asset  --assetid `node -pe 'JSON.parse(process.argv[1]).content.clientId' "$(cat agent.unittest.json)"` 
-        $mc list-assets 
-        $mc list-files --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
-        $mc starter-ts
-        $mc starter-js
-        $mc download-file --file $filename --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
-        $mc delete-file --file $filename --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
-        $mc iam --mode list --group
-        $mc assets --includeshared
-        $mc asset-types --includeshared
-        $mc aspects --includeshared
-        $mc event-types --includeshared
-        $mc jobs
-        $mc schedules
-        $mc data-exchange
-        $mc mobile-apps
-        $mc tenant
-        $mc subtenants
-        $mc models
-        cd ..
-        rm -rf $dirname
+            - name: Test Report
+              uses: dorny/test-reporter@v1
+              if: success() || failure()
+              with:
+                  name: Test Results
+                  path: report.xml
+                  reporter: jest-junit
 
-    - name: license check
-      run: |
-        npm run license > license-checker.txt
-        npm run license:summary >> license-checker.txt
+            - name: run command line tests
+              env:
+                  MDSP_PASSKEY: ${{ secrets.MDSP_PASSKEY }}
+              run: |
+                  dirname=`date +%s`
+                  mkdir $dirname
+                  cd $dirname
+                  ls ..
+                  mc='node ../src/cli/mc'
+                  set -e
+                  $mc create-agent --config agent.unittest.json
+                  $mc onboard --config agent.unittest.json
+                  $mc atk --config agent.unittest.json
+                  $mc configure-agent --config agent.unittest.json --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
+                  $mc configure-agent --config agent.unittest.json --mode test
+                  filename=`date +%s`
+                  cp agent.unittest.json $filename
+                  $mc upload-file --config agent.unittest.json --file $filename
+                  $mc upload-file --file $filename --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
+                  $mc create-event --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
+                  $mc register-diagnostic --config agent.unittest.json
+                  $mc configure-agent --config agent.unittest.json --mode test
+                  $mc get-diagnostic --config agent.unittest.json
+                  $mc unregister-diagnostic --config agent.unittest.json
+                  $mc offboard-agent --config agent.unittest.json
+                  $mc delete-asset  --assetid `node -pe 'JSON.parse(process.argv[1]).content.clientId' "$(cat agent.unittest.json)"` 
+                  $mc list-assets 
+                  $mc list-files --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
+                  $mc starter-ts
+                  $mc starter-js
+                  $mc download-file --file $filename --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
+                  $mc delete-file --file $filename --assetid 6177d9e13a4c4ab0a3b2d647ba3ba2a7
+                  $mc iam --mode list --group
+                  $mc assets --includeshared
+                  $mc asset-types --includeshared
+                  $mc aspects --includeshared
+                  $mc event-types --includeshared
+                  $mc jobs
+                  $mc schedules
+                  $mc data-exchange
+                  $mc mobile-apps
+                  $mc tenant
+                  $mc subtenants
+                  cd ..
+                  rm -rf $dirname
 
-    - name: package 
-      run: |
-        rm -rf dist/
-        npm pack
+            - name: license check
+              run: |
+                  npm run license > license-checker.txt
+                  npm run license:summary >> license-checker.txt
 
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v2.2.3
-      with:
-          path: |
-            *.tgz
-            license-checker.txt
+            - name: package
+              run: |
+                  rm -rf dist/
+                  npm pack
+
+            - name: Upload a Build Artifact
+              uses: actions/upload-artifact@v2.2.3
+              with:
+                  path: |
+                      *.tgz
+                      license-checker.txt

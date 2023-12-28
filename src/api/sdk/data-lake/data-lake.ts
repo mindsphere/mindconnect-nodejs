@@ -1,9 +1,9 @@
 import fetch from "cross-fetch";
 import * as fs from "fs";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import { toQueryString } from "../../utils";
 import { SdkClient } from "../common/sdk-client";
 import { DataLakeModels } from "./data-lake.models";
-const HttpsProxyAgent = require("https-proxy-agent");
 
 export class DataLakeClient extends SdkClient {
     private _baseUrl: string = "/api/datalake/v3";

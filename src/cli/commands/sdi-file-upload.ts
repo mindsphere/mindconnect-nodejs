@@ -3,7 +3,7 @@ import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { errorLog, getColor, getSdk, homeDirLog, proxyLog, serviceCredentialLog, verboseLog } from "./command-utils";
-import ora = require("ora");
+import ora = require("ora-classic");
 const mime = require("mime-types");
 
 let color = getColor("magenta");

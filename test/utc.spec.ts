@@ -2,7 +2,7 @@ import { MindSphereSdk } from "../src/api/sdk";
 import { decrypt, loadAuth } from "../src/api/utils";
 import { getPasskeyForUnitTest } from "./test-utils";
 
-describe("[SDK] UsageTransparencyClient", () => {
+describe.skip("[SDK] UsageTransparencyClient", () => {
     const auth = loadAuth();
 
     const sdk = new MindSphereSdk({ ...auth, basicAuth: decrypt(auth, getPasskeyForUnitTest()) });

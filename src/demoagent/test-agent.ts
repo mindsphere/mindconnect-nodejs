@@ -12,7 +12,7 @@ import { DataPointValue, MindConnectAgent, MindsphereStandardEvent, retry, TimeS
 
     // onboarding the agent
     // Check in the local agent state storage if agent is onboarded.
-    // https://opensource.mindsphere.io/docs/mindconnect-nodejs/agent-development/agent-state-storage.html
+    // https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/agent-development/agent-state-storage.html
 
     if (!agent.IsOnBoarded()) {
         // wrapping the call in the retry function makes the agent a bit more resillient

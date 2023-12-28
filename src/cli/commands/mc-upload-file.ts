@@ -5,7 +5,7 @@ import * as path from "path";
 import { MindConnectAgent, retry } from "../..";
 import { checkCertificate, getAgentDir } from "../../api/utils";
 import { adjustColor, errorLog, getColor, getSdk, homeDirLog, proxyLog, retrylog, verboseLog } from "./command-utils";
-import ora = require("ora");
+import ora = require("ora-classic");
 const mime = require("mime-types");
 
 let color = getColor("cyan");

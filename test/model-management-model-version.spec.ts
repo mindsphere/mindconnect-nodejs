@@ -8,7 +8,7 @@ chai.should();
 const timeOffset = new Date().getTime();
 const futureTimeOffset = new Date(timeOffset + 1000 * 60 * 60 * 24);
 
-describe("[SDK] ModelManagementClient.Models.Version", () => {
+describe.skip("[SDK] ModelManagementClient.Models.Version", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,

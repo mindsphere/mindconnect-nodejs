@@ -214,7 +214,7 @@ function createTemplate() {
                         languages: {
                             default: {
                                 name: "Open Source Software",
-                                value: "https://opensource.mindsphere.io",
+                                value: "https://developer.siemens.com/industrial-iot-open-source/index.html",
                             },
                         },
                     },

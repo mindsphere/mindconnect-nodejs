@@ -23,7 +23,6 @@ import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import { AgentUnitTestConfiguration, tearDownAgents, unitTestSetup } from "./test-agent-setup-utils";
 import { getPasskeyForUnitTest } from "./test-utils";
 const log = debug("mindconnect-agent-test");
-const HttpsProxyAgent = require("https-proxy-agent");
 chai.should();
 
 describe("MindConnectApi Version 3 Agent (SHARED_SECRET)", () => {

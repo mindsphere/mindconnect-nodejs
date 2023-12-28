@@ -17,7 +17,7 @@ import {
 } from "./command-utils";
 import { jobState } from "./iot-bulk-run";
 import _ = require("lodash");
-import ora = require("ora");
+import ora = require("ora-classic");
 
 let color = getColor("magenta");
 

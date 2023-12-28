@@ -177,7 +177,7 @@ export const loadAuth = (): authJson => {
 
     !result &&
         throwError(
-            "please configure the authentication: https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/setting-up-the-cli.html "
+            "please configure the authentication: https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/cli/setting-up-the-cli.html "
         );
 
     return result!;

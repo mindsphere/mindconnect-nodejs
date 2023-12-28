@@ -6,7 +6,7 @@ import { AssetManagementModels, MindSphereSdk } from "../../api/sdk";
 import { decrypt, getHomeDotMcDir, loadAuth } from "../../api/utils";
 import { MC_NAME, MC_VERSION } from "../../version";
 
-const updateNotifier = require("update-notifier");
+const updateNotifier = require("update-notifier-cjs");
 
 const magenta = getColor("magenta");
 const yellow = getColor("yellow");
@@ -57,7 +57,11 @@ export const serviceCredentialLog = (color: Function = magenta) => {
         )} using borrowed cookies `
     );
     log(`\n  Full Documentation: \n`);
-    log(`    ${color("https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/setting-up-the-cli.html")}\n`);
+    log(
+        `    ${color(
+            "https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/cli/setting-up-the-cli.html"
+        )}\n`
+    );
 
     checkForUpdates();
 };

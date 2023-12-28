@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.23.0 - Jet Black Vienna - December 2023
+
+- Moved links from opensource.mindsphere.io to [Siemens Xcelerator Developer Portal](https://developer.siemens.com)
+- Renamed MindSphere to Insights Hub
+- Bumped most dependencies
+- Happy Holidays!
+
+
 ## 3.22.0 - Tuscan Sun Vienna - November 2022
 
 - CLI: `mdsp visual-flow-creator` - command
@@ -24,7 +32,7 @@
 
 ## 3.19.0 - (Dove Vienna) - April 2022
 
-- CLI: new `mdsp markdown-help` command to generate markdown help available at [opensource.mindsphere.io](https://opensource.mindsphere.io/docs/mindconnect-nodejs/cli/index.html#tab1anchor2)
+- CLI: new `mdsp markdown-help` command to generate markdown help available at [developer.siemens.com](https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/cli/index.html#tab1anchor2)
 - SDK: Data Lake - added support for mindsphere data upload in CN1 (on alibaba cloud) [[#316](https://github.com/mindsphere/mindconnect-nodejs/issues/316)]
 - Bumped most depedencies
 

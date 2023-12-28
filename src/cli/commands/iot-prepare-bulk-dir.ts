@@ -14,7 +14,7 @@ import {
     subtractSecond,
     verboseLog,
 } from "./command-utils";
-import ora = require("ora");
+import ora = require("ora-classic");
 
 let color = getColor("magenta");
 const yellow = getColor("yellow");

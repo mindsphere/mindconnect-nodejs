@@ -11,7 +11,7 @@ const blue = getColor("blue");
 const yellow = getColor("yellow");
 
 export default (program: Command) => {
-    program.version(`MindSphere CLI (mc, mdsp) - Version: ${MC_VERSION}`);
+    program.version(`Insights Hub and Industrial IoT CLI (mc, mdsp) - Version: ${MC_VERSION}`);
 
     program.on("--help", () => {
         log(`\n  Documentation:\n`);
@@ -25,7 +25,7 @@ export default (program: Command) => {
         log(`    the ${green("green colored commands #")} are used as setup and utility commands`);
         log(`    the ${yellow("yellow colored commands &")} use borrowed mindsphere application cookies`);
         log(`    the credentials and cookies should only be used in secure environments`);
-        log(`    Full documentation: ${cyan("https://opensource.mindsphere.io")}\n`);
+        log(`    Full documentation: ${cyan("https://developer.siemens.com/industrial-iot-open-source/index.html")}\n`);
 
         checkForUpdates();
     });

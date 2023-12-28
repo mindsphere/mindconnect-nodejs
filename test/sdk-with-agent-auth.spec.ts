@@ -12,7 +12,6 @@ import { decrypt, loadAuth } from "../src/api/utils";
 import { AgentUnitTestConfiguration, tearDownAgents, unitTestSetup } from "./test-agent-setup-utils";
 import { getPasskeyForUnitTest } from "./test-utils";
 const log = debug("mindconnect-agent-test");
-const HttpsProxyAgent = require("https-proxy-agent");
 chai.should();
 
 describe("[SDK] using agent authorization", () => {
@@ -22,8 +21,8 @@ describe("[SDK] using agent authorization", () => {
         basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
 
-    let agentConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;
-    let unitTestConfiguration: AgentUnitTestConfiguration = ({} as unknown) as AgentUnitTestConfiguration;
+    let agentConfig: IMindConnectConfiguration = {} as unknown as IMindConnectConfiguration;
+    let unitTestConfiguration: AgentUnitTestConfiguration = {} as unknown as AgentUnitTestConfiguration;
 
     before(async () => {
         unitTestConfiguration = await unitTestSetup(
@@ -63,9 +62,9 @@ describe("[SDK] using agent authorization", () => {
 
     it("should determine if something implements TokenRotation", async () => {
         const agent = new MindConnectAgent(agentConfig);
-        const credentialAuth = new CredentialAuth("https://opensource.mindsphere.io", "Basic: test", "test");
+        const credentialAuth = new CredentialAuth("https://developer.siemens.com", "Basic: test", "test");
         const tokenManagerAuth = new TokenManagerAuth(
-            "https://opensource.mindsphere.io",
+            "https://developer.siemens.com",
             "Basic: test",
             "test",
             "test",
