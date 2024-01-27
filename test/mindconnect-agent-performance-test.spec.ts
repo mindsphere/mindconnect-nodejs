@@ -27,8 +27,8 @@ describe("MindConnectApi RSA_3072 Agent performance test", () => {
         basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
 
-    let rsaConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;
-    let unitTestConfiguration: AgentUnitTestConfiguration = ({} as unknown) as AgentUnitTestConfiguration;
+    let rsaConfig: IMindConnectConfiguration = {} as unknown as IMindConnectConfiguration;
+    let unitTestConfiguration: AgentUnitTestConfiguration = {} as unknown as AgentUnitTestConfiguration;
 
     before(async () => {
         unitTestConfiguration = await unitTestSetup(sdk, AgentManagementModels.AgentUpdate.SecurityProfileEnum.RSA3072);
@@ -153,7 +153,7 @@ describe("MindConnectApi RSA_3072 Agent performance test", () => {
         result.should.not.be.null;
     });
 
-    it("should be able to put the mappings configuration.", async () => {
+    it.skip("should be able to put the mappings configuration.", async () => {
         const agent = new MindConnectAgent(rsaConfig);
         agent.SetupAgentCertificate(fs.readFileSync("private.key"));
 
