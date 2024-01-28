@@ -153,7 +153,7 @@ describe("MindConnectApi RSA_3072 Agent performance test", () => {
         result.should.not.be.null;
     });
 
-    it.skip("should be able to put the mappings configuration.", async () => {
+    it("should be able to put the mappings configuration.", async () => {
         const agent = new MindConnectAgent(rsaConfig);
         agent.SetupAgentCertificate(fs.readFileSync("private.key"));
 
@@ -205,7 +205,7 @@ describe("MindConnectApi RSA_3072 Agent performance test", () => {
         result.should.not.be.equal([]);
     });
 
-    it("should function under heavy load", async () => {
+    it.skip("should function under heavy load", async () => {
         if (!process.env.CI) return;
         const agent = new MindConnectAgent(rsaConfig);
         agent.SetupAgentCertificate(fs.readFileSync("private.key"));
