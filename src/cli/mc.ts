@@ -75,7 +75,6 @@ import sdiSearchSchemasCommand from "./commands/sdi-search-schemas";
 import subtenantCommand from "./commands/subtenant";
 import tenantCommand from "./commands/tenant";
 import timeseriesCommand from "./commands/timeseries";
-import trendPredictionCommand from "./commands/trend-prediction";
 import vfcCommand from "./commands/vfc";
 import workOrdersCommand from "./commands/workorders";
 
@@ -185,7 +184,6 @@ workOrdersCommand(program);
 vfcCommand(program);
 
 // * analytics command
-trendPredictionCommand(program);
 kpicalculationCommand(program);
 eventAnalyticsCommand(program);
 // * models commands

@@ -570,7 +570,6 @@ Commands:
   mobile-apps|mb [options]            list, create or delete mobile apps *
   mobile-app-instances|mbi [options]  list, create or delete mobile app instances *
   signal-calculation|cal [options]    process timeseries data *
-  trend-prediction|tp [options]       perform trend prediction (linear/polynomial) @
   kpi-calculation|kp [options]        calculate kpi states or compute kpis @
   event-analytics|ea [options]        analyze mindsphere events @
   models|ml [options]                 list, create or delete analytic models *

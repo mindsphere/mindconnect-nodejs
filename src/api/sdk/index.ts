@@ -50,8 +50,6 @@ export * from "./sdi/sdi-models";
 export * from "./sdi/sdi-v4";
 export * from "./tenant/tenant-management";
 export * from "./tenant/tenant-management-models";
-export * from "./trend/trend-prediction";
-export * from "./trend/trend-prediction-models";
 export * from "./utc/utc";
 export * from "./utc/utc-models";
 export * from "./vfc/vfc";

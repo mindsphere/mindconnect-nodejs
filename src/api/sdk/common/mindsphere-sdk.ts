@@ -31,7 +31,6 @@ import {
 import { ResourceAccessManagementClient } from "../policy/policy";
 import { SemanticDataInterconnectClient } from "../sdi/sdi-v4";
 import { TenantManagementClient } from "../tenant/tenant-management";
-import { TrendPredictionClient } from "../trend/trend-prediction";
 import { UsageTransparencyClient } from "../utc/utc";
 import { VisualFlowCreatorClient } from "../vfc/vfc";
 import { WorkOrderManagementClient } from "../workorder/workorder";
@@ -177,20 +176,6 @@ export class MindSphereSdk extends SdkClient {
     public GetEventManagementClient(): EventManagementClient {
         this._eventManagementClient = this._eventManagementClient || new EventManagementClient(this._authenticator);
         return this._eventManagementClient;
-    }
-
-    private _trendPredictionClient?: TrendPredictionClient;
-
-    /**
-     * * Trend Prediction Client
-     *
-     * @returns {TrendPredictionClient}
-     *
-     * @memberOf MindSphereSdk
-     */
-    public GetTrendPredictionClient(): TrendPredictionClient {
-        this._trendPredictionClient = this._trendPredictionClient || new TrendPredictionClient(this._authenticator);
-        return this._trendPredictionClient;
     }
 
     private _kpiCalculationClient?: KPICalculationClient;
