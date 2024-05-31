@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import aggregatesCommand from "./commands/aggregates";
-import eventAnalyticsCommand from "./commands/analyze-events";
 import anomalydetectionCommand from "./commands/anomaly-detection";
 import aspectCommands from "./commands/aspect-commands";
 import assetInfoCommand from "./commands/asset-info";
@@ -183,7 +182,6 @@ workOrdersCommand(program);
 vfcCommand(program);
 
 // * analytics command
-eventAnalyticsCommand(program);
 // * models commands
 modelsCommand(program);
 jobsCommand(program);
