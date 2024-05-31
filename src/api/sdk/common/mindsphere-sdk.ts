@@ -14,7 +14,6 @@ import { TimeSeriesAggregateClient } from "../iotaggregate/iot-timeseries-aggreg
 import { TimeSeriesBulkClient } from "../iotbulk/iot-timeseries-bulk";
 import { IotFileClient } from "../iotfile/iot-file";
 import { JobManagerClient } from "../jobmanager/jobmanager";
-import { KPICalculationClient } from "../kpi/kpi";
 import { MindConnectApiClient } from "../mcapi/mcapi";
 import { MessageBrokerClient } from "../messagebroker/messagebroker";
 import { ModelManagementClient } from "../model/model-management";
@@ -176,20 +175,6 @@ export class MindSphereSdk extends SdkClient {
     public GetEventManagementClient(): EventManagementClient {
         this._eventManagementClient = this._eventManagementClient || new EventManagementClient(this._authenticator);
         return this._eventManagementClient;
-    }
-
-    private _kpiCalculationClient?: KPICalculationClient;
-
-    /**
-     * * KPI Calculation Client
-     *
-     * @returns {KPICalculationClient}
-     *
-     * @memberOf MindSphereSdk
-     */
-    public GetKPICalculationClient(): KPICalculationClient {
-        this._kpiCalculationClient = this._kpiCalculationClient || new KPICalculationClient(this._authenticator);
-        return this._kpiCalculationClient;
     }
 
     private _mindConnectApiClient?: MindConnectApiClient;

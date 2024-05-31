@@ -23,7 +23,6 @@ import iotDownloadBulkCommand from "./commands/iot-download-bulk";
 import iotBulkDirCommand from "./commands/iot-prepare-bulk-dir";
 import jobsCommand from "./commands/jobmanager-jobs";
 import scheduleCommand from "./commands/jobmanager-schedules";
-import kpicalculationCommand from "./commands/kpi-calculation";
 import markdownHelpCommand from "./commands/markdown-help";
 import agentStatusCommand from "./commands/mc-agent-status";
 import agentTokenCommand from "./commands/mc-agent-token";
@@ -184,7 +183,6 @@ workOrdersCommand(program);
 vfcCommand(program);
 
 // * analytics command
-kpicalculationCommand(program);
 eventAnalyticsCommand(program);
 // * models commands
 modelsCommand(program);
