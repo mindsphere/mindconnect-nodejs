@@ -74,7 +74,6 @@ import sdiQueryExecutionJobsCommand from "./commands/sdi-query-execution-jobs";
 import sdiSearchSchemasCommand from "./commands/sdi-search-schemas";
 import signalCalculationCommand from "./commands/signal-calculation";
 import signalValidationCommand from "./commands/signal-validation";
-import spectrumAnalysisCommand from "./commands/spectrum-analysis";
 import subtenantCommand from "./commands/subtenant";
 import tenantCommand from "./commands/tenant";
 import timeseriesCommand from "./commands/timeseries";
@@ -189,7 +188,6 @@ vfcCommand(program);
 
 // * analytics command
 
-spectrumAnalysisCommand(program);
 signalValidationCommand(program);
 signalCalculationCommand(program);
 trendPredictionCommand(program);

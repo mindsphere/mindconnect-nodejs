@@ -32,7 +32,6 @@ import { ResourceAccessManagementClient } from "../policy/policy";
 import { SemanticDataInterconnectClient } from "../sdi/sdi-v4";
 import { SignalCalculationClient } from "../signal-calculation/signal-calculation";
 import { SignalValidationClient } from "../signal-validation/signal-validation";
-import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
 import { TenantManagementClient } from "../tenant/tenant-management";
 import { TrendPredictionClient } from "../trend/trend-prediction";
 import { UsageTransparencyClient } from "../utc/utc";
@@ -180,21 +179,6 @@ export class MindSphereSdk extends SdkClient {
     public GetEventManagementClient(): EventManagementClient {
         this._eventManagementClient = this._eventManagementClient || new EventManagementClient(this._authenticator);
         return this._eventManagementClient;
-    }
-
-    private _spectrumAnalysisClient?: SpectrumAnalysisClient;
-
-    /**
-     *  * Spectrum Analysis Client
-     *
-     * @returns {SpectrumAnalysisClient}
-     *
-     * @memberOf MindSphereSdk
-     */
-    public GetSpectrumAnalysisClient(): SpectrumAnalysisClient {
-        this._spectrumAnalysisClient = this._spectrumAnalysisClient || new SpectrumAnalysisClient(this._authenticator);
-
-        return this._spectrumAnalysisClient;
     }
 
     private _signalValidationClient?: SignalValidationClient;
