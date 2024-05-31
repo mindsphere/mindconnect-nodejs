@@ -417,3 +417,13 @@ export function printTree(treeItem: TreeItem, level: number, color: (x: string) 
         printTree(child, level + 1, color);
     });
 }
+
+export function removeTrailingSlash(url: string): string {
+    if (url.includes("?")) {
+        const parts = url.split("?");
+        parts[0] = parts[0].replace(/\/+$/, "");
+        return parts.join("?");
+    } else {
+        return url.replace(/\/+$/, "");
+    }
+}
