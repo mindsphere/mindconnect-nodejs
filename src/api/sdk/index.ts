@@ -2,8 +2,6 @@ export * from "./advanced-token/advanced-token";
 export * from "./advanced-token/advanced-token-models";
 export * from "./agent/agent-management";
 export * from "./agent/agent-models";
-export * from "./anomaly-detection/anomaly-detection";
-export * from "./anomaly-detection/anomaly-detection-models";
 export * from "./asset/asset-management";
 export * from "./asset/asset-models";
 export * from "./commanding/commanding";

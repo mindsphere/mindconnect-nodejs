@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import aggregatesCommand from "./commands/aggregates";
-import anomalydetectionCommand from "./commands/anomaly-detection";
 import aspectCommands from "./commands/aspect-commands";
 import assetInfoCommand from "./commands/asset-info";
 import assetModelLockCommand from "./commands/asset-model-lock";
@@ -187,9 +186,6 @@ modelsCommand(program);
 jobsCommand(program);
 scheduleCommand(program);
 dataExchangeCommand(program);
-
-// * anomaly detection commands
-anomalydetectionCommand(program);
 
 // * dev proxy command
 devProxyCommand(program);

@@ -1,6 +1,5 @@
 import { AdvancedTokenExchangeClient } from "../advanced-token/advanced-token";
 import { AgentManagementClient } from "../agent/agent-management";
-import { AnomalyDetectionClient } from "../anomaly-detection/anomaly-detection";
 import { AssetManagementClient } from "../asset/asset-management";
 import { CommandingClient } from "../commanding/commanding";
 import { DataExchangeClient } from "../data-exchange/data-exchange";
@@ -73,20 +72,6 @@ export class MindSphereSdk extends SdkClient {
     public GetAgentManagementClient(): AgentManagementClient {
         this._agentManagementClient = this._agentManagementClient || new AgentManagementClient(this._authenticator);
         return this._agentManagementClient;
-    }
-
-    private _anomalyDetectionClient?: AnomalyDetectionClient;
-
-    /**
-     * * Anomaly Detection Client
-     *
-     * @returns {AnomalyDetectionClient}
-     *
-     * @memberOf MindSphereSdk
-     */
-    public GetAnomalyDetectionClient(): AnomalyDetectionClient {
-        this._anomalyDetectionClient = this._anomalyDetectionClient || new AnomalyDetectionClient(this._authenticator);
-        return this._anomalyDetectionClient;
     }
 
     private _iotFileClient?: IotFileClient;
