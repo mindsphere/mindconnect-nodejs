@@ -4,6 +4,8 @@ export * from "./agent/agent-management";
 export * from "./agent/agent-models";
 export * from "./asset/asset-management";
 export * from "./asset/asset-models";
+export * from "./cases/cases";
+export * from "./cases/cases-models";
 export * from "./commanding/commanding";
 export * from "./commanding/commanding-models";
 export * from "./common/credentials";

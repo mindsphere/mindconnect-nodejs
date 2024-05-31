@@ -1,6 +1,7 @@
 import { AdvancedTokenExchangeClient } from "../advanced-token/advanced-token";
 import { AgentManagementClient } from "../agent/agent-management";
 import { AssetManagementClient } from "../asset/asset-management";
+import { CaseManagementClient } from "../cases/cases";
 import { CommandingClient } from "../commanding/commanding";
 import { DataExchangeClient } from "../data-exchange/data-exchange";
 import { DataLakeClient } from "../data-lake/data-lake";
@@ -494,5 +495,17 @@ export class MindSphereSdk extends SdkClient {
         this._visualFlowCreatorClient =
             this._visualFlowCreatorClient || new VisualFlowCreatorClient(this._authenticator);
         return this._visualFlowCreatorClient;
+    }
+
+    private _caseManagementClient?: CaseManagementClient;
+    /**
+     * Case Management Client
+     *
+     * @return {*}  {CaseManagementClient}
+     * @memberof MindSphereSdk
+     */
+    public GetCaseManagementClient(): CaseManagementClient {
+        this._caseManagementClient = this._caseManagementClient || new CaseManagementClient(this._authenticator);
+        return this._caseManagementClient;
     }
 }

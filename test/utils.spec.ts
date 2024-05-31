@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { it } from "mocha";
 import { removeTrailingSlash } from "../src/api/utils";
 
-describe("[UTILS] Path normalization", () => {
+describe("[Utils] Path normalization", () => {
     it("should normalize paths", () => {
         const testurl =
             "https://gateway.{region}.{mindsphere-domain}/api/iottsaggregates/v3/aggregates/{assetId}/{aspectName}/";
