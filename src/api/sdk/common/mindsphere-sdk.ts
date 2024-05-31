@@ -30,7 +30,6 @@ import {
 } from "../open-edge/open-edge";
 import { ResourceAccessManagementClient } from "../policy/policy";
 import { SemanticDataInterconnectClient } from "../sdi/sdi-v4";
-import { SignalCalculationClient } from "../signal-calculation/signal-calculation";
 import { TenantManagementClient } from "../tenant/tenant-management";
 import { TrendPredictionClient } from "../trend/trend-prediction";
 import { UsageTransparencyClient } from "../utc/utc";
@@ -452,21 +451,6 @@ export class MindSphereSdk extends SdkClient {
     public GetDataExchangeClient(): DataExchangeClient {
         this._dataExchangeClient = this._dataExchangeClient || new DataExchangeClient(this._authenticator);
         return this._dataExchangeClient;
-    }
-
-    private _signalCalculationClient?: SignalCalculationClient;
-
-    /**
-     * * Signal Calculation Client
-     *
-     * @returns {SignalCalculationClient}
-     *
-     * @memberOf MindSphereSdk
-     */
-    public GetSignalCalculationClient(): SignalCalculationClient {
-        this._signalCalculationClient =
-            this._signalCalculationClient || new SignalCalculationClient(this._authenticator);
-        return this._signalCalculationClient;
     }
 
     private _semanticDataInterConnectClient?: SemanticDataInterconnectClient;

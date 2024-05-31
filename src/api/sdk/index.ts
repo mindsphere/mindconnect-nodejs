@@ -48,8 +48,6 @@ export * from "./policy/policy";
 export * from "./policy/policy-models";
 export * from "./sdi/sdi-models";
 export * from "./sdi/sdi-v4";
-export * from "./signal-calculation/signal-calculation";
-export * from "./signal-calculation/signal-calculation-models";
 export * from "./tenant/tenant-management";
 export * from "./tenant/tenant-management-models";
 export * from "./trend/trend-prediction";
