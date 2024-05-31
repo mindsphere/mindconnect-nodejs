@@ -31,7 +31,6 @@ import {
 import { ResourceAccessManagementClient } from "../policy/policy";
 import { SemanticDataInterconnectClient } from "../sdi/sdi-v4";
 import { SignalCalculationClient } from "../signal-calculation/signal-calculation";
-import { SignalValidationClient } from "../signal-validation/signal-validation";
 import { TenantManagementClient } from "../tenant/tenant-management";
 import { TrendPredictionClient } from "../trend/trend-prediction";
 import { UsageTransparencyClient } from "../utc/utc";
@@ -179,21 +178,6 @@ export class MindSphereSdk extends SdkClient {
     public GetEventManagementClient(): EventManagementClient {
         this._eventManagementClient = this._eventManagementClient || new EventManagementClient(this._authenticator);
         return this._eventManagementClient;
-    }
-
-    private _signalValidationClient?: SignalValidationClient;
-
-    /**
-     * * Signal Validation Client
-     *
-     * @returns {SignalValidationClient}
-     *
-     * @memberOf MindSphereSdk
-     */
-    public GetSignalValidationClient(): SignalValidationClient {
-        this._signalValidationClient = this._signalValidationClient || new SignalValidationClient(this._authenticator);
-
-        return this._signalValidationClient;
     }
 
     private _trendPredictionClient?: TrendPredictionClient;

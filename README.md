@@ -569,7 +569,6 @@ Commands:
   sdi-ontology-jobs|sdb [options]     manage ontology jobs for SDI *
   mobile-apps|mb [options]            list, create or delete mobile apps *
   mobile-app-instances|mbi [options]  list, create or delete mobile app instances *
-  signal-validation|sv [options]      perform signal validation @
   signal-calculation|cal [options]    process timeseries data *
   trend-prediction|tp [options]       perform trend prediction (linear/polynomial) @
   kpi-calculation|kp [options]        calculate kpi states or compute kpis @

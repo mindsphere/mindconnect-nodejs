@@ -73,7 +73,6 @@ import sdiOntologyJobsCommand from "./commands/sdi-ontology-jobs";
 import sdiQueryExecutionJobsCommand from "./commands/sdi-query-execution-jobs";
 import sdiSearchSchemasCommand from "./commands/sdi-search-schemas";
 import signalCalculationCommand from "./commands/signal-calculation";
-import signalValidationCommand from "./commands/signal-validation";
 import subtenantCommand from "./commands/subtenant";
 import tenantCommand from "./commands/tenant";
 import timeseriesCommand from "./commands/timeseries";
@@ -187,8 +186,6 @@ workOrdersCommand(program);
 vfcCommand(program);
 
 // * analytics command
-
-signalValidationCommand(program);
 signalCalculationCommand(program);
 trendPredictionCommand(program);
 kpicalculationCommand(program);
