@@ -48,7 +48,7 @@ describe("[Cases] Cases", () => {
         expect(caseActivities.activities?.length).to.be.greaterThan(0);
     });
 
-    it.only("should get case summary", async () => {
+    it("should get case summary", async () => {
         await cmg.CreateCase({ title: "[UNIT TEST]", dueDate: new Date().toISOString() });
         const caseSummary = await cmg.GetCasesAggregate();
         expect(caseSummary.totalCases).to.be.greaterThan(0);
