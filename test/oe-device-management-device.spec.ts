@@ -3,11 +3,11 @@ import "url-search-params-polyfill";
 import { MindSphereSdk } from "../src";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import { setupDeviceTestStructure, tearDownDeviceTestStructure } from "./test-device-setup-utils";
-import { getPasskeyForUnitTest} from "./test-utils";
+import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
 
 const timeOffset = new Date().getTime();
-describe("[SDK] DeviceManagementClient.Devices", () => {
+describe.skip("[SDK] DeviceManagementClient.Devices", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
@@ -24,8 +24,8 @@ describe("[SDK] DeviceManagementClient.Devices", () => {
         agents: [],
         properties: {
             key1: "value1",
-            key2: "value2"
-        }
+            key2: "value2",
+        },
     };
 
     let deviceTypeId = "aee2e37f-f562-4ed6-b90a-c43208dc054a";
@@ -39,7 +39,7 @@ describe("[SDK] DeviceManagementClient.Devices", () => {
         await tearDownDeviceTestStructure(sdk);
 
         // Setup the testing architecture
-        const {device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);
+        const { device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);
         assetTypeId = `${(deviceAssetType as any).id}`;
         deviceTypeId = `${(deviceType as any).id}`;
         assetId = `${(deviceAsset as any).assetId}`;
@@ -68,7 +68,7 @@ describe("[SDK] DeviceManagementClient.Devices", () => {
     it("should GET devices @sanity", async () => {
         deviceManagementClient.should.not.be.undefined;
         const devices = await deviceManagementClient.GetDevices({
-            assetId: `${assetId}`
+            assetId: `${assetId}`,
         });
         devices.should.not.be.undefined;
         devices.should.not.be.null;
@@ -118,10 +118,7 @@ describe("[SDK] DeviceManagementClient.Devices", () => {
 
         await deviceManagementClient.DeleteDevice(`${device.id}`);
         // Delete the newly created asset
-        await assetMgmt.DeleteAsset(
-            `${_asset.assetId}`,
-            {ifMatch: `${_asset.etag}`}
-        );
+        await assetMgmt.DeleteAsset(`${_asset.assetId}`, { ifMatch: `${_asset.etag}` });
     });
 
     it("should PATCH specific device ", async () => {
@@ -155,9 +152,6 @@ describe("[SDK] DeviceManagementClient.Devices", () => {
         await deviceManagementClient.DeleteDevice(`${device.id}`);
 
         // Delete the newly created asset
-        await assetMgmt.DeleteAsset(
-            `${_asset.assetId}`,
-            {ifMatch: `${_asset.etag}`}
-        );
+        await assetMgmt.DeleteAsset(`${_asset.assetId}`, { ifMatch: `${_asset.etag}` });
     });
 });

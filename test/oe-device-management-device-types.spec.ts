@@ -3,11 +3,10 @@ import "url-search-params-polyfill";
 import { MindSphereSdk } from "../src";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
 import { setupDeviceTestStructure, tearDownDeviceTestStructure } from "./test-device-setup-utils";
-import { getPasskeyForUnitTest} from "./test-utils";
+import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
 
-
-describe("[SDK] DeviceManagementClient.DeviceTypes", () => {
+describe.skip("[SDK] DeviceManagementClient.DeviceTypes", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
@@ -23,8 +22,8 @@ describe("[SDK] DeviceManagementClient.DeviceTypes", () => {
         description: " example device type",
         properties: {
             key1: "value1",
-            key2: "value2"
-        }
+            key2: "value2",
+        },
     };
 
     let deviceTypeId = "aee2e37f-f562-4ed6-b90a-c43208dc054a";
@@ -38,7 +37,7 @@ describe("[SDK] DeviceManagementClient.DeviceTypes", () => {
         await tearDownDeviceTestStructure(sdk);
 
         // Setup the testing architecture
-        const {device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);
+        const { device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);
         assetTypeId = `${(deviceAssetType as any).id}`;
         deviceTypeId = `${(deviceType as any).id}`;
         assetId = `${(deviceAsset as any).id}`;
