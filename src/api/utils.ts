@@ -419,6 +419,9 @@ export function printTree(treeItem: TreeItem, level: number, color: (x: string) 
 }
 
 export function removeTrailingSlash(url: string): string {
+    // billboard ends with /
+    if (url.includes("/api/assetmanagement/v3/")) return url;
+
     if (url.includes("?")) {
         const parts = url.split("?");
         parts[0] = parts[0].replace(/\/+$/, "");
