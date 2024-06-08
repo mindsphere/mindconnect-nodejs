@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 import { Command } from "commander";
 import aggregatesCommand from "./commands/aggregates";
 import aspectCommands from "./commands/aspect-commands";
@@ -6,6 +7,7 @@ import assetInfoCommand from "./commands/asset-info";
 import assetModelLockCommand from "./commands/asset-model-lock";
 import assetTypeCommand from "./commands/asset-types";
 import assetsCommand from "./commands/assets";
+import casesCommand from "./commands/cases";
 import dataExchangeCommand from "./commands/data-exchange";
 import dataLakeCommand from "./commands/data-lake";
 import deleteAssetCommand from "./commands/delete-asset";
@@ -109,8 +111,7 @@ iotDownloadBulkCommand(program);
 deliveryJobsCommand(program);
 
 // * assets files and event handling commands
-// TODO: @sn0wcat
-// assetModelCommand(program);
+
 assetModelLockCommand(program);
 assetInfoCommand(program);
 assetsCommand(program);
@@ -178,6 +179,7 @@ mobileAppInstancesCommand(program);
 
 messageBrokerCommand(program);
 workOrdersCommand(program);
+casesCommand(program);
 vfcCommand(program);
 
 // * analytics command
