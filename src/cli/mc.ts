@@ -75,7 +75,6 @@ import subtenantCommand from "./commands/subtenant";
 import tenantCommand from "./commands/tenant";
 import timeseriesCommand from "./commands/timeseries";
 import vfcCommand from "./commands/vfc";
-import workOrdersCommand from "./commands/workorders";
 
 const program = new Command();
 
@@ -178,7 +177,6 @@ mobileAppInstancesCommand(program);
 // * messageBroker Command
 
 messageBrokerCommand(program);
-workOrdersCommand(program);
 casesCommand(program);
 vfcCommand(program);
 
