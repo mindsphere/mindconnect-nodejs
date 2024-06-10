@@ -4,7 +4,7 @@ import { MindSphereSdk } from "../src";
 import { decrypt, loadAuth } from "../src/api/utils";
 import { getPasskeyForUnitTest } from "./test-utils";
 
-describe("[Cases] Cases", () => {
+describe.only("[Cases] Cases", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
@@ -28,22 +28,28 @@ describe("[Cases] Cases", () => {
     });
 
     it("should create a case ", async () => {
-        const createdCase = await cmg.CreateCase({ title: "[UNIT TEST]", dueDate: new Date().toISOString() });
+        const createdCase = await cmg.CreateCase({
+            title: `[UNIT TEST] ${new Date().toISOString()}`,
+            dueDate: new Date().toISOString(),
+        });
         expect(createdCase.handle).to.not.be.undefined;
     });
 
     it("should update a case ", async () => {
-        const createdCase = await cmg.CreateCase({ title: "[UNIT TEST]", dueDate: new Date().toISOString() });
+        const createdCase = await cmg.CreateCase({
+            title: `[UNIT TEST] ${new Date().toISOString()}`,
+            dueDate: new Date().toISOString(),
+        });
         const updatedCase = await cmg.UpdateCase(
             createdCase.handle!,
-            { description: "123", dueDate: new Date().toISOString(), title: "[UNIT TEST]" },
+            { description: "123", dueDate: new Date().toISOString(), title: `[UNIT TEST] ${new Date().toISOString()}` },
             { ifMatch: createdCase.eTag! }
         );
         expect(updatedCase.handle).to.not.be.undefined;
     });
 
     it("should get case activities  ", async () => {
-        await cmg.CreateCase({ title: "[UNIT TEST]", dueDate: new Date().toISOString() });
+        await cmg.CreateCase({ title: `[UNIT TEST] ${new Date().toISOString()}`, dueDate: new Date().toISOString() });
         const caseActivities = await cmg.GetCasesActivities();
         expect(caseActivities.activities?.length).to.be.greaterThan(0);
     });
@@ -55,7 +61,10 @@ describe("[Cases] Cases", () => {
     });
 
     it("should create case comment", async () => {
-        const createdCase = await cmg.CreateCase({ title: "[UNIT TEST]", dueDate: new Date().toISOString() });
+        const createdCase = await cmg.CreateCase({
+            title: `[UNIT TEST] ${new Date().toISOString()}`,
+            dueDate: new Date().toISOString(),
+        });
         const comment = await cmg.CreateComment(createdCase.handle!, {
             description: "This is a comment",
             isActive: true,
