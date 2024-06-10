@@ -4,7 +4,7 @@ import { MindSphereSdk } from "../src";
 import { decrypt, loadAuth } from "../src/api/utils";
 import { getPasskeyForUnitTest } from "./test-utils";
 
-describe.only("[Cases] Cases", () => {
+describe("[Cases] Cases", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
