@@ -124,7 +124,7 @@ Here are some examples of how to use the \`mdsp ${stripAnsi(name)}\` command:
 ${stripAnsi(examples)}
 \`\`\`
 
-See [MindSphere API documentation](https://documentation.mindsphere.io/MindSphere/apis/index.html) for more information about MindSphere APIs.
+See [MindSphere API documentation](https://developer.siemens.com/insights-hub/overview.html) for more information about MindSphere APIs.
 
 `;
 };

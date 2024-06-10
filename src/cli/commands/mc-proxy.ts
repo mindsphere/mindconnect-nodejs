@@ -324,7 +324,7 @@ async function serve({ configPort, options }: { configPort?: number; options: an
     console.log(
         `example api call (list of assets): ${color("http://localhost:" + port + "/api/assetmanagement/v3/assets")}`
     );
-    console.log(`API documentation: ${color("https://developer.mindsphere.io/apis/index.html")}`);
+    console.log(`API documentation: ${color("https://developer.siemens.com/insights-hub/overview.html")}`);
     console.log(`press ${color("CTRL + C")} to exit`);
 }
 

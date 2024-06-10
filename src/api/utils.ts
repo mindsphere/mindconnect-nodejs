@@ -420,6 +420,7 @@ export function printTree(treeItem: TreeItem, level: number, color: (x: string) 
 
 export function removeTrailingSlash(url: string): string {
     // billboard ends with /
+    // console.log(url);
     if (url === "/api/assetmanagement/v3/") return url;
 
     if (url.includes("?")) {
