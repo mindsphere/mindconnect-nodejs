@@ -2,7 +2,7 @@
 import * as chai from "chai";
 import { it } from "mocha";
 import "url-search-params-polyfill";
-import { DataPointValue, DataSourceConfiguration, IMindConnectConfiguration, MindConnectAgent, retry } from "../src";
+import { DataPointValue, DataSourceConfiguration, IMindConnectConfiguration, MindConnectAgent } from "../src";
 import { AgentManagementModels, AssetManagementModels, MindConnectApiClient } from "../src/api/sdk";
 import { MindSphereSdk } from "../src/api/sdk/";
 import { decrypt, loadAuth, throwError } from "../src/api/utils";
@@ -22,8 +22,8 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
         basicAuth: decrypt(auth, getPasskeyForUnitTest()),
     });
 
-    let agentConfig: IMindConnectConfiguration = ({} as unknown) as IMindConnectConfiguration;
-    let unitTestConfiguration: AgentUnitTestConfiguration = ({} as unknown) as AgentUnitTestConfiguration;
+    let agentConfig: IMindConnectConfiguration = {} as unknown as IMindConnectConfiguration;
+    let unitTestConfiguration: AgentUnitTestConfiguration = {} as unknown as AgentUnitTestConfiguration;
 
     let secondAsset: AssetManagementModels.AssetResourceWithHierarchyPath;
 
@@ -188,20 +188,6 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
         mappings.length.should.equal(7);
     });
 
-    it("should be able to use SDK with agent credentials", async () => {
-        const agent = new MindConnectAgent(agentConfig);
-
-        if (!agent.IsOnBoarded()) {
-            await agent.OnBoard();
-        }
-
-        const agentSdk = agent.Sdk();
-        const billboard = await retry(5, () => agentSdk.GetAssetManagementClient().GetBillboard());
-        billboard.should.not.be.undefined;
-        const assetTypes = await retry(5, () => agentSdk.GetAssetManagementClient().GetAspectTypes());
-        assetTypes.should.not.be.undefined;
-    });
-
     it("should be able to fix double names", async () => {
         const mcapi = new MindConnectApiClient();
 
@@ -311,8 +297,8 @@ describe("MindConnectApi Version 3 Agent (SHARED_SECRET) - automatic configurati
             eTag: "2",
         };
 
-        const fixedConfig = ((mcapi as unknown) as any).CreateUniqueDataPoints(
-            (testConfig as unknown) as DataSourceConfiguration
+        const fixedConfig = (mcapi as unknown as any).CreateUniqueDataPoints(
+            testConfig as unknown as DataSourceConfiguration
         );
         fixedConfig.dataSources[0].name.should.equal("DS-EnvironmentData00001");
         fixedConfig.dataSources[1].name.should.equal("DS-EnvironmentData00002");

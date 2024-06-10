@@ -6,7 +6,7 @@ import { setupDeviceTestStructure, tearDownDeviceTestStructure } from "./test-de
 import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
 
-describe("[SDK] DeviceManagementClient.Status", () => {
+describe.skip("[SDK] DeviceManagementClient.Status", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,

@@ -1,12 +1,23 @@
 # Changelog
 
+## 3.24.0 - Coconut Vienna - June 2024
+
+- SDK, CLI: Removed spectral analysis client (corresponding service switched off in Insights Hub) #357
+- SDK, CLI: Removed signal validation client (corresponding service switched off in Insights Hub) #357
+- SDK, CLI: Removed trend prediction client (corresponding service switched off in Insights Hub) #357
+- SDK, CLI: Removed kpi calculation client (corresponding service switched off in Insights Hub) #357
+- SDK, CLI: Removed event analytics client (corresponding service switched off in Insights Hub) #357
+- SDK, CLI: Removed anomaly detection client (corresponding service switched off in Insights Hub) #357
+- SDK: implemented trailing slash checks in HttpActions #356
+- SDK, CLI: renamed workorder client to cases client 
+- Bumped most dependencies
+
 ## 3.23.0 - Jet Black Vienna - December 2023
 
 - Moved links from opensource.mindsphere.io to [Siemens Xcelerator Developer Portal](https://developer.siemens.com)
 - Renamed MindSphere to Insights Hub
 - Bumped most dependencies
 - Happy Holidays!
-
 
 ## 3.22.0 - Tuscan Sun Vienna - November 2022
 

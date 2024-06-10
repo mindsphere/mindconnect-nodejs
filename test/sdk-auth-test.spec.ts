@@ -44,7 +44,6 @@ describe("[SDK] using different auths @s4f", () => {
         sdk.should.not.be.undefined;
         sdk.GetGateway().should.equal("https://gateway.eu1.mindsphere.io");
         sdk.GetAssetManagementClient().GetGateway().should.equal("https://gateway.eu1.mindsphere.io");
-        sdk.GetKPICalculationClient().GetTenant().should.equal("test");
     });
 
     it("should instantiate with ServiceCredentials @s4f", async () => {
@@ -56,7 +55,6 @@ describe("[SDK] using different auths @s4f", () => {
         sdk.should.not.be.undefined;
         sdk.GetGateway().should.equal("https://gateway.eu1.mindsphere.io");
         sdk.GetAssetManagementClient().GetGateway().should.equal("https://gateway.eu1.mindsphere.io");
-        sdk.GetKPICalculationClient().GetTenant().should.equal("test");
     });
 
     it("should instantiate with AppCredentials @s4f", async () => {
@@ -72,6 +70,5 @@ describe("[SDK] using different auths @s4f", () => {
         sdk.should.not.be.undefined;
         sdk.GetGateway().should.equal("https://gateway.eu1.mindsphere.io");
         sdk.GetAssetManagementClient().GetGateway().should.equal("https://gateway.eu1.mindsphere.io");
-        sdk.GetKPICalculationClient().GetTenant().should.equal("test");
     });
 });

@@ -569,10 +569,7 @@ Commands:
   sdi-ontology-jobs|sdb [options]     manage ontology jobs for SDI *
   mobile-apps|mb [options]            list, create or delete mobile apps *
   mobile-app-instances|mbi [options]  list, create or delete mobile app instances *
-  spectrum-analysis|sp [options]      perform spectrum analysis on a sound file @
-  signal-validation|sv [options]      perform signal validation @
   signal-calculation|cal [options]    process timeseries data *
-  trend-prediction|tp [options]       perform trend prediction (linear/polynomial) @
   kpi-calculation|kp [options]        calculate kpi states or compute kpis @
   event-analytics|ea [options]        analyze mindsphere events @
   models|ml [options]                 list, create or delete analytic models *

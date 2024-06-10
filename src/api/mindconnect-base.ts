@@ -2,7 +2,7 @@ import fetch from "cross-fetch";
 import * as debug from "debug";
 import { HttpsProxyAgent } from "https-proxy-agent";
 import { MC_NAME, MC_VERSION } from "../version";
-import { removeUndefined, throwError } from "./utils";
+import { removeTrailingSlash, removeUndefined, throwError } from "./utils";
 const log = debug("mindconnect");
 
 /**
@@ -241,7 +241,7 @@ export abstract class MindConnectBase {
 
         headers = removeUndefined({ ...headers, ...additionalHeaders });
 
-        const url = `${gateway}${baseUrl}`;
+        const url = removeTrailingSlash(`${gateway}${baseUrl}`);
         log(`${message} Headers ${JSON.stringify(headers)} Url ${url}`);
         try {
             const request: any = { method: verb, headers: headers, agent: this._proxyHttpAgent };

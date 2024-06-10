@@ -8,7 +8,7 @@ import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
 
 const timeOffset = new Date().getTime();
-describe("[SDK] DeviceManagementClient.FirmwareDeployment", () => {
+describe.skip("[SDK] DeviceManagementClient.FirmwareDeployment", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,

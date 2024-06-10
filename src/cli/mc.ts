@@ -1,13 +1,13 @@
 #!/usr/bin/env node
+
 import { Command } from "commander";
 import aggregatesCommand from "./commands/aggregates";
-import eventAnalyticsCommand from "./commands/analyze-events";
-import anomalydetectionCommand from "./commands/anomaly-detection";
 import aspectCommands from "./commands/aspect-commands";
 import assetInfoCommand from "./commands/asset-info";
 import assetModelLockCommand from "./commands/asset-model-lock";
 import assetTypeCommand from "./commands/asset-types";
 import assetsCommand from "./commands/assets";
+import casesCommand from "./commands/cases";
 import dataExchangeCommand from "./commands/data-exchange";
 import dataLakeCommand from "./commands/data-lake";
 import deleteAssetCommand from "./commands/delete-asset";
@@ -23,7 +23,6 @@ import iotDownloadBulkCommand from "./commands/iot-download-bulk";
 import iotBulkDirCommand from "./commands/iot-prepare-bulk-dir";
 import jobsCommand from "./commands/jobmanager-jobs";
 import scheduleCommand from "./commands/jobmanager-schedules";
-import kpicalculationCommand from "./commands/kpi-calculation";
 import markdownHelpCommand from "./commands/markdown-help";
 import agentStatusCommand from "./commands/mc-agent-status";
 import agentTokenCommand from "./commands/mc-agent-token";
@@ -72,15 +71,10 @@ import sdiOntologiesCommand from "./commands/sdi-ontologies";
 import sdiOntologyJobsCommand from "./commands/sdi-ontology-jobs";
 import sdiQueryExecutionJobsCommand from "./commands/sdi-query-execution-jobs";
 import sdiSearchSchemasCommand from "./commands/sdi-search-schemas";
-import signalCalculationCommand from "./commands/signal-calculation";
-import signalValidationCommand from "./commands/signal-validation";
-import spectrumAnalysisCommand from "./commands/spectrum-analysis";
 import subtenantCommand from "./commands/subtenant";
 import tenantCommand from "./commands/tenant";
 import timeseriesCommand from "./commands/timeseries";
-import trendPredictionCommand from "./commands/trend-prediction";
 import vfcCommand from "./commands/vfc";
-import workOrdersCommand from "./commands/workorders";
 
 const program = new Command();
 
@@ -116,8 +110,7 @@ iotDownloadBulkCommand(program);
 deliveryJobsCommand(program);
 
 // * assets files and event handling commands
-// TODO: @sn0wcat
-// assetModelCommand(program);
+
 assetModelLockCommand(program);
 assetInfoCommand(program);
 assetsCommand(program);
@@ -184,25 +177,15 @@ mobileAppInstancesCommand(program);
 // * messageBroker Command
 
 messageBrokerCommand(program);
-workOrdersCommand(program);
+casesCommand(program);
 vfcCommand(program);
 
 // * analytics command
-
-spectrumAnalysisCommand(program);
-signalValidationCommand(program);
-signalCalculationCommand(program);
-trendPredictionCommand(program);
-kpicalculationCommand(program);
-eventAnalyticsCommand(program);
 // * models commands
 modelsCommand(program);
 jobsCommand(program);
 scheduleCommand(program);
 dataExchangeCommand(program);
-
-// * anomaly detection commands
-anomalydetectionCommand(program);
 
 // * dev proxy command
 devProxyCommand(program);

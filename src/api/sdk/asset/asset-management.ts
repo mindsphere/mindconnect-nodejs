@@ -1298,6 +1298,7 @@ export class AssetManagementClient extends SdkClient {
      * @returns {Promise<AssetManagementModels.BillboardResource>}
      *
      * @memberOf AssetManagementClient
+     *
      */
     public async GetBillboard(): Promise<AssetManagementModels.BillboardResource> {
         const result = await this.HttpAction({

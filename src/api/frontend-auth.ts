@@ -1,6 +1,6 @@
 import fetch from "cross-fetch";
 import { MindConnectBase, TokenRotation } from "./mindconnect-base";
-import { removeUndefined, throwError } from "./utils";
+import { removeTrailingSlash, removeUndefined, throwError } from "./utils";
 
 function log(message: string) {
     if (typeof window !== "undefined" && (window as any).DEBUGSDK === true) {
@@ -109,7 +109,7 @@ export class FrontendAuth extends MindConnectBase implements TokenRotation {
         }
 
         headers = removeUndefined({ ...headers, ...additionalHeaders });
-        const url = this.isNodeOrCliCall() ? `${gateway}${baseUrl}` : `${baseUrl}`;
+        const url = removeTrailingSlash(this.isNodeOrCliCall() ? `${gateway}${baseUrl}` : `${baseUrl}`);
 
         log(`${message || ""} Headers ${JSON.stringify(headers)} Url ${url}`);
         try {

@@ -1,6 +1,6 @@
 import fetch from "cross-fetch";
 import { TokenRotation } from "./mindconnect-base";
-import { removeUndefined, throwError } from "./utils";
+import { removeTrailingSlash, removeUndefined, throwError } from "./utils";
 
 function log(message: string) {
     if (typeof window !== "undefined" && (window as any).DEBUGSDK === true) {
@@ -152,7 +152,7 @@ export class BrowserAuth implements TokenRotation {
 
         headers = removeUndefined({ ...headers, ...additionalHeaders });
 
-        const url = `${baseUrl}`;
+        const url = removeTrailingSlash(`${baseUrl}`);
 
         log(`${message || ""} Headers ${JSON.stringify(headers)} Url ${url}`);
         try {

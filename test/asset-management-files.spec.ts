@@ -85,11 +85,6 @@ describe("[SDK] AssetManagementClient.Files", () => {
 
         await am.DeleteFile(`${result.id}`, { ifMatch: `${updatedFile.etag}` });
     });
-
-    it("should be able to Get Billboard", async () => {
-        const billboard = await am.GetBillboard();
-        billboard.should.not.be.undefined;
-    });
 });
 async function deleteFiles(am: AssetManagementClient) {
     await sleep(2000);

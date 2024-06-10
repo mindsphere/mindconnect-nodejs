@@ -1,11 +1,10 @@
 import { AdvancedTokenExchangeClient } from "../advanced-token/advanced-token";
 import { AgentManagementClient } from "../agent/agent-management";
-import { AnomalyDetectionClient } from "../anomaly-detection/anomaly-detection";
 import { AssetManagementClient } from "../asset/asset-management";
+import { CaseManagementClient } from "../cases/cases";
 import { CommandingClient } from "../commanding/commanding";
 import { DataExchangeClient } from "../data-exchange/data-exchange";
 import { DataLakeClient } from "../data-lake/data-lake";
-import { EventAnalyticsClient } from "../event-analytics/eventanalytics";
 import { EventManagementClient } from "../event/event-management";
 import { IdentityManagementClient } from "../identity/identity";
 import { TimeSeriesClient } from "../iot/iot-timeseries";
@@ -14,7 +13,6 @@ import { TimeSeriesAggregateClient } from "../iotaggregate/iot-timeseries-aggreg
 import { TimeSeriesBulkClient } from "../iotbulk/iot-timeseries-bulk";
 import { IotFileClient } from "../iotfile/iot-file";
 import { JobManagerClient } from "../jobmanager/jobmanager";
-import { KPICalculationClient } from "../kpi/kpi";
 import { MindConnectApiClient } from "../mcapi/mcapi";
 import { MessageBrokerClient } from "../messagebroker/messagebroker";
 import { ModelManagementClient } from "../model/model-management";
@@ -30,14 +28,9 @@ import {
 } from "../open-edge/open-edge";
 import { ResourceAccessManagementClient } from "../policy/policy";
 import { SemanticDataInterconnectClient } from "../sdi/sdi-v4";
-import { SignalCalculationClient } from "../signal-calculation/signal-calculation";
-import { SignalValidationClient } from "../signal-validation/signal-validation";
-import { SpectrumAnalysisClient } from "../spectrum/spectrum-analysis";
 import { TenantManagementClient } from "../tenant/tenant-management";
-import { TrendPredictionClient } from "../trend/trend-prediction";
 import { UsageTransparencyClient } from "../utc/utc";
 import { VisualFlowCreatorClient } from "../vfc/vfc";
-import { WorkOrderManagementClient } from "../workorder/workorder";
 import { SdkClient } from "./sdk-client";
 
 /**
@@ -79,20 +72,6 @@ export class MindSphereSdk extends SdkClient {
     public GetAgentManagementClient(): AgentManagementClient {
         this._agentManagementClient = this._agentManagementClient || new AgentManagementClient(this._authenticator);
         return this._agentManagementClient;
-    }
-
-    private _anomalyDetectionClient?: AnomalyDetectionClient;
-
-    /**
-     * * Anomaly Detection Client
-     *
-     * @returns {AnomalyDetectionClient}
-     *
-     * @memberOf MindSphereSdk
-     */
-    public GetAnomalyDetectionClient(): AnomalyDetectionClient {
-        this._anomalyDetectionClient = this._anomalyDetectionClient || new AnomalyDetectionClient(this._authenticator);
-        return this._anomalyDetectionClient;
     }
 
     private _iotFileClient?: IotFileClient;
@@ -182,64 +161,6 @@ export class MindSphereSdk extends SdkClient {
         return this._eventManagementClient;
     }
 
-    private _spectrumAnalysisClient?: SpectrumAnalysisClient;
-
-    /**
-     *  * Spectrum Analysis Client
-     *
-     * @returns {SpectrumAnalysisClient}
-     *
-     * @memberOf MindSphereSdk
-     */
-    public GetSpectrumAnalysisClient(): SpectrumAnalysisClient {
-        this._spectrumAnalysisClient = this._spectrumAnalysisClient || new SpectrumAnalysisClient(this._authenticator);
-
-        return this._spectrumAnalysisClient;
-    }
-
-    private _signalValidationClient?: SignalValidationClient;
-
-    /**
-     * * Signal Validation Client
-     *
-     * @returns {SignalValidationClient}
-     *
-     * @memberOf MindSphereSdk
-     */
-    public GetSignalValidationClient(): SignalValidationClient {
-        this._signalValidationClient = this._signalValidationClient || new SignalValidationClient(this._authenticator);
-
-        return this._signalValidationClient;
-    }
-
-    private _trendPredictionClient?: TrendPredictionClient;
-
-    /**
-     * * Trend Prediction Client
-     *
-     * @returns {TrendPredictionClient}
-     *
-     * @memberOf MindSphereSdk
-     */
-    public GetTrendPredictionClient(): TrendPredictionClient {
-        this._trendPredictionClient = this._trendPredictionClient || new TrendPredictionClient(this._authenticator);
-        return this._trendPredictionClient;
-    }
-
-    private _kpiCalculationClient?: KPICalculationClient;
-
-    /**
-     * * KPI Calculation Client
-     *
-     * @returns {KPICalculationClient}
-     *
-     * @memberOf MindSphereSdk
-     */
-    public GetKPICalculationClient(): KPICalculationClient {
-        this._kpiCalculationClient = this._kpiCalculationClient || new KPICalculationClient(this._authenticator);
-        return this._kpiCalculationClient;
-    }
-
     private _mindConnectApiClient?: MindConnectApiClient;
 
     /**
@@ -268,20 +189,6 @@ export class MindSphereSdk extends SdkClient {
     }
 
     private _identityManagementClient?: IdentityManagementClient;
-
-    /**
-     * * Event Analytics Client
-     *
-     * @returns {EventAnalyticsClient}
-     *
-     * @memberOf MindSphereSdk
-     */
-    public GetEventAnalyticsClient(): EventAnalyticsClient {
-        this._eventAnalyticsClient = this._eventAnalyticsClient || new EventAnalyticsClient(this._authenticator);
-        return this._eventAnalyticsClient;
-    }
-
-    private _eventAnalyticsClient?: EventAnalyticsClient;
 
     private _dataLakeClient?: DataLakeClient;
 
@@ -486,21 +393,6 @@ export class MindSphereSdk extends SdkClient {
         return this._dataExchangeClient;
     }
 
-    private _signalCalculationClient?: SignalCalculationClient;
-
-    /**
-     * * Signal Calculation Client
-     *
-     * @returns {SignalCalculationClient}
-     *
-     * @memberOf MindSphereSdk
-     */
-    public GetSignalCalculationClient(): SignalCalculationClient {
-        this._signalCalculationClient =
-            this._signalCalculationClient || new SignalCalculationClient(this._authenticator);
-        return this._signalCalculationClient;
-    }
-
     private _semanticDataInterConnectClient?: SemanticDataInterconnectClient;
 
     /**
@@ -574,21 +466,6 @@ export class MindSphereSdk extends SdkClient {
         return this._advancedTokenExchangeClient;
     }
 
-    private _workOrderManagementClient?: WorkOrderManagementClient;
-
-    /**
-     * Work Order Management Client
-     *
-     * @returns {WorkOrderManagementClient}
-     *
-     * @memberOf MindSphereSdk
-     */
-    public GetWorkOrderManagementClient(): WorkOrderManagementClient {
-        this._workOrderManagementClient =
-            this._workOrderManagementClient || new WorkOrderManagementClient(this._authenticator);
-        return this._workOrderManagementClient;
-    }
-
     private _visualFlowCreatorClient?: VisualFlowCreatorClient;
 
     /**
@@ -602,5 +479,17 @@ export class MindSphereSdk extends SdkClient {
         this._visualFlowCreatorClient =
             this._visualFlowCreatorClient || new VisualFlowCreatorClient(this._authenticator);
         return this._visualFlowCreatorClient;
+    }
+
+    private _caseManagementClient?: CaseManagementClient;
+    /**
+     * Case Management Client
+     *
+     * @return {*}  {CaseManagementClient}
+     * @memberof MindSphereSdk
+     */
+    public GetCaseManagementClient(): CaseManagementClient {
+        this._caseManagementClient = this._caseManagementClient || new CaseManagementClient(this._authenticator);
+        return this._caseManagementClient;
     }
 }

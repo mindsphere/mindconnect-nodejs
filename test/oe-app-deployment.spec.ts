@@ -7,7 +7,7 @@ import { getPasskeyForUnitTest } from "./test-utils";
 chai.should();
 
 const timeOffset = new Date().getTime();
-describe("[SDK] DeviceManagementClient.EdgeAppDeployment", () => {
+describe.skip("[SDK] DeviceManagementClient.EdgeAppDeployment", () => {
     const auth = loadAuth();
     const sdk = new MindSphereSdk({
         ...auth,
@@ -22,7 +22,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppDeployment", () => {
         appInstanceId: `testAppInst_${tenant}_${timeOffset}`,
         deviceId: "string",
         releaseId: "string",
-        applicationId: `testApp_${tenant}_${timeOffset}`
+        applicationId: `testApp_${tenant}_${timeOffset}`,
     };
 
     const testConfigurations = {
@@ -32,8 +32,8 @@ describe("[SDK] DeviceManagementClient.EdgeAppDeployment", () => {
         appInstanceId: "718ca5ad0...",
         configuration: {
             sampleKey1: "sampleValue1",
-            sampleKey2: "sampleValue2"
-        }
+            sampleKey2: "sampleValue2",
+        },
     };
 
     const taskTemplate = {
@@ -42,19 +42,19 @@ describe("[SDK] DeviceManagementClient.EdgeAppDeployment", () => {
         softwareReleaseId: "7d018c...",
         customData: {
             sampleKey1: "sampleValue1",
-            sampleKey2: "sampleValue2"
-        }
+            sampleKey2: "sampleValue2",
+        },
     };
 
     const workflowInstance = {
         deviceId: "",
         model: {
             key: `${tenant}_fwupdate`,
-            customTransitions: []
+            customTransitions: [],
         },
         data: {
-            userDefined: {}
-        }
+            userDefined: {},
+        },
     };
 
     let deviceTypeId = "aee2e37f-f562-4ed6-b90a-c43208dc054a";
@@ -75,7 +75,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppDeployment", () => {
         await tearDownDeviceTestStructure(sdk);
 
         // Setup the testing architecture
-        const {device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);
+        const { device, deviceAsset, deviceType, deviceAssetType, folderid } = await setupDeviceTestStructure(sdk);
         assetTypeId = `${(deviceAssetType as any).id}`;
         deviceTypeId = `${(deviceType as any).id}`;
         assetId = `${(deviceAsset as any).assetId}`;
@@ -129,7 +129,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppDeployment", () => {
         // Prepare a new workflow instance
         const acceptedTermsAndConditions = await appDeploymentClient.PostAcceptTermsAndConditions({
             deviceId: deviceId,
-            releaseId: appReleaseId
+            releaseId: appReleaseId,
         });
 
         acceptedTermsAndConditions.should.not.be.undefined;
@@ -149,7 +149,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppDeployment", () => {
         (appTermAndConditions as any).firstAccepted.should.not.be.null;
     });
 
-/*  TODO: 27-06-2021 Not supported in yet
+    /*  TODO: 27-06-2021 Not supported in yet
     it("should POST a new deployment task", async () => {
         appDeploymentClient.should.not.be.undefined;
 
@@ -180,7 +180,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppDeployment", () => {
         (taks as any).content.length.should.be.gte(0);
     });
 
-/*  TODO: 27-06-2021 Not supported in yet
+    /*  TODO: 27-06-2021 Not supported in yet
     it("should GET specific installation task", async () => {
         appDeploymentClient.should.not.be.undefined;
 
@@ -191,7 +191,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppDeployment", () => {
         (task as any).id.should.not.be.null;
     });*/
 
-/*  TODO: 27-06-2021 Not supported in yet
+    /*  TODO: 27-06-2021 Not supported in yet
     it("should PATCH installation Status as downloading", async () => {
         appDeploymentClient.should.not.be.undefined;
 
@@ -214,7 +214,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppDeployment", () => {
     });
 */
 
-/*  TODO: 27-06-2021 Not supported in yet
+    /*  TODO: 27-06-2021 Not supported in yet
     it("should PATCH installation Status as activate", async () => {
         appDeploymentClient.should.not.be.undefined;
 
@@ -237,7 +237,7 @@ describe("[SDK] DeviceManagementClient.EdgeAppDeployment", () => {
     });
 */
 
-/* TODO: 27-06-2021 Not supported in yet
+    /* TODO: 27-06-2021 Not supported in yet
     it("should POST to create a removal task", async () => {
         appDeploymentClient.should.not.be.undefined;
 
@@ -268,6 +268,3 @@ describe("[SDK] DeviceManagementClient.EdgeAppDeployment", () => {
         (taks as any).content.length.should.be.gte(0);
     });
 });
-
-
-

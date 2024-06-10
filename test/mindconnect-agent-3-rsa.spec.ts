@@ -536,8 +536,8 @@ describe("MindConnectApi Version 3 Agent (RSA_3072)", () => {
         }
 
         const agentSdk = agent.Sdk();
-        const billboard = await retry(5, () => agentSdk.GetAssetManagementClient().GetBillboard());
-        billboard.should.not.be.undefined;
+        const assets = await retry(5, () => agentSdk.GetAssetManagementClient().GetAssets());
+        assets.should.not.be.undefined;
         const assetTypes = await retry(5, () => agentSdk.GetAssetManagementClient().GetAspectTypes());
         assetTypes.should.not.be.undefined;
     });
