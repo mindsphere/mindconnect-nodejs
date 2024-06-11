@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.24.1 - Coconut Vienna - June 2024
+## 3.24.2 - Coconut Vienna - June 2024
 
 - Restored previous behavior for Billboard URLs in Event Management and Asset Management Client
 
