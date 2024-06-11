@@ -1,13 +1,17 @@
 # Changelog
 
+## 3.24.1 - Coconut Vienna - June 2024
+
+- Restored previous behavior for Billboard URLs in Event Management and Asset Management Client
+
 ## 3.24.0 - Coconut Vienna - June 2024
 
-- SDK, CLI: Removed spectral analysis client (corresponding service switched off in Insights Hub) #357
-- SDK, CLI: Removed signal validation client (corresponding service switched off in Insights Hub) #357
-- SDK, CLI: Removed trend prediction client (corresponding service switched off in Insights Hub) #357
-- SDK, CLI: Removed kpi calculation client (corresponding service switched off in Insights Hub) #357
-- SDK, CLI: Removed event analytics client (corresponding service switched off in Insights Hub) #357
-- SDK, CLI: Removed anomaly detection client (corresponding service switched off in Insights Hub) #357
+- SDK, CLI: Removed spectral analysis client (corresponding service was switched off in Insights Hub) #357
+- SDK, CLI: Removed signal validation client (corresponding service was switched off in Insights Hub) #357
+- SDK, CLI: Removed trend prediction client (corresponding service was switched off in Insights Hub) #357
+- SDK, CLI: Removed kpi calculation client (corresponding service was switched off in Insights Hub) #357
+- SDK, CLI: Removed event analytics client (corresponding service was switched off in Insights Hub) #357
+- SDK, CLI: Removed anomaly detection client (corresponding service was switched off in Insights Hub) #357
 - SDK: implemented trailing slash checks in HttpActions #356
 - SDK, CLI: renamed workorder client to cases client 
 - Bumped most dependencies
