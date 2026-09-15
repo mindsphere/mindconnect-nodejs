@@ -15,7 +15,9 @@ import { IotFileModels } from "./iot-file-models";
  * @extends {SdkClient}
  */
 export class IotFileClient extends SdkClient {
-    private _baseUrl: string = "/api/iotfile/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("iotfile", "v3");
+    }
 
     /**
      * Create or update a file for the specified entity and path, with the provided content.

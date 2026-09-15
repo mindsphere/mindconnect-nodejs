@@ -12,7 +12,7 @@ export class CredentialAuth extends AuthBase implements TokenRotation {
             ...this._urlEncodedHeaders,
             Authorization: this._basicAuth,
         };
-        const url = `${getPiamUrl(this._gateway, this._tenant)}oauth/token`;
+        const url = `${getPiamUrl(this._gateway, this._tenant, this._systemId)}oauth/token`;
         log(`AcquireToken Headers: ${JSON.stringify(headers)} Url: ${url}`);
         const body = "grant_type=client_credentials";
 
@@ -59,10 +59,16 @@ export class CredentialAuth extends AuthBase implements TokenRotation {
      * @param {string} _gateway
      * @param {string} _basicAuth
      * @param {string} _tenant
+     * @param {string} [_systemId] Xcelerator system id (leave empty for on-premise / legacy tenants).
      *
      * @memberOf CredentialAuth
      */
-    constructor(protected _gateway: string, protected _basicAuth: string, protected _tenant: string) {
-        super(_gateway, _basicAuth, _tenant);
+    constructor(
+        protected _gateway: string,
+        protected _basicAuth: string,
+        protected _tenant: string,
+        protected _systemId: string = ""
+    ) {
+        super(_gateway, _basicAuth, _tenant, _systemId);
     }
 }

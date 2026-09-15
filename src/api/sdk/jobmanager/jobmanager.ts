@@ -17,7 +17,9 @@ import { JobManagerModels } from "./jobmanager-models";
  * @extends {SdkClient}
  */
 export class JobManagerClient extends SdkClient {
-    private _baseUrl: string = "/api/jobmanager/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("jobmanager", "v3");
+    }
 
     /**
      * * Jobs

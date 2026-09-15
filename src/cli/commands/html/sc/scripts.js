@@ -78,6 +78,7 @@ function addNew() {
         password: "" + $("#text-password").val(),
         gateway: "" + $("#text-gateway").val(),
         tenant: "" + $("#text-tenant").val(),
+        systemId: "" + $("#text-systemid").val(),
         usertenant: "",
         appName: "",
         appVersion: "",

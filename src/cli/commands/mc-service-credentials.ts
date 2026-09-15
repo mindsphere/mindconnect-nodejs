@@ -8,6 +8,7 @@ import {
     addAndStoreConfiguration,
     checkList,
     credentialEntry,
+    DEFAULT_SYSTEM_ID,
     getFullConfig,
     storeAuth,
     throwError,
@@ -29,12 +30,16 @@ export default (program: Command) => {
         .option("-p, --password <password>", "credendials: password")
         .option(
             "-g, --gateway <gateway>",
-            "region string or full gateway url (e.g. eu1, eu2 or https://gateway.eu1.mindsphere.io)"
+            "region string or full gateway url (e.g. eu1, eu2 or https://api.eu1.siemens.app)"
         )
         .option("-t, --tenant <tenant>", "your tenant name")
         .option("-s, --usertenant <usertenant>", "your user tenant name")
         .option("-a, --appName <appName>", "your application name (e.g. cli)")
         .option("-p, --appVersion <appVersion>", "your application version (e.g. 1.0.0)")
+        .option(
+            "-x, --system-id <systemId>",
+            `Xcelerator system id (defaults to ${DEFAULT_SYSTEM_ID} for region gateways, leave empty for on-premise/legacy tenants)`
+        )
         .option(
             "-k, --passkey <passkey>",
             "passkey (you will use this in the commands which require service credentials)"
@@ -187,6 +192,7 @@ function addEntry(options: any) {
         appVersion: `${options.appVersion || ""}`,
         createdAt: new Date().toISOString(),
         selected: true,
+        systemId: options.systemId ? `${options.systemId}` : undefined,
     };
 
     (config.credentials as any[]).push(newEntry);

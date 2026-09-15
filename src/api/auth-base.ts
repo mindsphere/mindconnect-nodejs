@@ -56,7 +56,7 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
     private async AcquirePublicKey(): Promise<boolean> {
         if (!this._oauthResponse) {
             const headers = this._headers;
-            const url = `${getPiamUrl(this._gateway, this._tenant)}token_keys`;
+            const url = `${getPiamUrl(this._gateway, this._tenant, this._systemId)}token_keys`;
             log(`AcquirePublicKey Headers: ${JSON.stringify(headers)} Url: ${url}`);
 
             try {
@@ -114,10 +114,17 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
      * @param {string} _gateway
      * @param {string} _basicAuth
      * @param {string} _tenant
+     * @param {string} [_systemId] Xcelerator system id, used to build the new siemens.app service urls.
+     *                             Leave empty for on-premise installations or legacy mindsphere.io tenants.
      *
      * @memberOf CredentialAuth
      */
-    constructor(protected _gateway: string, protected _basicAuth: string, protected _tenant: string) {
+    constructor(
+        protected _gateway: string,
+        protected _basicAuth: string,
+        protected _tenant: string,
+        protected _systemId: string = ""
+    ) {
         super();
         if (!_basicAuth || !_basicAuth.startsWith("Basic")) {
             throw new Error(
@@ -126,7 +133,7 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
         }
 
         if (!isUrl(_gateway)) {
-            throw new Error("the gateway must be an URL (e.g. https://gateway.eu1.mindsphere.io");
+            throw new Error("the gateway must be an URL (e.g. https://api.eu1.siemens.app");
         }
 
         if (!_tenant) {
@@ -138,5 +145,8 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
     }
     GetGateway(): string {
         return this._gateway;
+    }
+    GetSystemId(): string {
+        return this._systemId;
     }
 }

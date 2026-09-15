@@ -4,6 +4,7 @@ export interface MindSphereCredentials {
     basicAuth: string;
     gateway: string;
     tenant: string;
+    systemId?: string;
 }
 
 export interface AgentCredentials extends IMindConnectConfiguration {}

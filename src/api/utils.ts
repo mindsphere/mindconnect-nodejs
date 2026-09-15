@@ -24,6 +24,17 @@ export const convertToTdpArray = (data: any[]): TimeStampedDataPoint[] => {
     return tdpArray;
 };
 
+/**
+ * Default Xcelerator "system id" used to build the new siemens.app based service URLs
+ * (e.g. https://api.eu1.siemens.app/assetmanagement-1000001700/v3).
+ *
+ * This is only a fallback default: it is used when a bare region (e.g. "eu1") is passed
+ * as gateway during configuration. It can always be overridden (e.g. via --system-id in the CLI).
+ * On-premise installations (and other setups where a full custom gateway URL is supplied)
+ * never get a systemId assigned automatically and keep using the legacy /api/<service>/v<version> paths.
+ */
+export const DEFAULT_SYSTEM_ID = "1000001700";
+
 export type authJson = {
     auth: string;
     iv: string;
@@ -35,6 +46,7 @@ export type authJson = {
     selected: boolean;
     type: "SERVICE" | "APP";
     createdAt: string;
+    systemId?: string;
 };
 
 export function upgradeOldConfiguration(obj: any) {
@@ -65,7 +77,22 @@ export const isUrl = (url: string): boolean => {
     }
 };
 
-export const getPiamUrl = (gateway: string, tenant: string): string => {
+/**
+ * Builds the PIAM/OAuth base url used for token acquisition and public key retrieval.
+ *
+ * On the new Xcelerator scheme, PIAM lives on an entirely different domain:
+ * https://<systemId>.<region>.sws.siemens.com/ (region is extracted from the api.<region>.siemens.app gateway).
+ *
+ * When there is no systemId (on-premise installations, legacy mindsphere.io tenants, BrowserAuth) the
+ * legacy https://<tenant>.piam.<region>.mindsphere.io/ scheme is used, exactly as before.
+ */
+export const getPiamUrl = (gateway: string, tenant: string, systemId?: string): string => {
+    const xceleratorRegion = gateway.match(/^https?:\/\/api\.([^./]+)\.siemens\.app/i);
+
+    if (systemId && xceleratorRegion) {
+        return `https://${systemId}.${xceleratorRegion[1]}.sws.siemens.com/`;
+    }
+
     const piamUrl = gateway.replace("gateway", `${tenant}.piam`);
     return piamUrl.endsWith("/") ? piamUrl : piamUrl + "/";
 };
@@ -86,6 +113,7 @@ export const encrypt = ({
     appVersion,
     createdAt,
     selected,
+    systemId,
 }: credentialEntry): authJson => {
     const base64encoded = Buffer.from(`${user}:${password}`).toString("base64");
     const iv = crypto.randomBytes(16);
@@ -93,7 +121,7 @@ export const encrypt = ({
     const cipher = crypto.createCipheriv("aes-256-ctr", Buffer.from(normalizePasskey(passkey)), iv);
     let crypted = cipher.update(`Basic ${base64encoded}`, "utf8", "hex");
     crypted += cipher.final("hex");
-    const encryptedAuth = {
+    const encryptedAuth: authJson = {
         auth: crypted.toString(),
         iv: iv.toString("base64"),
         gateway: gateway,
@@ -104,6 +132,7 @@ export const encrypt = ({
         appVersion: appVersion,
         createdAt: createdAt,
         selected: selected,
+        systemId: systemId,
     };
     // console.log(encryptedAuth);
     return encryptedAuth;
@@ -121,6 +150,7 @@ export type credentialEntry = {
     appVersion: string;
     createdAt: string;
     selected: boolean;
+    systemId?: string;
 };
 
 export const decrypt = (encryptedAuth: authJson, passkey: string): string => {
@@ -326,7 +356,14 @@ export function addAndStoreConfiguration(configuration: any) {
     };
     (!configuration || !configuration.credentials) && throwError("invalid configuration!");
     configuration.credentials.forEach((element: credentialEntry) => {
-        element.gateway = isUrl(element.gateway) ? element.gateway : `https://gateway.${element.gateway}.mindsphere.io`;
+        // a bare region (e.g. "eu1") means the user wants a new Xcelerator (siemens.app) cloud tenant.
+        // a full URL (on-premise, or any other custom gateway) is left untouched and never gets a systemId
+        // assigned automatically, which keeps it on the legacy /api/<service>/v<version> paths.
+        const isBareRegion = !isUrl(element.gateway);
+        element.gateway = isBareRegion ? `https://api.${element.gateway}.siemens.app` : element.gateway;
+        if (isBareRegion && !element.systemId) {
+            element.systemId = DEFAULT_SYSTEM_ID;
+        }
         newConfiguration.credentials.push(element.passkey ? encrypt(element) : (element as unknown as authJson));
     });
     checkList(newConfiguration.credentials);
@@ -419,7 +456,7 @@ export function printTree(treeItem: TreeItem, level: number, color: (x: string) 
 }
 
 export function removeTrailingSlash(url: string): string {
-    if (url.endsWith("/api/assetmanagement/v3/") || url.endsWith("/api/eventmanagement/v3/")) {
+    if (/\/(api\/)?assetmanagement(-\d+)?\/v3\/$/.test(url) || /\/(api\/)?eventmanagement(-\d+)?\/v3\/$/.test(url)) {
         return url;
     }
     // console.log(url);

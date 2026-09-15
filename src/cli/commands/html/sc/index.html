@@ -185,9 +185,17 @@
 
                                 <label class="inputGroup__label is-required" for="text-gateway"> Gateway </label>
                                 <input class="inputGroup__textInput" type="text"
-                                    placeholder="eu1, eu2 or https://gateway.eu1.mindsphere.io" id="text-gateway"
+                                    placeholder="eu1, eu2 or https://api.eu1.siemens.app" id="text-gateway"
                                     onblur="validateInput('#text-gateway')" />
                                 <div class="inputGroup__description">Region string or full gateway url</div>
+
+                                <label class="inputGroup__label" for="text-systemid"> System Id </label>
+                                <input class="inputGroup__textInput" type="text"
+                                    placeholder="defaults to 1000001700, leave empty for on-premise/legacy tenants"
+                                    id="text-systemid" />
+                                <div class="inputGroup__description">
+                                    Xcelerator system id (optional, only used with a region gateway)
+                                </div>
 
                                 <label class="inputGroup__label is-required" for="text-tenant"> Tenant </label>
                                 <input class="inputGroup__textInput" type="text" placeholder="your tenant name"

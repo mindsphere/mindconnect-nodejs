@@ -68,7 +68,9 @@ import { sdiTemplate } from "./sdi-template";
  * @extends {SdkClient}
  */
 export class SemanticDataInterconnectClient extends SdkClient {
-    private _baseUrl: string = "/api/sdi/v4";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("sdi", "v4");
+    }
 
     /**
      *  * Data Lake

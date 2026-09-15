@@ -2,7 +2,12 @@ import { SdkClient } from "../common/sdk-client";
 import { MessageBrokerModels } from "./messagebroker-models";
 
 export class MessageBrokerClient extends SdkClient {
-    private _baseUrl: string = "/api/messagebroker/v4";
+    private get _baseUrl(): string {
+        // messagebroker was bumped to v5 as part of the Xcelerator migration; legacy/on-premise
+        // tenants (no systemId) stay on the old v4 API.
+        const version = this.GetSystemId() ? "v5" : "v4";
+        return this.GetServiceBaseUrl("messagebroker", version, { apiPrefix: true });
+    }
 
     /**
      * * Subscribers

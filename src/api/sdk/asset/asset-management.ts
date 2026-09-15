@@ -10,7 +10,9 @@ import { AssetManagementModels } from "./asset-models";
  * @extends {SdkClient}
  */
 export class AssetManagementClient extends SdkClient {
-    private _baseUrl: string = "/api/assetmanagement/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("assetmanagement", "v3");
+    }
 
     /**
      * * AspectTypes

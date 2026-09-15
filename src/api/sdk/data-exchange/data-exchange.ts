@@ -29,7 +29,9 @@ The maximum length of the composed path, that is filename and directories names 
  * @extends {SdkClient}
  */
 export class DataExchangeClient extends SdkClient {
-    private _baseUrl: string = "/api/dataexchange/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("dataexchange", "v3");
+    }
 
     /**
      * * Files

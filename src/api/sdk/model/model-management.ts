@@ -11,7 +11,9 @@ import { ModelManagementModels } from "./model-models";
  * @extends {SdkClient}
  */
 export class ModelManagementClient extends SdkClient {
-    private _baseUrl: string = "/api/modelmanagement/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("modelmanagement", "v3");
+    }
 
     /**
      * * Models

@@ -22,7 +22,9 @@ export class TokenManagerAuth extends AuthBase implements TokenRotation {
             ...this._apiHeaders,
             "X-SPACE-AUTH-KEY": this._basicAuth,
         };
-        const url = `${this._gateway}/api/technicaltokenmanager/v3/oauth/token`;
+        const url = this._systemId
+            ? `${this._gateway}/technicaltokenmanager-${this._systemId}/v3/oauth/token`
+            : `${this._gateway}/api/technicaltokenmanager/v3/oauth/token`;
         log(`AcquireToken Headers: ${JSON.stringify(headers)} Url: ${url}`);
 
         const body = {
@@ -96,6 +98,10 @@ export class TokenManagerAuth extends AuthBase implements TokenRotation {
      * @param {string} _gateway
      * @param {string} _basicAuth
      * @param {string} _hostTenant
+     * @param {string} _userTenant
+     * @param {string} [_appName]
+     * @param {string} [_appVersion]
+     * @param {string} [_systemId] Xcelerator system id (leave empty for on-premise / legacy tenants).
      *
      * @memberOf TokenManagerAuth
      */
@@ -105,16 +111,17 @@ export class TokenManagerAuth extends AuthBase implements TokenRotation {
         protected _hostTenant: string,
         protected _userTenant: string,
         protected _appName: string = "cli",
-        protected _appVersion: string = "1.0.0"
+        protected _appVersion: string = "1.0.0",
+        protected _systemId: string = ""
     ) {
-        super(_gateway, _basicAuth, _hostTenant);
+        super(_gateway, _basicAuth, _hostTenant, _systemId);
 
         (!_basicAuth || !_basicAuth.startsWith("Basic")) &&
             throwError(
                 "You have to pass the basic authentication header (Basic: <base64encoded login:password> in the constructor. Wrong Passkey in CLI?"
             );
 
-        !isUrl(_gateway) && throwError("the gateway must be an URL (e.g. https://gateway.eu1.mindsphere.io");
+        !isUrl(_gateway) && throwError("the gateway must be an URL (e.g. https://api.eu1.siemens.app");
 
         !_hostTenant && throwError("You have to provide a host tenant");
         !_userTenant && throwError("You have to provide a user tenant");

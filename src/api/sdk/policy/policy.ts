@@ -17,7 +17,9 @@ import { ResourceAccessManagementModels } from "./policy-models";
  * @extends {SdkClient}
  */
 export class ResourceAccessManagementClient extends SdkClient {
-    private _baseUrl: string = "/api/resourceaccessmanagement/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("resourceaccessmanagement", "v3");
+    }
 
     /**
      * * Policies

@@ -91,7 +91,10 @@ async function uploadFile(sdk: MindSphereSdk, options: any) {
     console.log("File successfully uploaded.");
     console.log(
         `Logo: ${color(
-            sdk.GetGateway().replace("gateway", sdk.GetTenant()) + "/api/tenantmanagement/v4/tenantInfo/logo"
+            sdk.GetGateway() +
+                (sdk.GetSystemId()
+                    ? `/tenantmanagement-${sdk.GetSystemId()}/v4/tenantInfo/logo`
+                    : "/api/tenantmanagement/v4/tenantInfo/logo")
         )}`
     );
 }
@@ -159,7 +162,10 @@ async function tenantInfo(sdk: MindSphereSdk, options: any) {
         console.log(`\tSize: ${logoMetaData.size}`);
         console.log(
             `\tURL: ${color(
-                sdk.GetGateway().replace("gateway", sdk.GetTenant()) + "/api/tenantmanagement/v4/tenantInfo/logo"
+                sdk.GetGateway() +
+                (sdk.GetSystemId()
+                    ? `/tenantmanagement-${sdk.GetSystemId()}/v4/tenantInfo/logo`
+                    : "/api/tenantmanagement/v4/tenantInfo/logo")
             )}`
         );
     } catch {

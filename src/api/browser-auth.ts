@@ -236,6 +236,17 @@ export class BrowserAuth implements TokenRotation {
         return ""; // the mindsphere gateway is doing this for us
     }
 
+    /**
+     * * Returns ""; the mindsphere gateway resolves relative /api/<service>/v<version> paths for us.
+     *
+     * @returns {string}
+     *
+     * @memberOf BrowserAuth
+     */
+    GetSystemId(): string {
+        return "";
+    }
+
     private getCookieValue(a: string) {
         if (!document) {
             return undefined;

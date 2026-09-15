@@ -15,7 +15,9 @@ import { IdentityManagementModels } from "./identity-models";
  * @extends {SdkClient}
  */
 export class IdentityManagementClient extends SdkClient {
-    private _baseUrl: string = "/api/identitymanagement/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("identitymanagement", "v3");
+    }
 
     /**
      *

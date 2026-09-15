@@ -48,6 +48,16 @@ export interface TokenRotation {
      */
     GetTenant(): string;
 
+    /**
+     * returns the currently configured Xcelerator system id (empty string if not configured,
+     * e.g. for on-premise installations, legacy mindsphere.io tenants or browser authorization).
+     *
+     * @returns {string}
+     *
+     * @memberOf TokenRotation
+     */
+    GetSystemId?(): string;
+
     HttpAction({
         verb,
         gateway,

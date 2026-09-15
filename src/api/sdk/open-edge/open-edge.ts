@@ -21,7 +21,9 @@ import {
  * @extends {SdkClient}
  */
 export class DeviceManagementClient extends SdkClient {
-    private _baseUrl: string = "/api/devicemanagement/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("devicemanagement", "v3");
+    }
 
     /**
      * * DeviceTypes
@@ -391,7 +393,9 @@ export class DeviceManagementClient extends SdkClient {
  * @extends {SdkClient}
  */
 export class DeviceStatusManagementClient extends SdkClient {
-    private _baseUrl: string = "/api/devicestatus/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("devicestatus", "v3");
+    }
 
     /**
      * Allows the devices to report on the device health status
@@ -772,7 +776,9 @@ export class DeviceStatusManagementClient extends SdkClient {
  * @extends {SdkClient}
  */
 export class DeviceConfigurationClient extends SdkClient {
-    private _baseUrl: string = "/api/deviceconfiguration/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("deviceconfiguration", "v3");
+    }
 
     /**
      * Returns a paginated list of all tasks of the specified device ordered by descending creation date (newest tasks first)
@@ -1295,7 +1301,9 @@ export class DeviceConfigurationClient extends SdkClient {
  * @extends {SdkClient}
  */
 export class DeploymentWorkflowClient extends SdkClient {
-    private _baseUrl: string = "/api/deploymentworkflow/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("deploymentworkflow", "v3");
+    }
 
     /**
      * Model description for a given key
@@ -1590,7 +1598,9 @@ export class DeploymentWorkflowClient extends SdkClient {
  * @extends {SdkClient}
  */
 export class EdgeAppInstanceManagementClient extends SdkClient {
-    private _baseUrl: string = "/api/edgeappinstancemanagement/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("edgeappinstancemanagement", "v3");
+    }
 
     /**
      * Get application instance list by device id.
@@ -1975,7 +1985,9 @@ export class EdgeAppInstanceManagementClient extends SdkClient {
  * @extends {SdkClient}
  */
 export class EdgeAppDeploymentClient extends SdkClient {
-    private _baseUrl: string = "/api/edgeappdeployment/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("edgeappdeployment", "v3");
+    }
 
     /**
      * Returns a paginated list of all installation tasks for the given device id ordered in descending order of creation date (newest tasks first).
@@ -2272,7 +2284,9 @@ export class EdgeAppDeploymentClient extends SdkClient {
  * @extends {SdkClient}
  */
 export class FirmwareDeploymentClient extends SdkClient {
-    private _baseUrl: string = "/api/firmwaredeployment/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("firmwaredeployment", "v3");
+    }
 
     /**
      * Returns a paginated list of all installation tasks for the given device id ordered in descending order of creation date (newest task first). Convenience method, equivalent to /search?deviceId={deviceId} It is possible to create an installation task for a software already installed on the device. It is dependent on the device implementation what will happen in this case. Devices may re-install the software or cancel / abort the task with an error message.  # Filter Criteria # Filter criteria can be specified as query parameters. Supported parameters are * *type*: filter for tasks of a specific type (firmware, app, etc) * *status*: filter based on task progress, one of \"closed\" or \"open\" (closed tasks are tasks in ACTIVATED, CANCELED or FAILED states, open are all other)

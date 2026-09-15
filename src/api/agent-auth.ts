@@ -73,7 +73,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
             ...this._apiHeaders,
             Authorization: `Bearer ${this._configuration.content.iat}`,
         };
-        const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/register`;
+        const url = `${this._configuration.content.baseUrl}${this.AgentManagementBaseUrl()}/register`;
 
         log(`Onboarding - Headers: ${JSON.stringify(headers)} Url: ${url} Profile: ${this.GetProfile()}`);
         try {
@@ -293,7 +293,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
      * @memberof AgentAuth
      */
     private async AquireToken(): Promise<boolean> {
-        const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/oauth/token`;
+        const url = `${this._configuration.content.baseUrl}${this.AgentManagementBaseUrl()}/oauth/token`;
         const headers = this._urlEncodedHeaders;
         const body = this.CreateClientAssertion().toString();
 
@@ -348,7 +348,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
     }
 
     private async GetCertificate(): Promise<object> {
-        const url = `${this._configuration.content.baseUrl}/api/agentmanagement/v3/oauth/token_key`;
+        const url = `${this._configuration.content.baseUrl}${this.AgentManagementBaseUrl()}/oauth/token_key`;
         const headers = this._headers;
         log(`Validate Token Headers ${JSON.stringify(headers)} Url: ${url}`);
         try {
@@ -575,5 +575,31 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
     }
     GetGateway(): string {
         return this._configuration.content.baseUrl!;
+    }
+    GetSystemId(): string {
+        return this._configuration.content.systemId || "";
+    }
+
+    /**
+     * Builds a service base url, honoring the Xcelerator systemId when the onboarding file provides one.
+     * Falls back to the legacy /api/<serviceName>/<version> path otherwise (on-premise, legacy tenants).
+     *
+     * @protected
+     * @memberof AgentAuth
+     */
+    protected ServiceBaseUrl(serviceName: string, version: string): string {
+        const systemId = this.GetSystemId();
+        return systemId ? `/${serviceName}-${systemId}/${version}` : `/api/${serviceName}/${version}`;
+    }
+
+    /**
+     * Builds the agentmanagement base url, honoring the Xcelerator systemId when the onboarding file provides one.
+     * Falls back to the legacy /api/agentmanagement/v3 path otherwise (on-premise, legacy tenants).
+     *
+     * @private
+     * @memberof AgentAuth
+     */
+    private AgentManagementBaseUrl(): string {
+        return this.ServiceBaseUrl("agentmanagement", "v3");
     }
 }

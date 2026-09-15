@@ -202,6 +202,17 @@ export class FrontendAuth extends MindConnectBase implements TokenRotation {
         return ""; // the mindsphere gateway is doing this for us
     }
 
+    /**
+     * returns the configured Xcelerator system id (empty for on-premise / legacy installations)
+     *
+     * @returns {string}
+     *
+     * @memberOf FrontendAuth
+     */
+    GetSystemId(): string {
+        return this._systemId;
+    }
+
     private getCookieValue(a: string) {
         if (!document) {
             return undefined;
@@ -210,7 +221,12 @@ export class FrontendAuth extends MindConnectBase implements TokenRotation {
         return b ? b.pop() : "";
     }
 
-    constructor(private _gateway: string = "", private _sesionCookie: string, private _xsrfToken: string) {
+    constructor(
+        private _gateway: string = "",
+        private _sesionCookie: string,
+        private _xsrfToken: string,
+        private _systemId: string = ""
+    ) {
         super();
     }
 }

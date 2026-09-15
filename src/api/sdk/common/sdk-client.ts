@@ -27,6 +27,39 @@ export abstract class SdkClient {
         return this._authenticator.GetTenant();
     }
 
+    /**
+     * Returns the currently configured Xcelerator system id, or "" if none is configured
+     * (on-premise installations, legacy mindsphere.io tenants, BrowserAuth).
+     *
+     * @memberOf SdkClient
+     */
+    public GetSystemId(): string {
+        const authenticator = this._authenticator as Partial<TokenRotation>;
+        return typeof authenticator.GetSystemId === "function" ? authenticator.GetSystemId() : "";
+    }
+
+    /**
+     * Builds the base url for a MindSphere/Insights Hub service.
+     *
+     * When a systemId is configured, the new Xcelerator scheme is used:
+     * /<serviceName>-<systemId>/<version> (or /api/<serviceName>-<systemId>/<version> when apiPrefix is set,
+     * required for e.g. messagebroker and notification).
+     *
+     * Without a systemId (on-premise installations, legacy mindsphere.io tenants, BrowserAuth) the legacy
+     * /api/<serviceName>/<version> relative path is used, unchanged from previous SDK versions.
+     *
+     * @protected
+     * @memberOf SdkClient
+     */
+    protected GetServiceBaseUrl(serviceName: string, version: string, options?: { apiPrefix?: boolean }): string {
+        const systemId = this.GetSystemId();
+        if (!systemId) {
+            return `/api/${serviceName}/${version}`;
+        }
+        const prefix = options?.apiPrefix ? "/api" : "";
+        return `${prefix}/${serviceName}-${systemId}/${version}`;
+    }
+
     public GetUserTenant(): string | undefined {
         if (this._authenticator instanceof TokenManagerAuth) {
             return this._authenticator.GetUserTenant();
@@ -113,14 +146,16 @@ export abstract class SdkClient {
                 appCredentials.tenant,
                 appCredentials.usertenant,
                 appCredentials.appName,
-                appCredentials.appVersion
+                appCredentials.appVersion,
+                appCredentials.systemId
             );
         } else if (isServiceCredentials(credentialsOrAuthorizer)) {
             const credentialsAuth = credentialsOrAuthorizer as MindSphereCredentials;
             this._authenticator = new CredentialAuth(
                 credentialsAuth.gateway,
                 credentialsAuth.basicAuth,
-                credentialsAuth.tenant
+                credentialsAuth.tenant,
+                credentialsAuth.systemId
             );
         } else {
             throw new Error("invalid constructor");

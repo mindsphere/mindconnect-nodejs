@@ -629,6 +629,14 @@ export interface OnboardingConfigurationContent {
      * @memberof OnboardingConfigurationContent
      */
     tenant?: string;
+    /**
+     * Xcelerator system id. Present only on onboarding files issued for the new siemens.app scheme;
+     * absent/empty for on-premise installations and legacy mindsphere.io tenants.
+     *
+     * @type {string}
+     * @memberof OnboardingConfigurationContent
+     */
+    systemId?: string;
 }
 
 /**

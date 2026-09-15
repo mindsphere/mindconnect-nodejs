@@ -6,7 +6,9 @@ import { SdkClient } from "../common/sdk-client";
 import { DataLakeModels } from "./data-lake.models";
 
 export class DataLakeClient extends SdkClient {
-    private _baseUrl: string = "/api/datalake/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("datalake", "v3");
+    }
 
     /**
      * * Object Metadata Catalog Operations

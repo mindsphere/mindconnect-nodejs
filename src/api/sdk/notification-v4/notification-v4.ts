@@ -39,7 +39,9 @@ import { NotificationModelsV4 } from "./notification-v4-models";
  * @extends {SdkClient}
  */
 export class NotificationClientV4 extends SdkClient {
-    private _baseUrl: string = "/api/notification/v4";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("notification", "v4", { apiPrefix: true });
+    }
 
     /**
      * * Email

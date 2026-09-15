@@ -227,7 +227,7 @@ export class MultipartUploader {
         timeStamp?: Date;
         ifMatch?: number;
     }) {
-        const url = `/api/iotfile/v3/files/${entityId}/${uploadPath}?upload=${mode}`;
+        const url = `${this.IotFileBaseUrl()}/files/${entityId}/${uploadPath}?upload=${mode}`;
         const token = await this.GetToken();
 
         const headers = {
@@ -279,7 +279,7 @@ export class MultipartUploader {
             part = `?upload=complete`;
         }
 
-        const url = `/api/iotfile/v3/files/${entityId}/${uploadPath}${part}`;
+        const url = `${this.IotFileBaseUrl()}/files/${entityId}/${uploadPath}${part}`;
         const previousEtag = this.setIfMatch(`${this.GetGateway()}${url}`, headers);
 
         const token = await this.GetToken();
@@ -573,6 +573,18 @@ export class MultipartUploader {
 
     private GetAuthorizer() {
         return (this.agent || this.sdkClient) as TokenRotation;
+    }
+
+    /**
+     * Builds the iotfile base url, honoring the Xcelerator systemId when configured.
+     * Falls back to the legacy /api/iotfile/v3 path otherwise (on-premise, legacy tenants, BrowserAuth).
+     *
+     * @private
+     * @memberof MultipartUploader
+     */
+    private IotFileBaseUrl(): string {
+        const systemId = this.GetAuthorizer().GetSystemId ? this.GetAuthorizer().GetSystemId!() : "";
+        return systemId ? `/iotfile-${systemId}/v3` : `/api/iotfile/v3`;
     }
 
     constructor(private agent?: MindConnectAgent, private sdkClient?: SdkClient) {
