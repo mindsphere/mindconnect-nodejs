@@ -33,7 +33,8 @@
                 <div class="content__column has-default-width-20 xs-100 xl-10 xs-hide sm-hide">
                     <div class="item__metaInfo">
                         <b>Gateway:</b> {{gateway}}<br />
-
+                        <b>System Id:</b> {{systemId}}<br />
+                        <b>OAuth System Id:</b> {{oauthSystemId}}<br />
                         {{appName}} {{appVersion}}
                     </div>
                 </div>
@@ -191,10 +192,28 @@
 
                                 <label class="inputGroup__label" for="text-systemid"> System Id </label>
                                 <input class="inputGroup__textInput" type="text"
-                                    placeholder="defaults to 1000001700, leave empty for on-premise/legacy tenants"
+                                    placeholder="e.g. 1000001700, leave empty for on-premise/legacy tenants"
                                     id="text-systemid" />
                                 <div class="inputGroup__description">
-                                    Xcelerator system id (optional, only used with a region gateway)
+                                    Xcelerator system id (optional, only used with a region gateway). Pre-filled
+                                    with the current default; clear it for on-premise/legacy mindsphere.io tenants.
+                                    This id is used to build API urls (e.g.
+                                    api.eu1.siemens.app/assetmanagement-&lt;systemId&gt;).
+                                </div>
+
+                                <label class="inputGroup__label" for="text-oauthsystemid">
+                                    OAuth System Id
+                                </label>
+                                <input class="inputGroup__textInput" type="text"
+                                    placeholder="only needed if different from System Id above"
+                                    id="text-oauthsystemid" />
+                                <div class="inputGroup__description">
+                                    Xcelerator OAuth/PIAM identity zone id (optional). Some tenants have a
+                                    <b>different</b> id for the login/token endpoint
+                                    (&lt;oauthSystemId&gt;.&lt;region&gt;.sws.siemens.com) than for their API
+                                    system id above &mdash; check with your Insights Hub administrator if
+                                    authentication fails with "Bad credentials". Leave empty to reuse the
+                                    System Id.
                                 </div>
 
                                 <label class="inputGroup__label is-required" for="text-tenant"> Tenant </label>
@@ -243,7 +262,7 @@
 
         <script type="text/javascript">
             _msb.init({
-                title: "Insights Hub and Industrial IoT CLI 3.24.2",
+                title: "Insights Hub and Industrial IoT CLI 4.0.0",
                 appId: "_mdspcontent",
                 appInfoPath: "/app-info.json",
                 polyfills: {

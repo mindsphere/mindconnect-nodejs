@@ -56,7 +56,7 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
     private async AcquirePublicKey(): Promise<boolean> {
         if (!this._oauthResponse) {
             const headers = this._headers;
-            const url = `${getPiamUrl(this._gateway, this._tenant, this._systemId)}token_keys`;
+            const url = `${getPiamUrl(this._gateway, this._tenant, this.GetOAuthSystemId())}token_keys`;
             log(`AcquirePublicKey Headers: ${JSON.stringify(headers)} Url: ${url}`);
 
             try {
@@ -116,6 +116,11 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
      * @param {string} _tenant
      * @param {string} [_systemId] Xcelerator system id, used to build the new siemens.app service urls.
      *                             Leave empty for on-premise installations or legacy mindsphere.io tenants.
+     * @param {string} [_oauthSystemId] Xcelerator OAuth/PIAM identity zone id, used to build the
+     *                             https://<oauthSystemId>.<region>.sws.siemens.com/ auth urls.
+     *                             This can be a *different* id than the API _systemId (the identity zone
+     *                             and the API system are provisioned/assigned independently). Leave empty
+     *                             to fall back to _systemId (the common case where both ids are equal).
      *
      * @memberOf CredentialAuth
      */
@@ -123,7 +128,8 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
         protected _gateway: string,
         protected _basicAuth: string,
         protected _tenant: string,
-        protected _systemId: string = ""
+        protected _systemId: string = "",
+        protected _oauthSystemId: string = ""
     ) {
         super();
         if (!_basicAuth || !_basicAuth.startsWith("Basic")) {
@@ -148,5 +154,12 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
     }
     GetSystemId(): string {
         return this._systemId;
+    }
+    /**
+     * Returns the Xcelerator OAuth/PIAM identity zone id used for the auth endpoints
+     * (falls back to the API systemId when no dedicated oauthSystemId was configured).
+     */
+    GetOAuthSystemId(): string {
+        return this._oauthSystemId || this._systemId;
     }
 }

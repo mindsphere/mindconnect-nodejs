@@ -41,6 +41,11 @@ export default (program: Command) => {
             `Xcelerator system id (defaults to ${DEFAULT_SYSTEM_ID} for region gateways, leave empty for on-premise/legacy tenants)`
         )
         .option(
+            "-z, --oauth-system-id <oauthSystemId>",
+            "Xcelerator OAuth/PIAM identity zone id, if different from the system id used for API calls " +
+                "(leave empty to use the same value as --system-id)"
+        )
+        .option(
             "-k, --passkey <passkey>",
             "passkey (you will use this in the commands which require service credentials)"
         )
@@ -117,7 +122,7 @@ async function serve(configPort?: number) {
 
             if (uri.path?.startsWith("/sc/config") && req.method === "GET") {
                 res.writeHead(200, { "Content-Type": "application/json" });
-                res.end(JSON.stringify(getFullConfig()));
+                res.end(JSON.stringify({ ...getFullConfig(), defaultSystemId: DEFAULT_SYSTEM_ID }));
                 console.log(`${color(new Date().toISOString())} Acquired the CLI settings`);
             } else if (uri.path?.startsWith("/sc/save") && req.method === "POST") {
                 const data: string[] = [];
@@ -193,6 +198,7 @@ function addEntry(options: any) {
         createdAt: new Date().toISOString(),
         selected: true,
         systemId: options.systemId ? `${options.systemId}` : undefined,
+        oauthSystemId: options.oauthSystemId ? `${options.oauthSystemId}` : undefined,
     };
 
     (config.credentials as any[]).push(newEntry);

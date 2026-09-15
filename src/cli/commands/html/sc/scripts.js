@@ -14,11 +14,16 @@ function bindList() {
         const element = window.configuration.credentials[index];
 
         const x = `${template.innerHTML}`;
-        element.index = index;
-        element.color = element.selected ? "black has-color-functionalGreen" : "black has-color-forced-gray200";
+        // render from a copy so display-only placeholders never leak into the
+        // real configuration object (and subsequently get persisted on save).
+        const display = { ...element };
+        display.index = index;
+        display.color = element.selected ? "black has-color-functionalGreen" : "black has-color-forced-gray200";
+        display.systemId = element.systemId || "(none)";
+        display.oauthSystemId = element.oauthSystemId || "(same as System Id)";
 
         // window.alert(x)
-        list.append(mustache(x, element));
+        list.append(mustache(x, display));
     }
 
     return false;
@@ -45,6 +50,8 @@ function cancelDialog() {
 }
 
 function showDialog() {
+    $("#text-systemid").val(window.configuration.defaultSystemId || "");
+    $("#text-oauthsystemid").val("");
     $("#addDialog").addClass("is-shown");
 }
 
@@ -79,6 +86,7 @@ function addNew() {
         gateway: "" + $("#text-gateway").val(),
         tenant: "" + $("#text-tenant").val(),
         systemId: "" + $("#text-systemid").val(),
+        oauthSystemId: "" + $("#text-oauthsystemid").val(),
         usertenant: "",
         appName: "",
         appVersion: "",

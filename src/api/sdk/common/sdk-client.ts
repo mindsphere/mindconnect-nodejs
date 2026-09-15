@@ -147,7 +147,8 @@ export abstract class SdkClient {
                 appCredentials.usertenant,
                 appCredentials.appName,
                 appCredentials.appVersion,
-                appCredentials.systemId
+                appCredentials.systemId,
+                appCredentials.oauthSystemId
             );
         } else if (isServiceCredentials(credentialsOrAuthorizer)) {
             const credentialsAuth = credentialsOrAuthorizer as MindSphereCredentials;
@@ -155,7 +156,8 @@ export abstract class SdkClient {
                 credentialsAuth.gateway,
                 credentialsAuth.basicAuth,
                 credentialsAuth.tenant,
-                credentialsAuth.systemId
+                credentialsAuth.systemId,
+                credentialsAuth.oauthSystemId
             );
         } else {
             throw new Error("invalid constructor");

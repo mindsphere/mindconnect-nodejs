@@ -102,6 +102,8 @@ export class TokenManagerAuth extends AuthBase implements TokenRotation {
      * @param {string} [_appName]
      * @param {string} [_appVersion]
      * @param {string} [_systemId] Xcelerator system id (leave empty for on-premise / legacy tenants).
+     * @param {string} [_oauthSystemId] Xcelerator OAuth/PIAM identity zone id, if different from _systemId
+     *                             (leave empty to fall back to _systemId).
      *
      * @memberOf TokenManagerAuth
      */
@@ -112,9 +114,10 @@ export class TokenManagerAuth extends AuthBase implements TokenRotation {
         protected _userTenant: string,
         protected _appName: string = "cli",
         protected _appVersion: string = "1.0.0",
-        protected _systemId: string = ""
+        protected _systemId: string = "",
+        protected _oauthSystemId: string = ""
     ) {
-        super(_gateway, _basicAuth, _hostTenant, _systemId);
+        super(_gateway, _basicAuth, _hostTenant, _systemId, _oauthSystemId);
 
         (!_basicAuth || !_basicAuth.startsWith("Basic")) &&
             throwError(

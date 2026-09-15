@@ -47,6 +47,7 @@ export type authJson = {
     type: "SERVICE" | "APP";
     createdAt: string;
     systemId?: string;
+    oauthSystemId?: string;
 };
 
 export function upgradeOldConfiguration(obj: any) {
@@ -114,6 +115,7 @@ export const encrypt = ({
     createdAt,
     selected,
     systemId,
+    oauthSystemId,
 }: credentialEntry): authJson => {
     const base64encoded = Buffer.from(`${user}:${password}`).toString("base64");
     const iv = crypto.randomBytes(16);
@@ -133,6 +135,7 @@ export const encrypt = ({
         createdAt: createdAt,
         selected: selected,
         systemId: systemId,
+        oauthSystemId: oauthSystemId,
     };
     // console.log(encryptedAuth);
     return encryptedAuth;
@@ -151,6 +154,7 @@ export type credentialEntry = {
     createdAt: string;
     selected: boolean;
     systemId?: string;
+    oauthSystemId?: string;
 };
 
 export const decrypt = (encryptedAuth: authJson, passkey: string): string => {
