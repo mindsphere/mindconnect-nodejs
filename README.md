@@ -27,6 +27,13 @@
 
 </p>
 
+> ### ⚠️ Breaking change starting with version 4.0.0
+>
+> Insights Hub URLs are migrating from the `mindsphere.io` domain to the new `siemens.app` scheme. **Version 4.0.0 and above only work with the new `siemens.app` URLs** and are **not compatible** with tenants/gateways still using the old `mindsphere.io` URLs.
+>
+> - If your tenant/gateway already uses the new `siemens.app` URLs, install `@mindconnect/mindconnect-nodejs@^4.0.0`.
+> - If your tenant/gateway still uses the old `mindsphere.io` URLs, keep using `@mindconnect/mindconnect-nodejs@^3.0.0` (the `3.x` line will continue to work with the old URL scheme).
+
 ## Full documentation
 
 The full documentation can be found at [https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/index.html](https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/index.html)
@@ -36,10 +43,12 @@ The full documentation can be found at [https://developer.siemens.com/industrial
 There are several ways to install the library. The most common one is via npm registry:
 
 ```bash
-# install the latest stable library from the npm registry
+# install the latest stable library from the npm registry (v4+, requires the new siemens.app URL scheme)
 npm install @mindconnect/mindconnect-nodejs --save
 # install the latest alpha library from the npm registry
 npm install @mindconnect/mindconnect-nodejs@alpha --save
+# if your tenant/gateway still uses the old mindsphere.io URLs, install the 3.x line instead
+npm install @mindconnect/mindconnect-nodejs@^3.0.0 --save
 ```
 
 ## Getting started

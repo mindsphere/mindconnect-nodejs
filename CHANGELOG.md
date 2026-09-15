@@ -2,7 +2,7 @@
 
 ## 4.0.0 - (unreleased)
 
-- BREAKING CHANGE: Insights Hub URLs are migrating from the `mindsphere.io` domain to the new `siemens.app` scheme (work in progress on this branch)
+- BREAKING CHANGE: Insights Hub URLs are migrating from the `mindsphere.io` domain to the new `siemens.app` scheme (work in progress on this branch). Version 4.0.0+ only works with the new `siemens.app` URLs - use the `3.x` release line if your tenant/gateway still uses `mindsphere.io` URLs.
 - Bumped in-range dependencies and fixed resulting TypeScript strictness issues
 
 ## 3.24.2 - Coconut Vienna - June 2024
