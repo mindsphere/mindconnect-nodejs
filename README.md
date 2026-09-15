@@ -27,7 +27,8 @@
 
 </p>
 
-> ### ⚠️ Breaking change starting with version 4.0.0
+> [!WARNING]
+> ### Breaking change starting with version 4.0.0
 >
 > Insights Hub URLs are migrating from the `mindsphere.io` domain to the new `siemens.app` scheme. **Version 4.0.0 and above only work with the new `siemens.app` URLs** and are **not compatible** with tenants/gateways still using the old `mindsphere.io` URLs.
 >
