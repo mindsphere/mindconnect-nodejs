@@ -482,7 +482,7 @@ export class MindConnectAgent extends AgentAuth {
         filePath?: string
     ): Promise<string> {
         const clientId = entityId || this.ClientId();
-        const filepath = filePath || (file instanceof Buffer ? "no-filepath-for-buffer" : path.basename(file));
+        const filepath = filePath || (file instanceof Buffer ? "no-filepath-for-buffer" : path.basename(file as string));
 
         return await this.UploadFile(clientId, filepath, file, {
             type: fileType,

@@ -261,7 +261,7 @@ async function generateCsv(
 
             const result = stream.write(line.trimRight().slice(0, -1) + "\n");
             if (!result) {
-                await new Promise((resolve) => stream.once("drain", resolve));
+                await new Promise((resolve) => stream.once("drain", () => resolve(undefined)));
             }
         }
 

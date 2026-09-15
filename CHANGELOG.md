@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.0.0 - (unreleased)
+
+- BREAKING CHANGE: Insights Hub URLs are migrating from the `mindsphere.io` domain to the new `siemens.app` scheme (work in progress on this branch)
+- Bumped in-range dependencies and fixed resulting TypeScript strictness issues
+
 ## 3.24.2 - Coconut Vienna - June 2024
 
 - Restored previous behavior for Billboard URLs in Event Management and Asset Management Client

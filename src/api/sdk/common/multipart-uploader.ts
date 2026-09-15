@@ -140,18 +140,18 @@ export class MultipartUploader {
     private highWatermark = 1 * 1024 * 1024;
 
     private getStreamFromFile(file: string | Buffer, chunksize: number) {
-        return file instanceof Buffer
-            ? (() => {
-                  const bufferStream = new stream.PassThrough({ highWaterMark: this.highWatermark });
-                  for (let index = 0; index < file.length; ) {
-                      const end = Math.min(index + chunksize, file.length);
-                      bufferStream.write(file.slice(index, end));
-                      index = end;
-                  }
-                  bufferStream.end();
-                  return bufferStream;
-              })()
-            : fs.createReadStream(path.resolve(file), { highWaterMark: this.highWatermark });
+        if (file instanceof Buffer) {
+            const bufferStream = new stream.PassThrough({ highWaterMark: this.highWatermark });
+            for (let index = 0; index < file.length; ) {
+                const end = Math.min(index + chunksize, file.length);
+                bufferStream.write(file.subarray(index, end));
+                index = end;
+            }
+            bufferStream.end();
+            return bufferStream;
+        }
+
+        return fs.createReadStream(path.resolve(file as string), { highWaterMark: this.highWatermark });
     }
 
     private addDataToBuffer(current: Uint8Array, data: Buffer) {
@@ -402,7 +402,7 @@ export class MultipartUploader {
         const hash = crypto.createHash("md5");
         const promises: any[] = [];
 
-        let current = new Uint8Array(0);
+        let current: Uint8Array = new Uint8Array(0);
         let chunks = 0;
 
         if (verboseFunction) verboseFunction(`file upload started for ${file}`);
@@ -433,7 +433,7 @@ export class MultipartUploader {
 
         return new Promise((resolve, reject) => {
             mystream
-                .on("error", (err) => reject(err))
+                .on("error", (err: Error) => reject(err))
                 .on("data", async (data: Buffer) => {
                     if (current.byteLength + data.byteLength <= chunkSize) {
                         current = this.addDataToBuffer(current, data);
