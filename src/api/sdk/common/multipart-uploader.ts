@@ -576,15 +576,15 @@ export class MultipartUploader {
     }
 
     /**
-     * Builds the iotfile base url, honoring the Xcelerator systemId when configured.
+     * Builds the iotfile base url, honoring the Xcelerator core tenant id when configured.
      * Falls back to the legacy /api/iotfile/v3 path otherwise (on-premise, legacy tenants, BrowserAuth).
      *
      * @private
      * @memberof MultipartUploader
      */
     private IotFileBaseUrl(): string {
-        const systemId = this.GetAuthorizer().GetSystemId ? this.GetAuthorizer().GetSystemId!() : "";
-        return systemId ? `/iotfile-${systemId}/v3` : `/api/iotfile/v3`;
+        const coreTenantId = this.GetAuthorizer().GetCoreTenantId ? this.GetAuthorizer().GetCoreTenantId!() : "";
+        return coreTenantId ? `/iotfile-${coreTenantId}/v3` : `/api/iotfile/v3`;
     }
 
     constructor(private agent?: MindConnectAgent, private sdkClient?: SdkClient) {

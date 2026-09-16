@@ -16,25 +16,25 @@ const log = debug("mindconnect-setup");
  */
 export class MindConnectSetup extends CredentialAuth {
     /**
-     * Builds the mindconnect service base url, honoring the Xcelerator systemId when configured.
+     * Builds the mindconnect service base url, honoring the Xcelerator core tenant id when configured.
      * Falls back to the legacy /api/mindconnect/v3 path otherwise (on-premise, legacy tenants).
      *
      * @private
      * @memberof MindConnectSetup
      */
     private MindConnectBaseUrl(): string {
-        return this._systemId ? `/mindconnect-${this._systemId}/v3` : `/api/mindconnect/v3`;
+        return this._coreTenantId ? `/mindconnect-${this._coreTenantId}/v3` : `/api/mindconnect/v3`;
     }
 
     /**
-     * Builds the agentmanagement service base url, honoring the Xcelerator systemId when configured.
+     * Builds the agentmanagement service base url, honoring the Xcelerator core tenant id when configured.
      * Falls back to the legacy /api/agentmanagement/v3 path otherwise (on-premise, legacy tenants).
      *
      * @private
      * @memberof MindConnectSetup
      */
     private AgentManagementBaseUrl(): string {
-        return this._systemId ? `/agentmanagement-${this._systemId}/v3` : `/api/agentmanagement/v3`;
+        return this._coreTenantId ? `/agentmanagement-${this._coreTenantId}/v3` : `/api/agentmanagement/v3`;
     }
 
     /**

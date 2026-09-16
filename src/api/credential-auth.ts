@@ -12,7 +12,7 @@ export class CredentialAuth extends AuthBase implements TokenRotation {
             ...this._urlEncodedHeaders,
             Authorization: this._basicAuth,
         };
-        const url = `${getPiamUrl(this._gateway, this._tenant, this.GetOAuthSystemId())}oauth/token`;
+        const url = `${getPiamUrl(this._gateway, this._tenant, this.GetCustomerTenantId())}oauth/token`;
         log(`AcquireToken Headers: ${JSON.stringify(headers)} Url: ${url}`);
         const body = "grant_type=client_credentials";
 
@@ -59,9 +59,9 @@ export class CredentialAuth extends AuthBase implements TokenRotation {
      * @param {string} _gateway
      * @param {string} _basicAuth
      * @param {string} _tenant
-     * @param {string} [_systemId] Xcelerator system id (leave empty for on-premise / legacy tenants).
-     * @param {string} [_oauthSystemId] Xcelerator OAuth/PIAM identity zone id, if different from _systemId
-     *                             (leave empty to fall back to _systemId).
+     * @param {string} [_coreTenantId] Xcelerator core tenant id (leave empty for on-premise / legacy tenants).
+     * @param {string} [_customerTenantId] Xcelerator customer tenant id (OAuth/PIAM identity zone id), if
+     *                             different from _coreTenantId (leave empty to fall back to _coreTenantId).
      *
      * @memberOf CredentialAuth
      */
@@ -69,9 +69,9 @@ export class CredentialAuth extends AuthBase implements TokenRotation {
         protected _gateway: string,
         protected _basicAuth: string,
         protected _tenant: string,
-        protected _systemId: string = "",
-        protected _oauthSystemId: string = ""
+        protected _coreTenantId: string = "",
+        protected _customerTenantId: string = ""
     ) {
-        super(_gateway, _basicAuth, _tenant, _systemId, _oauthSystemId);
+        super(_gateway, _basicAuth, _tenant, _coreTenantId, _customerTenantId);
     }
 }

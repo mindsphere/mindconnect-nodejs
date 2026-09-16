@@ -22,8 +22,8 @@ export class TokenManagerAuth extends AuthBase implements TokenRotation {
             ...this._apiHeaders,
             "X-SPACE-AUTH-KEY": this._basicAuth,
         };
-        const url = this._systemId
-            ? `${this._gateway}/technicaltokenmanager-${this._systemId}/v3/oauth/token`
+        const url = this._coreTenantId
+            ? `${this._gateway}/technicaltokenmanager-${this._coreTenantId}/v3/oauth/token`
             : `${this._gateway}/api/technicaltokenmanager/v3/oauth/token`;
         log(`AcquireToken Headers: ${JSON.stringify(headers)} Url: ${url}`);
 
@@ -101,9 +101,9 @@ export class TokenManagerAuth extends AuthBase implements TokenRotation {
      * @param {string} _userTenant
      * @param {string} [_appName]
      * @param {string} [_appVersion]
-     * @param {string} [_systemId] Xcelerator system id (leave empty for on-premise / legacy tenants).
-     * @param {string} [_oauthSystemId] Xcelerator OAuth/PIAM identity zone id, if different from _systemId
-     *                             (leave empty to fall back to _systemId).
+     * @param {string} [_coreTenantId] Xcelerator core tenant id (leave empty for on-premise / legacy tenants).
+     * @param {string} [_customerTenantId] Xcelerator customer tenant id (OAuth/PIAM identity zone id), if
+     *                             different from _coreTenantId (leave empty to fall back to _coreTenantId).
      *
      * @memberOf TokenManagerAuth
      */
@@ -114,10 +114,10 @@ export class TokenManagerAuth extends AuthBase implements TokenRotation {
         protected _userTenant: string,
         protected _appName: string = "cli",
         protected _appVersion: string = "1.0.0",
-        protected _systemId: string = "",
-        protected _oauthSystemId: string = ""
+        protected _coreTenantId: string = "",
+        protected _customerTenantId: string = ""
     ) {
-        super(_gateway, _basicAuth, _hostTenant, _systemId, _oauthSystemId);
+        super(_gateway, _basicAuth, _hostTenant, _coreTenantId, _customerTenantId);
 
         (!_basicAuth || !_basicAuth.startsWith("Basic")) &&
             throwError(

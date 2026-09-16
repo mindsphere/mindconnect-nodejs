@@ -29,7 +29,7 @@ export class UserAuth extends MindConnectBase implements TokenRotation {
      *
      * @memberOf UserAuth
      */
-    constructor(token: string, gateway: string, private _systemId: string = "") {
+    constructor(token: string, gateway: string, private _coreTenantId: string = "") {
         super();
         if (!isUrl(gateway)) {
             throw new Error("the gateway must be an URL (e.g. https://gateway.eu1.mindsphere.io");
@@ -85,13 +85,13 @@ export class UserAuth extends MindConnectBase implements TokenRotation {
     }
 
     /**
-     * returns the configured Xcelerator system id (empty for on-premise / legacy installations)
+     * returns the configured Xcelerator core tenant id (empty for on-premise / legacy installations)
      *
      * @returns {string}
      *
      * @memberOf UserAuth
      */
-    GetSystemId(): string {
-        return this._systemId;
+    GetCoreTenantId(): string {
+        return this._coreTenantId;
     }
 }

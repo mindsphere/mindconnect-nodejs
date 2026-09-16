@@ -19,8 +19,8 @@ function bindList() {
         const display = { ...element };
         display.index = index;
         display.color = element.selected ? "black has-color-functionalGreen" : "black has-color-forced-gray200";
-        display.systemId = element.systemId || "(none)";
-        display.oauthSystemId = element.oauthSystemId || "(same as System Id)";
+        display.coreTenantId = element.coreTenantId || "(none)";
+        display.customerTenantId = element.customerTenantId || "(same as Core Tenant Id)";
 
         // window.alert(x)
         list.append(mustache(x, display));
@@ -50,8 +50,8 @@ function cancelDialog() {
 }
 
 function showDialog() {
-    $("#text-systemid").val(window.configuration.defaultSystemId || "");
-    $("#text-oauthsystemid").val("");
+    $("#text-coretenantid").val(window.configuration.defaultCoreTenantId || "");
+    $("#text-customertenantid").val("");
     $("#addDialog").addClass("is-shown");
 }
 
@@ -85,8 +85,8 @@ function addNew() {
         password: "" + $("#text-password").val(),
         gateway: "" + $("#text-gateway").val(),
         tenant: "" + $("#text-tenant").val(),
-        systemId: "" + $("#text-systemid").val(),
-        oauthSystemId: "" + $("#text-oauthsystemid").val(),
+        coreTenantId: "" + $("#text-coretenantid").val(),
+        customerTenantId: "" + $("#text-customertenantid").val(),
         usertenant: "",
         appName: "",
         appVersion: "",

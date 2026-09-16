@@ -203,14 +203,14 @@ export class FrontendAuth extends MindConnectBase implements TokenRotation {
     }
 
     /**
-     * returns the configured Xcelerator system id (empty for on-premise / legacy installations)
+     * returns the configured Xcelerator core tenant id (empty for on-premise / legacy installations)
      *
      * @returns {string}
      *
      * @memberOf FrontendAuth
      */
-    GetSystemId(): string {
-        return this._systemId;
+    GetCoreTenantId(): string {
+        return this._coreTenantId;
     }
 
     private getCookieValue(a: string) {
@@ -225,7 +225,7 @@ export class FrontendAuth extends MindConnectBase implements TokenRotation {
         private _gateway: string = "",
         private _sesionCookie: string,
         private _xsrfToken: string,
-        private _systemId: string = ""
+        private _coreTenantId: string = ""
     ) {
         super();
     }

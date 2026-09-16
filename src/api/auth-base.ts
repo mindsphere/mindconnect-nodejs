@@ -56,7 +56,7 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
     private async AcquirePublicKey(): Promise<boolean> {
         if (!this._oauthResponse) {
             const headers = this._headers;
-            const url = `${getPiamUrl(this._gateway, this._tenant, this.GetOAuthSystemId())}token_keys`;
+            const url = `${getPiamUrl(this._gateway, this._tenant, this.GetCustomerTenantId())}token_keys`;
             log(`AcquirePublicKey Headers: ${JSON.stringify(headers)} Url: ${url}`);
 
             try {
@@ -114,13 +114,15 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
      * @param {string} _gateway
      * @param {string} _basicAuth
      * @param {string} _tenant
-     * @param {string} [_systemId] Xcelerator system id, used to build the new siemens.app service urls.
-     *                             Leave empty for on-premise installations or legacy mindsphere.io tenants.
-     * @param {string} [_oauthSystemId] Xcelerator OAuth/PIAM identity zone id, used to build the
-     *                             https://<oauthSystemId>.<region>.sws.siemens.com/ auth urls.
-     *                             This can be a *different* id than the API _systemId (the identity zone
-     *                             and the API system are provisioned/assigned independently). Leave empty
-     *                             to fall back to _systemId (the common case where both ids are equal).
+     * @param {string} [_coreTenantId] Xcelerator core tenant id (API system id), used to build the new
+     *                             siemens.app service urls. Leave empty for on-premise installations or
+     *                             legacy mindsphere.io tenants.
+     * @param {string} [_customerTenantId] Xcelerator customer tenant id (OAuth/PIAM identity zone id),
+     *                             used to build the https://<customerTenantId>.<region>.sws.siemens.com/
+     *                             auth urls. This can be a *different* id than the API _coreTenantId (the
+     *                             identity zone and the API system are provisioned/assigned independently).
+     *                             Leave empty to fall back to _coreTenantId (the common case where both
+     *                             ids are equal).
      *
      * @memberOf CredentialAuth
      */
@@ -128,8 +130,8 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
         protected _gateway: string,
         protected _basicAuth: string,
         protected _tenant: string,
-        protected _systemId: string = "",
-        protected _oauthSystemId: string = ""
+        protected _coreTenantId: string = "",
+        protected _customerTenantId: string = ""
     ) {
         super();
         if (!_basicAuth || !_basicAuth.startsWith("Basic")) {
@@ -152,14 +154,15 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
     GetGateway(): string {
         return this._gateway;
     }
-    GetSystemId(): string {
-        return this._systemId;
+    GetCoreTenantId(): string {
+        return this._coreTenantId;
     }
     /**
-     * Returns the Xcelerator OAuth/PIAM identity zone id used for the auth endpoints
-     * (falls back to the API systemId when no dedicated oauthSystemId was configured).
+     * Returns the Xcelerator customer tenant id (OAuth/PIAM identity zone id) used for the auth
+     * endpoints (falls back to the API core tenant id when no dedicated customerTenantId was
+     * configured).
      */
-    GetOAuthSystemId(): string {
-        return this._oauthSystemId || this._systemId;
+    GetCustomerTenantId(): string {
+        return this._customerTenantId || this._coreTenantId;
     }
 }

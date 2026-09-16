@@ -243,7 +243,7 @@ export class BrowserAuth implements TokenRotation {
      *
      * @memberOf BrowserAuth
      */
-    GetSystemId(): string {
+    GetCoreTenantId(): string {
         return "";
     }
 

@@ -576,24 +576,26 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
     GetGateway(): string {
         return this._configuration.content.baseUrl!;
     }
-    GetSystemId(): string {
+    GetCoreTenantId(): string {
+        // Note: this reads the "systemId" key from the onboarding file JSON as issued by the
+        // server (wire format) - do not rename that key, only our own getter method name.
         return this._configuration.content.systemId || "";
     }
 
     /**
-     * Builds a service base url, honoring the Xcelerator systemId when the onboarding file provides one.
+     * Builds a service base url, honoring the Xcelerator core tenant id when the onboarding file provides one.
      * Falls back to the legacy /api/<serviceName>/<version> path otherwise (on-premise, legacy tenants).
      *
      * @protected
      * @memberof AgentAuth
      */
     protected ServiceBaseUrl(serviceName: string, version: string): string {
-        const systemId = this.GetSystemId();
-        return systemId ? `/${serviceName}-${systemId}/${version}` : `/api/${serviceName}/${version}`;
+        const coreTenantId = this.GetCoreTenantId();
+        return coreTenantId ? `/${serviceName}-${coreTenantId}/${version}` : `/api/${serviceName}/${version}`;
     }
 
     /**
-     * Builds the agentmanagement base url, honoring the Xcelerator systemId when the onboarding file provides one.
+     * Builds the agentmanagement base url, honoring the Xcelerator core tenant id when the onboarding file provides one.
      * Falls back to the legacy /api/agentmanagement/v3 path otherwise (on-premise, legacy tenants).
      *
      * @private

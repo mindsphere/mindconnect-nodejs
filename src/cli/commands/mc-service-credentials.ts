@@ -8,7 +8,7 @@ import {
     addAndStoreConfiguration,
     checkList,
     credentialEntry,
-    DEFAULT_SYSTEM_ID,
+    DEFAULT_CORE_TENANT_ID,
     getFullConfig,
     storeAuth,
     throwError,
@@ -37,13 +37,13 @@ export default (program: Command) => {
         .option("-a, --appName <appName>", "your application name (e.g. cli)")
         .option("-p, --appVersion <appVersion>", "your application version (e.g. 1.0.0)")
         .option(
-            "-x, --system-id <systemId>",
-            `Xcelerator system id (defaults to ${DEFAULT_SYSTEM_ID} for region gateways, leave empty for on-premise/legacy tenants)`
+            "-x, --core-tenant-id <coreTenantId>",
+            `Xcelerator core tenant id (API system id, defaults to ${DEFAULT_CORE_TENANT_ID} for region gateways, leave empty for on-premise/legacy tenants)`
         )
         .option(
-            "-z, --oauth-system-id <oauthSystemId>",
-            "Xcelerator OAuth/PIAM identity zone id, if different from the system id used for API calls " +
-                "(leave empty to use the same value as --system-id)"
+            "-z, --customer-tenant-id <customerTenantId>",
+            "Xcelerator customer tenant id (OAuth/PIAM identity zone id), if different from the core tenant id " +
+                "used for API calls (leave empty to use the same value as --core-tenant-id)"
         )
         .option(
             "-k, --passkey <passkey>",
@@ -122,7 +122,7 @@ async function serve(configPort?: number) {
 
             if (uri.path?.startsWith("/sc/config") && req.method === "GET") {
                 res.writeHead(200, { "Content-Type": "application/json" });
-                res.end(JSON.stringify({ ...getFullConfig(), defaultSystemId: DEFAULT_SYSTEM_ID }));
+                res.end(JSON.stringify({ ...getFullConfig(), defaultCoreTenantId: DEFAULT_CORE_TENANT_ID }));
                 console.log(`${color(new Date().toISOString())} Acquired the CLI settings`);
             } else if (uri.path?.startsWith("/sc/save") && req.method === "POST") {
                 const data: string[] = [];
@@ -197,8 +197,8 @@ function addEntry(options: any) {
         appVersion: `${options.appVersion || ""}`,
         createdAt: new Date().toISOString(),
         selected: true,
-        systemId: options.systemId ? `${options.systemId}` : undefined,
-        oauthSystemId: options.oauthSystemId ? `${options.oauthSystemId}` : undefined,
+        coreTenantId: options.coreTenantId ? `${options.coreTenantId}` : undefined,
+        customerTenantId: options.customerTenantId ? `${options.customerTenantId}` : undefined,
     };
 
     (config.credentials as any[]).push(newEntry);

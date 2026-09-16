@@ -25,15 +25,15 @@ export const convertToTdpArray = (data: any[]): TimeStampedDataPoint[] => {
 };
 
 /**
- * Default Xcelerator "system id" used to build the new siemens.app based service URLs
- * (e.g. https://api.eu1.siemens.app/assetmanagement-1000001700/v3).
+ * Default Xcelerator "core tenant id" (API system id) used to build the new siemens.app based
+ * service URLs (e.g. https://api.eu1.siemens.app/assetmanagement-1000001700/v3).
  *
  * This is only a fallback default: it is used when a bare region (e.g. "eu1") is passed
- * as gateway during configuration. It can always be overridden (e.g. via --system-id in the CLI).
+ * as gateway during configuration. It can always be overridden (e.g. via --core-tenant-id in the CLI).
  * On-premise installations (and other setups where a full custom gateway URL is supplied)
- * never get a systemId assigned automatically and keep using the legacy /api/<service>/v<version> paths.
+ * never get a coreTenantId assigned automatically and keep using the legacy /api/<service>/v<version> paths.
  */
-export const DEFAULT_SYSTEM_ID = "1000001700";
+export const DEFAULT_CORE_TENANT_ID = "1000001700";
 
 export type authJson = {
     auth: string;
@@ -46,8 +46,8 @@ export type authJson = {
     selected: boolean;
     type: "SERVICE" | "APP";
     createdAt: string;
-    systemId?: string;
-    oauthSystemId?: string;
+    coreTenantId?: string;
+    customerTenantId?: string;
 };
 
 export function upgradeOldConfiguration(obj: any) {
@@ -82,16 +82,18 @@ export const isUrl = (url: string): boolean => {
  * Builds the PIAM/OAuth base url used for token acquisition and public key retrieval.
  *
  * On the new Xcelerator scheme, PIAM lives on an entirely different domain:
- * https://<systemId>.<region>.sws.siemens.com/ (region is extracted from the api.<region>.siemens.app gateway).
+ * https://<customerTenantId>.<region>.sws.siemens.com/ (region is extracted from the
+ * api.<region>.siemens.app gateway).
  *
- * When there is no systemId (on-premise installations, legacy mindsphere.io tenants, BrowserAuth) the
- * legacy https://<tenant>.piam.<region>.mindsphere.io/ scheme is used, exactly as before.
+ * When there is no customerTenantId (on-premise installations, legacy mindsphere.io tenants,
+ * BrowserAuth) the legacy https://<tenant>.piam.<region>.mindsphere.io/ scheme is used, exactly
+ * as before.
  */
-export const getPiamUrl = (gateway: string, tenant: string, systemId?: string): string => {
+export const getPiamUrl = (gateway: string, tenant: string, customerTenantId?: string): string => {
     const xceleratorRegion = gateway.match(/^https?:\/\/api\.([^./]+)\.siemens\.app/i);
 
-    if (systemId && xceleratorRegion) {
-        return `https://${systemId}.${xceleratorRegion[1]}.sws.siemens.com/`;
+    if (customerTenantId && xceleratorRegion) {
+        return `https://${customerTenantId}.${xceleratorRegion[1]}.sws.siemens.com/`;
     }
 
     const piamUrl = gateway.replace("gateway", `${tenant}.piam`);
@@ -114,8 +116,8 @@ export const encrypt = ({
     appVersion,
     createdAt,
     selected,
-    systemId,
-    oauthSystemId,
+    coreTenantId,
+    customerTenantId,
 }: credentialEntry): authJson => {
     const base64encoded = Buffer.from(`${user}:${password}`).toString("base64");
     const iv = crypto.randomBytes(16);
@@ -134,8 +136,8 @@ export const encrypt = ({
         appVersion: appVersion,
         createdAt: createdAt,
         selected: selected,
-        systemId: systemId,
-        oauthSystemId: oauthSystemId,
+        coreTenantId: coreTenantId,
+        customerTenantId: customerTenantId,
     };
     // console.log(encryptedAuth);
     return encryptedAuth;
@@ -153,8 +155,8 @@ export type credentialEntry = {
     appVersion: string;
     createdAt: string;
     selected: boolean;
-    systemId?: string;
-    oauthSystemId?: string;
+    coreTenantId?: string;
+    customerTenantId?: string;
 };
 
 export const decrypt = (encryptedAuth: authJson, passkey: string): string => {
@@ -361,12 +363,12 @@ export function addAndStoreConfiguration(configuration: any) {
     (!configuration || !configuration.credentials) && throwError("invalid configuration!");
     configuration.credentials.forEach((element: credentialEntry) => {
         // a bare region (e.g. "eu1") means the user wants a new Xcelerator (siemens.app) cloud tenant.
-        // a full URL (on-premise, or any other custom gateway) is left untouched and never gets a systemId
-        // assigned automatically, which keeps it on the legacy /api/<service>/v<version> paths.
+        // a full URL (on-premise, or any other custom gateway) is left untouched and never gets a
+        // coreTenantId assigned automatically, which keeps it on the legacy /api/<service>/v<version> paths.
         const isBareRegion = !isUrl(element.gateway);
         element.gateway = isBareRegion ? `https://api.${element.gateway}.siemens.app` : element.gateway;
-        if (isBareRegion && !element.systemId) {
-            element.systemId = DEFAULT_SYSTEM_ID;
+        if (isBareRegion && !element.coreTenantId) {
+            element.coreTenantId = DEFAULT_CORE_TENANT_ID;
         }
         newConfiguration.credentials.push(element.passkey ? encrypt(element) : (element as unknown as authJson));
     });

@@ -33,8 +33,8 @@
                 <div class="content__column has-default-width-20 xs-100 xl-10 xs-hide sm-hide">
                     <div class="item__metaInfo">
                         <b>Gateway:</b> {{gateway}}<br />
-                        <b>System Id:</b> {{systemId}}<br />
-                        <b>OAuth System Id:</b> {{oauthSystemId}}<br />
+                        <b>Core Tenant Id:</b> {{coreTenantId}}<br />
+                        <b>Customer Tenant Id:</b> {{customerTenantId}}<br />
                         {{appName}} {{appVersion}}
                     </div>
                 </div>
@@ -190,30 +190,30 @@
                                     onblur="validateInput('#text-gateway')" />
                                 <div class="inputGroup__description">Region string or full gateway url</div>
 
-                                <label class="inputGroup__label" for="text-systemid"> System Id </label>
+                                <label class="inputGroup__label" for="text-coretenantid"> Core Tenant Id </label>
                                 <input class="inputGroup__textInput" type="text"
                                     placeholder="e.g. 1000001700, leave empty for on-premise/legacy tenants"
-                                    id="text-systemid" />
+                                    id="text-coretenantid" />
                                 <div class="inputGroup__description">
-                                    Xcelerator system id (optional, only used with a region gateway). Pre-filled
-                                    with the current default; clear it for on-premise/legacy mindsphere.io tenants.
-                                    This id is used to build API urls (e.g.
-                                    api.eu1.siemens.app/assetmanagement-&lt;systemId&gt;).
+                                    Xcelerator core tenant id (API system id, optional, only used with a region
+                                    gateway). Pre-filled with the current default; clear it for on-premise/legacy
+                                    mindsphere.io tenants. This id is used to build API urls (e.g.
+                                    api.eu1.siemens.app/assetmanagement-&lt;coreTenantId&gt;).
                                 </div>
 
-                                <label class="inputGroup__label" for="text-oauthsystemid">
-                                    OAuth System Id
+                                <label class="inputGroup__label" for="text-customertenantid">
+                                    Customer Tenant Id
                                 </label>
                                 <input class="inputGroup__textInput" type="text"
-                                    placeholder="only needed if different from System Id above"
-                                    id="text-oauthsystemid" />
+                                    placeholder="only needed if different from Core Tenant Id above"
+                                    id="text-customertenantid" />
                                 <div class="inputGroup__description">
-                                    Xcelerator OAuth/PIAM identity zone id (optional). Some tenants have a
-                                    <b>different</b> id for the login/token endpoint
-                                    (&lt;oauthSystemId&gt;.&lt;region&gt;.sws.siemens.com) than for their API
-                                    system id above &mdash; check with your Insights Hub administrator if
+                                    Xcelerator customer tenant id (OAuth/PIAM identity zone id, optional). Some
+                                    tenants have a <b>different</b> id for the login/token endpoint
+                                    (&lt;customerTenantId&gt;.&lt;region&gt;.sws.siemens.com) than for their API
+                                    core tenant id above &mdash; check with your Insights Hub administrator if
                                     authentication fails with "Bad credentials". Leave empty to reuse the
-                                    System Id.
+                                    Core Tenant Id.
                                 </div>
 
                                 <label class="inputGroup__label is-required" for="text-tenant"> Tenant </label>

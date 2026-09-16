@@ -92,8 +92,8 @@ async function uploadFile(sdk: MindSphereSdk, options: any) {
     console.log(
         `Logo: ${color(
             sdk.GetGateway() +
-                (sdk.GetSystemId()
-                    ? `/tenantmanagement-${sdk.GetSystemId()}/v4/tenantInfo/logo`
+                (sdk.GetCoreTenantId()
+                    ? `/tenantmanagement-${sdk.GetCoreTenantId()}/v4/tenantInfo/logo`
                     : "/api/tenantmanagement/v4/tenantInfo/logo")
         )}`
     );
@@ -163,8 +163,8 @@ async function tenantInfo(sdk: MindSphereSdk, options: any) {
         console.log(
             `\tURL: ${color(
                 sdk.GetGateway() +
-                (sdk.GetSystemId()
-                    ? `/tenantmanagement-${sdk.GetSystemId()}/v4/tenantInfo/logo`
+                (sdk.GetCoreTenantId()
+                    ? `/tenantmanagement-${sdk.GetCoreTenantId()}/v4/tenantInfo/logo`
                     : "/api/tenantmanagement/v4/tenantInfo/logo")
             )}`
         );
