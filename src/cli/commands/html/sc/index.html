@@ -200,13 +200,9 @@
                                         placeholder="e.g. 1000001700, leave empty for on-premise/legacy tenants"
                                         id="app-text-coretenantid" />
                                     <div class="inputGroup__description">
-                                        Xcelerator core tenant id (API system id, optional, only used with a region
-                                        gateway). Pre-filled with the current default; clear it for
-                                        on-premise/legacy mindsphere.io tenants. This id is used to build API urls
-                                        (e.g. api.eu1.siemens.app/assetmanagement-&lt;coreTenantId&gt;). You can
-                                        find it in the URL of any Xcelerator app for your tenant, e.g.
+                                        API system id. Found in the URL of any Xcelerator app, e.g.
                                         <code>https://&lt;customerTenantId&gt;-settings-&lt;coreTenantId&gt;.&lt;region&gt;.siemens.app/</code>
-                                        &mdash; it's the second number.
+                                        (second number). Leave empty for on-premise/legacy tenants.
                                     </div>
 
                                     <label class="inputGroup__label" for="app-text-customertenantid">
@@ -216,14 +212,9 @@
                                         placeholder="only needed if different from Core Tenant Id above"
                                         id="app-text-customertenantid" />
                                     <div class="inputGroup__description">
-                                        Xcelerator customer tenant id (OAuth/PIAM identity zone id, optional). Some
-                                        tenants have a <b>different</b> id for the login/token endpoint
-                                        (&lt;customerTenantId&gt;.&lt;region&gt;.sws.siemens.com) than for their API
-                                        core tenant id above &mdash; check with your Insights Hub administrator if
-                                        authentication fails with "Bad credentials". Leave empty to reuse the
-                                        Core Tenant Id. Not used for legacy on-premise/mindsphere.io tenants. Like
-                                        the Core Tenant Id, you can find it in the URL of any Xcelerator app for
-                                        your tenant &mdash; it's the first number.
+                                        OAuth/PIAM zone id, only if different from Core Tenant Id above (ask your
+                                        admin if login fails with "Bad credentials"). Same URL, first number.
+                                        Leave empty to reuse the Core Tenant Id.
                                     </div>
 
                                     <label class="inputGroup__label is-required" for="app-text-tenant">
@@ -290,14 +281,9 @@
                                         placeholder="e.g. 1000001700, leave empty for on-premise/legacy tenants"
                                         id="svc-text-coretenantid" />
                                     <div class="inputGroup__description">
-                                        Xcelerator core tenant id (API system id, optional, only used with a region
-                                        gateway). Pre-filled with the current default; clear it for
-                                        on-premise/legacy mindsphere.io tenants. Not the same as the Tenant name
-                                        below, and not needed for technical user credentials unless you also set a
-                                        Customer Tenant Id. You can find it in the URL of any Xcelerator app for
-                                        your tenant, e.g.
+                                        API system id, optional here. Found in the URL of any Xcelerator app, e.g.
                                         <code>https://&lt;customerTenantId&gt;-settings-&lt;coreTenantId&gt;.&lt;region&gt;.siemens.app/</code>
-                                        &mdash; it's the second number.
+                                        (second number). Not needed unless you also set a Customer Tenant Id.
                                     </div>
 
                                     <label class="inputGroup__label" for="svc-text-customertenantid">
@@ -307,12 +293,9 @@
                                         placeholder="only needed if different from Core Tenant Id above"
                                         id="svc-text-customertenantid" />
                                     <div class="inputGroup__description">
-                                        Xcelerator customer tenant id (OAuth/PIAM identity zone id, optional). Some
-                                        tenants have a <b>different</b> id for the login/token endpoint
-                                        (&lt;customerTenantId&gt;.&lt;region&gt;.sws.siemens.com) than for their API
-                                        core tenant id above &mdash; check with your Insights Hub administrator if
-                                        authentication fails with "Bad credentials". Leave empty to reuse the
-                                        Core Tenant Id. Not used for legacy on-premise/mindsphere.io tenants.
+                                        OAuth/PIAM zone id, only if different from Core Tenant Id above (ask your
+                                        admin if login fails with "Bad credentials"). Same URL, first number.
+                                        Leave empty to reuse the Core Tenant Id.
                                     </div>
 
                                     <label class="inputGroup__label is-required" for="svc-text-tenant">
