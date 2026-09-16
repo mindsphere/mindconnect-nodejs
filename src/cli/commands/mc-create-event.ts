@@ -32,7 +32,7 @@ export default (program: Command) => {
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option(
             "-p, --passkey <passkey>",
-            `passkey (optional, event creation uses ${adminColor("service credentials *")})`
+            `passkey (optional, event creation uses ${adminColor("technical user credentials *")})`
         )
         .option("-v, --verbose", "verbose output")
         .description(`${color("create an event in the mindsphere")} ${adminColor("(optional: passkey) *")}`)
@@ -111,5 +111,5 @@ function getEventManager(options: any) {
 function checkParameters(options: any) {
     options.passkey &&
         !options.assetid &&
-        errorLog(" You have to specify assetid when using service credential upload", true);
+        errorLog(" You have to specify assetid when using technical user credential upload", true);
 }

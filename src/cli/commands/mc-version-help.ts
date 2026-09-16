@@ -18,7 +18,7 @@ export default (program: Command) => {
         log(
             `    the ${magenta(
                 "magenta colored commands *"
-            )} use app or service credentials or borrowed mindsphere cookies`
+            )} use app or technical user credentials or borrowed mindsphere cookies`
         );
         log(`    the ${cyan("cyan colored commands ")}require mindconnectlib (agent) credentials`);
         log(`    the ${blue("blue colored commands @")} use analytical functions of MindSphere`);

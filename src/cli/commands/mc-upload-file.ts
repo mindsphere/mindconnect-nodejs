@@ -30,7 +30,7 @@ export default (program: Command) => {
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option(
             "-p, --passkey <passkey>",
-            `passkey (optional, file upload uses ${adminColor("service credentials *")})`
+            `passkey (optional, file upload uses ${adminColor("technical user credentials *")})`
         )
         .option("-v, --verbose", "verbose output")
         .description(
@@ -169,5 +169,5 @@ function checkParameters(options: any) {
         errorLog("Missing file name for upload-file command. Run mdsp uf --help for full syntax and examples.", true);
     !options.config &&
         !options.assetid &&
-        errorLog(" You have to specify assetid when using service credential upload", true);
+        errorLog(" You have to specify assetid when using technical user credential upload", true);
 }

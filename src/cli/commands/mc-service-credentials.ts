@@ -47,7 +47,7 @@ export default (program: Command) => {
         )
         .option(
             "-k, --passkey <passkey>",
-            "passkey (you will use this in the commands which require service credentials)"
+            "passkey (you will use this in the commands which require technical user credentials)"
         )
         .option("-v, --verbose", "verbose output")
         .description(color("provide login for commands which require technical user credentials *"))
@@ -218,12 +218,12 @@ function checkRequiredParamaters(options: any) {
     options.mode === "add" &&
         options.type === "SERVICE" &&
         (!options.user || !options.tenant || !options.passkey || !options.gateway) &&
-        throwError("you have to specify user, tenant, gateway and passkey for SERVICE credentials");
+        throwError("you have to specify user, tenant, gateway and passkey for technical user credentials");
 
     options.mode === "add" &&
         options.type === "SERVICE" &&
         (options.usertenant || options.appName || options.appVersion) &&
-        throwError("you must not use appName, appVersion or usertenant option with SERVICE credentials");
+        throwError("you must not use appName, appVersion or usertenant option with technical user credentials");
 
     options.mode === "add" &&
         options.type === "APP" &&

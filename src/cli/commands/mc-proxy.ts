@@ -100,7 +100,7 @@ export default (program: Command) => {
             log(`    mdsp dev-proxy  \t\t\t\t runs on default port (7707) using ${yellow("cookies")}`);
             log(
                 `    mdsp dev-proxy --mode credentials --port 7777 --passkey $MDSP_PASSKEY 
-                                        \t runs on port 7777 using ${magenta("app/service credentials")}`
+                                        \t runs on port 7777 using ${magenta("app/technical user credentials")}`
             );
 
             log("\n  Configuration:\n");

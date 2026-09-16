@@ -84,7 +84,10 @@ export default (program: Command) => {
                     );
                     log(`There are ${color(information.totalElements + " ")}total log entries`);
                 } catch (err) {
-                    verboseLog(color("This operation requires additionaly the service credentials."), options.verbose);
+                    verboseLog(
+                        color("This operation requires additionaly the technical user credentials."),
+                        options.verbose
+                    );
                     errorLog(err, options.verbose);
                 }
             })();

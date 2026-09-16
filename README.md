@@ -472,11 +472,11 @@ Linux, macOS: Rename the file to `mc` and make sure that the file is marked as e
 
 ### Configuring CLI
 
-First step is to configure the CLI. For this you will need a session cookie from Insights Hub, service credentials (which have been deprecated) or application credentials from your developer cockpit.
+First step is to configure the CLI. For this you will need a session cookie from Insights Hub, technical user credentials or application credentials from your developer cockpit.
 
 - [SESSION and XSRF-TOKEN cookie](https://developer.mindsphere.io/howto/howto-local-development.html#generate-user-credentials)
 - [Application Credentials](https://documentation.mindsphere.io/resources/html/developer-cockpit/en-US/124342231819.html)
-- [Service Credentials](https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials)
+- [Technical User Credentials](https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials)
 
 First start the credentials configuration. This will start a web server on your local computer where you can enter the credentials.
 
@@ -595,7 +595,7 @@ Commands:
 
   Documentation:
 
-    the magenta colored commands * use app or service credentials or borrowed mindsphere cookies
+    the magenta colored commands * use app or technical user credentials or borrowed mindsphere cookies
     the cyan colored commands require mindconnectlib (agent) credentials
     the blue colored commands @ use analytical functions of Insights Hub
     the green colored commands # are used as setup and utility commands
@@ -611,7 +611,7 @@ at your local machine at
 
 [http://localhost:7707](http://localhost:7707)
 
-which will authenticate all requests using either [a borrowed SESSION and XSRF-TOKEN cookie from Insights Hub](https://developer.mindsphere.io/howto/howto-local-development.html#generate-user-credentials) or the the configured app credentials or service credentials.
+which will authenticate all requests using either [a borrowed SESSION and XSRF-TOKEN cookie from Insights Hub](https://developer.mindsphere.io/howto/howto-local-development.html#generate-user-credentials) or the the configured app credentials or technical user credentials.
 
 The command below will start your development proxy without any installation and configuration (you just need the cookies from an existing app):
 
@@ -646,7 +646,7 @@ Options:
   Examples:
 
     mc dev-proxy                                 runs on default port (7707) using cookies
-    mc dev-proxy --port 7777 --passkey passkey   runs on port 7777 using app/service credentials
+    mc dev-proxy --port 7777 --passkey passkey   runs on port 7777 using app/technical user credentials
 
   Configuration:
 

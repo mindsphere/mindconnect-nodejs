@@ -44,7 +44,7 @@ export const serviceCredentialLog = (color: Function = magenta) => {
     }
 
     log(`\n  Important: `);
-    log(`\n  Authentication with ${color("service credentials")} or ${color("app credentials")}:\n`);
+    log(`\n  Authentication with ${color("technical user credentials")} or ${color("app credentials")}:\n`);
 
     log(`    \t- either append option [--passkey <your passkey>] to the command `);
     log(`    \t- or create environment variable ${color("MDSP_PASSKEY")} with your current passkey`);
