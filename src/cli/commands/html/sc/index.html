@@ -198,7 +198,12 @@
                                     Xcelerator core tenant id (API system id, optional, only used with a region
                                     gateway). Pre-filled with the current default; clear it for on-premise/legacy
                                     mindsphere.io tenants. This id is used to build API urls (e.g.
-                                    api.eu1.siemens.app/assetmanagement-&lt;coreTenantId&gt;).
+                                    api.eu1.siemens.app/assetmanagement-&lt;coreTenantId&gt;). Not the same as the
+                                    Tenant name below, and not needed for technical user credentials unless you also
+                                    set a Customer Tenant Id. You can find it in the URL of any Xcelerator app for
+                                    your tenant, e.g.
+                                    <code>https://&lt;customerTenantId&gt;-settings-&lt;coreTenantId&gt;.&lt;region&gt;.siemens.app/</code>
+                                    &mdash; it's the second number.
                                 </div>
 
                                 <label class="inputGroup__label" for="text-customertenantid">
@@ -213,7 +218,11 @@
                                     (&lt;customerTenantId&gt;.&lt;region&gt;.sws.siemens.com) than for their API
                                     core tenant id above &mdash; check with your Insights Hub administrator if
                                     authentication fails with "Bad credentials". Leave empty to reuse the
-                                    Core Tenant Id.
+                                    Core Tenant Id. Not used for legacy on-premise/mindsphere.io tenants. Like the
+                                    Core Tenant Id, you can find it in the URL of any Xcelerator app for your
+                                    tenant, e.g.
+                                    <code>https://&lt;customerTenantId&gt;-settings-&lt;coreTenantId&gt;.&lt;region&gt;.siemens.app/</code>
+                                    &mdash; it's the first number.
                                 </div>
 
                                 <label class="inputGroup__label is-required" for="text-tenant"> Tenant </label>

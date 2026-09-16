@@ -38,12 +38,13 @@ export default (program: Command) => {
         .option("-p, --appVersion <appVersion>", "your application version (e.g. 1.0.0)")
         .option(
             "-x, --core-tenant-id <coreTenantId>",
-            `Xcelerator core tenant id (API system id, defaults to ${DEFAULT_CORE_TENANT_ID} for region gateways, leave empty for on-premise/legacy tenants)`
+            `Xcelerator core tenant id (API system id, defaults to ${DEFAULT_CORE_TENANT_ID} for region gateways, leave empty for on-premise/legacy tenants; found in the URL of any Xcelerator app, e.g. https://<customerTenantId>-settings-<coreTenantId>.<region>.siemens.app/)`
         )
         .option(
             "-z, --customer-tenant-id <customerTenantId>",
             "Xcelerator customer tenant id (OAuth/PIAM identity zone id), if different from the core tenant id " +
-                "used for API calls (leave empty to use the same value as --core-tenant-id)"
+                "used for API calls (leave empty to use the same value as --core-tenant-id; also found in the " +
+                "URL of any Xcelerator app, e.g. https://<customerTenantId>-settings-<coreTenantId>.<region>.siemens.app/)"
         )
         .option(
             "-k, --passkey <passkey>",
