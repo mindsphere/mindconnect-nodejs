@@ -149,15 +149,14 @@
 
                                 <div class="radioButtonWrapper">
                                     <input type="radio" class="inputGroup__radioButton" id="radio-button01"
-                                        name="radio-button" value="app" checked
-                                        onclick="$('#appCredentialElements').show()" />
+                                        name="radio-button" value="app" checked onclick="showCredentialType('app')" />
                                     <label for="radio-button01">Application Credentials</label>
                                 </div>
 
                                 <div class="radioButtonWrapper">
                                     <input type="radio" class="inputGroup__radioButton" id="radio-button02"
                                         name="radio-button" value="service"
-                                        onclick="$('#appCredentialElements').hide()" />
+                                        onclick="showCredentialType('service')" />
                                     <label for="radio-button02">Technical User Credentials</label>
                                 </div>
 
@@ -170,90 +169,158 @@
                                     retrieve it.
                                 </div>
 
-                                <label class="inputGroup__label is-required" for="text-user"> User </label>
-                                <input class="inputGroup__textInput" type="text" placeholder="credentials: user"
-                                    id="text-user" onblur="validateInput('#text-user')" />
-                                <div class="inputGroup__description">
-                                    Username for application or technical user credentials.
-                                </div>
+                                <div id="appCredentialFields">
+                                    <h4>Application Credentials</h4>
 
-                                <label class="inputGroup__label is-required" for="text-password"> Password </label>
-                                <input class="inputGroup__textInput" type="text" placeholder="credentials: password"
-                                    id="text-password" onblur="validateInput('#text-password')" />
-                                <div class="inputGroup__description">
-                                    Password for application or technical user credentials.
-                                </div>
+                                    <label class="inputGroup__label is-required" for="app-text-user"> User </label>
+                                    <input class="inputGroup__textInput" type="text" placeholder="credentials: user"
+                                        id="app-text-user" onblur="validateInput('#app-text-user')" />
+                                    <div class="inputGroup__description">Username for the application credentials.</div>
 
-                                <label class="inputGroup__label is-required" for="text-gateway"> Gateway </label>
-                                <input class="inputGroup__textInput" type="text"
-                                    placeholder="eu1, eu2 or https://api.eu1.siemens.app" id="text-gateway"
-                                    onblur="validateInput('#text-gateway')" />
-                                <div class="inputGroup__description">Region string or full gateway url</div>
+                                    <label class="inputGroup__label is-required" for="app-text-password">
+                                        Password
+                                    </label>
+                                    <input class="inputGroup__textInput" type="text"
+                                        placeholder="credentials: password" id="app-text-password"
+                                        onblur="validateInput('#app-text-password')" />
+                                    <div class="inputGroup__description">Password for the application credentials.</div>
 
-                                <label class="inputGroup__label" for="text-coretenantid"> Core Tenant Id </label>
-                                <input class="inputGroup__textInput" type="text"
-                                    placeholder="e.g. 1000001700, leave empty for on-premise/legacy tenants"
-                                    id="text-coretenantid" />
-                                <div class="inputGroup__description">
-                                    Xcelerator core tenant id (API system id, optional, only used with a region
-                                    gateway). Pre-filled with the current default; clear it for on-premise/legacy
-                                    mindsphere.io tenants. This id is used to build API urls (e.g.
-                                    api.eu1.siemens.app/assetmanagement-&lt;coreTenantId&gt;). Not the same as the
-                                    Tenant name below, and not needed for technical user credentials unless you also
-                                    set a Customer Tenant Id. You can find it in the URL of any Xcelerator app for
-                                    your tenant, e.g.
-                                    <code>https://&lt;customerTenantId&gt;-settings-&lt;coreTenantId&gt;.&lt;region&gt;.siemens.app/</code>
-                                    &mdash; it's the second number.
-                                </div>
+                                    <label class="inputGroup__label is-required" for="app-text-gateway">
+                                        Gateway
+                                    </label>
+                                    <input class="inputGroup__textInput" type="text"
+                                        placeholder="eu1, eu2 or https://api.eu1.siemens.app" id="app-text-gateway"
+                                        onblur="validateInput('#app-text-gateway')" />
+                                    <div class="inputGroup__description">Region string or full gateway url</div>
 
-                                <label class="inputGroup__label" for="text-customertenantid">
-                                    Customer Tenant Id
-                                </label>
-                                <input class="inputGroup__textInput" type="text"
-                                    placeholder="only needed if different from Core Tenant Id above"
-                                    id="text-customertenantid" />
-                                <div class="inputGroup__description">
-                                    Xcelerator customer tenant id (OAuth/PIAM identity zone id, optional). Some
-                                    tenants have a <b>different</b> id for the login/token endpoint
-                                    (&lt;customerTenantId&gt;.&lt;region&gt;.sws.siemens.com) than for their API
-                                    core tenant id above &mdash; check with your Insights Hub administrator if
-                                    authentication fails with "Bad credentials". Leave empty to reuse the
-                                    Core Tenant Id. Not used for legacy on-premise/mindsphere.io tenants. Like the
-                                    Core Tenant Id, you can find it in the URL of any Xcelerator app for your
-                                    tenant, e.g.
-                                    <code>https://&lt;customerTenantId&gt;-settings-&lt;coreTenantId&gt;.&lt;region&gt;.siemens.app/</code>
-                                    &mdash; it's the first number.
-                                </div>
+                                    <label class="inputGroup__label" for="app-text-coretenantid">
+                                        Core Tenant Id
+                                    </label>
+                                    <input class="inputGroup__textInput" type="text"
+                                        placeholder="e.g. 1000001700, leave empty for on-premise/legacy tenants"
+                                        id="app-text-coretenantid" />
+                                    <div class="inputGroup__description">
+                                        Xcelerator core tenant id (API system id, optional, only used with a region
+                                        gateway). Pre-filled with the current default; clear it for
+                                        on-premise/legacy mindsphere.io tenants. This id is used to build API urls
+                                        (e.g. api.eu1.siemens.app/assetmanagement-&lt;coreTenantId&gt;). You can
+                                        find it in the URL of any Xcelerator app for your tenant, e.g.
+                                        <code>https://&lt;customerTenantId&gt;-settings-&lt;coreTenantId&gt;.&lt;region&gt;.siemens.app/</code>
+                                        &mdash; it's the second number.
+                                    </div>
 
-                                <label class="inputGroup__label is-required" for="text-tenant"> Tenant </label>
-                                <input class="inputGroup__textInput" type="text" placeholder="your tenant name"
-                                    id="text-tenant" onblur="validateInput('#text-tenant')" />
-                                <div class="inputGroup__description">
-                                    Tenant or Host Tenant (for application credentials)
-                                </div>
+                                    <label class="inputGroup__label" for="app-text-customertenantid">
+                                        Customer Tenant Id
+                                    </label>
+                                    <input class="inputGroup__textInput" type="text"
+                                        placeholder="only needed if different from Core Tenant Id above"
+                                        id="app-text-customertenantid" />
+                                    <div class="inputGroup__description">
+                                        Xcelerator customer tenant id (OAuth/PIAM identity zone id, optional). Some
+                                        tenants have a <b>different</b> id for the login/token endpoint
+                                        (&lt;customerTenantId&gt;.&lt;region&gt;.sws.siemens.com) than for their API
+                                        core tenant id above &mdash; check with your Insights Hub administrator if
+                                        authentication fails with "Bad credentials". Leave empty to reuse the
+                                        Core Tenant Id. Not used for legacy on-premise/mindsphere.io tenants. Like
+                                        the Core Tenant Id, you can find it in the URL of any Xcelerator app for
+                                        your tenant &mdash; it's the first number.
+                                    </div>
 
-                                <div id="appCredentialElements">
-                                    <label class="inputGroup__label is-required" for="text-usertenant">
+                                    <label class="inputGroup__label is-required" for="app-text-tenant">
+                                        Tenant
+                                    </label>
+                                    <input class="inputGroup__textInput" type="text" placeholder="your tenant name"
+                                        id="app-text-tenant" onblur="validateInput('#app-text-tenant')" />
+                                    <div class="inputGroup__description">Host Tenant name</div>
+
+                                    <label class="inputGroup__label is-required" for="app-text-usertenant">
                                         User Tenant
                                     </label>
                                     <input class="inputGroup__textInput" type="text" placeholder="your tenant name"
-                                        id="text-usertenant" onblur="validateInput('#text-usertenant')" />
-                                    <div class="inputGroup__description">
-                                        User Tenant (for application credentials)
-                                    </div>
+                                        id="app-text-usertenant" onblur="validateInput('#app-text-usertenant')" />
+                                    <div class="inputGroup__description">User Tenant name</div>
 
-                                    <label class="inputGroup__label is-required" for="text-appname">
+                                    <label class="inputGroup__label is-required" for="app-text-appname">
                                         Application Name
                                     </label>
                                     <input class="inputGroup__textInput" type="text" placeholder="e.g. cli"
-                                        id="text-appname" onblur="validateInput('#text-appname')" />
+                                        id="app-text-appname" onblur="validateInput('#app-text-appname')" />
                                     <div class="inputGroup__description">Application name</div>
-                                    <label class="inputGroup__label is-required" for="text-appversion">
+
+                                    <label class="inputGroup__label is-required" for="app-text-appversion">
                                         Application Version
                                     </label>
                                     <input class="inputGroup__textInput" type="text" placeholder="e.g. 1.0.0"
-                                        id="text-appversion" onblur="validateInput('#text-appversion')" />
+                                        id="app-text-appversion" onblur="validateInput('#app-text-appversion')" />
                                     <div class="inputGroup__description">Application version</div>
+                                </div>
+
+                                <div id="serviceCredentialFields" style="display: none">
+                                    <h4>Technical User Credentials</h4>
+
+                                    <label class="inputGroup__label is-required" for="svc-text-user"> User </label>
+                                    <input class="inputGroup__textInput" type="text" placeholder="credentials: user"
+                                        id="svc-text-user" onblur="validateInput('#svc-text-user')" />
+                                    <div class="inputGroup__description">
+                                        Username for the technical user credentials.
+                                    </div>
+
+                                    <label class="inputGroup__label is-required" for="svc-text-password">
+                                        Password
+                                    </label>
+                                    <input class="inputGroup__textInput" type="text"
+                                        placeholder="credentials: password" id="svc-text-password"
+                                        onblur="validateInput('#svc-text-password')" />
+                                    <div class="inputGroup__description">
+                                        Password for the technical user credentials.
+                                    </div>
+
+                                    <label class="inputGroup__label is-required" for="svc-text-gateway">
+                                        Gateway
+                                    </label>
+                                    <input class="inputGroup__textInput" type="text"
+                                        placeholder="eu1, eu2 or https://api.eu1.siemens.app" id="svc-text-gateway"
+                                        onblur="validateInput('#svc-text-gateway')" />
+                                    <div class="inputGroup__description">Region string or full gateway url</div>
+
+                                    <label class="inputGroup__label" for="svc-text-coretenantid">
+                                        Core Tenant Id
+                                    </label>
+                                    <input class="inputGroup__textInput" type="text"
+                                        placeholder="e.g. 1000001700, leave empty for on-premise/legacy tenants"
+                                        id="svc-text-coretenantid" />
+                                    <div class="inputGroup__description">
+                                        Xcelerator core tenant id (API system id, optional, only used with a region
+                                        gateway). Pre-filled with the current default; clear it for
+                                        on-premise/legacy mindsphere.io tenants. Not the same as the Tenant name
+                                        below, and not needed for technical user credentials unless you also set a
+                                        Customer Tenant Id. You can find it in the URL of any Xcelerator app for
+                                        your tenant, e.g.
+                                        <code>https://&lt;customerTenantId&gt;-settings-&lt;coreTenantId&gt;.&lt;region&gt;.siemens.app/</code>
+                                        &mdash; it's the second number.
+                                    </div>
+
+                                    <label class="inputGroup__label" for="svc-text-customertenantid">
+                                        Customer Tenant Id
+                                    </label>
+                                    <input class="inputGroup__textInput" type="text"
+                                        placeholder="only needed if different from Core Tenant Id above"
+                                        id="svc-text-customertenantid" />
+                                    <div class="inputGroup__description">
+                                        Xcelerator customer tenant id (OAuth/PIAM identity zone id, optional). Some
+                                        tenants have a <b>different</b> id for the login/token endpoint
+                                        (&lt;customerTenantId&gt;.&lt;region&gt;.sws.siemens.com) than for their API
+                                        core tenant id above &mdash; check with your Insights Hub administrator if
+                                        authentication fails with "Bad credentials". Leave empty to reuse the
+                                        Core Tenant Id. Not used for legacy on-premise/mindsphere.io tenants.
+                                    </div>
+
+                                    <label class="inputGroup__label is-required" for="svc-text-tenant">
+                                        Tenant
+                                    </label>
+                                    <input class="inputGroup__textInput" type="text" placeholder="your tenant name"
+                                        id="svc-text-tenant" onblur="validateInput('#svc-text-tenant')" />
+                                    <div class="inputGroup__description">Tenant name</div>
                                 </div>
                             </div>
                         </form>
