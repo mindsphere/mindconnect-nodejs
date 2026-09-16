@@ -102,8 +102,8 @@ export class TokenManagerAuth extends AuthBase implements TokenRotation {
      * @param {string} [_appName]
      * @param {string} [_appVersion]
      * @param {string} [_coreTenantId] Xcelerator core tenant id (leave empty for on-premise / legacy tenants).
-     * @param {string} [_customerTenantId] Xcelerator customer tenant id (OAuth/PIAM identity zone id), if
-     *                             different from _coreTenantId (leave empty to fall back to _coreTenantId).
+     * @param {string} [_customerTenantId] Xcelerator customer tenant id (OAuth/PIAM identity zone id),
+     *                             usually different from _coreTenantId and normally must be set explicitly.
      *
      * @memberOf TokenManagerAuth
      */

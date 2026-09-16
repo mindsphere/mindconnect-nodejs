@@ -119,10 +119,9 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
      *                             legacy mindsphere.io tenants.
      * @param {string} [_customerTenantId] Xcelerator customer tenant id (OAuth/PIAM identity zone id),
      *                             used to build the https://<customerTenantId>.<region>.sws.siemens.com/
-     *                             auth urls. This can be a *different* id than the API _coreTenantId (the
-     *                             identity zone and the API system are provisioned/assigned independently).
-     *                             Leave empty to fall back to _coreTenantId (the common case where both
-     *                             ids are equal).
+     *                             auth urls. This is usually a *different* id than the API _coreTenantId
+     *                             (the identity zone and the API system are provisioned/assigned
+     *                             independently) and normally must be set explicitly.
      *
      * @memberOf CredentialAuth
      */

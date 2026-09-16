@@ -42,9 +42,9 @@ export default (program: Command) => {
         )
         .option(
             "-z, --customer-tenant-id <customerTenantId>",
-            "Xcelerator customer tenant id (OAuth/PIAM identity zone id), if different from the core tenant id " +
-                "used for API calls (leave empty to use the same value as --core-tenant-id; also found in the " +
-                "URL of any Xcelerator app, e.g. https://<customerTenantId>-settings-<coreTenantId>.<region>.siemens.app/)"
+            "Xcelerator customer tenant id (OAuth/PIAM identity zone id), usually different from the core " +
+                "tenant id (found in the URL of any Xcelerator app, e.g. " +
+                "https://<customerTenantId>-settings-<coreTenantId>.<region>.siemens.app/)"
         )
         .option(
             "-k, --passkey <passkey>",
