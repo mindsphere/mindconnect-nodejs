@@ -33,8 +33,8 @@
                 <div class="content__column has-default-width-20 xs-100 xl-10 xs-hide sm-hide">
                     <div class="item__metaInfo">
                         <b>Gateway:</b> {{gateway}}<br />
-                        <b>Core Tenant Id:</b> {{coreTenantId}}<br />
                         <b>Customer Tenant Id:</b> {{customerTenantId}}<br />
+                        <b>Core Tenant Id:</b> {{coreTenantId}}<br />
                         {{appName}} {{appVersion}}
                     </div>
                 </div>
@@ -193,6 +193,17 @@
                                         onblur="validateInput('#app-text-gateway')" />
                                     <div class="inputGroup__description">Region string or full gateway url</div>
 
+                                    <label class="inputGroup__label" for="app-text-customertenantid">
+                                        Customer Tenant Id
+                                    </label>
+                                    <input class="inputGroup__textInput" type="text"
+                                        placeholder="e.g. 1270562658" id="app-text-customertenantid" />
+                                    <div class="inputGroup__description">
+                                        OAuth/PIAM zone id. Found in the URL of any Xcelerator app, e.g.
+                                        <code>https://&lt;customerTenantId&gt;-settings-&lt;coreTenantId&gt;.&lt;region&gt;.siemens.app/</code>
+                                        (first number).
+                                    </div>
+
                                     <label class="inputGroup__label" for="app-text-coretenantid">
                                         Core Tenant Id
                                     </label>
@@ -203,18 +214,6 @@
                                         API system id. Found in the URL of any Xcelerator app, e.g.
                                         <code>https://&lt;customerTenantId&gt;-settings-&lt;coreTenantId&gt;.&lt;region&gt;.siemens.app/</code>
                                         (second number). Leave empty for on-premise/legacy tenants.
-                                    </div>
-
-                                    <label class="inputGroup__label" for="app-text-customertenantid">
-                                        Customer Tenant Id
-                                    </label>
-                                    <input class="inputGroup__textInput" type="text"
-                                        placeholder="e.g. 1270562658, usually different from Core Tenant Id above"
-                                        id="app-text-customertenantid" />
-                                    <div class="inputGroup__description">
-                                        OAuth/PIAM zone id. Found in the URL of any Xcelerator app, e.g.
-                                        <code>https://&lt;customerTenantId&gt;-settings-&lt;coreTenantId&gt;.&lt;region&gt;.siemens.app/</code>
-                                        (first number).
                                     </div>
 
                                     <label class="inputGroup__label is-required" for="app-text-tenant">
@@ -274,6 +273,17 @@
                                         onblur="validateInput('#svc-text-gateway')" />
                                     <div class="inputGroup__description">Region string or full gateway url</div>
 
+                                    <label class="inputGroup__label" for="svc-text-customertenantid">
+                                        Customer Tenant Id
+                                    </label>
+                                    <input class="inputGroup__textInput" type="text"
+                                        placeholder="e.g. 1270562658" id="svc-text-customertenantid" />
+                                    <div class="inputGroup__description">
+                                        OAuth/PIAM zone id. Found in the URL of any Xcelerator app, e.g.
+                                        <code>https://&lt;customerTenantId&gt;-settings-&lt;coreTenantId&gt;.&lt;region&gt;.siemens.app/</code>
+                                        (first number).
+                                    </div>
+
                                     <label class="inputGroup__label" for="svc-text-coretenantid">
                                         Core Tenant Id
                                     </label>
@@ -284,18 +294,6 @@
                                         API system id, optional here. Found in the URL of any Xcelerator app, e.g.
                                         <code>https://&lt;customerTenantId&gt;-settings-&lt;coreTenantId&gt;.&lt;region&gt;.siemens.app/</code>
                                         (second number). Not needed unless you also set a Customer Tenant Id.
-                                    </div>
-
-                                    <label class="inputGroup__label" for="svc-text-customertenantid">
-                                        Customer Tenant Id
-                                    </label>
-                                    <input class="inputGroup__textInput" type="text"
-                                        placeholder="e.g. 1270562658, usually different from Core Tenant Id above"
-                                        id="svc-text-customertenantid" />
-                                    <div class="inputGroup__description">
-                                        OAuth/PIAM zone id. Found in the URL of any Xcelerator app, e.g.
-                                        <code>https://&lt;customerTenantId&gt;-settings-&lt;coreTenantId&gt;.&lt;region&gt;.siemens.app/</code>
-                                        (first number).
                                     </div>
 
                                     <label class="inputGroup__label is-required" for="svc-text-tenant">
