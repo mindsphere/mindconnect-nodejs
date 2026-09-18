@@ -220,7 +220,7 @@ function createTemplate() {
                         languages: {
                             default: {
                                 name: "Open Source Software",
-                                value: "https://developer.siemens.com/industrial-iot-open-source/index.html",
+                                value: "https://developer.siemens.com/industrial-iot-open-source/overview.html",
                             },
                         },
                     },

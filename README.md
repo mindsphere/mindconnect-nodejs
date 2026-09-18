@@ -625,7 +625,7 @@ Commands:
     the green colored commands # are used as setup and utility commands
     the yellow colored commands & use borrowed mindsphere application cookies
     the credentials and cookies should only be used in secure environments
-    Full documentation: developer.siemens.com/industrial-iot-open-source/index.html
+    Full documentation: developer.siemens.com/industrial-iot-open-source/overview.html
 ```
 
 ## Insights Hub Development Proxy
