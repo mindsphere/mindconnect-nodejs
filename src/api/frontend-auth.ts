@@ -96,7 +96,12 @@ export class FrontendAuth extends MindConnectBase implements TokenRotation {
         // this is only used in commands when working with browser authorization
 
         if (this._sesionCookie && this._xsrfToken) {
-            headers["cookie"] = `SESSION=${this._sesionCookie}; XSRF-TOKEN=${this._xsrfToken}`;
+            // * legacy tenants use a SESSION cookie, Xcelerator (gateway) tenants use gw_session;
+            // * sending both is harmless (the server ignores the one it doesn't recognize) and
+            // * lets a borrowed session work regardless of which scheme the target tenant uses.
+            headers[
+                "cookie"
+            ] = `SESSION=${this._sesionCookie}; gw_session=${this._sesionCookie}; XSRF-TOKEN=${this._xsrfToken}`;
         }
 
         const xsrfTokenFromCookie = this._xsrfToken || this.getCookieValue("XSRF-TOKEN");

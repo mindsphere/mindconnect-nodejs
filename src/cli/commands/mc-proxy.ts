@@ -182,7 +182,9 @@ async function serve({ configPort, options }: { configPort?: number; options: an
                         );
                 }
 
-                let newCookie = `SESSION=${options.session}; XSRF-TOKEN=${options.xsrftoken}`;
+                // * legacy tenants use a SESSION cookie, Xcelerator (gateway) tenants use gw_session;
+                // * sending both is harmless and lets a borrowed session work on either scheme.
+                let newCookie = `SESSION=${options.session}; gw_session=${options.session}; XSRF-TOKEN=${options.xsrftoken}`;
                 if (region && region !== "") {
                     newCookie += `;REGION-SESSION=${region}`;
                     options.verbose &&
@@ -274,6 +276,7 @@ async function serve({ configPort, options }: { configPort?: number; options: an
 
                         if (responseHeaders["set-cookie"] && responseHeaders["set-cookie"].length > 0) {
                             cookies.push(`SESSION=${options.session}; Path=/;`);
+                            cookies.push(`gw_session=${options.session}; Path=/;`);
                             cookies.push(`XSRF-TOKEN=${options.xsrftoken}; Path=/;`);
 
                             options.verbose &&
@@ -333,7 +336,7 @@ function keepAliveIfConfigured(options: any, proxyHttpAgent: any) {
         !options.dontkeepalive &&
         setInterval(async () => {
             const host = `https://${options.host}`;
-            const newCookie = `SESSION=${options.session}; XSRF-TOKEN=${options.xsrftoken}`;
+            const newCookie = `SESSION=${options.session}; gw_session=${options.session}; XSRF-TOKEN=${options.xsrftoken}`;
             const keepAlive = await fetch(host, {
                 method: "GET",
                 headers: { cookie: newCookie },
