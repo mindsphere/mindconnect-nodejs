@@ -56,7 +56,7 @@ export default (program: Command) => {
                         case "template":
                             await createTemplateInstallationTask(options, sdk);
                             await createTemplateTaskStatus(options, sdk);
-                            console.log("Edit the file(s) before submitting it to MindSphere.");
+                            console.log("Edit the file(s) before submitting it to Insights Hub.");
                             break;
 
                         case "create":

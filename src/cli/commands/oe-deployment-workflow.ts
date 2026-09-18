@@ -65,7 +65,7 @@ export default (program: Command) => {
                             await createTemplateWorkflowModel(options, sdk);
                             await createTemplateWorkflowInstance(options, sdk);
                             await createTemplateWorkflowStatus(options, sdk);
-                            console.log("Edit the file(s) before submitting it to MindSphere.");
+                            console.log("Edit the file(s) before submitting it to Insights Hub.");
                             break;
 
                         case "delete":

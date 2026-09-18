@@ -22,7 +22,7 @@ export default (program: Command) => {
             "-r, --cert [privatekey]",
             "required for agents with RSA_3072 profile. create with: openssl genrsa -out private.key 3072"
         )
-        .option("-i, --assetid <assetid>", "mindsphere asset id  (default: send event to the agent)")
+        .option("-i, --assetid <assetid>", "Insights Hub asset id  (default: send event to the agent)")
         .option("-y, --sourceType <sourceType>", "Source Type", "MindConnect-Agent")
         .option("-S, --sourceId <sourceId>", "Source Id", os.hostname() || "")
         .option("-O, --source <source>", "Source", "MindConnect-NodeJs CLI")
@@ -35,7 +35,7 @@ export default (program: Command) => {
             `passkey (optional, event creation uses ${adminColor("technical user credentials *")})`
         )
         .option("-v, --verbose", "verbose output")
-        .description(`${color("create an event in the mindsphere")} ${adminColor("(optional: passkey) *")}`)
+        .description(`${color("create an event in the Insights Hub")} ${adminColor("(optional: passkey) *")}`)
         .action((options) => {
             (async () => {
                 try {

@@ -31,13 +31,13 @@ export default (program: Command) => {
         )
         .option("-n, --modelname <modelname>", "modelname")
         .option("-t, --modeltype <modeltype>", "modeltype")
-        .option("-d, --modeldesc <modeldesc>", "modeldesc", "created with mindsphere CLI")
-        .option("-i, --modelid <modelid>", "mindsphere model id ")
+        .option("-d, --modeldesc <modeldesc>", "modeldesc", "created with Insights Hub CLI")
+        .option("-i, --modelid <modelid>", "Insights Hub model id ")
         .option("-f, --metadata <metadata>", "model metadata file", "model.metadata.mdsp.json")
         .option("-r, --version <version>", "model version for download", "last")
         .option("-p, --payload <payload>", "model payload file", "model.payload.mdsp.json")
-        .option("-i, --modelid <modelid>", "mindsphere model id ")
-        .option("-a, --modelauthor <modelauthor>", "model author", "created by mindsphere CLI")
+        .option("-i, --modelid <modelid>", "Insights Hub model id ")
+        .option("-a, --modelauthor <modelauthor>", "model author", "created by Insights Hub CLI")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
@@ -53,7 +53,7 @@ export default (program: Command) => {
                     switch (options.mode) {
                         case "template":
                             await createTemplate(options, sdk);
-                            console.log("Edit the files before submitting them to mindsphere.");
+                            console.log("Edit the files before submitting them to Insights Hub.");
                             break;
                         case "create":
                             await createModel(options, sdk);
@@ -92,7 +92,7 @@ function printHelp() {
     log(
         `    mdsp models --mode create --metadata model.metadata.mdsp.json --payload model.payload.mdsp.json \n\t\t\t\t\t\t\t creates a model from specified files`
     );
-    log(`    mdsp models --mode list \t\t\t\t lists all models in mindsphere`);
+    log(`    mdsp models --mode list \t\t\t\t lists all models in Insights Hub`);
     log(`    mdsp models --mode delete --modelid 1234567..ef \t deletes model with specified id`);
     log(`    mdsp models --mode info --modelid 123456...ef \t print out infos about model with id 132456...ef`);
     log(`    mdsp models --mode download --modelid 123456...ef \t download model with id 132456...ef`);
@@ -160,7 +160,7 @@ async function createTemplate(options: any, sdk: MindSphereSdk) {
     const metadata = {
         name: options.modelname || `unnamed model (${uuid.v4()})`,
         type: options.modeltype || "core.basicmodel",
-        description: options.modeldesc || "created with mindsphere CLI",
+        description: options.modeldesc || "created with Insights Hub CLI",
         lastVersion: {
             number: 1.0,
             dependencies: [

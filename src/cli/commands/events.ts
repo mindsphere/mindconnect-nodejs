@@ -32,7 +32,7 @@ export default (program: Command) => {
             "list"
         )
         .option("-f, --file <file>", ".mdsp.json file with event definition")
-        .option("-i, --assetid <assetid>", "mindsphere asset id ")
+        .option("-i, --assetid <assetid>", "Insights Hub asset id ")
         .option("-e, --eventid <eventid>", "event id ")
         .option(
             "-f, --filter [filter]",
@@ -64,12 +64,12 @@ export default (program: Command) => {
 
                         case "template":
                             await createEventTemplate(options, sdk);
-                            console.log("Edit the file before submitting it to MindSphere.");
+                            console.log("Edit the file before submitting it to Insights Hub.");
                             break;
 
                         case "filtertemplate":
                             createFilter(options);
-                            console.log("Edit the file before submitting it to MindSphere.");
+                            console.log("Edit the file before submitting it to Insights Hub.");
                             break;
                         case "delete":
                             await deleteEvent(options, sdk);

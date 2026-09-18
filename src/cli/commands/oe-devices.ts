@@ -28,7 +28,7 @@ export default (program: Command) => {
         .option("-n, --devicename <devicename>", "device name")
         .option("-a, --assetid <assetid>", "the id of the asset linked to the device")
         .option("-t, --typeid <typeid>", "the device type id")
-        .option("-d, --desc <desc>", "description", "created with mindsphere CLI")
+        .option("-d, --desc <desc>", "description", "created with Insights Hub CLI")
         .option("-s, --serialnumber <serialnumber>", "the id of the asset linked to the device")
         .option("-i, --id <id>", "the device id")
         .option("-o, --overwrite", "overwrite template file if it already exists")
@@ -52,7 +52,7 @@ export default (program: Command) => {
 
                         case "template":
                             await createTemplate(options, sdk);
-                            console.log("Edit the file before submitting it to MindSphere.");
+                            console.log("Edit the file before submitting it to Insights Hub.");
                             break;
                         case "delete":
                             await deleteDevice(options, sdk);

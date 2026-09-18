@@ -25,7 +25,7 @@ export default (program: Command) => {
         .option("-n, --name <name>", "the ontology name", "myontology")
         .option("-i, --ontologyid <ontologyid>", "the ontology id (for update)")
         .option("-k, --keymappingtype <keymappingtype>", "key mapping type", "INNER JOIN")
-        .option("-s, --description <description>", "the ontology description", "created-by-mindsphere-cli")
+        .option("-s, --description <description>", "the ontology description", "created-by-insights-hub-cli")
         .option("-j, --jobid <ontologyid>", "the jobid for --info command")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
@@ -109,7 +109,7 @@ async function submitOntology(sdk: MindSphereSdk, options: any) {
             mimeType,
             options.name,
             options.ontologyid,
-            options.description || "created by mindsphere.cli",
+            options.description || "created by insights-hub.cli",
             options.keymapping
         );
     printDataOntologyJob(result, options);

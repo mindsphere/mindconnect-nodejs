@@ -24,7 +24,7 @@ export default (program: Command) => {
         .command("download-bulk")
         .alias("db")
         .option("-d, --dir <directoryname>", "directory for the download (shouldn't exist)", "bulkdownload")
-        .option("-i, --assetid <assetid>", "mindsphere asset id")
+        .option("-i, --assetid <assetid>", "Insights Hub asset id")
         .option("-a, --aspectname <aspectname>", "aspectname")
         .option("-f, --from <from>", "from date")
         .option("-t, --to <to>", "to date")
@@ -32,7 +32,7 @@ export default (program: Command) => {
         .option("-p, --passkey <passkey>", `passkey`)
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(`${color("download the timeseries data in bulk from mindsphere *")}`)
+        .description(`${color("download the timeseries data in bulk from Insights Hub *")}`)
         .action((options) => {
             (async () => {
                 try {

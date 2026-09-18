@@ -48,7 +48,7 @@ export default (program: Command) => {
 
                         case "template":
                             createTemplate(options, sdk);
-                            console.log("Edit the file before submitting it to MindSphere.");
+                            console.log("Edit the file before submitting it to Insights Hub.");
                             break;
                         case "delete":
                             await deleteEventType(options, sdk);
@@ -80,7 +80,7 @@ export default (program: Command) => {
                 `    mdsp event-types --mode template --eventtype PumpEvent \n\tcreate a template file (PumpEvent.eventtype.mdsp.json) for event type PumpEvent`
             );
             log(
-                `    mdsp event-types --mode create --file PumpEvent.eventtype.mdsp.json \n\tcreate event type PumpEvent in MindSphere`
+                `    mdsp event-types --mode create --file PumpEvent.eventtype.mdsp.json \n\tcreate event type PumpEvent in Insights Hub`
             );
 
             serviceCredentialLog();

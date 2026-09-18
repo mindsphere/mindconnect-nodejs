@@ -26,7 +26,7 @@ const headers = {
     "Access-Control-Allow-Headers": "*",
     "Access-Control-Max-Age": 2592000, // 30 days
     "cache-control": "no-cache",
-    "x-proxied-by": "mindsphere development proxy",
+    "x-proxied-by": "Insights Hub development proxy",
 };
 
 export default (program: Command) => {
@@ -51,7 +51,7 @@ export default (program: Command) => {
         )
         .option("-t, --timeout <timeout>", "keep alive timeout in seconds", "60")
         .option("-k, --passkey <passkey>", "passkey")
-        .description(color(`starts mindsphere development proxy & ${magenta("(optional passkey) *")}`))
+        .description(color(`starts Insights Hub development proxy & ${magenta("(optional passkey) *")}`))
         .action((options) => {
             (async () => {
                 try {
@@ -197,13 +197,13 @@ async function serve({ configPort, options }: { configPort?: number; options: an
                 (requestOptions.headers as any)["cookie"] = newCookie;
                 options.verbose &&
                     console.log(
-                        `[${green(new Date().toISOString())}] Setting mindsphere request cookies to ${newCookie}`
+                        `[${green(new Date().toISOString())}] Setting Insights Hub request cookies to ${newCookie}`
                     );
 
                 (requestOptions.headers as any)["x-xsrf-token"] = options.xsrftoken;
                 options.verbose &&
                     console.log(
-                        `[${green(new Date().toISOString())}] Setting mindsphere request x-xsrf-token to ${
+                        `[${green(new Date().toISOString())}] Setting Insights Hub request x-xsrf-token to ${
                             options.xsrftoken
                         }`
                     );

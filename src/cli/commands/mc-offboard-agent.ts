@@ -28,7 +28,7 @@ export default (program: Command) => {
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(color("offboards the agent in the mindsphere *"))
+        .description(color("offboards the agent in the Insights Hub *"))
         .action((options) => {
             (async () => {
                 try {

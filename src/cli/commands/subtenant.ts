@@ -46,7 +46,7 @@ export default (program: Command) => {
 
                         case "template":
                             createTemplate(options);
-                            console.log("Edit the file before submitting it to MindSphere.");
+                            console.log("Edit the file before submitting it to Insights Hub.");
                             break;
                         case "delete":
                             await deleteSubtenant(options, sdk);
@@ -92,7 +92,7 @@ function createTemplate(options: any) {
     const subTenant = {
         id: uuid.v4().toString(),
         displayName: `${options.subtenant}`,
-        description: `${options.subtenant} created on ${new Date().toISOString()} with MindSphere CLI`,
+        description: `${options.subtenant} created on ${new Date().toISOString()} with Insights Hub CLI`,
     };
 
     verboseLog(subTenant, options.verbose);

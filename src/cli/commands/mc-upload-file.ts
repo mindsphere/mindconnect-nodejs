@@ -21,9 +21,9 @@ export default (program: Command) => {
             "required for agents with RSA_3072 profile. create with: openssl genrsa -out private.key 3072"
         )
         .option("-f, --file <fileToUpload>", "file to upload to the file service")
-        .option("-h, --filepath <filepath>", "file path in the mindsphere")
+        .option("-h, --filepath <filepath>", "file path in the Insights Hub")
         .option("-l, --parallel <number>", "parallel chunk uploads", "3")
-        .option("-i, --assetid [assetid]", "mindsphere asset id  (default: upload to the agent)")
+        .option("-i, --assetid [assetid]", "Insights Hub asset id  (default: upload to the agent)")
         .option("-m, --mime [mime-type]", "mime type of the file (default: automatic recognition)")
         .option("-d, --desc [description]", "description")
         .option("-k, --chunked", "Use chunked upload")
@@ -34,7 +34,7 @@ export default (program: Command) => {
         )
         .option("-v, --verbose", "verbose output")
         .description(
-            `${color("upload the file to the mindsphere file service")} ${adminColor("(optional: passkey) *")}`
+            `${color("upload the file to the Insights Hub file service")} ${adminColor("(optional: passkey) *")}`
         )
         .action((options) => {
             (async () => {

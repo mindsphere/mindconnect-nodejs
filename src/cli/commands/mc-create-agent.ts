@@ -34,7 +34,7 @@ export default (program: Command) => {
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(color("create an agent in the mindsphere *"))
+        .description(color("create an agent in the Insights Hub *"))
         .action((options) => {
             (async () => {
                 try {

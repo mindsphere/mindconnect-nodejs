@@ -37,7 +37,7 @@ export default (program: Command) => {
         .option("-w, --raw", "don't automatically preceed group names with mdsp_usergroup or role with mdsp_customrole")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-v, --verbose", "verbose output")
-        .description(color("manage mindsphere users, groups and roles *"))
+        .description(color("manage Insights Hub users, groups and roles *"))
         .action((options) => {
             (async () => {
                 try {

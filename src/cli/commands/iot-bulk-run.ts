@@ -34,7 +34,7 @@ export default (program: Command) => {
         .option("-k, --passkey <passkey>", "passkey")
         .option("-i, --timeseries", `use ${warn("(deprecated)")} timeseries upload`)
         .option("-v, --verbose", "verbose output")
-        .option("-t, --start", "start sending data to mindsphere")
+        .option("-t, --start", "start sending data to Insights Hub")
         .description(color("runs the timeseries (bulk) upload job from <directoryname> directory *"))
         .action((options) => {
             (async () => {
@@ -108,7 +108,7 @@ export default (program: Command) => {
                     !options.verbose && spinner.succeed("Done converting files to json.");
                     !options.start &&
                         console.log(
-                            `\nrun mdsp run-bulk with ${color("--start")} option to start sending data to mindsphere\n`
+                            `\nrun mdsp run-bulk with ${color("--start")} option to start sending data to Insights Hub\n`
                         );
 
                     // *
@@ -445,7 +445,7 @@ async function createOrReadAsset(sdk: MindSphereSdk, options: any) {
     } else {
         verboseLog(`reading asset ${color(asset.name)} ${color(asset.assetId)}`, options.verbose);
         asset = await assetMgmt.GetAsset(asset.assetId);
-        verboseLog(`asset ${color(asset.name)} ${color(asset.assetId)} was read from the MindSphere`, options.verbose);
+        verboseLog(`asset ${color(asset.name)} ${color(asset.assetId)} was read from Insights Hub`, options.verbose);
     }
     fs.writeFileSync(`${options.dir}/asset.json`, JSON.stringify(asset, null, 2));
     return asset;

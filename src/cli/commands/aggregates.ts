@@ -30,8 +30,8 @@ export default (program: Command) => {
     program
         .command("aggregates")
         .alias("ag")
-        .option("-i, --assetid <assetid>", "mindsphere asset id ")
-        .option("-n, --aspectname <aspectname>", "mindsphere aspect name")
+        .option("-i, --assetid <assetid>", "Insights Hub asset id ")
+        .option("-n, --aspectname <aspectname>", "Insights Hub aspect name")
         .option("-f, --from <from>", "begining of the time range to read", yesterday.toISOString())
         .option("-t, --to <to>", "end of the time range to read")
         .option("-r, --intervalvalue <intervalvalue>", "interval duration for the aggregates in interval units")

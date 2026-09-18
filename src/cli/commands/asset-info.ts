@@ -10,7 +10,7 @@ export default (program: Command) => {
     program
         .command("asset-info")
         .alias("ai")
-        .option("-i, --assetid <assetid>", "mindsphere asset id ")
+        .option("-i, --assetid <assetid>", "Insights Hub asset id ")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")

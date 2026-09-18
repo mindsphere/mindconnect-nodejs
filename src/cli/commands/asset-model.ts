@@ -34,7 +34,7 @@ export default (program: Command) => {
         .alias("asm")
         .option("-m, --mode [export|import]", "export | import", "export")
         .option("-d, --directory [directory]", "download to specified folder (default: <tenantname.mdsp.model>)")
-        .option("-i, --assetid [assetid]", "mindsphere asset id  (default: root asset id)")
+        .option("-i, --assetid [assetid]", "Insights Hub asset id  (default: root asset id)")
         .option("-o, --overwrite", "overwrite directory with the model if it already exists")
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
@@ -96,7 +96,7 @@ export default (program: Command) => {
             //     `    mc asset-types --mode template --assettype Pump \n\tcreate a template file (Enironment.assettype.mdsp.json) for assettype Pump`
             // );
             // log(
-            //     `    mc asset-types --mode create --file Pump.assettype.mdsp.json \n\tcreate asset type Pump in MindSphere`
+            //     `    mc asset-types --mode create --file Pump.assettype.mdsp.json \n\tcreate asset type Pump in Insights Hub`
             // );
 
             serviceCredentialLog();

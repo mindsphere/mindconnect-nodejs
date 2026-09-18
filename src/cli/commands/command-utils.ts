@@ -91,10 +91,10 @@ export const subtractSecond = (date: Date, seconds: number): Date => {
 export const displayCsvHelp = (color: (chalk: string) => string) => {
     const now = new Date();
     log("\n  Examples:\n");
-    log(`    mdsp ts -f timeseries.csv \t\t\t\t\t upload timeseries from the csv file to mindsphere `);
+    log(`    mdsp ts -f timeseries.csv \t\t\t\t\t upload timeseries from the csv file to Insights Hub `);
     log(`    mdsp upload-timeseries --file timeseries.csv  --size 100  \t use http post size of 100 records `);
 
-    log(`\n  ${color("Data Format:")} (use your own data point ids from mindsphere)\n`);
+    log(`\n  ${color("Data Format:")} (use your own data point ids from Insights Hub)\n`);
     log(`  timestamp, ${color("dataPointId")}, ${green("qualityCode")}, ${yellow("value")}`);
     log(`  ${subtractSecond(now, 2).toISOString()}, ${color("DP-Temperature")} ,${green("0")}, ${yellow("20.34")}`);
     log(`  ${subtractSecond(now, 1).toISOString()}, ${color("DP-Humidity")}, ${green("0")}, ${yellow("70")}`);
@@ -102,14 +102,14 @@ export const displayCsvHelp = (color: (chalk: string) => string) => {
 
     log(
         `\n  Make sure that the timestamp is in ISO format. The headers and the casing (timestamp, dataPointId) are important.`,
-        `\n  The values must correspond with data types configured in mindsphere (in example: ${color(
+        `\n  The values must correspond with data types configured in Insights Hub (in example: ${color(
             "DP-Humidity"
         )} must be an ${color("integer")})`
     );
 
     log(`\n  ${color("Important:")}\n`);
     log(
-        `    You have to configure the data source and data mappings in mindsphere asset manager before you can upload the data`
+        `    You have to configure the data source and data mappings in Insights Hub asset manager before you can upload the data`
     );
     log(
         `    See also: ${color(
@@ -154,7 +154,7 @@ export function modeInformation(asset: AssetManagementModels.AssetResourceWithHi
         console.log(`\nYou are using the ${color("standard timeseries")} ingest for the asset.`);
         console.log(`The calls to the API will be ${color("throttled")} to match your throttling limits.`);
         console.log(`The number of the records per message will be reduced to ${color(options.size)} per message.\n`);
-        console.log(`Using this feature has a direct impact on ${color("your")} MindSphere resource consumption.`);
+        console.log(`Using this feature has a direct impact on ${color("your")} Insights Hub resource consumption.`);
         console.log(`You might get a notice that you will need to upgrade your account's data ingest rate.`);
         console.log(`${yellow("Warning")} This feature is ${yellow("deprecated")}!\n`);
     }

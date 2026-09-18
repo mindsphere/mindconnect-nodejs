@@ -50,7 +50,7 @@ export default (program: Command) => {
                     } else {
                         log(`Your agent with id ${color(agent.ClientId())} was already onboarded.`);
                         verboseLog(
-                            `Offboard the agent in the mindsphere UI and delete the .mc/${color(
+                            `Offboard the agent in the Insights Hub UI and delete the .mc/${color(
                                 agent.ClientId() + ".json"
                             )} file to onboard again.`,
                             options.verbose

@@ -44,7 +44,7 @@ export default (program: Command) => {
                     switch (options.mode) {
                         case "template":
                             await createTemplate(options);
-                            console.log("Edit the file before submitting it to mindsphere.");
+                            console.log("Edit the file before submitting it to Insights Hub.");
                             break;
 
                         case "send":
@@ -86,8 +86,8 @@ async function createTemplate(options: any) {
     switch (options.type) {
         case "email":
             metadata = {
-                subject: "[Status] Demo Mail Notification from MindSphere CLI",
-                message: `This is a demo mail notification from MindSphere CLI. See more at https://developer.siemens.com/industrial-iot-open-source/overview.html`,
+                subject: "[Status] Demo Mail Notification from Insights Hub CLI",
+                message: `This is a demo mail notification from Insights Hub CLI. See more at https://developer.siemens.com/industrial-iot-open-source/overview.html`,
                 fromApplication: "CLI",
                 priority: "Normal",
                 recipients: ["<recipient1>@<email>", "<recipient2>@<email>"],
@@ -96,7 +96,7 @@ async function createTemplate(options: any) {
 
         case "sms":
             metadata = {
-                message: `This is a demo sms notification from MindSphere CLI`,
+                message: `This is a demo sms notification from Insights Hub CLI`,
                 fromApplication: "CLI",
                 recipients: ["+411xxxxxxx9", "+911xxxxxxx9"],
             };
@@ -110,8 +110,8 @@ async function createTemplate(options: any) {
                     userEmailAddresses: ["<user>@<email>"],
                 },
                 message: {
-                    title: '{ "en": "Siemens Mindsphere", "de": "Siemens MindSphere"}',
-                    text: '{ "en": "Hi there, Welcome to MindSphere!", "de": "Hallo, Willkommen bei MindSphere!"}',
+                    title: '{ "en": "Siemens Insights Hub", "de": "Siemens Insights Hub"}',
+                    text: '{ "en": "Hi there, Welcome to Insights Hub!", "de": "Hallo, Willkommen bei Insights Hub!"}',
                 },
             };
             break;
@@ -219,7 +219,7 @@ async function getStatus(options: any, sdk: MindSphereSdk) {
                     console.log(
                         "Error occured. In April 2021 there was no method available to get the status of the MulticastPushNotificationJob"
                     );
-                    console.log("This was reported to MindSphere dev team and should eventually start working...");
+                    console.log("This was reported to Insights Hub dev team and should eventually start working...");
                     throw err;
                 }
             }

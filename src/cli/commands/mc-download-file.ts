@@ -25,12 +25,12 @@ export default (program: Command) => {
         .command("download-file")
         .alias("df")
         .option("-f, --file <fileToDownload>", "file to download from the file service")
-        .option("-h, --filepath [filepath]", "file path in the mindsphere", "")
-        .option("-i, --assetid <assetid>", "mindsphere asset id")
+        .option("-h, --filepath [filepath]", "file path in the Insights Hub", "")
+        .option("-i, --assetid <assetid>", "Insights Hub asset id")
         .option("-p, --passkey <passkey>", `passkey`)
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(`${color("download the file from mindsphere file service *")}`)
+        .description(`${color("download the file from Insights Hub file service *")}`)
         .action((options) => {
             (async () => {
                 try {
@@ -60,7 +60,7 @@ export default (program: Command) => {
                     verboseLog(
                         `Downloading file ${color(fileInfo[0].name)} with size of ${color(
                             humanFileSize(fileInfo[0].size || 0)
-                        )} from MindSphere.`,
+                        )} from Insights Hub.`,
                         options.verbose,
                         spinner
                     );

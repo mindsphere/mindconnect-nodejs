@@ -88,7 +88,7 @@ export default (program: Command) => {
                         case "template":
                             {
                                 createTemplate(options);
-                                console.log("Edit the file before submitting it to MindSphere.");
+                                console.log("Edit the file before submitting it to Insights Hub.");
                             }
                             break;
 
@@ -100,7 +100,7 @@ export default (program: Command) => {
 
                                 await sdk.GetMessageBrokerClient().SendMessage(options.topicid, message);
 
-                                console.log("Edit the file before submitting it to MindSphere.");
+                                console.log("Edit the file before submitting it to Insights Hub.");
                             }
                             break;
 

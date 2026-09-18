@@ -50,7 +50,7 @@ export default (program: Command) => {
 
                         case "template":
                             createTemplate(options);
-                            console.log("Edit the file before submitting it to MindSphere.");
+                            console.log("Edit the file before submitting it to Insights Hub.");
                             break;
                         case "create":
                             await createIngestJob(options, sdk);

@@ -44,7 +44,7 @@ export default (program: Command) => {
                     switch (options.mode) {
                         case "template":
                             await createAppInstanceTemplate(options);
-                            console.log("Edit the files before submitting them to mindsphere.");
+                            console.log("Edit the files before submitting them to Insights Hub.");
                             break;
                         case "update":
                         case "create":
@@ -144,7 +144,7 @@ async function createAppInstanceTemplate(options: any) {
     console.log(`The ${color(options.type)} template file was written into ${color(fileName)}`);
     console.log(`Run:\n\n\
               \tmdsp mobile-app-instances --mode create --file ${fileName} --appid ${options.appid}
-              \nto create mobile app instance in mindsphere.`);
+              \nto create mobile app instance in Insights Hub.`);
 }
 
 async function createOrUpdateAppInstance(options: any, sdk: MindSphereSdk) {
