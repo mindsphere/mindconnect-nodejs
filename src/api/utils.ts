@@ -100,6 +100,21 @@ export const getPiamUrl = (gateway: string, tenant: string, customerTenantId?: s
     return piamUrl.endsWith("/") ? piamUrl : piamUrl + "/";
 };
 
+/**
+ * Extracts the Xcelerator core tenant id from an app hostname of the form
+ * <customerTenantId>-<appName>-<coreTenantId>.<region>.siemens.app (e.g. the origin an embedded
+ * app is served from). Returns "" if the hostname doesn't match that scheme (on-premise
+ * installations, legacy *.mindsphere.io app hosts, or any other host).
+ *
+ * Used by BrowserAuth/FrontendAuth to build the correct /<service>-<coreTenantId>/<version>
+ * request paths when the SDK is embedded in - or is proxying for - an Xcelerator-migrated app,
+ * since those apps no longer resolve the legacy bare /api/<service>/<version> path.
+ */
+export const extractCoreTenantIdFromHostname = (hostname: string): string => {
+    const match = hostname.match(/^\d+-[a-z0-9-]+-(\d+)\.[a-z0-9-]+\.siemens\.app$/i);
+    return match ? match[1] : "";
+};
+
 const normalizePasskey = (passkey: string): string => {
     return passkey.length < 32 ? passkey + new Array(33 - passkey.length).join("$") : passkey.substr(0, 32);
 };

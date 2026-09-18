@@ -6,7 +6,7 @@ export class MessageBrokerClient extends SdkClient {
         // messagebroker was bumped to v5 as part of the Xcelerator migration; legacy/on-premise
         // tenants (no coreTenantId) stay on the old v4 API.
         const version = this.GetCoreTenantId() ? "v5" : "v4";
-        return this.GetServiceBaseUrl("messagebroker", version, { apiPrefix: true });
+        return this.GetServiceBaseUrl("messagebroker", version);
     }
 
     /**

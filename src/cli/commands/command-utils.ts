@@ -3,7 +3,7 @@ import { log } from "console";
 import { isAfter, isSameDay, subDays } from "date-fns";
 import { FrontendAuth } from "../../api/frontend-auth";
 import { AssetManagementModels, MindSphereSdk } from "../../api/sdk";
-import { decrypt, getHomeDotMcDir, loadAuth } from "../../api/utils";
+import { decrypt, extractCoreTenantIdFromHostname, getHomeDotMcDir, loadAuth } from "../../api/utils";
 import { MC_NAME, MC_VERSION } from "../../version";
 
 const updateNotifier = require("update-notifier-cjs");
@@ -212,7 +212,14 @@ export function getSdk(options: any) {
             host = `https://${host}`;
         }
 
-        sdk = new MindSphereSdk(new FrontendAuth(host, process.env.MDSP_SESSION, process.env.MDSP_XSRF_TOKEN));
+        // On Xcelerator-migrated hosts (<customerTenantId>-<appName>-<coreTenantId>.<region>.siemens.app)
+        // the app no longer resolves the legacy bare /api/<service>/<version> path - it needs the
+        // coreTenantId embedded (/api/<service>-<coreTenantId>/<version>), same as the app's own frontend code.
+        const coreTenantId = extractCoreTenantIdFromHostname(new URL(host).hostname);
+
+        sdk = new MindSphereSdk(
+            new FrontendAuth(host, process.env.MDSP_SESSION, process.env.MDSP_XSRF_TOKEN, coreTenantId)
+        );
         options._selected_mode = "cookie";
     } else {
         throw new Error("The passkey was not provided and there are no environment variables");

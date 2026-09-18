@@ -42,22 +42,24 @@ export abstract class SdkClient {
      * Builds the base url for a MindSphere/Insights Hub service.
      *
      * When a coreTenantId is configured, the new Xcelerator scheme is used:
-     * /<serviceName>-<coreTenantId>/<version> (or /api/<serviceName>-<coreTenantId>/<version> when apiPrefix is set,
-     * required for e.g. messagebroker and notification).
+     * /api/<serviceName>-<coreTenantId>/<version>. The /api prefix is always included here -
+     * confirmed required when calls are made relative to an embedded app's own
+     * <customerTenantId>-<appName>-<coreTenantId>.<region>.siemens.app origin (e.g. via
+     * BrowserAuth), since that origin also serves the app's static frontend and uses /api to
+     * route API calls; the api.<region>.siemens.app gateway tolerates the prefix either way.
      *
-     * Without a coreTenantId (on-premise installations, legacy mindsphere.io tenants, BrowserAuth) the legacy
+     * Without a coreTenantId (on-premise installations, legacy mindsphere.io tenants) the legacy
      * /api/<serviceName>/<version> relative path is used, unchanged from previous SDK versions.
      *
      * @protected
      * @memberOf SdkClient
      */
-    protected GetServiceBaseUrl(serviceName: string, version: string, options?: { apiPrefix?: boolean }): string {
+    protected GetServiceBaseUrl(serviceName: string, version: string): string {
         const coreTenantId = this.GetCoreTenantId();
         if (!coreTenantId) {
             return `/api/${serviceName}/${version}`;
         }
-        const prefix = options?.apiPrefix ? "/api" : "";
-        return `${prefix}/${serviceName}-${coreTenantId}/${version}`;
+        return `/api/${serviceName}-${coreTenantId}/${version}`;
     }
 
     public GetUserTenant(): string | undefined {
