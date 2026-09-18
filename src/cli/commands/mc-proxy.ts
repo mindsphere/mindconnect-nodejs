@@ -43,9 +43,12 @@ export default (program: Command) => {
         .option("-w, --nowarn", "don't warn for missing headers")
         .option("-d, --dontkeepalive", "don't keep the session alive")
         .option("-v, --verbose", "verbose output")
-        .option("-s, --session <session>", "borrowed SESSION cookie from brower")
+        .option("-s, --session <session>", "borrowed SESSION (legacy) or gw_session (Xcelerator) cookie value from browser")
         .option("-x, --xsrftoken <xsrftoken>", "borrowed XSRF-TOKEN cookie from browser")
-        .option("-h, --host <host>", "the address where SESSION and XSRF-TOKEN have been borrowed from")
+        .option(
+            "-h, --host <host>",
+            "the address where SESSION/gw_session and XSRF-TOKEN have been borrowed from"
+        )
         .option("-t, --timeout <timeout>", "keep alive timeout in seconds", "60")
         .option("-k, --passkey <passkey>", "passkey")
         .description(color(`starts mindsphere development proxy & ${magenta("(optional passkey) *")}`))

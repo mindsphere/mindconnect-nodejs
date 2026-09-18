@@ -635,7 +635,9 @@ at your local machine at
 
 [http://localhost:7707](http://localhost:7707)
 
-which will authenticate all requests using either [a borrowed SESSION and XSRF-TOKEN cookie from Insights Hub](https://developer.mindsphere.io/howto/howto-local-development.html#generate-user-credentials) or the the configured app credentials or technical user credentials.
+which will authenticate all requests using either [a borrowed session and XSRF-TOKEN cookie from Insights Hub](https://developer.mindsphere.io/howto/howto-local-development.html#generate-user-credentials) or the the configured app credentials or technical user credentials.
+
+> Note: the browser cookie holding the session is named `SESSION` on legacy (`.mindsphere.io`) tenants and `gw_session` on Xcelerator (`.siemens.app`) tenants. The `--session`/`MDSP_SESSION` option always takes the cookie's **value**, regardless of which of the two names it has in the browser - the CLI sends both cookie names to the target host so it works either way.
 
 The command below will start your development proxy without any installation and configuration (you just need the cookies from an existing app):
 
@@ -658,10 +660,11 @@ Options:
   -w, --nowarn                      don't warn for missing headers
   -d, --dontkeepalive               don't keep the session alive
   -v, --verbose                     verbose output
-  -s, --session <session>           borrowed SESSION cookie from brower
+  -s, --session <session>           borrowed SESSION (legacy) or gw_session
+                                    (Xcelerator) cookie value from browser
   -x, --xsrftoken <xsrftoken>       borrowed XSRF-TOKEN cookie from browser
-  -h, --host <host>                 the address where SESSION and XSRF-TOKEN
-                                    have been borrowed from
+  -h, --host <host>                 the address where SESSION/gw_session and
+                                    XSRF-TOKEN have been borrowed from
   -t, --timeout <timeout>           keep alive timeout in seconds (default:
                                     "60")
   -k, --passkey <passkey>           passkey
