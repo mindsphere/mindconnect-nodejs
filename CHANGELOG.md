@@ -1,8 +1,18 @@
 # Changelog
 
-## 4.0.0 - (unreleased)
+## 4.0.0 - Stormy Vienna - September 2026
 
-- BREAKING CHANGE: Insights Hub URLs are migrating from the `mindsphere.io` domain to the new `siemens.app` scheme (work in progress on this branch). Version 4.0.0+ only works with the new `siemens.app` URLs - use the `3.x` release line if your tenant/gateway still uses `mindsphere.io` URLs.
+- BREAKING CHANGE: Insights Hub URLs are migrating from the `mindsphere.io` domain to the new `siemens.app` scheme. Version 4.0.0+ only works with the new `siemens.app` URLs - use the `3.x` release line if your tenant/gateway still uses `mindsphere.io` URLs.
+- SDK, CLI: added support for the Xcelerator `coreTenantId`/`customerTenantId` (OAuth/PIAM identity zone id) so the SDK can build correct `siemens.app` URLs
+- SDK: separated application vs. technical user credential forms in the config web server, renamed "service credentials" to "technical user credentials", and clarified core/customer tenant id field descriptions
+- Fixed file upload hitting the wrong gateway host on Xcelerator agents
+- Fixed cookie/browser auth path resolution for Xcelerator tenants, including sending the `gw_session` cookie (renamed from `mindsphere_session`) for borrowed-cookie auth
+- Fixed jku host validation and an Application Credentials UI bug
+- Fixed broken Asset Manager, Operations Insight, and Settings app links on Xcelerator tenants (they now correctly use `<customerTenantId>-<appName>-<coreTenantId>.<region>.siemens.app`)
+- Fixed the OS Bar/config web server pulling static assets from the retired `static.eu1.mindsphere.io` host; now uses `static.ih.eu1.siemens.app`
+- Fixed a wrong open-source documentation URL in CLI help output
+- Renamed "MindSphere" to "Insights Hub" across CLI help text and console messages
+- Fixed `.npmignore` silently excluding the entire `dist/` build output from the published package
 - Bumped in-range dependencies and fixed resulting TypeScript strictness issues
 
 ## 3.24.2 - Coconut Vienna - June 2024
