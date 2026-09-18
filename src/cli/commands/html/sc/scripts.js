@@ -20,7 +20,7 @@ function bindList() {
         display.index = index;
         display.color = element.selected ? "black has-color-functionalGreen" : "black has-color-forced-gray200";
         display.coreTenantId = element.coreTenantId || "(none)";
-        display.customerTenantId = element.customerTenantId || "(same as Core Tenant Id)";
+        display.customerTenantId = element.customerTenantId || "(none, falls back to tenant name)";
 
         // window.alert(x)
         list.append(mustache(x, display));

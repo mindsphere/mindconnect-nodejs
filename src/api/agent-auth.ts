@@ -73,7 +73,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
             ...this._apiHeaders,
             Authorization: `Bearer ${this._configuration.content.iat}`,
         };
-        const url = `${this._configuration.content.baseUrl}${this.AgentManagementBaseUrl()}/register`;
+        const url = `${this.AgentManagementGateway()}${this.AgentManagementBaseUrl()}/register`;
 
         log(`Onboarding - Headers: ${JSON.stringify(headers)} Url: ${url} Profile: ${this.GetProfile()}`);
         try {
@@ -293,7 +293,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
      * @memberof AgentAuth
      */
     private async AquireToken(): Promise<boolean> {
-        const url = `${this._configuration.content.baseUrl}${this.AgentManagementBaseUrl()}/oauth/token`;
+        const url = `${this.AgentManagementGateway()}${this.AgentManagementBaseUrl()}/oauth/token`;
         const headers = this._urlEncodedHeaders;
         const body = this.CreateClientAssertion().toString();
 
@@ -348,7 +348,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
     }
 
     private async GetCertificate(): Promise<object> {
-        const url = `${this._configuration.content.baseUrl}${this.AgentManagementBaseUrl()}/oauth/token_key`;
+        const url = `${this.AgentManagementGateway()}${this.AgentManagementBaseUrl()}/oauth/token_key`;
         const headers = this._headers;
         log(`Validate Token Headers ${JSON.stringify(headers)} Url: ${url}`);
         try {
@@ -378,8 +378,146 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
     }
 
     /**
+     * Checks a jku hostname against the set of hosts we're willing to fetch signing keys from.
+     *
+     * The jku header claim comes from the token itself, i.e. it is *not yet* trusted at the point
+     * we need to decide whether to fetch it - blindly following it would let anyone who can forge/
+     * substitute a token (e.g. a compromised gateway or MITM) redirect key lookup to a server they
+     * control, defeating signature verification entirely (the classic jku header-injection bypass,
+     * cf. CVE-2018-0114).
+     *
+     * By default only `<coreTenantId>.<region>.sws.siemens.com` is trusted: that's a Siemens-owned
+     * domain (registering a subdomain there requires access to Siemens' own DNS, a much higher bar
+     * than pointing jku at an attacker-controlled host), and the `<coreTenantId>` segment is cross-
+     * checked against our *own configured* value (from GetCoreTenantId()) rather than anything the
+     * token itself claims, so a forged token can't redirect key lookup to a different, still-
+     * Siemens-hosted tenant's key endpoint either.
+     *
+     * Different Insights Hub deployments/stamps may use other, currently unknown-to-us host
+     * conventions - rather than guessing/hardcoding those upfront (and risking silently breaking
+     * them), operators can opt in explicitly via the MDSP_TRUSTED_JKU_HOSTS environment variable
+     * (comma separated exact hostnames or `*.`-prefixed wildcard patterns). This only *adds* to the
+     * default check, it never replaces/weakens it.
+     *
+     * @private
+     * @param {string} hostname
+     * @returns {boolean}
+     * @memberof AgentAuth
+     */
+    private IsTrustedJkuHost(hostname: string): boolean {
+        const coreTenantId = this.GetCoreTenantId();
+        const defaultPattern = coreTenantId
+            ? new RegExp(`^${_.escapeRegExp(coreTenantId)}\\.[a-z0-9-]+\\.sws\\.siemens\\.com$`, "i")
+            : undefined;
+
+        if (defaultPattern && defaultPattern.test(hostname)) return true;
+
+        const extraHosts = (process.env.MDSP_TRUSTED_JKU_HOSTS || "")
+            .split(",")
+            .map((x) => x.trim())
+            .filter((x) => x.length > 0);
+
+        return extraHosts.some((allowed) => {
+            if (allowed.startsWith("*.")) {
+                return hostname.toLowerCase().endsWith(allowed.slice(1).toLowerCase());
+            }
+            return hostname.toLowerCase() === allowed.toLowerCase();
+        });
+    }
+
+    /**
+     * Fallback used when the documented /oauth/token_key endpoint returns a key that doesn't match
+     * the one that actually signed the access token. Resolves the real signing key from the token's
+     * own `jku` header claim (the issuer's own key store) instead of trusting the gateway's endpoint.
+     *
+     * The jku claim is only followed if IsTrustedJkuHost() accepts its host - see that method for
+     * why blindly trusting it would be a security bypass.
+     *
+     * @private
+     * @returns {Promise<TokenKey>}
+     * @memberof AgentAuth
+     */
+    private async GetCertificateFromJku(): Promise<TokenKey> {
+        if (!this._accessToken?.access_token) throw new Error("Invalid access token");
+
+        const decoded = jwt.decode(this._accessToken.access_token, { complete: true }) as {
+            header?: { jku?: string; kid?: string };
+        } | null;
+        const jku = decoded?.header?.jku;
+        const kid = decoded?.header?.kid;
+
+        if (!jku) {
+            throw new Error(
+                "couldnt validate token: /oauth/token_key key didn't match and the token has no jku claim to fall back to"
+            );
+        }
+
+        let jkuUrl: URL;
+        try {
+            jkuUrl = new URL(jku);
+        } catch (err) {
+            throw new Error(`couldnt validate token: jku claim "${jku}" is not a valid URL`);
+        }
+
+        if (jkuUrl.protocol !== "https:" || !this.IsTrustedJkuHost(jkuUrl.hostname)) {
+            throw new Error(
+                `couldnt validate token: jku host "${jkuUrl.hostname}" is not a trusted key-issuer host ` +
+                    `(expected https://${this.GetCoreTenantId() || "<coreTenantId>"}.<region>.sws.siemens.com). ` +
+                    "If this is a legitimate deployment with a different convention, add it via " +
+                    "MDSP_TRUSTED_JKU_HOSTS (comma separated hostnames or *.-prefixed wildcard patterns)."
+            );
+        }
+
+        log(`Fetching signing key from token issuer (jku claim): ${jku}`);
+        const headers = this._headers;
+        try {
+            const response = await fetch(jku, {
+                method: "GET",
+                headers: headers,
+                agent: this._proxyHttpAgent,
+            } as RequestInit);
+
+            if (!response.ok) {
+                throw new Error(`${response.statusText} ${await response.text()}`);
+            }
+
+            const json = await response.json();
+            log(`jku key response ${JSON.stringify(json)}`);
+            const keys: TokenKey[] = json.keys || [];
+            const key = kid ? keys.find((x) => x.kid === kid) : keys[0];
+
+            if (!key) {
+                throw new Error(`couldnt find signing key with kid ${kid} at jku endpoint ${jku}`);
+            }
+
+            return key;
+        } catch (err) {
+            log(err);
+            throw new Error(`Network error occured ${err.message}`);
+        }
+    }
+
+    private VerifyWithPemKey(pemValue: string, token: string): boolean {
+        // Some endpoints return the PEM body already split across lines, others as a single line.
+        // Strip any existing line breaks first so re-wrapping the header/footer is always safe -
+        // inserting a newline next to one that's already there produces an invalid, unparsable PEM
+        // (silently downgraded by jsonwebtoken to a secret key, causing a confusing "invalid algorithm").
+        const publicKeyWithLineBreaks = pemValue
+            .replace(/\r?\n/g, "")
+            .replace("-----BEGIN PUBLIC KEY-----", "-----BEGIN PUBLIC KEY-----\n")
+            .replace("-----END PUBLIC KEY-----", "\n-----END PUBLIC KEY-----");
+
+        const result = jwt.verify(token, publicKeyWithLineBreaks);
+        return result ? true : false;
+    }
+
+    /**
      * Validates /exchange token on the client. If the certificate is not available retrieves certificate from /oauth/token_key endpoint
      * acnd caches it in _oauthPublicKey property for the lifetime of the agent.
+     *
+     * If the documented /oauth/token_key endpoint returns a key that doesn't match the token's real
+     * signer (a known gateway defect - see insights-hub-gateway-migration-shim/FINDINGS.md), this logs
+     * a warning and falls back to the key referenced by the token's own jku claim.
      *
      * @private
      * @returns {Promise<boolean>}
@@ -387,6 +525,7 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
      */
     private async ValidateToken(): Promise<boolean> {
         if (!this._accessToken) throw new Error("The token needs to be acquired first before validation.");
+        if (!this._accessToken.access_token) throw new Error("Invalid access token");
 
         if (!this._oauthPublicKey) {
             await retry(5, () => this.GetCertificate());
@@ -397,13 +536,23 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
         }
 
         log(this._oauthPublicKey.value);
-        const publicKeyWithLineBreaks = this._oauthPublicKey.value
-            .replace("-----BEGIN PUBLIC KEY-----", "-----BEGIN PUBLIC KEY-----\n")
-            .replace("-----END PUBLIC KEY-----", "\n-----END PUBLIC KEY-----");
-        if (!this._accessToken.access_token) throw new Error("Invalid access token");
 
-        const result = jwt.verify(this._accessToken.access_token, publicKeyWithLineBreaks);
-        return result ? true : false;
+        try {
+            return this.VerifyWithPemKey(this._oauthPublicKey.value, this._accessToken.access_token);
+        } catch (err) {
+            if (err.name !== "JsonWebTokenError") {
+                throw err;
+            }
+
+            console.warn(
+                "warning: the /oauth/token_key endpoint returned a signing key that doesn't match the access token - " +
+                    "falling back to the key referenced by the token's own jku claim (see also: https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/troubleshooting.html)"
+            );
+
+            const jkuKey = await this.GetCertificateFromJku();
+            this._oauthPublicKey = jkuKey;
+            return this.VerifyWithPemKey(jkuKey.value, this._accessToken.access_token);
+        }
     }
 
     /**
@@ -574,12 +723,29 @@ export abstract class AgentAuth extends MindConnectBase implements TokenRotation
         return this._configuration.content.tenant!;
     }
     GetGateway(): string {
-        return this._configuration.content.baseUrl!;
+        // This is also what backs MindSphereSdk/AgentManagementClient's ServiceBaseUrl()-agnostic
+        // callers (data source configuration, mappings, ...) via the Sdk() wrapper below - so it
+        // needs the same fds.baseUrl preference as AgentManagementGateway(), not just content.baseUrl.
+        return this.AgentManagementGateway();
     }
     GetCoreTenantId(): string {
         // Note: this reads the "systemId" key from the onboarding file JSON as issued by the
         // server (wire format) - do not rename that key, only our own getter method name.
-        return this._configuration.content.systemId || "";
+        // Some onboarding responses nest the same id under fds.mntTenant instead - honor that too.
+        return this._configuration.content.systemId || this._configuration.content.fds?.mntTenant || "";
+    }
+
+    /**
+     * Base url used for the agent management endpoints (register, token, token_key). Prefers the
+     * Xcelerator gateway (content.fds.baseUrl) when the onboarding response provides one, since that
+     * is where the tenant-id-embedded paths built by ServiceBaseUrl() are actually routed. Falls back
+     * to the regular content.baseUrl otherwise (on-premise, legacy tenants, or older onboarding files).
+     *
+     * @protected
+     * @memberof AgentAuth
+     */
+    protected AgentManagementGateway(): string {
+        return this._configuration.content.fds?.baseUrl || this._configuration.content.baseUrl!;
     }
 
     /**

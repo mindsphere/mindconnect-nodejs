@@ -221,14 +221,19 @@
                                     </label>
                                     <input class="inputGroup__textInput" type="text" placeholder="your tenant name"
                                         id="app-text-tenant" onblur="validateInput('#app-text-tenant')" />
-                                    <div class="inputGroup__description">Host Tenant name</div>
+                                    <div class="inputGroup__description">
+                                        Host tenant name that owns this application registration.
+                                    </div>
 
                                     <label class="inputGroup__label is-required" for="app-text-usertenant">
                                         User Tenant
                                     </label>
                                     <input class="inputGroup__textInput" type="text" placeholder="your tenant name"
                                         id="app-text-usertenant" onblur="validateInput('#app-text-usertenant')" />
-                                    <div class="inputGroup__description">User Tenant name</div>
+                                    <div class="inputGroup__description">
+                                        Tenant name the app acts on behalf of. Usually the same as Tenant above; only
+                                        differs for cross-tenant applications.
+                                    </div>
 
                                     <label class="inputGroup__label is-required" for="app-text-appname">
                                         Application Name

@@ -34,6 +34,23 @@
 >
 > - If your tenant/gateway already uses the new `siemens.app` URLs, install `@mindconnect/mindconnect-nodejs@^4.0.0`.
 > - If your tenant/gateway still uses the old `mindsphere.io` URLs, keep using `@mindconnect/mindconnect-nodejs@^3.0.0` (the `3.x` line will continue to work with the old URL scheme).
+>
+> **4.0.0 is best-effort compatible with the new Xcelerator gateway** - it has been tested against the current public-cloud regions, but the migration is still in progress and some backend behavior (see below) is known to differ across deployments. **For on-premise/private-cloud installations we recommend staying on the `3.x` line** until the Xcelerator migration and this library's support for it have stabilized.
+
+## Migrating to the Xcelerator gateway (4.0.0)
+
+Version 4.0.0 talks to the new Xcelerator gateway (`siemens.app`) instead of the classic Insights Hub gateway (`mindsphere.io`). A few things changed as a consequence, and a couple of rough edges (outside this library's control) are worth knowing about:
+
+- **Tenant name vs. tenant/identity-zone id (CLI/SDK credentials only)**: Xcelerator distinguishes between the tenant **name** (used in asset-model qualified names, e.g. `mytenant.MyAspectType`) and a numeric **identity-zone/customer tenant id** (required by the OAuth token endpoint). This only concerns `mc service-credentials` (APP/SERVICE credentials used by CLI/SDK commands like `mc aspects`/`mc assets`) - it has no effect on agent onboarding/`mc agent-token`, which derives its tenant identity entirely from the onboarding response instead. Older configurations that only set a single `tenant`/`usertenant` value may need to also set `--customer-tenant-id`/`--core-tenant-id` when adding credentials, e.g.:
+
+  ```bash
+  mc service-credentials --mode add --type APP --tenant mytenant --usertenant mytenant \
+      --customer-tenant-id <numeric identity zone id> --core-tenant-id <numeric core tenant id>
+  ```
+
+  Both ids can be found in the URL of any Xcelerator app, e.g. `https://<customerTenantId>-settings-<coreTenantId>.<region>.siemens.app/`.
+
+- **Agent token signature verification (`mc agent-token`)**: the documented `GET /oauth/token_key` endpoint on some FDS-migrated tenants currently returns a signing key that doesn't match the one that actually signed the access token (a known, tracked upstream defect, not specific to this library). When that happens, this library falls back to resolving the real signing key from the token's own `jku` header claim - but only from a **trusted host**: by default `<coreTenantId>.<region>.sws.siemens.com`, cross-checked against your own configured core tenant id (never blindly trusted from the token itself). If your deployment legitimately serves signing keys from a different host, opt it in explicitly via the `MDSP_TRUSTED_JKU_HOSTS` environment variable (comma separated hostnames or `*.`-prefixed wildcard patterns) - this only adds to, never replaces, the default check.
 
 ## Full documentation
 
@@ -100,6 +117,9 @@ Create an agent in Asset Manager of type core.MindConnectLib create initial JSON
     "expiration": "2018-04-06T00:47:39.000Z"
 }
 ```
+
+> [!NOTE]
+> On tenants that have been migrated to the Xcelerator gateway, the JSON token also contains a nested `fds` object (e.g. `"fds": { "baseUrl": "https://api.eu1.siemens.app", "mntTenant": "1000001700" }`) alongside the fields above. This library prefers `content.fds.baseUrl`/`fds.mntTenant` over the legacy `content.baseUrl` whenever they are present, so you don't need to change anything in your code for this - just don't remove the `fds` object if you hand-edit this file.
 
 ### Step 3 : Create an agent
 
@@ -494,6 +514,10 @@ Navigate to [http://localhost:4994](http://localhost:4994) to configure the CLI.
 The image below shows the dialog for adding new credentials (press on the + sign in the upper left corner)
 
 ![CLI](images/servicecredentials.png)
+
+Technical User Credentials additionally expose a Customer Tenant Id field (the OAuth/PIAM identity zone id) alongside Core Tenant Id - both ids can be found in the URL of any Xcelerator app, e.g. `https://<customerTenantId>-settings-<coreTenantId>.<region>.siemens.app/`.
+
+![CLI](images/servicecredentials-technical.png)
 
 You can get the application credentials from your developer or operator cockpit in Insights Hub. (if you don't have any application you can register a dummy one just for CLI)
 

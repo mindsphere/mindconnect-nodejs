@@ -30,8 +30,13 @@ export class TokenManagerAuth extends AuthBase implements TokenRotation {
         const body = {
             appName: this._appName,
             appVersion: this._appVersion,
-            hostTenant: this._hostTenant,
-            userTenant: this._userTenant,
+            // The OAuth/PIAM token endpoint identifies the tenant by its numeric identity-zone id
+            // (customerTenantId), not by its human-readable name - which is what _hostTenant/_userTenant
+            // hold and what GetTenant()/GetUserTenant() expose for asset-model qualified names. Fall
+            // back to _hostTenant/_userTenant themselves when no customerTenantId is configured (legacy
+            // on-premise/SERVICE credentials, where the tenant name and the OAuth identity coincide).
+            hostTenant: this._customerTenantId || this._hostTenant,
+            userTenant: this._customerTenantId || this._userTenant,
         };
 
         try {
