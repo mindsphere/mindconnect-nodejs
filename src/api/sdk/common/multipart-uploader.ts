@@ -555,7 +555,11 @@ export class MultipartUploader {
     private GetGateway() {
         !this.agent && !this.sdkClient && throwError("invalid conifguraiton for multipart upload");
         if (this.agent) {
-            return `${this.agent.GetMindConnectConfiguration().content.baseUrl}`;
+            // agent.GetGateway() prefers the Xcelerator gateway (content.fds.baseUrl) when the
+            // onboarding response provides one, matching the host the /iotfile-{coreTenantId}/v3
+            // path (built in IotFileBaseUrl() below) is actually routed to. Reading
+            // content.baseUrl directly here would bypass that and hit the wrong host.
+            return this.agent.GetGateway();
         }
 
         if (this.sdkClient) {
