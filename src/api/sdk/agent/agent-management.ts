@@ -14,7 +14,9 @@ import { AgentManagementModels } from "./agent-models";
  * @extends {SdkClient}
  */
 export class AgentManagementClient extends SdkClient {
-    private _baseUrl: string = "/api/agentmanagement/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("agentmanagement", "v3");
+    }
 
     /**
      * * Agents

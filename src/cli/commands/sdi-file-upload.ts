@@ -76,7 +76,7 @@ export default (program: Command) => {
             log(`\n  Restriction:\n`);
             log(`    This works only for SDI only tenants (without Integrated Data Lake)`);
             log(
-                `    If you are MindSphere Integrated Data Lake Customer use mdsp data-lake --mode upload command instead. `
+                `    If you are Insights Hub Integrated Data Lake Customer use mdsp data-lake --mode upload command instead. `
             );
             serviceCredentialLog();
         });

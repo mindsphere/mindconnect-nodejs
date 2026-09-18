@@ -8,6 +8,7 @@ import {
     addAndStoreConfiguration,
     checkList,
     credentialEntry,
+    DEFAULT_CORE_TENANT_ID,
     getFullConfig,
     storeAuth,
     throwError,
@@ -29,15 +30,25 @@ export default (program: Command) => {
         .option("-p, --password <password>", "credendials: password")
         .option(
             "-g, --gateway <gateway>",
-            "region string or full gateway url (e.g. eu1, eu2 or https://gateway.eu1.mindsphere.io)"
+            "region string or full gateway url (e.g. eu1, eu2 or https://api.eu1.siemens.app)"
         )
         .option("-t, --tenant <tenant>", "your tenant name")
         .option("-s, --usertenant <usertenant>", "your user tenant name")
         .option("-a, --appName <appName>", "your application name (e.g. cli)")
         .option("-p, --appVersion <appVersion>", "your application version (e.g. 1.0.0)")
         .option(
+            "-x, --core-tenant-id <coreTenantId>",
+            `Xcelerator core tenant id (API system id, defaults to ${DEFAULT_CORE_TENANT_ID} for region gateways, leave empty for on-premise/legacy tenants; found in the URL of any Xcelerator app, e.g. https://<customerTenantId>-settings-<coreTenantId>.<region>.siemens.app/)`
+        )
+        .option(
+            "-z, --customer-tenant-id <customerTenantId>",
+            "Xcelerator customer tenant id (OAuth/PIAM identity zone id), usually different from the core " +
+                "tenant id (found in the URL of any Xcelerator app, e.g. " +
+                "https://<customerTenantId>-settings-<coreTenantId>.<region>.siemens.app/)"
+        )
+        .option(
             "-k, --passkey <passkey>",
-            "passkey (you will use this in the commands which require service credentials)"
+            "passkey (you will use this in the commands which require technical user credentials)"
         )
         .option("-v, --verbose", "verbose output")
         .description(color("provide login for commands which require technical user credentials *"))
@@ -112,7 +123,7 @@ async function serve(configPort?: number) {
 
             if (uri.path?.startsWith("/sc/config") && req.method === "GET") {
                 res.writeHead(200, { "Content-Type": "application/json" });
-                res.end(JSON.stringify(getFullConfig()));
+                res.end(JSON.stringify({ ...getFullConfig(), defaultCoreTenantId: DEFAULT_CORE_TENANT_ID }));
                 console.log(`${color(new Date().toISOString())} Acquired the CLI settings`);
             } else if (uri.path?.startsWith("/sc/save") && req.method === "POST") {
                 const data: string[] = [];
@@ -187,6 +198,8 @@ function addEntry(options: any) {
         appVersion: `${options.appVersion || ""}`,
         createdAt: new Date().toISOString(),
         selected: true,
+        coreTenantId: options.coreTenantId ? `${options.coreTenantId}` : undefined,
+        customerTenantId: options.customerTenantId ? `${options.customerTenantId}` : undefined,
     };
 
     (config.credentials as any[]).push(newEntry);
@@ -206,12 +219,12 @@ function checkRequiredParamaters(options: any) {
     options.mode === "add" &&
         options.type === "SERVICE" &&
         (!options.user || !options.tenant || !options.passkey || !options.gateway) &&
-        throwError("you have to specify user, tenant, gateway and passkey for SERVICE credentials");
+        throwError("you have to specify user, tenant, gateway and passkey for technical user credentials");
 
     options.mode === "add" &&
         options.type === "SERVICE" &&
         (options.usertenant || options.appName || options.appVersion) &&
-        throwError("you must not use appName, appVersion or usertenant option with SERVICE credentials");
+        throwError("you must not use appName, appVersion or usertenant option with technical user credentials");
 
     options.mode === "add" &&
         options.type === "APP" &&

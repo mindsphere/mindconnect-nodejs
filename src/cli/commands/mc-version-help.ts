@@ -18,14 +18,14 @@ export default (program: Command) => {
         log(
             `    the ${magenta(
                 "magenta colored commands *"
-            )} use app or service credentials or borrowed mindsphere cookies`
+            )} use app or technical user credentials or borrowed Insights Hub cookies`
         );
         log(`    the ${cyan("cyan colored commands ")}require mindconnectlib (agent) credentials`);
-        log(`    the ${blue("blue colored commands @")} use analytical functions of MindSphere`);
+        log(`    the ${blue("blue colored commands @")} use analytical functions of Insights Hub`);
         log(`    the ${green("green colored commands #")} are used as setup and utility commands`);
-        log(`    the ${yellow("yellow colored commands &")} use borrowed mindsphere application cookies`);
+        log(`    the ${yellow("yellow colored commands &")} use borrowed Insights Hub application cookies`);
         log(`    the credentials and cookies should only be used in secure environments`);
-        log(`    Full documentation: ${cyan("https://developer.siemens.com/industrial-iot-open-source/index.html")}\n`);
+        log(`    Full documentation: ${cyan("https://developer.siemens.com/industrial-iot-open-source/overview.html")}\n`);
 
         checkForUpdates();
     });

@@ -91,7 +91,10 @@ async function uploadFile(sdk: MindSphereSdk, options: any) {
     console.log("File successfully uploaded.");
     console.log(
         `Logo: ${color(
-            sdk.GetGateway().replace("gateway", sdk.GetTenant()) + "/api/tenantmanagement/v4/tenantInfo/logo"
+            sdk.GetGateway() +
+                (sdk.GetCoreTenantId()
+                    ? `/tenantmanagement-${sdk.GetCoreTenantId()}/v4/tenantInfo/logo`
+                    : "/api/tenantmanagement/v4/tenantInfo/logo")
         )}`
     );
 }
@@ -101,7 +104,7 @@ async function deleteLegal(sdk: MindSphereSdk, options: any) {
     await tenantManagement.DeleteLegalConfigRegions();
     console.log("Legal configuration successfully deleted.");
     console.log("Settings application (not available in start for free tenants):");
-    console.log(color(`\t${sdk.GetGateway().replace("gateway", sdk.GetTenant() + "-settings")}/provider/`));
+    console.log(color(sdk.GetAppUrl("settings", "/provider/")));
 }
 
 async function createLegal(sdk: MindSphereSdk, options: any) {
@@ -115,7 +118,7 @@ async function createLegal(sdk: MindSphereSdk, options: any) {
 
     console.log("Legal configuration successfully created.");
     console.log("Settings application (not available in start for free tenants):");
-    console.log(color(`\t${sdk.GetGateway().replace("gateway", sdk.GetTenant() + "-settings")}/provider/`));
+    console.log(color(sdk.GetAppUrl("settings", "/provider/")));
 }
 
 function writeTemplate(sdk: MindSphereSdk, options: any) {
@@ -159,7 +162,10 @@ async function tenantInfo(sdk: MindSphereSdk, options: any) {
         console.log(`\tSize: ${logoMetaData.size}`);
         console.log(
             `\tURL: ${color(
-                sdk.GetGateway().replace("gateway", sdk.GetTenant()) + "/api/tenantmanagement/v4/tenantInfo/logo"
+                sdk.GetGateway() +
+                (sdk.GetCoreTenantId()
+                    ? `/tenantmanagement-${sdk.GetCoreTenantId()}/v4/tenantInfo/logo`
+                    : "/api/tenantmanagement/v4/tenantInfo/logo")
             )}`
         );
     } catch {
@@ -185,7 +191,7 @@ async function tenantInfo(sdk: MindSphereSdk, options: any) {
     verboseLog(JSON.stringify(tenantLegalConfig, null, 2), options.verbose);
 
     console.log("Settings application (not available in start for free tenants):");
-    console.log(color(`\t${sdk.GetGateway().replace("gateway", sdk.GetTenant() + "-settings")}/provider/`));
+    console.log(color(sdk.GetAppUrl("settings", "/provider/")));
 }
 
 function createTemplate() {
@@ -214,7 +220,7 @@ function createTemplate() {
                         languages: {
                             default: {
                                 name: "Open Source Software",
-                                value: "https://developer.siemens.com/industrial-iot-open-source/index.html",
+                                value: "https://developer.siemens.com/industrial-iot-open-source/overview.html",
                             },
                         },
                     },

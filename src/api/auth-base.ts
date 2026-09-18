@@ -56,7 +56,7 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
     private async AcquirePublicKey(): Promise<boolean> {
         if (!this._oauthResponse) {
             const headers = this._headers;
-            const url = `${getPiamUrl(this._gateway, this._tenant)}token_keys`;
+            const url = `${getPiamUrl(this._gateway, this._tenant, this.GetCustomerTenantId())}token_keys`;
             log(`AcquirePublicKey Headers: ${JSON.stringify(headers)} Url: ${url}`);
 
             try {
@@ -114,10 +114,24 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
      * @param {string} _gateway
      * @param {string} _basicAuth
      * @param {string} _tenant
+     * @param {string} [_coreTenantId] Xcelerator core tenant id (API system id), used to build the new
+     *                             siemens.app service urls. Leave empty for on-premise installations or
+     *                             legacy mindsphere.io tenants.
+     * @param {string} [_customerTenantId] Xcelerator customer tenant id (OAuth/PIAM identity zone id),
+     *                             used to build the https://<customerTenantId>.<region>.sws.siemens.com/
+     *                             auth urls. This is usually a *different* id than the API _coreTenantId
+     *                             (the identity zone and the API system are provisioned/assigned
+     *                             independently) and normally must be set explicitly.
      *
      * @memberOf CredentialAuth
      */
-    constructor(protected _gateway: string, protected _basicAuth: string, protected _tenant: string) {
+    constructor(
+        protected _gateway: string,
+        protected _basicAuth: string,
+        protected _tenant: string,
+        protected _coreTenantId: string = "",
+        protected _customerTenantId: string = ""
+    ) {
         super();
         if (!_basicAuth || !_basicAuth.startsWith("Basic")) {
             throw new Error(
@@ -126,7 +140,7 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
         }
 
         if (!isUrl(_gateway)) {
-            throw new Error("the gateway must be an URL (e.g. https://gateway.eu1.mindsphere.io");
+            throw new Error("the gateway must be an URL (e.g. https://api.eu1.siemens.app");
         }
 
         if (!_tenant) {
@@ -138,5 +152,20 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
     }
     GetGateway(): string {
         return this._gateway;
+    }
+    GetCoreTenantId(): string {
+        return this._coreTenantId;
+    }
+    /**
+     * Returns the Xcelerator customer tenant id (OAuth/PIAM identity zone id) used for the auth
+     * endpoints (falls back to the API core tenant id when no dedicated customerTenantId was
+     * configured).
+     */
+    GetCustomerTenantId(): string {
+        return this._customerTenantId || this._coreTenantId;
+    }
+
+    GetRawCustomerTenantId(): string {
+        return this._customerTenantId;
     }
 }

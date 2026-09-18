@@ -20,7 +20,9 @@ import { CaseManagementModels } from "./cases-models";
  * @extends {SdkClient}
  */
 export class CaseManagementClient extends SdkClient {
-    private _baseUrl = "/api/casemanagement/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("casemanagement", "v3");
+    }
     /**
      *
      * Retrieves the list of cases for the tenant.

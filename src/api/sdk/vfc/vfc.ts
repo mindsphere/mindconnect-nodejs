@@ -52,7 +52,9 @@ import { VisualFlowCreatorModels } from "./vfc-models";
  * @extends {SdkClient}
  */
 export class VisualFlowCreatorClient extends SdkClient {
-    private _baseUrl: string = "/api/vfc/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("vfc", "v3");
+    }
 
     /**
      * * Projects

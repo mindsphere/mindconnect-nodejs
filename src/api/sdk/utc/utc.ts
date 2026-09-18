@@ -40,7 +40,9 @@ import { UsageTransparencyModels } from "./utc-models";
  * @extends {SdkClient}
  */
 export class UsageTransparencyClient extends SdkClient {
-    private _baseUrl: string = "/api/usagetransparency/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("usagetransparency", "v3");
+    }
 
     /**
      * This method can be used by operators and applications to send application specific usages

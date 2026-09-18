@@ -14,11 +14,16 @@ function bindList() {
         const element = window.configuration.credentials[index];
 
         const x = `${template.innerHTML}`;
-        element.index = index;
-        element.color = element.selected ? "black has-color-functionalGreen" : "black has-color-forced-gray200";
+        // render from a copy so display-only placeholders never leak into the
+        // real configuration object (and subsequently get persisted on save).
+        const display = { ...element };
+        display.index = index;
+        display.color = element.selected ? "black has-color-functionalGreen" : "black has-color-forced-gray200";
+        display.coreTenantId = element.coreTenantId || "(none)";
+        display.customerTenantId = element.customerTenantId || "(none, falls back to tenant name)";
 
         // window.alert(x)
-        list.append(mustache(x, element));
+        list.append(mustache(x, display));
     }
 
     return false;
@@ -44,7 +49,19 @@ function cancelDialog() {
     $("#addDialog").removeClass("is-shown");
 }
 
+function showCredentialType(type) {
+    const isApp = type === "app";
+    $("#appCredentialFields").toggle(isApp);
+    $("#serviceCredentialFields").toggle(!isApp);
+}
+
 function showDialog() {
+    $("#app-text-coretenantid").val(window.configuration.defaultCoreTenantId || "");
+    $("#app-text-customertenantid").val("");
+    $("#svc-text-coretenantid").val(window.configuration.defaultCoreTenantId || "");
+    $("#svc-text-customertenantid").val("");
+    $("#radio-button01").prop("checked", true);
+    showCredentialType("app");
     $("#addDialog").addClass("is-shown");
 }
 
@@ -60,24 +77,28 @@ function addNew() {
     let valid = true;
 
     const appcredentials = $("#radio-button01").is(":checked");
+    const prefix = appcredentials ? "app" : "svc";
 
-    ["passkey", "user", "password", "gateway", "tenant"].forEach((x) => {
-        valid = validateInput(`#text-${x}`) && valid;
+    ["user", "password", "gateway", "tenant"].forEach((x) => {
+        valid = validateInput(`#${prefix}-text-${x}`) && valid;
     });
+    valid = validateInput("#text-passkey") && valid;
 
     if (appcredentials) {
         ["usertenant", "appname", "appversion"].forEach((x) => {
-            valid = validateInput(`#text-${x}`) && valid;
+            valid = validateInput(`#app-text-${x}`) && valid;
         });
     }
 
     const element = {
         type: appcredentials ? "APP" : "SERVICE",
         passkey: "" + $("#text-passkey").val(),
-        user: "" + $("#text-user").val(),
-        password: "" + $("#text-password").val(),
-        gateway: "" + $("#text-gateway").val(),
-        tenant: "" + $("#text-tenant").val(),
+        user: "" + $(`#${prefix}-text-user`).val(),
+        password: "" + $(`#${prefix}-text-password`).val(),
+        gateway: "" + $(`#${prefix}-text-gateway`).val(),
+        tenant: "" + $(`#${prefix}-text-tenant`).val(),
+        coreTenantId: "" + $(`#${prefix}-text-coretenantid`).val(),
+        customerTenantId: "" + $(`#${prefix}-text-customertenantid`).val(),
         usertenant: "",
         appName: "",
         appVersion: "",
@@ -86,9 +107,9 @@ function addNew() {
     };
 
     if (appcredentials) {
-        element.usertenant = "" + $("#text-usertenant").val();
-        element.appName = "" + $("#text-appname").val();
-        element.appVersion = "" + $("#text-appversion").val();
+        element.usertenant = "" + $("#app-text-usertenant").val();
+        element.appName = "" + $("#app-text-appname").val();
+        element.appVersion = "" + $("#app-text-appversion").val();
     }
 
     for (let i = 0; i < window.configuration.credentials.length; i++) {

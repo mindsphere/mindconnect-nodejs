@@ -20,7 +20,7 @@ export default (program: Command) => {
     program
         .command("list-files")
         .alias("ls")
-        .option("-i, --assetid <assetid>", "mindsphere asset id ")
+        .option("-i, --assetid <assetid>", "Insights Hub asset id ")
         .option(
             "-f, --filter [filter]",
             `filter (see: ${color(

@@ -82,11 +82,10 @@ export default (program: Command) => {
                     options.mode !== "test" && (await print(sdk, agentid, color, options));
 
                     agentConfigLog({
-                        gateway: sdk.GetGateway(),
-                        host: options.passkey ? "gateway" : "southgate",
-                        tenant: sdk.GetTenant(),
+                        sdk,
                         agentid: agentid,
                         color: color,
+                        legacyReplaceToken: options.passkey ? "gateway" : "southgate",
                     });
                 } catch (err) {
                     errorLog(err, options.verbose);
@@ -109,7 +108,7 @@ export default (program: Command) => {
             );
 
             log(`    mdsp configure-agent --mode delete --agentid 12345..ef \t\tdeletes the mappings for agentid`);
-            log(`    mdsp configure-agent --config agent.json --mode test \t\t\tsends test data to mindsphere`);
+            log(`    mdsp configure-agent --config agent.json --mode test \t\t\tsends test data to Insights Hub`);
             log(`    mdsp configure-agent --mode template \\`);
             log(`    \t--typeid castidev.Pump --language python \t\t\tcreate mapping template and function in python`);
         });

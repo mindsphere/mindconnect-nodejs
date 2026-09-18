@@ -16,6 +16,28 @@ const log = debug("mindconnect-setup");
  */
 export class MindConnectSetup extends CredentialAuth {
     /**
+     * Builds the mindconnect service base url, honoring the Xcelerator core tenant id when configured.
+     * Falls back to the legacy /api/mindconnect/v3 path otherwise (on-premise, legacy tenants).
+     *
+     * @private
+     * @memberof MindConnectSetup
+     */
+    private MindConnectBaseUrl(): string {
+        return this._coreTenantId ? `/mindconnect-${this._coreTenantId}/v3` : `/api/mindconnect/v3`;
+    }
+
+    /**
+     * Builds the agentmanagement service base url, honoring the Xcelerator core tenant id when configured.
+     * Falls back to the legacy /api/agentmanagement/v3 path otherwise (on-premise, legacy tenants).
+     *
+     * @private
+     * @memberof MindConnectSetup
+     */
+    private AgentManagementBaseUrl(): string {
+        return this._coreTenantId ? `/agentmanagement-${this._coreTenantId}/v3` : `/api/agentmanagement/v3`;
+    }
+
+    /**
      * Register the agent for diagnostics.
      *
      * @param {string} agentId
@@ -30,7 +52,7 @@ export class MindConnectSetup extends CredentialAuth {
         if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
 
         const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
-        const url = `${this._gateway}/api/mindconnect/v3/diagnosticActivations`;
+        const url = `${this._gateway}${this.MindConnectBaseUrl()}/diagnosticActivations`;
 
         log(`RegisterForDiagnostic Headers ${JSON.stringify(headers)} Url ${url}`);
 
@@ -94,7 +116,7 @@ export class MindConnectSetup extends CredentialAuth {
         if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
 
         const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
-        const url = `${this._gateway}/api/mindconnect/v3/diagnosticActivations/${activationId}`;
+        const url = `${this._gateway}${this.MindConnectBaseUrl()}/diagnosticActivations/${activationId}`;
 
         log(`DeleteDiagnostic Headers ${JSON.stringify(headers)} Url ${url}`);
 
@@ -148,7 +170,7 @@ export class MindConnectSetup extends CredentialAuth {
         if (!this._accessToken) throw new Error("The agent doesn't have a valid access token.");
 
         const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
-        const url = `${this._gateway}/api/mindconnect/v3/diagnosticActivations`;
+        const url = `${this._gateway}${this.MindConnectBaseUrl()}/diagnosticActivations`;
 
         log(`GetDiagnosticActivations Headers ${JSON.stringify(headers)} Url ${url}`);
 
@@ -218,7 +240,7 @@ export class MindConnectSetup extends CredentialAuth {
         }
 
         const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
-        let url = `${this._gateway}/api/mindconnect/v3/diagnosticInformation?size=50&page=${page}`;
+        let url = `${this._gateway}${this.MindConnectBaseUrl()}/diagnosticInformation?size=50&page=${page}`;
         if (agentId) {
             url = `${url}&filter={"agentId" : "${agentId}"}`;
         }
@@ -254,7 +276,7 @@ export class MindConnectSetup extends CredentialAuth {
         }
 
         const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
-        const url = `${this._gateway}/api/agentmanagement/v3/agents/${agentId}/status`;
+        const url = `${this._gateway}${this.AgentManagementBaseUrl()}/agents/${agentId}/status`;
         log(`GetAgentStatus Headers ${JSON.stringify(headers)} Url ${url}`);
 
         try {
@@ -286,7 +308,7 @@ export class MindConnectSetup extends CredentialAuth {
         }
 
         const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
-        const url = `${this._gateway}/api/agentmanagement/v3/agents/${agentId}/boarding/status`;
+        const url = `${this._gateway}${this.AgentManagementBaseUrl()}/agents/${agentId}/boarding/status`;
         log(`GetAgentStatus Headers ${JSON.stringify(headers)} Url ${url}`);
 
         try {

@@ -27,6 +27,31 @@
 
 </p>
 
+> [!WARNING]
+> ### Breaking change starting with version 4.0.0
+>
+> Insights Hub URLs are migrating from the `mindsphere.io` domain to the new `siemens.app` scheme. **Version 4.0.0 and above only work with the new `siemens.app` URLs** and are **not compatible** with tenants/gateways still using the old `mindsphere.io` URLs.
+>
+> - If your tenant/gateway already uses the new `siemens.app` URLs, install `@mindconnect/mindconnect-nodejs@^4.0.0`.
+> - If your tenant/gateway still uses the old `mindsphere.io` URLs, keep using `@mindconnect/mindconnect-nodejs@^3.0.0` (the `3.x` line will continue to work with the old URL scheme).
+>
+> **4.0.0 is best-effort compatible with the new Xcelerator gateway** - it has been tested against the current public-cloud regions, but the migration is still in progress and some backend behavior (see below) is known to differ across deployments. **For on-premise/private-cloud installations we recommend staying on the `3.x` line** until the Xcelerator migration and this library's support for it have stabilized.
+
+## Migrating to the Xcelerator gateway (4.0.0)
+
+Version 4.0.0 talks to the new Xcelerator gateway (`siemens.app`) instead of the classic Insights Hub gateway (`mindsphere.io`). A few things changed as a consequence, and a couple of rough edges (outside this library's control) are worth knowing about:
+
+- **Tenant name vs. tenant/identity-zone id (CLI/SDK credentials only)**: Xcelerator distinguishes between the tenant **name** (used in asset-model qualified names, e.g. `mytenant.MyAspectType`) and a numeric **identity-zone/customer tenant id** (required by the OAuth token endpoint). This only concerns `mc service-credentials` (APP/SERVICE credentials used by CLI/SDK commands like `mc aspects`/`mc assets`) - it has no effect on agent onboarding/`mc agent-token`, which derives its tenant identity entirely from the onboarding response instead. Older configurations that only set a single `tenant`/`usertenant` value may need to also set `--customer-tenant-id`/`--core-tenant-id` when adding credentials, e.g.:
+
+  ```bash
+  mc service-credentials --mode add --type APP --tenant mytenant --usertenant mytenant \
+      --customer-tenant-id <numeric identity zone id> --core-tenant-id <numeric core tenant id>
+  ```
+
+  Both ids can be found in the URL of any Xcelerator app, e.g. `https://<customerTenantId>-settings-<coreTenantId>.<region>.siemens.app/`.
+
+- **Agent token signature verification (`mc agent-token`)**: the documented `GET /oauth/token_key` endpoint on some FDS-migrated tenants currently returns a signing key that doesn't match the one that actually signed the access token (a known, tracked upstream defect, not specific to this library). When that happens, this library falls back to resolving the real signing key from the token's own `jku` header claim - but only from a **trusted host**: by default `<coreTenantId>.<region>.sws.siemens.com`, cross-checked against your own configured core tenant id (never blindly trusted from the token itself). If your deployment legitimately serves signing keys from a different host, opt it in explicitly via the `MDSP_TRUSTED_JKU_HOSTS` environment variable (comma separated hostnames or `*.`-prefixed wildcard patterns) - this only adds to, never replaces, the default check.
+
 ## Full documentation
 
 The full documentation can be found at [https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/index.html](https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/index.html)
@@ -36,10 +61,12 @@ The full documentation can be found at [https://developer.siemens.com/industrial
 There are several ways to install the library. The most common one is via npm registry:
 
 ```bash
-# install the latest stable library from the npm registry
+# install the latest stable library from the npm registry (v4+, requires the new siemens.app URL scheme)
 npm install @mindconnect/mindconnect-nodejs --save
 # install the latest alpha library from the npm registry
 npm install @mindconnect/mindconnect-nodejs@alpha --save
+# if your tenant/gateway still uses the old mindsphere.io URLs, install the 3.x line instead
+npm install @mindconnect/mindconnect-nodejs@^3.0.0 --save
 ```
 
 ## Getting started
@@ -90,6 +117,9 @@ Create an agent in Asset Manager of type core.MindConnectLib create initial JSON
     "expiration": "2018-04-06T00:47:39.000Z"
 }
 ```
+
+> [!NOTE]
+> On tenants that have been migrated to the Xcelerator gateway, the JSON token also contains a nested `fds` object (e.g. `"fds": { "baseUrl": "https://api.eu1.siemens.app", "mntTenant": "1000001700" }`) alongside the fields above. This library prefers `content.fds.baseUrl`/`fds.mntTenant` over the legacy `content.baseUrl` whenever they are present, so you don't need to change anything in your code for this - just don't remove the `fds` object if you hand-edit this file.
 
 ### Step 3 : Create an agent
 
@@ -462,11 +492,11 @@ Linux, macOS: Rename the file to `mc` and make sure that the file is marked as e
 
 ### Configuring CLI
 
-First step is to configure the CLI. For this you will need a session cookie from Insights Hub, service credentials (which have been deprecated) or application credentials from your developer cockpit.
+First step is to configure the CLI. For this you will need a session cookie from Insights Hub, technical user credentials or application credentials from your developer cockpit.
 
 - [SESSION and XSRF-TOKEN cookie](https://developer.mindsphere.io/howto/howto-local-development.html#generate-user-credentials)
 - [Application Credentials](https://documentation.mindsphere.io/resources/html/developer-cockpit/en-US/124342231819.html)
-- [Service Credentials](https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials)
+- [Technical User Credentials](https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html#creating-service-credentials)
 
 First start the credentials configuration. This will start a web server on your local computer where you can enter the credentials.
 
@@ -484,6 +514,10 @@ Navigate to [http://localhost:4994](http://localhost:4994) to configure the CLI.
 The image below shows the dialog for adding new credentials (press on the + sign in the upper left corner)
 
 ![CLI](images/servicecredentials.png)
+
+Technical User Credentials additionally expose a Customer Tenant Id field (the OAuth/PIAM identity zone id) alongside Core Tenant Id - both ids can be found in the URL of any Xcelerator app, e.g. `https://<customerTenantId>-settings-<coreTenantId>.<region>.siemens.app/`.
+
+![CLI](images/servicecredentials-technical.png)
 
 You can get the application credentials from your developer or operator cockpit in Insights Hub. (if you don't have any application you can register a dummy one just for CLI)
 
@@ -585,13 +619,13 @@ Commands:
 
   Documentation:
 
-    the magenta colored commands * use app or service credentials or borrowed mindsphere cookies
+    the magenta colored commands * use app or technical user credentials or borrowed mindsphere cookies
     the cyan colored commands require mindconnectlib (agent) credentials
     the blue colored commands @ use analytical functions of Insights Hub
     the green colored commands # are used as setup and utility commands
     the yellow colored commands & use borrowed mindsphere application cookies
     the credentials and cookies should only be used in secure environments
-    Full documentation: developer.siemens.com/industrial-iot-open-source/index.html
+    Full documentation: developer.siemens.com/industrial-iot-open-source/overview.html
 ```
 
 ## Insights Hub Development Proxy
@@ -601,7 +635,9 @@ at your local machine at
 
 [http://localhost:7707](http://localhost:7707)
 
-which will authenticate all requests using either [a borrowed SESSION and XSRF-TOKEN cookie from Insights Hub](https://developer.mindsphere.io/howto/howto-local-development.html#generate-user-credentials) or the the configured app credentials or service credentials.
+which will authenticate all requests using either [a borrowed session and XSRF-TOKEN cookie from Insights Hub](https://developer.mindsphere.io/howto/howto-local-development.html#generate-user-credentials) or the the configured app credentials or technical user credentials.
+
+> Note: the browser cookie holding the session is named `SESSION` on legacy (`.mindsphere.io`) tenants and `gw_session` on Xcelerator (`.siemens.app`) tenants. The `--session`/`MDSP_SESSION` option always takes the cookie's **value**, regardless of which of the two names it has in the browser - the CLI sends both cookie names to the target host so it works either way.
 
 The command below will start your development proxy without any installation and configuration (you just need the cookies from an existing app):
 
@@ -624,10 +660,11 @@ Options:
   -w, --nowarn                      don't warn for missing headers
   -d, --dontkeepalive               don't keep the session alive
   -v, --verbose                     verbose output
-  -s, --session <session>           borrowed SESSION cookie from brower
+  -s, --session <session>           borrowed SESSION (legacy) or gw_session
+                                    (Xcelerator) cookie value from browser
   -x, --xsrftoken <xsrftoken>       borrowed XSRF-TOKEN cookie from browser
-  -h, --host <host>                 the address where SESSION and XSRF-TOKEN
-                                    have been borrowed from
+  -h, --host <host>                 the address where SESSION/gw_session and
+                                    XSRF-TOKEN have been borrowed from
   -t, --timeout <timeout>           keep alive timeout in seconds (default:
                                     "60")
   -k, --passkey <passkey>           passkey
@@ -636,7 +673,7 @@ Options:
   Examples:
 
     mc dev-proxy                                 runs on default port (7707) using cookies
-    mc dev-proxy --port 7777 --passkey passkey   runs on port 7777 using app/service credentials
+    mc dev-proxy --port 7777 --passkey passkey   runs on port 7777 using app/technical user credentials
 
   Configuration:
 
@@ -645,12 +682,6 @@ Options:
     see more documentation at https://developer.siemens.com/industrial-iot-open-source/mindconnect-nodejs/development-proxy.html
 
 ````
-
-## Community
-
-[![Stargazers repo roster for @mindsphere/mindconnect-nodejs](https://reporoster.com/stars/mindsphere/mindconnect-nodejs)](https://github.com/mindsphere/mindconnect-nodejs/stargazers)
-
-[![Forkers repo roster for @mindsphere/mindconnect-nodejs](https://reporoster.com/forks/mindsphere/mindconnect-nodejs)](https://github.com/mindsphere/mindconnect-nodejs/network/members)
 
 ## Legal
 

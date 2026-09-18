@@ -12,7 +12,9 @@ import { TimeSeriesBulkModels } from "./iot-timeseries-bulk-models";
  * @extends {SdkClient}
  */
 export class TimeSeriesBulkClient extends SdkClient {
-    private _baseUrl: string = "/api/iottsbulk/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("iottsbulk", "v3");
+    }
 
     /**
      * Bulk imports time series data for a specific asset and aspect.

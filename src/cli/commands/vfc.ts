@@ -55,7 +55,7 @@ export default (program: Command) => {
 
                         case "template":
                             createTemplate(options, sdk.GetTenant());
-                            console.log("Edit the file before submitting it to MindSphere.");
+                            console.log("Edit the file before submitting it to Insights Hub.");
                             break;
                         case "delete":
                             await deleteVfcProject(options, sdk);

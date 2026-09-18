@@ -1,6 +1,6 @@
 import fetch from "cross-fetch";
 import { TokenRotation } from "./mindconnect-base";
-import { removeTrailingSlash, removeUndefined, throwError } from "./utils";
+import { extractCoreTenantIdFromHostname, removeTrailingSlash, removeUndefined, throwError } from "./utils";
 
 function log(message: string) {
     if (typeof window !== "undefined" && (window as any).DEBUGSDK === true) {
@@ -234,6 +234,22 @@ export class BrowserAuth implements TokenRotation {
      */
     GetTenant(): string {
         return ""; // the mindsphere gateway is doing this for us
+    }
+
+    /**
+     * Returns the Xcelerator core tenant id parsed from the embedding page's own hostname
+     * (<customerTenantId>-<appName>-<coreTenantId>.<region>.siemens.app), so relative API calls
+     * resolve to /<service>-<coreTenantId>/<version> the same way the app's own frontend code
+     * does. Falls back to "" (legacy bare /api/<service>/<version> path) for on-premise
+     * installations, legacy *.mindsphere.io app hosts, or non-browser (SSR/build) contexts.
+     *
+     * @returns {string}
+     *
+     * @memberOf BrowserAuth
+     */
+    GetCoreTenantId(): string {
+        if (typeof window === "undefined" || !window.location) return "";
+        return extractCoreTenantIdFromHostname(window.location.hostname);
     }
 
     private getCookieValue(a: string) {

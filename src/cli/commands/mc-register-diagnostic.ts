@@ -51,7 +51,10 @@ export default (program: Command) => {
                         true
                     );
                 } catch (err) {
-                    verboseLog(color("This operation requires additionaly the service credentials."), options.verbose);
+                    verboseLog(
+                        color("This operation requires additionaly the technical user credentials."),
+                        options.verbose
+                    );
                     errorLog(err, options.verbose);
                 }
             })();

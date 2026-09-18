@@ -34,7 +34,9 @@ import { TimeSeriesAggregateModels } from "./iot-timeseries-aggregate-models";
  * @extends {SdkClient}
  */
 export class TimeSeriesAggregateClient extends SdkClient {
-    private _baseUrl: string = "/api/iottsaggregates/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("iottsaggregates", "v3");
+    }
 
     /**
      * Read time series data aggregated over a certain interval for a single entity and propertyset within the provided time range.

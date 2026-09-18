@@ -3,7 +3,9 @@ import { SdkClient } from "../common/sdk-client";
 import { EventManagementModels } from "./event-models";
 
 export class EventManagementClient extends SdkClient {
-    private _baseUrl: string = "/api/eventmanagement/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("eventmanagement", "v3");
+    }
 
     /**
      * Ideally, the billboard URI is the only address a REST client needs to know.

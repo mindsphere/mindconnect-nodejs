@@ -26,7 +26,7 @@ const headers = {
     "Access-Control-Allow-Headers": "*",
     "Access-Control-Max-Age": 2592000, // 30 days
     "cache-control": "no-cache",
-    "x-proxied-by": "mindsphere development proxy",
+    "x-proxied-by": "Insights Hub development proxy",
 };
 
 export default (program: Command) => {
@@ -43,12 +43,15 @@ export default (program: Command) => {
         .option("-w, --nowarn", "don't warn for missing headers")
         .option("-d, --dontkeepalive", "don't keep the session alive")
         .option("-v, --verbose", "verbose output")
-        .option("-s, --session <session>", "borrowed SESSION cookie from brower")
+        .option("-s, --session <session>", "borrowed SESSION (legacy) or gw_session (Xcelerator) cookie value from browser")
         .option("-x, --xsrftoken <xsrftoken>", "borrowed XSRF-TOKEN cookie from browser")
-        .option("-h, --host <host>", "the address where SESSION and XSRF-TOKEN have been borrowed from")
+        .option(
+            "-h, --host <host>",
+            "the address where SESSION/gw_session and XSRF-TOKEN have been borrowed from"
+        )
         .option("-t, --timeout <timeout>", "keep alive timeout in seconds", "60")
         .option("-k, --passkey <passkey>", "passkey")
-        .description(color(`starts mindsphere development proxy & ${magenta("(optional passkey) *")}`))
+        .description(color(`starts Insights Hub development proxy & ${magenta("(optional passkey) *")}`))
         .action((options) => {
             (async () => {
                 try {
@@ -100,7 +103,7 @@ export default (program: Command) => {
             log(`    mdsp dev-proxy  \t\t\t\t runs on default port (7707) using ${yellow("cookies")}`);
             log(
                 `    mdsp dev-proxy --mode credentials --port 7777 --passkey $MDSP_PASSKEY 
-                                        \t runs on port 7777 using ${magenta("app/service credentials")}`
+                                        \t runs on port 7777 using ${magenta("app/technical user credentials")}`
             );
 
             log("\n  Configuration:\n");
@@ -182,7 +185,9 @@ async function serve({ configPort, options }: { configPort?: number; options: an
                         );
                 }
 
-                let newCookie = `SESSION=${options.session}; XSRF-TOKEN=${options.xsrftoken}`;
+                // * legacy tenants use a SESSION cookie, Xcelerator (gateway) tenants use gw_session;
+                // * sending both is harmless and lets a borrowed session work on either scheme.
+                let newCookie = `SESSION=${options.session}; gw_session=${options.session}; XSRF-TOKEN=${options.xsrftoken}`;
                 if (region && region !== "") {
                     newCookie += `;REGION-SESSION=${region}`;
                     options.verbose &&
@@ -192,13 +197,13 @@ async function serve({ configPort, options }: { configPort?: number; options: an
                 (requestOptions.headers as any)["cookie"] = newCookie;
                 options.verbose &&
                     console.log(
-                        `[${green(new Date().toISOString())}] Setting mindsphere request cookies to ${newCookie}`
+                        `[${green(new Date().toISOString())}] Setting Insights Hub request cookies to ${newCookie}`
                     );
 
                 (requestOptions.headers as any)["x-xsrf-token"] = options.xsrftoken;
                 options.verbose &&
                     console.log(
-                        `[${green(new Date().toISOString())}] Setting mindsphere request x-xsrf-token to ${
+                        `[${green(new Date().toISOString())}] Setting Insights Hub request x-xsrf-token to ${
                             options.xsrftoken
                         }`
                     );
@@ -274,6 +279,7 @@ async function serve({ configPort, options }: { configPort?: number; options: an
 
                         if (responseHeaders["set-cookie"] && responseHeaders["set-cookie"].length > 0) {
                             cookies.push(`SESSION=${options.session}; Path=/;`);
+                            cookies.push(`gw_session=${options.session}; Path=/;`);
                             cookies.push(`XSRF-TOKEN=${options.xsrftoken}; Path=/;`);
 
                             options.verbose &&
@@ -333,7 +339,7 @@ function keepAliveIfConfigured(options: any, proxyHttpAgent: any) {
         !options.dontkeepalive &&
         setInterval(async () => {
             const host = `https://${options.host}`;
-            const newCookie = `SESSION=${options.session}; XSRF-TOKEN=${options.xsrftoken}`;
+            const newCookie = `SESSION=${options.session}; gw_session=${options.session}; XSRF-TOKEN=${options.xsrftoken}`;
             const keepAlive = await fetch(host, {
                 method: "GET",
                 headers: { cookie: newCookie },

@@ -113,3 +113,7 @@ markdown-help/**
 ## downloaded assets models
 
 *.mdsp.assetmodel/**
+
+url-migration-review.md
+
+.DS_Store

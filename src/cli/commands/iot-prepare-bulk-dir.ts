@@ -25,7 +25,7 @@ export default (program: Command) => {
         .alias("pb")
         .option("-d, --dir <directoryname>", "config file with agent configuration", "bulkupload")
         .option("-w, --twintype <mode>", "twintype of asset [performance|simulation]")
-        .option("-i, --assetid <assetid>", "mindsphere asset id ")
+        .option("-i, --assetid <assetid>", "Insights Hub asset id ")
         .option("-t, --typeid <typeid>", "typeid e.g. castidev.Engine ")
         .option("-s, --size <size>", "entries per file ", "100")
         .option("-f, --files <files>", "generated files ", "2")
@@ -261,7 +261,7 @@ async function generateCsv(
 
             const result = stream.write(line.trimRight().slice(0, -1) + "\n");
             if (!result) {
-                await new Promise((resolve) => stream.once("drain", resolve));
+                await new Promise((resolve) => stream.once("drain", () => resolve(undefined)));
             }
         }
 

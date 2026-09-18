@@ -69,7 +69,7 @@ export default (program: Command) => {
                                     throwError(`${options.for} is not a valid option for template creation`);
                                     break;
                             }
-                            console.log("Edit the file before submitting it to MindSphere.");
+                            console.log("Edit the file before submitting it to Insights Hub.");
                             break;
                         }
                         case "create":

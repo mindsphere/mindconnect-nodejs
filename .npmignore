@@ -6,9 +6,9 @@
 agentconfig*.json
 images/
 docs/
-src/
-test/
-templates/
+/src/
+/test/
+/templates/
 .dockerignore
 Dockerfile
 tsconfig.json
@@ -31,6 +31,8 @@ Jenkinsfile
 report.xml
 .github
 .prettier*
+
+url-migration-review.md
 
 bulkupload*
 bulkdownload*

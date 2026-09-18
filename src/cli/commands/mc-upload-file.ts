@@ -21,20 +21,20 @@ export default (program: Command) => {
             "required for agents with RSA_3072 profile. create with: openssl genrsa -out private.key 3072"
         )
         .option("-f, --file <fileToUpload>", "file to upload to the file service")
-        .option("-h, --filepath <filepath>", "file path in the mindsphere")
+        .option("-h, --filepath <filepath>", "file path in the Insights Hub")
         .option("-l, --parallel <number>", "parallel chunk uploads", "3")
-        .option("-i, --assetid [assetid]", "mindsphere asset id  (default: upload to the agent)")
+        .option("-i, --assetid [assetid]", "Insights Hub asset id  (default: upload to the agent)")
         .option("-m, --mime [mime-type]", "mime type of the file (default: automatic recognition)")
         .option("-d, --desc [description]", "description")
         .option("-k, --chunked", "Use chunked upload")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option(
             "-p, --passkey <passkey>",
-            `passkey (optional, file upload uses ${adminColor("service credentials *")})`
+            `passkey (optional, file upload uses ${adminColor("technical user credentials *")})`
         )
         .option("-v, --verbose", "verbose output")
         .description(
-            `${color("upload the file to the mindsphere file service")} ${adminColor("(optional: passkey) *")}`
+            `${color("upload the file to the Insights Hub file service")} ${adminColor("(optional: passkey) *")}`
         )
         .action((options) => {
             (async () => {
@@ -169,5 +169,5 @@ function checkParameters(options: any) {
         errorLog("Missing file name for upload-file command. Run mdsp uf --help for full syntax and examples.", true);
     !options.config &&
         !options.assetid &&
-        errorLog(" You have to specify assetid when using service credential upload", true);
+        errorLog(" You have to specify assetid when using technical user credential upload", true);
 }

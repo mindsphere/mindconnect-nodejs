@@ -30,7 +30,7 @@ export default (program: Command) => {
             "download"
         )
         .option("-d, --dir <dir>", "download folder", "eventdownload")
-        .option("-i, --assetid <assetid>", "mindsphere asset id ")
+        .option("-i, --assetid <assetid>", "Insights Hub asset id ")
         .option("-j, --jobid <jobid>", "check deletion process of jobs with jobid")
         .option(
             "-f, --filter [filter]",
@@ -105,7 +105,7 @@ async function downloadEvents(options: any, sdk: MindSphereSdk) {
 
     const eventManagement = sdk.GetEventManagementClient();
 
-    const spinner = ora("downloading mindsphere events");
+    const spinner = ora("downloading Insights Hub events");
     !options.verbose && spinner.start();
 
     let filter: string;

@@ -74,7 +74,7 @@ function extractExamples(cmd: Command) {
 const commandTemplate = (name: string, description: string, help: string, examples: string) => {
     return `
 ---
-title: MindSphere CLI -  mdsp ${stripAnsi(name)} Command
+title: Insights Hub CLI -  mdsp ${stripAnsi(name)} Command
 next:
     - title: Overview
       link: ../cli/index
@@ -82,7 +82,7 @@ next:
       link: ../cli/setting-up-the-cli
 ---
 
-# MindSphere CLI: mdsp ${stripAnsi(name)} Command
+# Insights Hub CLI: mdsp ${stripAnsi(name)} Command
 
 Syntax:
 
@@ -124,16 +124,16 @@ Here are some examples of how to use the \`mdsp ${stripAnsi(name)}\` command:
 ${stripAnsi(examples)}
 \`\`\`
 
-See [MindSphere API documentation](https://developer.siemens.com/insights-hub/overview.html) for more information about MindSphere APIs.
+See [Insights Hub API documentation](https://developer.siemens.com/insights-hub/overview.html) for more information about Insights Hub APIs.
 
 `;
 };
 
 const indexTemplate = (index: string) => `
 ---
-title: MindSphere CLI: List of all commands
+title: Insights Hub CLI: List of all commands
 ---
-# MindSphere CLI: List of all commands
+# Insights Hub CLI: List of all commands
 
 | Command     | Description |
 | ----------- | ----------- |

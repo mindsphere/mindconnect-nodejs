@@ -24,6 +24,17 @@ export const convertToTdpArray = (data: any[]): TimeStampedDataPoint[] => {
     return tdpArray;
 };
 
+/**
+ * Default Xcelerator "core tenant id" (API system id) used to build the new siemens.app based
+ * service URLs (e.g. https://api.eu1.siemens.app/assetmanagement-1000001700/v3).
+ *
+ * This is only a fallback default: it is used when a bare region (e.g. "eu1") is passed
+ * as gateway during configuration. It can always be overridden (e.g. via --core-tenant-id in the CLI).
+ * On-premise installations (and other setups where a full custom gateway URL is supplied)
+ * never get a coreTenantId assigned automatically and keep using the legacy /api/<service>/v<version> paths.
+ */
+export const DEFAULT_CORE_TENANT_ID = "1000001700";
+
 export type authJson = {
     auth: string;
     iv: string;
@@ -35,6 +46,8 @@ export type authJson = {
     selected: boolean;
     type: "SERVICE" | "APP";
     createdAt: string;
+    coreTenantId?: string;
+    customerTenantId?: string;
 };
 
 export function upgradeOldConfiguration(obj: any) {
@@ -65,9 +78,41 @@ export const isUrl = (url: string): boolean => {
     }
 };
 
-export const getPiamUrl = (gateway: string, tenant: string): string => {
+/**
+ * Builds the PIAM/OAuth base url used for token acquisition and public key retrieval.
+ *
+ * On the new Xcelerator scheme, PIAM lives on an entirely different domain:
+ * https://<customerTenantId>.<region>.sws.siemens.com/ (region is extracted from the
+ * api.<region>.siemens.app gateway).
+ *
+ * When there is no customerTenantId (on-premise installations, legacy mindsphere.io tenants,
+ * BrowserAuth) the legacy https://<tenant>.piam.<region>.mindsphere.io/ scheme is used, exactly
+ * as before.
+ */
+export const getPiamUrl = (gateway: string, tenant: string, customerTenantId?: string): string => {
+    const xceleratorRegion = gateway.match(/^https?:\/\/api\.([^./]+)\.siemens\.app/i);
+
+    if (customerTenantId && xceleratorRegion) {
+        return `https://${customerTenantId}.${xceleratorRegion[1]}.sws.siemens.com/`;
+    }
+
     const piamUrl = gateway.replace("gateway", `${tenant}.piam`);
     return piamUrl.endsWith("/") ? piamUrl : piamUrl + "/";
+};
+
+/**
+ * Extracts the Xcelerator core tenant id from an app hostname of the form
+ * <customerTenantId>-<appName>-<coreTenantId>.<region>.siemens.app (e.g. the origin an embedded
+ * app is served from). Returns "" if the hostname doesn't match that scheme (on-premise
+ * installations, legacy *.mindsphere.io app hosts, or any other host).
+ *
+ * Used by BrowserAuth/FrontendAuth to build the correct /<service>-<coreTenantId>/<version>
+ * request paths when the SDK is embedded in - or is proxying for - an Xcelerator-migrated app,
+ * since those apps no longer resolve the legacy bare /api/<service>/<version> path.
+ */
+export const extractCoreTenantIdFromHostname = (hostname: string): string => {
+    const match = hostname.match(/^\d+-[a-z0-9-]+-(\d+)\.[a-z0-9-]+\.siemens\.app$/i);
+    return match ? match[1] : "";
 };
 
 const normalizePasskey = (passkey: string): string => {
@@ -86,6 +131,8 @@ export const encrypt = ({
     appVersion,
     createdAt,
     selected,
+    coreTenantId,
+    customerTenantId,
 }: credentialEntry): authJson => {
     const base64encoded = Buffer.from(`${user}:${password}`).toString("base64");
     const iv = crypto.randomBytes(16);
@@ -93,7 +140,7 @@ export const encrypt = ({
     const cipher = crypto.createCipheriv("aes-256-ctr", Buffer.from(normalizePasskey(passkey)), iv);
     let crypted = cipher.update(`Basic ${base64encoded}`, "utf8", "hex");
     crypted += cipher.final("hex");
-    const encryptedAuth = {
+    const encryptedAuth: authJson = {
         auth: crypted.toString(),
         iv: iv.toString("base64"),
         gateway: gateway,
@@ -104,6 +151,8 @@ export const encrypt = ({
         appVersion: appVersion,
         createdAt: createdAt,
         selected: selected,
+        coreTenantId: coreTenantId,
+        customerTenantId: customerTenantId,
     };
     // console.log(encryptedAuth);
     return encryptedAuth;
@@ -121,6 +170,8 @@ export type credentialEntry = {
     appVersion: string;
     createdAt: string;
     selected: boolean;
+    coreTenantId?: string;
+    customerTenantId?: string;
 };
 
 export const decrypt = (encryptedAuth: authJson, passkey: string): string => {
@@ -326,7 +377,14 @@ export function addAndStoreConfiguration(configuration: any) {
     };
     (!configuration || !configuration.credentials) && throwError("invalid configuration!");
     configuration.credentials.forEach((element: credentialEntry) => {
-        element.gateway = isUrl(element.gateway) ? element.gateway : `https://gateway.${element.gateway}.mindsphere.io`;
+        // a bare region (e.g. "eu1") means the user wants a new Xcelerator (siemens.app) cloud tenant.
+        // a full URL (on-premise, or any other custom gateway) is left untouched and never gets a
+        // coreTenantId assigned automatically, which keeps it on the legacy /api/<service>/v<version> paths.
+        const isBareRegion = !isUrl(element.gateway);
+        element.gateway = isBareRegion ? `https://api.${element.gateway}.siemens.app` : element.gateway;
+        if (isBareRegion && !element.coreTenantId) {
+            element.coreTenantId = DEFAULT_CORE_TENANT_ID;
+        }
         newConfiguration.credentials.push(element.passkey ? encrypt(element) : (element as unknown as authJson));
     });
     checkList(newConfiguration.credentials);
@@ -419,7 +477,7 @@ export function printTree(treeItem: TreeItem, level: number, color: (x: string) 
 }
 
 export function removeTrailingSlash(url: string): string {
-    if (url.endsWith("/api/assetmanagement/v3/") || url.endsWith("/api/eventmanagement/v3/")) {
+    if (/\/(api\/)?assetmanagement(-\d+)?\/v3\/$/.test(url) || /\/(api\/)?eventmanagement(-\d+)?\/v3\/$/.test(url)) {
         return url;
     }
     // console.log(url);

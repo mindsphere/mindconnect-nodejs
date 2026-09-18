@@ -34,7 +34,7 @@ export default (program: Command) => {
         .option("-k, --passkey <passkey>", "passkey")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(color("create an agent in the mindsphere *"))
+        .description(color("create an agent in the Insights Hub *"))
         .action((options) => {
             (async () => {
                 try {
@@ -94,9 +94,7 @@ export default (program: Command) => {
                         console.log("\t" + color(`openssl genrsa -out ${options.config}.key 3072`));
                     }
                     agentConfigLog({
-                        gateway: sdk.GetGateway(),
-                        host: "gateway",
-                        tenant: sdk.GetTenant(),
+                        sdk,
                         agentid: `${createdAgent.id}`,
                         color,
                     });

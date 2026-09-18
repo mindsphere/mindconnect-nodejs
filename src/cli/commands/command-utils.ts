@@ -3,7 +3,7 @@ import { log } from "console";
 import { isAfter, isSameDay, subDays } from "date-fns";
 import { FrontendAuth } from "../../api/frontend-auth";
 import { AssetManagementModels, MindSphereSdk } from "../../api/sdk";
-import { decrypt, getHomeDotMcDir, loadAuth } from "../../api/utils";
+import { decrypt, extractCoreTenantIdFromHostname, getHomeDotMcDir, loadAuth } from "../../api/utils";
 import { MC_NAME, MC_VERSION } from "../../version";
 
 const updateNotifier = require("update-notifier-cjs");
@@ -44,7 +44,7 @@ export const serviceCredentialLog = (color: Function = magenta) => {
     }
 
     log(`\n  Important: `);
-    log(`\n  Authentication with ${color("service credentials")} or ${color("app credentials")}:\n`);
+    log(`\n  Authentication with ${color("technical user credentials")} or ${color("app credentials")}:\n`);
 
     log(`    \t- either append option [--passkey <your passkey>] to the command `);
     log(`    \t- or create environment variable ${color("MDSP_PASSKEY")} with your current passkey`);
@@ -91,10 +91,10 @@ export const subtractSecond = (date: Date, seconds: number): Date => {
 export const displayCsvHelp = (color: (chalk: string) => string) => {
     const now = new Date();
     log("\n  Examples:\n");
-    log(`    mdsp ts -f timeseries.csv \t\t\t\t\t upload timeseries from the csv file to mindsphere `);
+    log(`    mdsp ts -f timeseries.csv \t\t\t\t\t upload timeseries from the csv file to Insights Hub `);
     log(`    mdsp upload-timeseries --file timeseries.csv  --size 100  \t use http post size of 100 records `);
 
-    log(`\n  ${color("Data Format:")} (use your own data point ids from mindsphere)\n`);
+    log(`\n  ${color("Data Format:")} (use your own data point ids from Insights Hub)\n`);
     log(`  timestamp, ${color("dataPointId")}, ${green("qualityCode")}, ${yellow("value")}`);
     log(`  ${subtractSecond(now, 2).toISOString()}, ${color("DP-Temperature")} ,${green("0")}, ${yellow("20.34")}`);
     log(`  ${subtractSecond(now, 1).toISOString()}, ${color("DP-Humidity")}, ${green("0")}, ${yellow("70")}`);
@@ -102,14 +102,14 @@ export const displayCsvHelp = (color: (chalk: string) => string) => {
 
     log(
         `\n  Make sure that the timestamp is in ISO format. The headers and the casing (timestamp, dataPointId) are important.`,
-        `\n  The values must correspond with data types configured in mindsphere (in example: ${color(
+        `\n  The values must correspond with data types configured in Insights Hub (in example: ${color(
             "DP-Humidity"
         )} must be an ${color("integer")})`
     );
 
     log(`\n  ${color("Important:")}\n`);
     log(
-        `    You have to configure the data source and data mappings in mindsphere asset manager before you can upload the data`
+        `    You have to configure the data source and data mappings in Insights Hub asset manager before you can upload the data`
     );
     log(
         `    See also: ${color(
@@ -154,7 +154,7 @@ export function modeInformation(asset: AssetManagementModels.AssetResourceWithHi
         console.log(`\nYou are using the ${color("standard timeseries")} ingest for the asset.`);
         console.log(`The calls to the API will be ${color("throttled")} to match your throttling limits.`);
         console.log(`The number of the records per message will be reduced to ${color(options.size)} per message.\n`);
-        console.log(`Using this feature has a direct impact on ${color("your")} MindSphere resource consumption.`);
+        console.log(`Using this feature has a direct impact on ${color("your")} Insights Hub resource consumption.`);
         console.log(`You might get a notice that you will need to upgrade your account's data ingest rate.`);
         console.log(`${yellow("Warning")} This feature is ${yellow("deprecated")}!\n`);
     }
@@ -212,7 +212,14 @@ export function getSdk(options: any) {
             host = `https://${host}`;
         }
 
-        sdk = new MindSphereSdk(new FrontendAuth(host, process.env.MDSP_SESSION, process.env.MDSP_XSRF_TOKEN));
+        // On Xcelerator-migrated hosts (<customerTenantId>-<appName>-<coreTenantId>.<region>.siemens.app)
+        // the app no longer resolves the legacy bare /api/<service>/<version> path - it needs the
+        // coreTenantId embedded (/api/<service>-<coreTenantId>/<version>), same as the app's own frontend code.
+        const coreTenantId = extractCoreTenantIdFromHostname(new URL(host).hostname);
+
+        sdk = new MindSphereSdk(
+            new FrontendAuth(host, process.env.MDSP_SESSION, process.env.MDSP_XSRF_TOKEN, coreTenantId)
+        );
         options._selected_mode = "cookie";
     } else {
         throw new Error("The passkey was not provided and there are no environment variables");
@@ -221,24 +228,20 @@ export function getSdk(options: any) {
 }
 
 export function agentConfigLog({
-    gateway,
-    host,
-    tenant,
+    sdk,
     agentid,
     color,
+    legacyReplaceToken = "gateway",
 }: {
-    gateway: string;
-    host: string;
-    tenant: string;
+    sdk: MindSphereSdk;
     agentid: string | undefined;
     color: Function;
+    legacyReplaceToken?: string;
 }) {
     console.log("\nConfigure your agent at:\n");
     console.log(
         "\t" +
-            color(
-                `${gateway.replace(host, tenant + "-assetmanager")}/entity/${agentid}/plugin/uipluginassetmanagermclib`
-            ) +
+            color(sdk.GetAppUrl("assetmanager", `/entity/${agentid}/plugin/uipluginassetmanagermclib`, legacyReplaceToken)) +
             "\n"
     );
 }

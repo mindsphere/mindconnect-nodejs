@@ -2,7 +2,9 @@ import { SdkClient } from "../common/sdk-client";
 import { AdvancedTokenExchangeModels } from "./advanced-token-models";
 
 export class AdvancedTokenExchangeClient extends SdkClient {
-    private _baseUrl: string = "/api/ate/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("ate", "v3");
+    }
 
     /**
      *

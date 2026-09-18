@@ -47,16 +47,14 @@ export default (program: Command) => {
 
                     verboseLog(JSON.stringify(bc), options.verbose);
 
-                    !bc.content && throwError("Invalid configuration recieved from mindsphere.");
+                    !bc.content && throwError("Invalid configuration recieved from Insights Hub.");
 
                     console.log(`\nAgent configuration renewed`);
 
                     fs.writeFileSync(options.config, JSON.stringify(bc));
 
                     agentConfigLog({
-                        gateway: sdk.GetGateway(),
-                        host: "gateway",
-                        tenant: sdk.GetTenant(),
+                        sdk,
                         agentid,
                         color,
                     });

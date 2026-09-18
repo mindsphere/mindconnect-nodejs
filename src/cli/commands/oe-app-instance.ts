@@ -53,7 +53,7 @@ export default (program: Command) => {
                         case "template":
                             await createTemplateApp(options, sdk);
                             await createTemplateAppConfig(options, sdk);
-                            console.log("Edit the file(s) before submitting it to MindSphere.");
+                            console.log("Edit the file(s) before submitting it to Insights Hub.");
                             break;
                         case "delete":
                             await deleteAppInst(options, sdk);

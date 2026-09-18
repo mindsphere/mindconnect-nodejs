@@ -19,12 +19,12 @@ export default (program: Command) => {
             "-r, --cert [privatekey]",
             "required for agents with RSA_3072 profile. create with: openssl genrsa -out private.key 3072"
         )
-        .option("-f, --file <timeseriesdata.csv>", "csv file containing the timeseries data to upload to mindsphere")
+        .option("-f, --file <timeseriesdata.csv>", "csv file containing the timeseries data to upload to Insights Hub")
         .option("-s, --size <size>", "max records per http post", "200")
         .option("-n, --no-validation", "switch validation off (only if you are sure that the timeseries upload works)")
         .option("-y, --retry <number>", "retry attempts before giving up", "3")
         .option("-v, --verbose", "verbose output")
-        .description(color("parse .csv file with timeseriesdata and upload the timeseries data to mindsphere"))
+        .description(color("parse .csv file with timeseriesdata and upload the timeseries data to Insights Hub"))
         .action((options) => {
             (async () => {
                 try {

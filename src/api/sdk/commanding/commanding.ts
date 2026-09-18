@@ -14,7 +14,9 @@ import { CommandingModels } from "./commanding-models";
  * @extends {SdkClient}
  */
 export class CommandingClient extends SdkClient {
-    private _baseUrl: string = "/api/commanding/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("commanding", "v3");
+    }
 
     /**
      * Creates a delivery job.

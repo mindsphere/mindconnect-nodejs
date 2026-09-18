@@ -10,7 +10,9 @@ import { TimeSeriesModels } from "./iot-timeseries-models";
  * @extends {SdkClient}
  */
 export class TimeSeriesClient extends SdkClient {
-    private _baseUrl: string = "/api/iottimeseries/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("iottimeseries", "v3");
+    }
 
     /**
      * Read time series data for a single entity and propertyset. Returns data for a specified time range. Returns the latest value if no range is provided.

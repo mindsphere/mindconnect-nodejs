@@ -53,7 +53,7 @@ export default (program: Command) => {
 
                         case "template":
                             createTemplate(options, sdk.GetTenant());
-                            console.log("Edit the file before submitting it to MindSphere.");
+                            console.log("Edit the file before submitting it to Insights Hub.");
                             break;
                         case "delete":
                             await deletePolicy(options, sdk);
@@ -114,7 +114,7 @@ async function updatePolicy(options: any, sdk: MindSphereSdk) {
 function createTemplate(options: any, tenant: string) {
     const policy = {
         name: "Policy",
-        description: "Created with MindSphere CLI",
+        description: "Created with Insights Hub CLI",
         active: true,
         subjects: [`mdsp:core:identitymanagement:eu1:${tenant}:user:test@example.com`],
         rules: [

@@ -140,18 +140,18 @@ export class MultipartUploader {
     private highWatermark = 1 * 1024 * 1024;
 
     private getStreamFromFile(file: string | Buffer, chunksize: number) {
-        return file instanceof Buffer
-            ? (() => {
-                  const bufferStream = new stream.PassThrough({ highWaterMark: this.highWatermark });
-                  for (let index = 0; index < file.length; ) {
-                      const end = Math.min(index + chunksize, file.length);
-                      bufferStream.write(file.slice(index, end));
-                      index = end;
-                  }
-                  bufferStream.end();
-                  return bufferStream;
-              })()
-            : fs.createReadStream(path.resolve(file), { highWaterMark: this.highWatermark });
+        if (file instanceof Buffer) {
+            const bufferStream = new stream.PassThrough({ highWaterMark: this.highWatermark });
+            for (let index = 0; index < file.length; ) {
+                const end = Math.min(index + chunksize, file.length);
+                bufferStream.write(file.subarray(index, end));
+                index = end;
+            }
+            bufferStream.end();
+            return bufferStream;
+        }
+
+        return fs.createReadStream(path.resolve(file as string), { highWaterMark: this.highWatermark });
     }
 
     private addDataToBuffer(current: Uint8Array, data: Buffer) {
@@ -227,7 +227,7 @@ export class MultipartUploader {
         timeStamp?: Date;
         ifMatch?: number;
     }) {
-        const url = `/api/iotfile/v3/files/${entityId}/${uploadPath}?upload=${mode}`;
+        const url = `${this.IotFileBaseUrl()}/files/${entityId}/${uploadPath}?upload=${mode}`;
         const token = await this.GetToken();
 
         const headers = {
@@ -279,7 +279,7 @@ export class MultipartUploader {
             part = `?upload=complete`;
         }
 
-        const url = `/api/iotfile/v3/files/${entityId}/${uploadPath}${part}`;
+        const url = `${this.IotFileBaseUrl()}/files/${entityId}/${uploadPath}${part}`;
         const previousEtag = this.setIfMatch(`${this.GetGateway()}${url}`, headers);
 
         const token = await this.GetToken();
@@ -402,7 +402,7 @@ export class MultipartUploader {
         const hash = crypto.createHash("md5");
         const promises: any[] = [];
 
-        let current = new Uint8Array(0);
+        let current: Uint8Array = new Uint8Array(0);
         let chunks = 0;
 
         if (verboseFunction) verboseFunction(`file upload started for ${file}`);
@@ -433,7 +433,7 @@ export class MultipartUploader {
 
         return new Promise((resolve, reject) => {
             mystream
-                .on("error", (err) => reject(err))
+                .on("error", (err: Error) => reject(err))
                 .on("data", async (data: Buffer) => {
                     if (current.byteLength + data.byteLength <= chunkSize) {
                         current = this.addDataToBuffer(current, data);
@@ -555,7 +555,11 @@ export class MultipartUploader {
     private GetGateway() {
         !this.agent && !this.sdkClient && throwError("invalid conifguraiton for multipart upload");
         if (this.agent) {
-            return `${this.agent.GetMindConnectConfiguration().content.baseUrl}`;
+            // agent.GetGateway() prefers the Xcelerator gateway (content.fds.baseUrl) when the
+            // onboarding response provides one, matching the host the /iotfile-{coreTenantId}/v3
+            // path (built in IotFileBaseUrl() below) is actually routed to. Reading
+            // content.baseUrl directly here would bypass that and hit the wrong host.
+            return this.agent.GetGateway();
         }
 
         if (this.sdkClient) {
@@ -573,6 +577,18 @@ export class MultipartUploader {
 
     private GetAuthorizer() {
         return (this.agent || this.sdkClient) as TokenRotation;
+    }
+
+    /**
+     * Builds the iotfile base url, honoring the Xcelerator core tenant id when configured.
+     * Falls back to the legacy /api/iotfile/v3 path otherwise (on-premise, legacy tenants, BrowserAuth).
+     *
+     * @private
+     * @memberof MultipartUploader
+     */
+    private IotFileBaseUrl(): string {
+        const coreTenantId = this.GetAuthorizer().GetCoreTenantId ? this.GetAuthorizer().GetCoreTenantId!() : "";
+        return coreTenantId ? `/iotfile-${coreTenantId}/v3` : `/api/iotfile/v3`;
     }
 
     constructor(private agent?: MindConnectAgent, private sdkClient?: SdkClient) {

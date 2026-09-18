@@ -48,7 +48,7 @@ export default (program: Command) => {
 
                         case "template":
                             createTemplate(options);
-                            console.log("Edit the file before submitting it to MindSphere.");
+                            console.log("Edit the file before submitting it to Insights Hub.");
                             break;
                         case "delete":
                             await deleteAssetType(options, sdk);
@@ -78,7 +78,7 @@ export default (program: Command) => {
                 `    mdsp asset-types --mode template --assettype Pump \n\tcreate a template file (Enironment.assettype.mdsp.json) for assettype Pump`
             );
             log(
-                `    mdsp asset-types --mode create --file Pump.assettype.mdsp.json \n\tcreate asset type Pump in MindSphere`
+                `    mdsp asset-types --mode create --file Pump.assettype.mdsp.json \n\tcreate asset type Pump in Insights Hub`
             );
 
             serviceCredentialLog();

@@ -4,6 +4,15 @@ export interface MindSphereCredentials {
     basicAuth: string;
     gateway: string;
     tenant: string;
+    coreTenantId?: string;
+    /**
+     * Xcelerator customer tenant id (OAuth/PIAM identity zone id), used to build the
+     * https://<customerTenantId>.<region>.sws.siemens.com/ auth urls.
+     * This is usually a *different* id than the API `coreTenantId` (the identity zone
+     * and the API system are provisioned/assigned independently) and normally must be
+     * set explicitly.
+     */
+    customerTenantId?: string;
 }
 
 export interface AgentCredentials extends IMindConnectConfiguration {}

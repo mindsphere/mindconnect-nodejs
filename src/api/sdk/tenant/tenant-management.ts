@@ -11,7 +11,9 @@ import { TenantManagementModels } from "./tenant-management-models";
  * @extends {SdkClient}
  */
 export class TenantManagementClient extends SdkClient {
-    private _baseUrl = "/api/tenantmanagement/v4";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("tenantmanagement", "v4");
+    }
 
     /**
      * Get the complete legal information configuration of current tenant

@@ -24,7 +24,9 @@ import { TimeSeriesAggregateModelsV4 } from "./iot-timeseries-aggregate-models-v
  * @extends {SdkClient}
  */
 export class TimeSeriesAggregateClientV4 extends SdkClient {
-    private _baseUrl: string = "/api/iottsaggregates/v4";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("iottsaggregates", "v4");
+    }
 
     /**
      *

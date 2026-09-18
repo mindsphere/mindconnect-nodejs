@@ -292,8 +292,8 @@ export class MindConnectAgent extends AgentAuth {
         const eventManagement = this.Sdk().GetEventManagementClient();
 
         const headers = { ...this._apiHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
-        // const url = `${this._configuration.content.baseUrl}/api/mindconnect/v3/exchange`;
-        const url = `${this._configuration.content.baseUrl}/api/eventmanagement/v3/events`;
+        // const url = `${this.AgentManagementGateway()}${this.ServiceBaseUrl("mindconnect", "v3")}/exchange`;
+        const url = `${this.AgentManagementGateway()}${this.ServiceBaseUrl("eventmanagement", "v3")}/events`;
         log(`GetDataSourceConfiguration Headers ${JSON.stringify(headers)} Url ${url}`);
 
         if (!(event as any).timestamp) {
@@ -345,7 +345,7 @@ export class MindConnectAgent extends AgentAuth {
         }
 
         const headers = { ...this._multipartHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
-        const url = `${this._configuration.content.baseUrl}/api/mindconnect/v3/exchange`;
+        const url = `${this.AgentManagementGateway()}${this.ServiceBaseUrl("mindconnect", "v3")}/exchange`;
 
         log(`GetDataSourceConfiguration Headers ${JSON.stringify(headers)} Url ${url}`);
 
@@ -396,7 +396,7 @@ export class MindConnectAgent extends AgentAuth {
         }
 
         const headers = { ...this._multipartHeaders, Authorization: `Bearer ${this._accessToken.access_token}` };
-        const url = `${this._configuration.content.baseUrl}/api/mindconnect/v3/exchange`;
+        const url = `${this.AgentManagementGateway()}${this.ServiceBaseUrl("mindconnect", "v3")}/exchange`;
 
         log(`GetDataSourceConfiguration Headers ${JSON.stringify(headers)} Url ${url}`);
 
@@ -482,7 +482,7 @@ export class MindConnectAgent extends AgentAuth {
         filePath?: string
     ): Promise<string> {
         const clientId = entityId || this.ClientId();
-        const filepath = filePath || (file instanceof Buffer ? "no-filepath-for-buffer" : path.basename(file));
+        const filepath = filePath || (file instanceof Buffer ? "no-filepath-for-buffer" : path.basename(file as string));
 
         return await this.UploadFile(clientId, filepath, file, {
             type: fileType,

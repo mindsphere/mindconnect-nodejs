@@ -31,9 +31,9 @@ export default (program: Command) => {
         .option("-n, --assetname <assetname>", "assetname")
         .option("-p, --parentid <parentid>", "parentid")
         .option("-e, --externalid <externalid>", "externalid")
-        .option("-i, --assetid <assetid>", "mindsphere asset id ")
+        .option("-i, --assetid <assetid>", "Insights Hub asset id ")
         .option("-t, --typeid <typeid>", "typeid")
-        .option("-d, --desc <desc>", "description", "created with mindsphere CLI")
+        .option("-d, --desc <desc>", "description", "created with Insights Hub CLI")
         .option("-w, --twintype <twintype>", "digital twin type [performance|simulation]")
         .option("-c, --includeshared", "include shared aspect types")
         .option("-k, --passkey <passkey>", "passkey")
@@ -81,15 +81,15 @@ export default (program: Command) => {
         .on("--help", () => {
             log("\n  Examples:\n");
             log(
-                `    mdsp assets --mode create --typeid core.basicarea --assetname MyArea \t creates an asset in mindsphere of type basicarea`
+                `    mdsp assets --mode create --typeid core.basicarea --assetname MyArea \t creates an asset in Insights Hub of type basicarea`
             );
             log(
                 `    mdsp assets --mode create --file MyPump.asset.mdsp.json \t\t creates an asset from specified file template`
             );
-            log(`    mdsp assets --mode list \t\t\t\t\t\t lists all assets in mindsphere`);
-            log(`    mdsp assets --mode list --typeid mclib\t\t\t\t lists all assets in mindsphere of type core.mclib`);
+            log(`    mdsp assets --mode list \t\t\t\t\t\t lists all assets in Insights Hub`);
+            log(`    mdsp assets --mode list --typeid mclib\t\t\t\t lists all assets in Insights Hub of type core.mclib`);
             log(
-                `    mdsp assets --mode delete --assetid 1234567..ef \t\t\t deletes asset with specified id from mindsphere`
+                `    mdsp assets --mode delete --assetid 1234567..ef \t\t\t deletes asset with specified id from Insights Hub`
             );
             log(
                 `    mdsp assets --mode template --typeid <mytenant>.Pump --assetname MyPump \n\t\tcreates a file template MyPump.asset.mdsp.json which can be use in create command`
@@ -175,7 +175,7 @@ function createTemplate(options: any, rootid: string, tenant: string) {
     const asset = {
         name: options.assetname || "unnamed",
         externalId: options.externalid,
-        description: options.desc || "created with mindsphere CLI",
+        description: options.desc || "created with Insights Hub CLI",
         location: {
             country: "Germany",
             region: "Bayern",
@@ -232,10 +232,7 @@ async function createAsset(options: any, rootAssetId: string, sdk: MindSphereSdk
 
     console.log(`Asset with assetid ${color(result.assetId)} was created.`);
     console.log("\nAsset Manager:");
-    console.log(
-        "\t" +
-            color(`${sdk.GetGateway().replace("gateway", sdk.GetTenant() + "-assetmanager")}/entity/${result.assetId!}`)
-    );
+    console.log("\t" + color(sdk.GetAppUrl("assetmanager", `/entity/${result.assetId!}`)));
 }
 
 function buildFilter(options: any) {

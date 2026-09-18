@@ -51,7 +51,7 @@ export default (program: Command) => {
 
                         case "template":
                             await createTemplate(options, sdk);
-                            console.log("Edit the file before submitting it to MindSphere.");
+                            console.log("Edit the file before submitting it to Insights Hub.");
                             break;
                         case "delete":
                             await deleteDeviceType(options, sdk);
@@ -86,7 +86,7 @@ export default (program: Command) => {
                 `    mdsp oe-device-types --mode template --devicetype board \n\tcreate a template file for specified device type`
             );
             log(
-                `    mdsp oe-device-types --mode create --file board.devicetype.mdsp.json \n\tcreate device type board in MindSphere`
+                `    mdsp oe-device-types --mode create --file board.devicetype.mdsp.json \n\tcreate device type board in Insights Hub`
             );
             log(`    mdsp oe-device-types --mode delete --id <devicetype>\t delete the device type with the device id`);
             serviceCredentialLog();
@@ -107,7 +107,7 @@ async function createTemplate(options: any, sdk: MindSphereSdk) {
     const tenant = sdk.GetTenant();
     const templateType = {
         name: `${tenant}.${options.devicetype || "<devicetype>"}`,
-        description: "created by mindsphere CLI",
+        description: "created by Insights Hub CLI",
         owner: `${sdk.GetTenant()}`,
         code: options.code || `${tenant}.${options.devicetype || "<devicetype>"}`,
         assetTypeId: options.assettype || "<your assetid>",
@@ -138,7 +138,7 @@ function writeDeviceTypeToFile(options: any, templateType: any) {
 
 async function deleteDeviceType(options: any, sdk: MindSphereSdk) {
     const id = (options.id! as string) ? options.id : `${options.id}`;
-    // !important! this will not work (no support in mindsphere)
+    // !important! this will not work (no support in Insights Hub)
     // !but we are leaving it here for future
     await sdk.GetDeviceManagementClient().DeleteDeviceType(id);
     console.log(`Device type with id ${color(id)} deleted.`);

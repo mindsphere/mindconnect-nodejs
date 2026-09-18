@@ -629,6 +629,45 @@ export interface OnboardingConfigurationContent {
      * @memberof OnboardingConfigurationContent
      */
     tenant?: string;
+    /**
+     * Xcelerator system id. Present only on onboarding files issued for the new siemens.app scheme;
+     * absent/empty for on-premise installations and legacy mindsphere.io tenants.
+     *
+     * @type {string}
+     * @memberof OnboardingConfigurationContent
+     */
+    systemId?: string;
+    /**
+     * Xcelerator gateway details, as actually issued by the server's boarding configuration
+     * (nested here rather than under the top-level systemId/baseUrl fields). When present,
+     * `fds.baseUrl` is the Xcelerator gateway host and `fds.mntTenant` is the Xcelerator core
+     * tenant id (equivalent in purpose to `systemId`, just delivered under a different key).
+     *
+     * @type {OnboardingConfigurationContentFds}
+     * @memberof OnboardingConfigurationContent
+     */
+    fds?: OnboardingConfigurationContentFds;
+}
+
+/**
+ * @export
+ * @interface OnboardingConfigurationContentFds
+ */
+export interface OnboardingConfigurationContentFds {
+    /**
+     * Xcelerator gateway host (e.g. https://api.eu1.siemens.app).
+     *
+     * @type {string}
+     * @memberof OnboardingConfigurationContentFds
+     */
+    baseUrl?: string;
+    /**
+     * Xcelerator core tenant id.
+     *
+     * @type {string}
+     * @memberof OnboardingConfigurationContentFds
+     */
+    mntTenant?: string;
 }
 
 /**

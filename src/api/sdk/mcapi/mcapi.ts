@@ -12,7 +12,9 @@ import { MindConnectApiModels } from "./mcapi-models";
  * @extends {SdkClient}
  */
 export class MindConnectApiClient extends SdkClient {
-    private _baseUrl: string = "/api/mindconnect/v3";
+    private get _baseUrl(): string {
+        return this.GetServiceBaseUrl("mindconnect", "v3");
+    }
 
     /**
      * * diagnostic
@@ -525,7 +527,7 @@ export class MindConnectApiClient extends SdkClient {
             gateway: this.GetGateway(),
             authorization: await this.GetToken(),
             body: message,
-            baseUrl: `/api/mindconnect/v3/ingest?${toQueryString({ senderId: senderId })}`,
+            baseUrl: `${this._baseUrl}/ingest?${toQueryString({ senderId: senderId })}`,
             rawResponse: true,
         }) as unknown)) as Response;
     }
