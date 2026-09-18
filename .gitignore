@@ -115,3 +115,5 @@ markdown-help/**
 *.mdsp.assetmodel/**
 
 url-migration-review.md
+
+.DS_Store
