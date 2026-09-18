@@ -164,4 +164,8 @@ export abstract class AuthBase extends MindConnectBase implements TokenRotation 
     GetCustomerTenantId(): string {
         return this._customerTenantId || this._coreTenantId;
     }
+
+    GetRawCustomerTenantId(): string {
+        return this._customerTenantId;
+    }
 }

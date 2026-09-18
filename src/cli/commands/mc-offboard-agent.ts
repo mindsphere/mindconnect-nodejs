@@ -63,9 +63,7 @@ export default (program: Command) => {
                     );
 
                     agentConfigLog({
-                        gateway: sdk.GetGateway(),
-                        host: "gateway",
-                        tenant: sdk.GetTenant(),
+                        sdk,
                         agentid,
                         color,
                     });

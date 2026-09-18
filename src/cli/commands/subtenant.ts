@@ -141,14 +141,7 @@ async function subtenantInfo(options: any, sdk: MindSphereSdk) {
     console.log(`ETag: ${subtenant.ETag}`);
     console.log(`EntityId: ${subtenant.entityId}`);
     console.log("Asset Manager:");
-    console.log(
-        "\t" +
-            color(
-                `${sdk
-                    .GetGateway()
-                    .replace("gateway", sdk.GetTenant() + "-assetmanager")}/entity/${subtenant.entityId!}`
-            )
-    );
+    console.log("\t" + color(sdk.GetAppUrl("assetmanager", `/entity/${subtenant.entityId!}`)));
 }
 
 function checkRequiredParamaters(options: any) {

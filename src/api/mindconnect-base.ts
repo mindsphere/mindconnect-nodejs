@@ -59,6 +59,19 @@ export interface TokenRotation {
      */
     GetCoreTenantId?(): string;
 
+    /**
+     * returns the currently configured Xcelerator customer tenant id (the OAuth/PIAM identity
+     * zone id), with no fallback to the core tenant id - "" if not explicitly configured (unlike
+     * auth-base's own GetCustomerTenantId(), which falls back to the core tenant id for PIAM URL
+     * purposes). Used to build <customerTenantId>-<appName>-<coreTenantId>.<region>.siemens.app
+     * app links, which need the two distinct ids and must not be built with a wrong guess.
+     *
+     * @returns {string}
+     *
+     * @memberOf TokenRotation
+     */
+    GetRawCustomerTenantId?(): string;
+
     HttpAction({
         verb,
         gateway,

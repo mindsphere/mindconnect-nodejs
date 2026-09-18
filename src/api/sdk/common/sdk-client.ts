@@ -39,6 +39,62 @@ export abstract class SdkClient {
     }
 
     /**
+     * Returns the currently configured Xcelerator customer tenant id (OAuth/PIAM identity zone
+     * id), with no fallback to the core tenant id - "" if not explicitly configured. Used
+     * (together with GetCoreTenantId()) to build the
+     * <customerTenantId>-<appName>-<coreTenantId>.<region>.siemens.app application links (Asset
+     * Manager, Operations Insight, ...); building those links with a wrong guess would be worse
+     * than not showing them, so no fallback is used here.
+     *
+     * @memberOf SdkClient
+     */
+    public GetCustomerTenantId(): string {
+        const authenticator = this._authenticator as Partial<TokenRotation>;
+        return typeof authenticator.GetRawCustomerTenantId === "function"
+            ? authenticator.GetRawCustomerTenantId()
+            : "";
+    }
+
+    /**
+     * Builds the URL of a tenant-specific Xcelerator/MindSphere application (Asset Manager,
+     * Operations Insight, ...) for a given entity path, e.g. GetAppUrl("assetmanager",
+     * `/entity/${assetId}`).
+     *
+     * On Xcelerator tenants (coreTenantId + customerTenantId both configured) this builds
+     * https://<customerTenantId>-<appName>-<coreTenantId>.<region>.siemens.app<path> - the
+     * gateway host (api.<region>.siemens.app) itself does not serve these UI applications, so the
+     * legacy gateway.replace("gateway", ...) trick (which only worked for the old
+     * gateway.<tenant>.<region>.mindsphere.io hosts) is not applicable here and would silently
+     * produce a broken link (https://api.<region>.siemens.app<path>, with no app subdomain at
+     * all) since there is no "gateway" substring in api.<region>.siemens.app to replace.
+     *
+     * Returns "" (instead of a guessed/broken link) when the Xcelerator region can't be
+     * determined, or a coreTenantId is configured but no customerTenantId is - since both ids are
+     * required and are normally *different* values, so guessing one from the other would produce
+     * a wrong link.
+     *
+     * Falls back to the legacy gateway.replace("gateway", `${tenant}-${appName}`) behavior,
+     * unchanged, when no coreTenantId is configured at all (on-premise installations, legacy
+     * mindsphere.io tenants).
+     *
+     * @memberOf SdkClient
+     */
+    public GetAppUrl(appName: string, path: string, legacyReplaceToken: string = "gateway"): string {
+        const coreTenantId = this.GetCoreTenantId();
+        if (!coreTenantId) {
+            return `${this.GetGateway().replace(legacyReplaceToken, `${this.GetTenant()}-${appName}`)}${path}`;
+        }
+
+        const customerTenantId = this.GetCustomerTenantId();
+        const xceleratorRegion = this.GetGateway().match(/^https?:\/\/api\.([^./]+)\.siemens\.app/i);
+        if (!customerTenantId || !xceleratorRegion) {
+            return "";
+        }
+
+        return `https://${customerTenantId}-${appName}-${coreTenantId}.${xceleratorRegion[1]}.siemens.app${path}`;
+    }
+
+    /**
      * Builds the base url for a MindSphere/Insights Hub service.
      *
      * When a coreTenantId is configured, the new Xcelerator scheme is used:

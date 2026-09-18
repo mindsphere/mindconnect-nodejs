@@ -54,9 +54,7 @@ export default (program: Command) => {
                     fs.writeFileSync(options.config, JSON.stringify(bc));
 
                     agentConfigLog({
-                        gateway: sdk.GetGateway(),
-                        host: "gateway",
-                        tenant: sdk.GetTenant(),
+                        sdk,
                         agentid,
                         color,
                     });

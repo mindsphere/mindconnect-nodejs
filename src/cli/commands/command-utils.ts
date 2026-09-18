@@ -228,24 +228,20 @@ export function getSdk(options: any) {
 }
 
 export function agentConfigLog({
-    gateway,
-    host,
-    tenant,
+    sdk,
     agentid,
     color,
+    legacyReplaceToken = "gateway",
 }: {
-    gateway: string;
-    host: string;
-    tenant: string;
+    sdk: MindSphereSdk;
     agentid: string | undefined;
     color: Function;
+    legacyReplaceToken?: string;
 }) {
     console.log("\nConfigure your agent at:\n");
     console.log(
         "\t" +
-            color(
-                `${gateway.replace(host, tenant + "-assetmanager")}/entity/${agentid}/plugin/uipluginassetmanagermclib`
-            ) +
+            color(sdk.GetAppUrl("assetmanager", `/entity/${agentid}/plugin/uipluginassetmanagermclib`, legacyReplaceToken)) +
             "\n"
     );
 }

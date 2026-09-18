@@ -90,25 +90,11 @@ export default (program: Command) => {
                     console.table(files.slice(0, 10), ["name", "path", "type", "timestamp"]);
 
                     console.log("\nAsset Manager:");
-                    console.log(
-                        "\t" +
-                            color(
-                                `${sdk
-                                    .GetGateway()
-                                    .replace("gateway", sdk.GetTenant() + "-assetmanager")}/entity/${asset.assetId!}`
-                            )
-                    );
+                    console.log("\t" + color(sdk.GetAppUrl("assetmanager", `/entity/${asset.assetId!}`)));
                     console.log("\nOperations Insight:");
                     console.log(
                         "\t" +
-                            color(
-                                `${sdk
-                                    .GetGateway()
-                                    .replace(
-                                        "gateway",
-                                        sdk.GetTenant() + "-operationsinsight"
-                                    )}/explore-assets/info?asset=${asset.assetId!}`
-                            )
+                            color(sdk.GetAppUrl("operationsinsight", `/explore-assets/info?asset=${asset.assetId!}`))
                     );
                 } catch (err) {
                     errorLog(err, options.verbose);

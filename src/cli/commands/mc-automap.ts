@@ -82,11 +82,10 @@ export default (program: Command) => {
                     options.mode !== "test" && (await print(sdk, agentid, color, options));
 
                     agentConfigLog({
-                        gateway: sdk.GetGateway(),
-                        host: options.passkey ? "gateway" : "southgate",
-                        tenant: sdk.GetTenant(),
+                        sdk,
                         agentid: agentid,
                         color: color,
+                        legacyReplaceToken: options.passkey ? "gateway" : "southgate",
                     });
                 } catch (err) {
                     errorLog(err, options.verbose);

@@ -94,9 +94,7 @@ export default (program: Command) => {
                         console.log("\t" + color(`openssl genrsa -out ${options.config}.key 3072`));
                     }
                     agentConfigLog({
-                        gateway: sdk.GetGateway(),
-                        host: "gateway",
-                        tenant: sdk.GetTenant(),
+                        sdk,
                         agentid: `${createdAgent.id}`,
                         color,
                     });

@@ -232,10 +232,7 @@ async function createAsset(options: any, rootAssetId: string, sdk: MindSphereSdk
 
     console.log(`Asset with assetid ${color(result.assetId)} was created.`);
     console.log("\nAsset Manager:");
-    console.log(
-        "\t" +
-            color(`${sdk.GetGateway().replace("gateway", sdk.GetTenant() + "-assetmanager")}/entity/${result.assetId!}`)
-    );
+    console.log("\t" + color(sdk.GetAppUrl("assetmanager", `/entity/${result.assetId!}`)));
 }
 
 function buildFilter(options: any) {
